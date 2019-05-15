@@ -18,15 +18,17 @@
 #define MAP_SIZE_X	(10)				// マップの横サイズ
 #define MAP_SIZE_Y	(10)				// マップの縦サイズ
 
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class Map
 {
 private:
-	string line;						// 文字列を一時的に保存
-	int maptbl[MAP_SIZE_Y][MAP_SIZE_X];	// マップ用の配列
-	const string delim = ",";			// データ区切り用の文字
+	string					line;							// 文字列を一時的に保存
+	int						maptbl[MAP_SIZE_Y][MAP_SIZE_X];	// マップ用の配列
+	const string			delim = ",";					// データ区切り用の文字
+
 
 public:
 	Map();
