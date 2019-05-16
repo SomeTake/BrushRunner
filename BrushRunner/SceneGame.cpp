@@ -7,17 +7,19 @@
 #include "Main.h"
 #include "SceneGame.h"
 #include "Map.h"
+#include "Camera.h"
 
-Map *pMap;
+// オブジェクトのポインタ
+MAP *pMap;
 
 //=============================================================================
 // 初期化
 //=============================================================================
 HRESULT InitSceneGame()
 {
-	return S_OK;
+	pMap = new MAP();
 
-	pMap = new Map();
+	return S_OK;
 }
 
 //=============================================================================
@@ -33,6 +35,8 @@ void UninitSceneGame()
 //=============================================================================
 void UpdateSceneGame()
 {
+	UpdateCamera();
+
 	pMap->Update();
 }
 
