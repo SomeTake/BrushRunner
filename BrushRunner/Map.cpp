@@ -20,7 +20,7 @@ MAP::MAP()
 	ReadCsv(MAP_FILE);
 
 	// 位置・回転・スケールの初期設定
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pos = D3DXVECTOR3(0.0f, 50.0f, 0.0f);
 	rot = D3DXVECTOR3(90.0f, 0.0f, 0.0f);	// 縦に向ける
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 

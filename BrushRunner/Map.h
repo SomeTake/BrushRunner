@@ -20,7 +20,7 @@
 #define MAP_FILE		("data.csv")				// 読み込むマップデータ
 #define MAP_SIZE_X		(10)						// マップの横の枚数
 #define MAP_SIZE_Y		(10)						// マップの縦の枚数
-#define CHIP_SIZE		(10.0f)						// マップチップ一枚のサイズ
+#define CHIP_SIZE		(40.0f)						// マップチップ一枚のサイズ
 
 // マップチップの種類
 enum {
