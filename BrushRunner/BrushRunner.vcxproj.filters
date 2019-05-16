@@ -60,18 +60,6 @@
     <ClCompile Include="Faceframe.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
-    <ClCompile Include="inklinered.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="inklineblack.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="inklineyellow.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="inklinegreen.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
     <ClCompile Include="colorinkline.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
@@ -105,18 +93,6 @@
       <Filter>ヘッダー ファイル\2d</Filter>
     </ClInclude>
     <ClInclude Include="Faceframe.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="inklinered.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="inklineblack.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="inklinegreen.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="inklineyellow.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
     <ClInclude Include="colorinkline.h">

@@ -14,7 +14,6 @@
 #include "Faceframe.h"
 #include "blackinkline.h"
 #include "colorinkline.h"
-#include "inklinered.h"
 enum
 {
 	NumFrame01,

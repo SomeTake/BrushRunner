@@ -134,10 +134,6 @@
     <ClCompile Include="colorinkline.cpp" />
     <ClCompile Include="Faceframe.cpp" />
     <ClCompile Include="Frame01.cpp" />
-    <ClCompile Include="inklineblack.cpp" />
-    <ClCompile Include="inklinegreen.cpp" />
-    <ClCompile Include="inklinered.cpp" />
-    <ClCompile Include="inklineyellow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
@@ -151,10 +147,6 @@
     <ClInclude Include="colorinkline.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="Frame01.h" />
-    <ClInclude Include="inklineblack.h" />
-    <ClInclude Include="inklinegreen.h" />
-    <ClInclude Include="inklinered.h" />
-    <ClInclude Include="inklineyellow.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
