@@ -11,6 +11,7 @@
 #include "SceneResult.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Input.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
@@ -316,6 +317,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
 #endif
+	InitInput(hInstance,hWnd);
+
 	InitCamera();
 	InitLight();
 
@@ -351,6 +354,7 @@ void Uninit(void)
 		g_pD3D->Release();
 		g_pD3D = NULL;
 	}
+	UninitInput();
 
 	UninitSceneTitle();
 	UninitSceneCharacterSelect();
@@ -367,6 +371,7 @@ void Update(void)
 #ifdef _DEBUG
 
 #endif
+	UpdateInput();
 
 	switch (eScene)
 	{

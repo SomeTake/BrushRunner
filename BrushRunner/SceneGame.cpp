@@ -8,9 +8,11 @@
 #include "SceneGame.h"
 #include "Map.h"
 #include "Camera.h"
+#include "Player.h"
 
 // オブジェクトのポインタ
 MAP *pMap;
+PLAYER *pPlayer;
 
 //=============================================================================
 // 初期化
@@ -18,6 +20,8 @@ MAP *pMap;
 HRESULT InitSceneGame()
 {
 	pMap = new MAP();
+
+	pPlayer = new PLAYER();
 
 	return S_OK;
 }
@@ -28,6 +32,8 @@ HRESULT InitSceneGame()
 void UninitSceneGame()
 {
 	delete pMap;
+
+	delete pPlayer;
 }
 
 //=============================================================================
@@ -38,6 +44,8 @@ void UpdateSceneGame()
 	UpdateCamera();
 
 	pMap->Update();
+
+	pPlayer->Update();
 }
 
 //=============================================================================
@@ -46,4 +54,6 @@ void UpdateSceneGame()
 void DrawSceneGame()
 {
 	pMap->Draw();
+
+	pPlayer->Draw();
 }
