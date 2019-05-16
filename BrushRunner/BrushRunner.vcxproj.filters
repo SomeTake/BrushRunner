@@ -13,6 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\2d">
+      <UniqueIdentifier>{18559280-5db7-45f5-bbfa-0761f42d29e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\2d">
+      <UniqueIdentifier>{56b584bc-ccf2-45ce-98f7-06b021bdb16c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\2d\title">
+      <UniqueIdentifier>{40d443f3-67c0-4f9e-9034-66b8c7b7e57c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\2d\title">
+      <UniqueIdentifier>{34aff239-5f37-4323-a4bf-d10072cace28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\2d\game">
+      <UniqueIdentifier>{df87afa6-efbc-4be1-b2e5-86f6147ff311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\2d\game">
+      <UniqueIdentifier>{36fd2dde-1d33-4fb3-91fc-a02b2ad7d31e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -33,6 +51,33 @@
     <ClCompile Include="Map.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Frame01.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="_2dobj.cpp">
+      <Filter>ソース ファイル\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Faceframe.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="inklinered.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="inklineblack.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="inklineyellow.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="inklinegreen.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="colorinkline.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="blackinkline.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -52,6 +97,33 @@
     </ClInclude>
     <ClInclude Include="Map.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Frame01.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="_2dobj.h">
+      <Filter>ヘッダー ファイル\2d</Filter>
+    </ClInclude>
+    <ClInclude Include="Faceframe.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="inklinered.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="inklineblack.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="inklinegreen.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="inklineyellow.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="colorinkline.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="blackinkline.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

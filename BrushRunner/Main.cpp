@@ -9,7 +9,6 @@
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
 #include "SceneResult.h"
-
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -116,7 +115,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	D3DXMATRIX mat;
 	D3DXMatrixIdentity(&mat);
 	g_pD3DDevice->SetTransform(D3DTS_WORLD, &mat);
-
 
 	// --------------------------------------  メッセージループ---------------------------------------------
 	while (1)

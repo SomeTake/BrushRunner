@@ -79,6 +79,10 @@
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -126,20 +130,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="blackinkline.cpp" />
+    <ClCompile Include="colorinkline.cpp" />
+    <ClCompile Include="Faceframe.cpp" />
+    <ClCompile Include="Frame01.cpp" />
+    <ClCompile Include="inklineblack.cpp" />
+    <ClCompile Include="inklinegreen.cpp" />
+    <ClCompile Include="inklinered.cpp" />
+    <ClCompile Include="inklineyellow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="blackinkline.h" />
+    <ClInclude Include="colorinkline.h" />
+    <ClInclude Include="Faceframe.h" />
+    <ClInclude Include="Frame01.h" />
+    <ClInclude Include="inklineblack.h" />
+    <ClInclude Include="inklinegreen.h" />
+    <ClInclude Include="inklinered.h" />
+    <ClInclude Include="inklineyellow.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
