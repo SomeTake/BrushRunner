@@ -7,6 +7,8 @@
 #include "Main.h"
 #include "SceneGame.h"
 #include "Map.h"
+#include "Camera.h"
+#include "Player.h"
 
 //2d obje
 #include "_2dobj.h"
@@ -50,8 +52,10 @@ enum
 };
 
 
-Map *pMap;
 static _2dobj *p2dobj[_2dMax];			// 2Dオブジェクト用のポインタ
+// オブジェクトのポインタ
+MAP *pMap;
+PLAYER *pPlayer;
 
 //=============================================================================
 // 初期化
@@ -91,19 +95,11 @@ HRESULT InitSceneGame()
 	p2dobj[NumInklineblackframe04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_BLACKINKFRAME);
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	return S_OK;
+	pMap = new MAP();
 
+	pPlayer = new PLAYER();
+
+	return S_OK;
 }
 
 //=============================================================================
@@ -119,6 +115,7 @@ void UninitSceneGame()
 		delete p2dobj[i];
 	}
 
+	delete pPlayer;
 }
 
 //=============================================================================
@@ -132,8 +129,11 @@ void UpdateSceneGame()
 	{
 		p2dobj[i]->Update();
 	}
+	UpdateCamera();
 
 	pMap->Update();
+
+	pPlayer->Update();
 }
 
 //=============================================================================
@@ -149,4 +149,6 @@ void DrawSceneGame()
 	}
 
 	pMap->Draw();
+
+	pPlayer->Draw();
 }
