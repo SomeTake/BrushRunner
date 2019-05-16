@@ -13,24 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ヘッダー ファイル\GameScene">
+      <UniqueIdentifier>{6b54e0c6-6b3e-4aff-96aa-7da386d9e8c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\GameScene">
+      <UniqueIdentifier>{1591d19f-e66a-471b-85b7-6fc313a1ec00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="SceneCharacterSelect.cpp">
+    <ClCompile Include="Map.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneCharacterSelect.cpp">
+      <Filter>ソース ファイル\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="SceneGame.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="SceneResult.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="SceneTitle.cpp">
+      <Filter>ソース ファイル\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
+    <ClCompile Include="Camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,19 +50,25 @@
     <ClInclude Include="Main.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="SceneCharacterSelect.h">
+    <ClInclude Include="Map.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneCharacterSelect.h">
+      <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="SceneGame.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="SceneResult.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="SceneTitle.h">
+      <Filter>ヘッダー ファイル\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
+    <ClInclude Include="Camera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

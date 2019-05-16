@@ -9,6 +9,8 @@
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
 #include "SceneResult.h"
+#include "Camera.h"
+#include "Light.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -314,6 +316,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
 #endif
+	InitCamera();
+	InitLight();
 
 	InitSceneTitle();
 	InitSceneCharacterSelect();
@@ -395,6 +399,7 @@ void Draw(void)
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{
+		SetCamera();
 
 #ifdef _DEBUG
 		// FPS表示
