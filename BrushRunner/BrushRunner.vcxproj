@@ -130,12 +130,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="blackinkline.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="colorinkline.cpp" />
+    <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="Faceframe.cpp" />
     <ClCompile Include="Frame01.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
@@ -143,12 +149,18 @@
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="blackinkline.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="colorinkline.h" />
+    <ClInclude Include="D3DXAnimation.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="Frame01.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />

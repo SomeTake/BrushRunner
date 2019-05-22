@@ -63,7 +63,7 @@ PLAYER *pPlayer;
 HRESULT InitSceneGame()
 {
 
-	pMap = new Map();
+	pMap = new MAP();
 	p2dobj[NumFrame01] = new Frame01();
 
 
