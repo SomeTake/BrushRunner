@@ -11,6 +11,7 @@
 #include "SceneResult.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Input.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -118,7 +119,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	D3DXMATRIX mat;
 	D3DXMatrixIdentity(&mat);
 	g_pD3DDevice->SetTransform(D3DTS_WORLD, &mat);
-
 
 	// --------------------------------------  メッセージループ---------------------------------------------
 	while (1)
@@ -316,6 +316,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
 #endif
+	InitInput(hInstance,hWnd);
+
 	InitCamera();
 	InitLight();
 
@@ -351,6 +353,7 @@ void Uninit(void)
 		g_pD3D->Release();
 		g_pD3D = NULL;
 	}
+	UninitInput();
 
 	UninitSceneTitle();
 	UninitSceneCharacterSelect();
@@ -367,6 +370,7 @@ void Update(void)
 #ifdef _DEBUG
 
 #endif
+	UpdateInput();
 
 	switch (eScene)
 	{
