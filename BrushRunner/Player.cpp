@@ -6,19 +6,16 @@
 //=============================================================================
 #include "Main.h"
 #include "Player.h"
+#include "Debugproc.h"
+#include "Input.h"
+#include "Gravity.h"
 
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-PLAYER::PLAYER()
+PLAYER::PLAYER(int _CtrlNum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// 位置・回転・スケールの初期設定
-	pos = PLAYER_FIRST_POS;
-	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	//オブジェクトの初期化
 	Animation = CreateAnimationObject();
@@ -77,6 +74,20 @@ PLAYER::PLAYER()
 		Animation->SetShiftTime(Animation, i, Data[i].ShiftTime);
 	}
 
+	// 位置・回転・スケールの初期設定
+	pos = PLAYER_FIRST_POS;
+	rot = PLAYER_FIRST_ROT;
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	jumpFlag = false;
+	jumpSpeed = 0;
+	ctrlNum = _CtrlNum;
+
+	for (int i = 0; i < InkNum; i++)
+	{
+		inkValue[i] = INK_MAX;
+	}
+
 }
 
 //=====================================================================================================
@@ -84,6 +95,9 @@ PLAYER::PLAYER()
 //=====================================================================================================
 PLAYER::~PLAYER()
 {
+	// アニメーションをリリース
+	Animation->UninitAnimation(Animation);
+
 }
 
 //=====================================================================================================
@@ -93,6 +107,38 @@ void PLAYER::Update()
 {
 	// アニメーションを更新
 	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
+
+	// ジャンプ
+	if (GetKeyboardTrigger(DIK_UP))
+	{
+		jumpFlag = true;
+		jumpSpeed = JUMP_SPEED;
+	}
+
+	// ジャンプ中または落下中は重力が加わる
+	if (jumpFlag)
+	{
+		pos.y += jumpSpeed;
+		if (jumpSpeed > 0)
+		{
+			jumpSpeed -= STANDARD_GRAVITY;
+		}
+	}
+
+	pos.x += MOVE_SPEED;
+
+	//// 移動処理
+	//pos.x += move.x;
+	//pos.y += move.y;
+	//pos.z += move.z;
+
+	//// 移動量に慣性をかける
+	//move.x += (0.0f - move.x) * RATE_MOVE_PLAYER;
+	//move.y += (0.0f - move.y) * RATE_MOVE_PLAYER;
+	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
+
+	PrintDebugProc("PLAYER POS X:%f, Y:%f, Z:%f\n", pos.x, pos.y, pos.z);
+	PrintDebugProc("PLAYER MOVE X:%f, Y:%f, Z:%f\n", move.x, move.y, move.z);
 }
 
 //=====================================================================================================

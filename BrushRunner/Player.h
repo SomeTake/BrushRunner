@@ -12,9 +12,15 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	CHARA_XFILE		"data/MODEL/Boy.x"				// 読み込むモデル名(ファイルパス名)
-
-#define PLAYER_FIRST_POS	D3DXVECTOR3(0.0f, 0.0f, 0.0f)
+#define	CHARA_XFILE			"data/MODEL/Boy.x"							// 読み込むモデル名(ファイルパス名)
+#define PLAYER_MAX			(4)											// 操作するプレイヤーの数
+#define PLAYER_FIRST_POS	D3DXVECTOR3(20.0f, -40.0f, 0.0f)			// 初期位置
+#define PLAYER_FIRST_ROT	D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
+#define JUMP_SPEED			(30.0f)										// ジャンプの初速
+#define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
+#define INK_MAX				(100)										// インクの最大量
+#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
+#define MOVE_SPEED			(1.0f)										// 動くスピード
 
 // キャラクターのアニメーション番号
 static const char* CharaStateAnim[] =
@@ -104,22 +110,47 @@ static BATTLEDATA Data[AnimMax] = {
 { 0, 1.0f, 0.1f, 0, 0 },		// Throwpose
 };
 
+// インクの種類
+enum InkType {
+	ColorInk,
+	BlackInk,
+
+	// インクの最大数
+	InkNum,
+};
+
+//*****************************************************************************
+// クラス定義
+//*****************************************************************************
 class PLAYER
 {
 private:
 	// メンバ変数
-	D3DXANIMATION * Animation;			// アニメーション構造体
+	D3DXANIMATION * Animation;				// アニメーション構造体
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			move;				// モデルの移動量
 	D3DXVECTOR3			rot;				// 現在の向き
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
+	bool				jumpFlag;			// ジャンプフラグ
+	float				jumpSpeed;			// ジャンプスピード
+	int					ctrlNum;			// 操作するコントローラ番号
+	int					inkValue[InkNum];	// インクの残量
 
 public:
-	PLAYER();
+	PLAYER(int _CtrlNum);
 	~PLAYER();
 	void Update();
 	void Draw();
 
+	// ゲッター
+	D3DXVECTOR3	GetPos() { return pos; };
+	D3DXVECTOR3 GetMove() { return move; };
+	bool GetJumpFlag() { return jumpFlag; };
+
+	// セッター
+	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
+	void SetMove(D3DXVECTOR3 _move) { move = _move; };
+	void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
 };
 
 #endif

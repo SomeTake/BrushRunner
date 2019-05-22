@@ -31,11 +31,14 @@
     <Filter Include="ヘッダー ファイル\System">
       <UniqueIdentifier>{37c027fe-faf8-471d-891c-6f11a5f00337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Obj3D">
+      <UniqueIdentifier>{07c0aef6-811a-4233-9e0d-b041e5730f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Obj3D">
+      <UniqueIdentifier>{b13e5d86-a417-445f-a411-b49bd5c9f9b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Map.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="SceneCharacterSelect.cpp">
       <Filter>ソース ファイル\GameScene</Filter>
     </ClCompile>
@@ -69,11 +72,20 @@
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
+    <ClCompile Include="Debugproc.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Gravity.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Map.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="SceneCharacterSelect.h">
       <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
@@ -106,6 +118,18 @@
     </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugproc.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Gravity.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

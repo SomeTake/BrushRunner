@@ -6,13 +6,16 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
+#include "Debugproc.h"
 #include "Map.h"
 #include "Camera.h"
 #include "Player.h"
+#include "Collision.h"
+#include "Gravity.h"
 
 // オブジェクトのポインタ
 MAP *pMap;
-PLAYER *pPlayer;
+PLAYER *pPlayer[PLAYER_MAX];
 
 //=============================================================================
 // 初期化
@@ -21,7 +24,11 @@ HRESULT InitSceneGame()
 {
 	pMap = new MAP();
 
-	pPlayer = new PLAYER();
+
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i] = new PLAYER(i);
+	}
 
 	return S_OK;
 }
@@ -33,7 +40,10 @@ void UninitSceneGame()
 {
 	delete pMap;
 
-	delete pPlayer;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		delete pPlayer[i];
+	}
 }
 
 //=============================================================================
@@ -45,7 +55,26 @@ void UpdateSceneGame()
 
 	pMap->Update();
 
-	pPlayer->Update();
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Update();
+
+		// 地面に接しているか確認
+		if (HitCheckPToM(pPlayer[i], pMap))
+		{
+			pPlayer[i]->SetJumpFlag(false);
+		}
+		// 地面に接していないので、落下する
+		else
+		{
+			GravityFall(pPlayer[i]);
+		}
+	}
+
+	// デバッグ表示
+#ifndef _DEBUG_
+
+#endif
 }
 
 //=============================================================================
@@ -55,5 +84,8 @@ void DrawSceneGame()
 {
 	pMap->Draw();
 
-	pPlayer->Draw();
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Draw();
+	}
 }

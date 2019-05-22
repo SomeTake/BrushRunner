@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Input.h"
+#include "Debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -316,6 +317,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
+	InitDebugProc();
+
 #endif
 	InitInput(hInstance,hWnd);
 
@@ -342,6 +345,7 @@ void Uninit(void)
 		g_pD3DXFont = NULL;
 	}
 
+	UninitDebugProc();
 #endif
 	if (g_pD3DDevice != NULL)
 	{// デバイスの開放
@@ -410,6 +414,8 @@ void Draw(void)
 		// FPS表示
 		DrawFPS();
 
+		DrawDebugProc();
+
 #endif
 		switch (eScene)
 		{
@@ -452,7 +458,7 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 //=============================================================================
 void DrawFPS(void)
 {
-
+	PrintDebugProc("FPS:%d\n", g_nCountFPS);
 }
 #endif
 
