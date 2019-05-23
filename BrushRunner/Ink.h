@@ -14,19 +14,19 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define INK_SIZE	D3DXVECTOR2(300.0f, 100.0f)	// 表示サイズ
+#define INK_SIZE	D3DXVECTOR2(135.0f, 30.0f)	// 表示サイズ
 
-#define INKLINEBLUE_POS     D3DXVECTOR3(0.0f, 0.0f, 0.0f)
-#define INKLINERED_POS      D3DXVECTOR3(318.0f, 0.0f, 0.0f)
-#define INKLINEYELLOW_POS   D3DXVECTOR3(636.0f, 0.0f, 0.0f)
-#define INKLINEGREEN_POS    D3DXVECTOR3(954.0f, 0.0f, 0.0f)
+#define INKLINEBLUE_POS     D3DXVECTOR3(60.0f, 25.0f, 0.0f)
+#define INKLINERED_POS      D3DXVECTOR3(378.0f, 25.0f, 0.0f)
+#define INKLINEYELLOW_POS   D3DXVECTOR3(696.0f, 25.0f, 0.0f)
+#define INKLINEGREEN_POS    D3DXVECTOR3(1014.0f, 25.0f, 0.0f)
 
-#define INKLINEBLACK_POS01  D3DXVECTOR3(0.0f, 0.0f, 0.0f)
-#define INKLINEBLACK_POS02  D3DXVECTOR3(318.0f, 0.0f, 0.0f)
-#define INKLINEBLACK_POS03  D3DXVECTOR3(636.0f, 0.0f, 0.0f)
-#define INKLINEBLACK_POS04  D3DXVECTOR3(954.0f, 0.0f, 0.0f)
+#define INKLINEBLACK_POS01  D3DXVECTOR3(60.0f, 35.0f, 0.0f)
+#define INKLINEBLACK_POS02  D3DXVECTOR3(378.0f, 35.0f, 0.0f)
+#define INKLINEBLACK_POS03  D3DXVECTOR3(696.0f, 35.0f, 0.0f)
+#define INKLINEBLACK_POS04  D3DXVECTOR3(1014.0f, 35.0f, 0.0f)
 
-#define DISPLACE	(90.0f)		// 斜めにずらす角度
+#define DISPLACE	(20.0f)		// 斜めにずらす角度
 
 //*****************************************************************************
 // クラス定義
