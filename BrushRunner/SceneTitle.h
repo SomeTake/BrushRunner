@@ -12,7 +12,7 @@
 //*****************************************************************************
 HRESULT InitSceneTitle();
 void UninitSceneTitle();
-void UpdateSceneTitle();
+int UpdateSceneTitle();
 void DrawSceneTitle();
 
 #endif
