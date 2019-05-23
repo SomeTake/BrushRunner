@@ -146,11 +146,13 @@ public:
 	D3DXVECTOR3	GetPos() { return pos; };
 	D3DXVECTOR3 GetMove() { return move; };
 	bool GetJumpFlag() { return jumpFlag; };
+	int GetInkValue(int _InkNum) { return inkValue[_InkNum]; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
 	void SetMove(D3DXVECTOR3 _move) { move = _move; };
 	void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
+	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
 };
 
 #endif

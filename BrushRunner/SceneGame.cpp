@@ -65,46 +65,48 @@ PLAYER *pPlayer[PLAYER_MAX];
 //=============================================================================
 HRESULT InitSceneGame()
 {
+	// プレイヤーの初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i] = new PLAYER(i);
+	}
 
+	// マップの初期化
 	pMap = new MAP();
+
+	// 2DUIの初期化
+	// フレーム
 	p2dobj[NumFrame01] = new Frame01();
 
-
+	// カラーインクの初期化
 	p2dobj[NumInklineblue] = new Colorinkline(INKLINEBLUE_POS, TEXTURE_INKLINEBLUE);
 	p2dobj[NumInklinered] = new Colorinkline(INKLINERED_POS, TEXTURE_INKLINERED);
 	p2dobj[NumInklineyellow] = new Colorinkline(INKLINEYELLOW_POS, TEXTURE_INKLINEYELLOW);
 	p2dobj[NumInklinegreen] = new Colorinkline(INKLINEGREEN_POS, TEXTURE_INKLINEGREEN);
 
+	// カラーインク用フレームの初期化
 	p2dobj[NumColorinkline01] = new Colorinkline(COLORINKFRAME_POS01, TEXTURE_COLORINKFRAME);
 	p2dobj[NumColorinkline02] = new Colorinkline(COLORINKFRAME_POS02, TEXTURE_COLORINKFRAME);
 	p2dobj[NumColorinkline03] = new Colorinkline(COLORINKFRAME_POS03, TEXTURE_COLORINKFRAME);
 	p2dobj[NumColorinkline04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_COLORINKFRAME);
 
-
+	// 顔を表示するフレームの初期化
 	p2dobj[NumFaceframe01] = new Faceframe(FACEFRAME_POS01);
 	p2dobj[NumFaceframe02] = new Faceframe(FACEFRAME_POS02);
 	p2dobj[NumFaceframe03] = new Faceframe(FACEFRAME_POS03);
 	p2dobj[NumFaceframe04] = new Faceframe(FACEFRAME_POS04);
 
-
+	// 黒インクの初期化
 	p2dobj[NumInklineblack01] = new Colorinkline(INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK);
 	p2dobj[NumInklineblack02] = new Colorinkline(INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK);
 	p2dobj[NumInklineblack03] = new Colorinkline(INKLINEBLACK_POS03, TEXTURE_INKLINEBLACK);
 	p2dobj[NumInklineblack04] = new Colorinkline(INKLINEBLACK_POS04, TEXTURE_INKLINEBLACK);
 	
+	// 黒インク用フレームの初期化
 	p2dobj[NumInklineblackframe01] = new Colorinkline(COLORINKFRAME_POS01, TEXTURE_BLACKINKFRAME);
 	p2dobj[NumInklineblackframe02] = new Colorinkline(COLORINKFRAME_POS02, TEXTURE_BLACKINKFRAME);
 	p2dobj[NumInklineblackframe03] = new Colorinkline(COLORINKFRAME_POS03, TEXTURE_BLACKINKFRAME);
 	p2dobj[NumInklineblackframe04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_BLACKINKFRAME);
-
-	
-	pMap = new MAP();
-
-
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPlayer[i] = new PLAYER(i);
-	}
 
 	return S_OK;
 }

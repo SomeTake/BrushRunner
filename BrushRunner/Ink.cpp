@@ -1,16 +1,7 @@
-//=============================================================================
-//
-// バトル画面フレーム表示処理 [Colorinkline.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
-//
-//=============================================================================
 #include "Main.h"
-#include "Colorinkline.h"
+#include "Ink.h"
 
-//=============================================================================
-// コンストラクタ
-//=============================================================================
-Colorinkline::Colorinkline(D3DXVECTOR3 _pos, const char *texno)
+INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -24,17 +15,15 @@ Colorinkline::Colorinkline(D3DXVECTOR3 _pos, const char *texno)
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
+	pPlayer = pP;
 
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
-
 }
 
-//=============================================================================
-// デストラクタ
-//=============================================================================
-Colorinkline::~Colorinkline()
+
+INK::~INK()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -43,10 +32,7 @@ Colorinkline::~Colorinkline()
 	}
 }
 
-//=============================================================================
-// 更新処理
-//=============================================================================
-void Colorinkline::Update()
+void INK::Update()
 {
 	if (use == true)
 	{
@@ -58,10 +44,7 @@ void Colorinkline::Update()
 	SetVertex();
 }
 
-//=============================================================================
-// 描画処理
-//=============================================================================
-void Colorinkline::Draw()
+void INK::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -77,13 +60,9 @@ void Colorinkline::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
 	}
-
 }
 
-//=============================================================================
-// 頂点の作成
-//=============================================================================
-HRESULT Colorinkline::MakeVertex(void)
+HRESULT INK::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -111,10 +90,7 @@ HRESULT Colorinkline::MakeVertex(void)
 	return S_OK;
 }
 
-//=============================================================================
-// テクスチャ座標の設定
-//=============================================================================
-void Colorinkline::SetTexture(int cntPattern)
+void INK::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -128,14 +104,13 @@ void Colorinkline::SetTexture(int cntPattern)
 	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 }
 
-//=============================================================================
-// 頂点座標の設定
-//=============================================================================
-void Colorinkline::SetVertex(void)
-{
+
+void INK::SetVertex()
+{	
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
 	vertexWk[1].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y, pos.z);
 	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
 	vertexWk[3].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
 }
+

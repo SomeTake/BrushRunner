@@ -127,11 +127,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AllocateHierarchy.cpp" />
+    <ClCompile Include="blackinkline.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="colorinkline.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="Debugproc.cpp" />
+    <ClCompile Include="Faceframe.cpp" />
+    <ClCompile Include="Frame01.cpp" />
     <ClCompile Include="Gravity.cpp" />
+    <ClCompile Include="Ink.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -141,14 +146,20 @@
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\AllocateHierarchy.h" />
     <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\D3DXAnimation.h" />
+    <ClInclude Include="blackinkline.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="colorinkline.h" />
     <ClInclude Include="Debugproc.h" />
+    <ClInclude Include="Faceframe.h" />
+    <ClInclude Include="Frame01.h" />
     <ClInclude Include="Gravity.h" />
+    <ClInclude Include="Ink.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
@@ -158,6 +169,7 @@
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

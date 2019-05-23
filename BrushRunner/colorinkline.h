@@ -33,6 +33,7 @@
 //*****************************************************************************
 class Colorinkline :
 	public _2dobj {
+
 public:
 	Colorinkline(D3DXVECTOR3 _pos, const char *texno); //constにより定数化を成しdefineの使用可　ポインタにしないとtextureファイルをうけとれない
 	~Colorinkline();
