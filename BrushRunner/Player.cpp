@@ -137,8 +137,19 @@ void PLAYER::Update()
 	//move.y += (0.0f - move.y) * RATE_MOVE_PLAYER;
 	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
 
+#ifndef _DEBUG_
 	PrintDebugProc("PLAYER POS X:%f, Y:%f, Z:%f\n", pos.x, pos.y, pos.z);
 	PrintDebugProc("PLAYER MOVE X:%f, Y:%f, Z:%f\n", move.x, move.y, move.z);
+
+	if (GetKeyboardPress(DIK_LEFT))
+	{
+		inkValue[ColorInk]--;
+	}
+	if (GetKeyboardPress(DIK_RIGHT))
+	{
+		inkValue[ColorInk]++;
+	}
+#endif
 }
 
 //=====================================================================================================

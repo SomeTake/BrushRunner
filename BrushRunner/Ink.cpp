@@ -1,7 +1,16 @@
+//=============================================================================
+//
+// インクゲージ表示処理 [Ink.cpp]
+// Author : HAL東京 GP11B341 17 染谷武志
+//
+//=============================================================================
 #include "Main.h"
 #include "Ink.h"
 
-INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno)
+//=============================================================================
+// コンストラクタ
+//=============================================================================
+INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -11,18 +20,21 @@ INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno)
 		&D3DTexture);				// 読み込むメモリのポインタ
 
 	///////////////////////////////////////////////////////////////////////////////////////
-	// フレームの初期化
+	// インクの初期化
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
 	pPlayer = pP;
+	inktype = _inktype;
 
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
 }
 
-
+//=============================================================================
+// デストラクタ
+//=============================================================================
 INK::~INK()
 {
 	if (D3DTexture != NULL)
@@ -32,6 +44,9 @@ INK::~INK()
 	}
 }
 
+//=============================================================================
+// 更新処理
+//=============================================================================
 void INK::Update()
 {
 	if (use == true)
@@ -44,6 +59,9 @@ void INK::Update()
 	SetVertex();
 }
 
+//=============================================================================
+// 描画処理
+//=============================================================================
 void INK::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
@@ -62,6 +80,9 @@ void INK::Draw()
 	}
 }
 
+//=============================================================================
+// 頂点の作成
+//=============================================================================
 HRESULT INK::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
@@ -90,6 +111,9 @@ HRESULT INK::MakeVertex()
 	return S_OK;
 }
 
+//=============================================================================
+// テクスチャ座標の設定
+//=============================================================================
 void INK::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
@@ -99,18 +123,20 @@ void INK::SetTexture(int cntPattern)
 
 	// テクスチャ座標の設定
 	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY + sizeY);
 }
 
-
+//=============================================================================
+// 頂点座標の設定
+//=============================================================================
 void INK::SetVertex()
 {	
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + INK_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y + INK_SIZE.y, pos.z);
 }
 

@@ -10,7 +10,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Colorinkline::Colorinkline(D3DXVECTOR3 _pos, const char *texno)
+INKFRAME::INKFRAME(D3DXVECTOR3 _pos, const char *texno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -34,7 +34,7 @@ Colorinkline::Colorinkline(D3DXVECTOR3 _pos, const char *texno)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Colorinkline::~Colorinkline()
+INKFRAME::~INKFRAME()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +46,7 @@ Colorinkline::~Colorinkline()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Colorinkline::Update()
+void INKFRAME::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +61,7 @@ void Colorinkline::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Colorinkline::Draw()
+void INKFRAME::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -83,7 +83,7 @@ void Colorinkline::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Colorinkline::MakeVertex(void)
+HRESULT INKFRAME::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +114,7 @@ HRESULT Colorinkline::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Colorinkline::SetTexture(int cntPattern)
+void INKFRAME::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +131,7 @@ void Colorinkline::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Colorinkline::SetVertex(void)
+void INKFRAME::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

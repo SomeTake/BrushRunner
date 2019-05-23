@@ -10,7 +10,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Faceframe::Faceframe(D3DXVECTOR3 _pos)
+FACEFRAME::FACEFRAME(D3DXVECTOR3 _pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -34,7 +34,7 @@ Faceframe::Faceframe(D3DXVECTOR3 _pos)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Faceframe::~Faceframe()
+FACEFRAME::~FACEFRAME()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +46,7 @@ Faceframe::~Faceframe()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Faceframe::Update()
+void FACEFRAME::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +61,7 @@ void Faceframe::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Faceframe::Draw()
+void FACEFRAME::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -83,7 +83,7 @@ void Faceframe::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Faceframe::MakeVertex(void)
+HRESULT FACEFRAME::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +114,7 @@ HRESULT Faceframe::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Faceframe::SetTexture(int cntPattern)
+void FACEFRAME::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +131,7 @@ void Faceframe::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Faceframe::SetVertex(void)
+void FACEFRAME::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

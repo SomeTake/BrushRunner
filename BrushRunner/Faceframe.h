@@ -22,11 +22,11 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Faceframe :
+class FACEFRAME :
 	public _2dobj {
 public:
-	Faceframe(D3DXVECTOR3 _pos);
-	~Faceframe();
+	FACEFRAME(D3DXVECTOR3 _pos);
+	~FACEFRAME();
 
 	// オーバーライド関数
 	void Update();
