@@ -122,10 +122,10 @@ void INK::SetTexture(int cntPattern)
 	float sizeY = 1.0f;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX + ((float)DISPLACE / INK_SIZE.x), (float)(y)* sizeY);
 	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY + sizeY);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX - ((float)DISPLACE / INK_SIZE.x) + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY + sizeY);
 }
 
 //=============================================================================
@@ -134,9 +134,9 @@ void INK::SetTexture(int cntPattern)
 void INK::SetVertex()
 {	
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x + DISPLACE, pos.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x+ INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y, pos.z);
 	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + INK_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y + INK_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x - DISPLACE + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y + INK_SIZE.y, pos.z);
 }
 
