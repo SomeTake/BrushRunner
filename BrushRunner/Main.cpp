@@ -409,13 +409,6 @@ void Draw(void)
 	{
 		SetCamera();
 
-#ifdef _DEBUG
-		// FPS•\Ž¦
-		DrawFPS();
-
-		DrawDebugProc();
-
-#endif
 		switch (eScene)
 		{
 		case SceneTitle:
@@ -434,6 +427,14 @@ void Draw(void)
 			break;
 		}
 
+
+#ifdef _DEBUG
+		// FPS•\Ž¦
+		DrawFPS();
+
+		DrawDebugProc();
+
+#endif
 
 		// Direct3D‚É‚æ‚é•`‰æ‚ÌI—¹
 		g_pD3DDevice->EndScene();

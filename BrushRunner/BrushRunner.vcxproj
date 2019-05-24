@@ -131,6 +131,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="colorinkline.cpp" />
+    <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="Debugproc.cpp" />
     <ClCompile Include="Faceframe.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="colorinkline.h" />
+    <ClInclude Include="Cursor.h" />
     <ClInclude Include="Debugproc.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="Frame01.h" />

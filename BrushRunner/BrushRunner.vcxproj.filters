@@ -118,7 +118,10 @@
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
     <ClCompile Include="Ink.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Cursor.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,12 +164,6 @@
     <ClInclude Include="Player.h">
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\AllocateHierarchy.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\D3DXAnimation.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="_2dobj.h">
       <Filter>ヘッダー ファイル\2d</Filter>
     </ClInclude>
@@ -182,8 +179,17 @@
     <ClInclude Include="Frame01.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\AllocateHierarchy.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\source\repos\BattleGym3D\D3DXAnimation.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
     <ClInclude Include="Ink.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Cursor.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

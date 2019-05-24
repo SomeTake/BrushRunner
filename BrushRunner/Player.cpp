@@ -9,6 +9,7 @@
 #include "Debugproc.h"
 #include "Input.h"
 #include "Gravity.h"
+#include "SceneGame.h"
 
 //=====================================================================================================
 // コンストラクタ
@@ -82,6 +83,7 @@ PLAYER::PLAYER(int _CtrlNum)
 	jumpFlag = false;
 	jumpSpeed = 0;
 	ctrlNum = _CtrlNum;
+	inkType = false;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -125,7 +127,11 @@ void PLAYER::Update()
 		}
 	}
 
+	// オート移動
 	pos.x += MOVE_SPEED;
+
+	// インク変更
+	Change();
 
 	//// 移動処理
 	//pos.x += move.x;
@@ -138,16 +144,26 @@ void PLAYER::Update()
 	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
 
 #ifndef _DEBUG_
-	PrintDebugProc("PLAYER POS X:%f, Y:%f, Z:%f\n", pos.x, pos.y, pos.z);
-	PrintDebugProc("PLAYER MOVE X:%f, Y:%f, Z:%f\n", move.x, move.y, move.z);
+	//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+	//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
+	PrintDebugProc("PLAYER[%d] INK TYPE %d\n", ctrlNum, inkType);
+	//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
+	//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
+
 
 	if (GetKeyboardPress(DIK_LEFT))
 	{
-		inkValue[ColorInk]--;
+		if (inkValue[inkType] > 0)
+		{
+			inkValue[inkType]--;
+		}
 	}
 	if (GetKeyboardPress(DIK_RIGHT))
 	{
-		inkValue[ColorInk]++;
+		if (inkValue[inkType] < INK_MAX)
+		{
+			inkValue[inkType]++;
+		}
 	}
 #endif
 }
@@ -187,4 +203,29 @@ void PLAYER::Draw()
 
 	// マテリアルをデフォルトに戻す
 	pDevice->SetMaterial(&matDef);
+}
+
+//=====================================================================================================
+// インクの種類交換
+//=====================================================================================================
+void PLAYER::Change()
+{
+	if (GetKeyboardTrigger(DIK_P))
+	{
+		// 黒→カラー
+		if (inkType == BlackInk)
+		{
+			inkType = ColorInk;
+		}
+		// カラー→黒
+		else
+		{
+			inkType = BlackInk;
+		}
+
+		// インクバーの描画順を入れ替え
+		ChangeDrawOrder(NumInkblack00 + ctrlNum, NumInkblue + ctrlNum);
+		// フレームの描画順を入れ替え
+		ChangeDrawOrder(NumBlackFrame00 + ctrlNum, NumColorFrame00 + ctrlNum);
+	}
 }
