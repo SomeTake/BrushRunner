@@ -111,20 +111,21 @@ void PLAYER::Update()
 	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
 
 	// ジャンプ
-	if (GetKeyboardTrigger(DIK_UP))
+	if (GetKeyboardTrigger(DIK_UP) && (!jumpFlag))
 	{
 		jumpFlag = true;
 		jumpSpeed = JUMP_SPEED;
 	}
 
-	// ジャンプ中または落下中は重力が加わる
-	if (jumpFlag)
+	// 地上にいるとき
+	if (!jumpFlag)
+	{
+		jumpSpeed = 0;
+	}
+	// 空中にいるとき
+	else
 	{
 		pos.y += jumpSpeed;
-		if (jumpSpeed > 0)
-		{
-			jumpSpeed -= STANDARD_GRAVITY;
-		}
 	}
 
 	// オート移動
@@ -144,12 +145,13 @@ void PLAYER::Update()
 	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
 
 #ifndef _DEBUG_
-	//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
-	//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
+	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+	PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
 	PrintDebugProc("PLAYER[%d] INK TYPE %d\n", ctrlNum, inkType);
-	//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
-	//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
-
+	PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
+	PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
+	PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
+	PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
 
 	if (GetKeyboardPress(DIK_LEFT))
 	{

@@ -12,13 +12,15 @@
 //=============================================================================
 void GravityFall(PLAYER *pP)
 {
+	// 空中はジャンプ入力できない
+	pP->SetJumpFlag(true);
+
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
-	if (pP->GetMove().y > - FALL_VELOCITY_MAX)
+	if (pP->GetJumpSpeed() > - FALL_VELOCITY_MAX)
 	{
-		D3DXVECTOR3 pos = D3DXVECTOR3(pP->GetPos().x,pP->GetPos().y - STANDARD_GRAVITY, pP->GetPos().z);
-		pP->SetPos(pos);
+		float speed = pP->GetJumpSpeed() - STANDARD_GRAVITY;
+		pP->SetJumpSpeed(speed);
 	}
 
-	// 落下中はジャンプ入力できない
-	pP->SetJumpFlag(true);
+
 }

@@ -16,11 +16,11 @@
 #define PLAYER_MAX			(4)											// 操作するプレイヤーの数
 #define PLAYER_FIRST_POS	D3DXVECTOR3(20.0f, -40.0f, 0.0f)			// 初期位置
 #define PLAYER_FIRST_ROT	D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
-#define JUMP_SPEED			(10.0f)										// ジャンプの初速
+#define JUMP_SPEED			(20.0f)										// ジャンプの初速
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
 #define INK_MAX				(100)										// インクの最大量
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
-#define MOVE_SPEED			(1.0f)										// 動くスピード
+#define MOVE_SPEED			(5.0f)										// 動くスピード
 
 // キャラクターのアニメーション番号
 static const char* CharaStateAnim[] =
@@ -151,6 +151,7 @@ public:
 	bool GetJumpFlag() { return jumpFlag; };
 	int GetInkValue(int _InkNum) { return inkValue[_InkNum]; };
 	int GetInkType() { return inkType; };
+	float GetJumpSpeed() { return jumpSpeed; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
@@ -158,6 +159,7 @@ public:
 	void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
 	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
 	void SetInkType(int _InkType) { inkType = _InkType; };
+	void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
 };
 
 #endif

@@ -181,21 +181,37 @@ void CURSOR::KeyMove()
 	// 上下
 	if (GetKeyboardPress(DIK_W))
 	{
-		pos.y -= CURSOR_SPEED;
+		// 画面外判定
+		if (pos.y > 0)
+		{
+			pos.y -= CURSOR_SPEED;
+		}
 	}
 	else if (GetKeyboardPress(DIK_S))
 	{
-		pos.y += CURSOR_SPEED;
+		// 画面外判定
+		if (pos.y < SCREEN_HEIGHT - CURSOR_SIZE.y)
+		{
+			pos.y += CURSOR_SPEED;
+		}
 	}
 
 	// 左右
 	if (GetKeyboardPress(DIK_D))
 	{
-		pos.x += CURSOR_SPEED;
+		// 画面外判定
+		if (pos.x < SCREEN_WIDTH - CURSOR_SIZE.x)
+		{
+			pos.x += CURSOR_SPEED;
+		}
 	}
 	else if (GetKeyboardPress(DIK_A))
 	{
-		pos.x -= CURSOR_SPEED;
+		// 画面外判定
+		if (pos.x > 0)
+		{
+			pos.x -= CURSOR_SPEED;
+		}
 	}
 }
 
