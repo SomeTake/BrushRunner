@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Collision.h"
 #include "Debugproc.h"
+#include "Gravity.h"
 
 //=============================================================================
 // ‹éŒ`‚Ì“–‚½‚è”»’è
@@ -61,6 +62,9 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 	{
 		if (pM->GetMapTbl(-y, x) >= 0 && pM->GetMapTbl(-y, x) < MapChipMax)
 		{
+			// ‚ß‚èž‚Ý‚ðC³
+			PosModification(pP, mappos);
+
 			return true;
 		}
 		else
