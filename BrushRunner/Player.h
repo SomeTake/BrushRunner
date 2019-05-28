@@ -144,6 +144,7 @@ public:
 	void Draw();
 
 	void Change();			// インクの種類交換
+	void Move();			// 移動
 
 	// ゲッター
 	D3DXVECTOR3	GetPos() { return pos; };

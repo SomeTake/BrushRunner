@@ -165,13 +165,6 @@ void UpdateSceneGame()
 //=============================================================================
 void DrawSceneGame()
 {
-
-	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMax; i++)
-	{
-		p2dobj[Draw2dobjBuff[i]]->Draw();
-	}
-
 	// マップの描画
 	pMap->Draw();
 
@@ -180,6 +173,13 @@ void DrawSceneGame()
 	{
 		pPlayer[i]->Draw();
 	}
+
+	// 2Dオブジェクトの描画
+	for (int i = 0; i < _2dMax; i++)
+	{
+		p2dobj[Draw2dobjBuff[i]]->Draw();
+	}
+
 }
 
 //=============================================================================

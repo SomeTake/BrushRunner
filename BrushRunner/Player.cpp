@@ -110,44 +110,16 @@ void PLAYER::Update()
 	// アニメーションを更新
 	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
 
-	// ジャンプ
-	if (GetKeyboardTrigger(DIK_UP) && (!jumpFlag))
-	{
-		jumpFlag = true;
-		jumpSpeed = JUMP_SPEED;
-	}
-
-	// 地上にいるとき
-	if (!jumpFlag)
-	{
-		jumpSpeed = 0;
-	}
-	// 空中にいるとき
-	else
-	{
-		pos.y += jumpSpeed;
-	}
-
-	// オート移動
-	pos.x += MOVE_SPEED;
+	// 移動
+	Move();
 
 	// インク変更
 	Change();
 
-	//// 移動処理
-	//pos.x += move.x;
-	//pos.y += move.y;
-	//pos.z += move.z;
-
-	//// 移動量に慣性をかける
-	//move.x += (0.0f - move.x) * RATE_MOVE_PLAYER;
-	//move.y += (0.0f - move.y) * RATE_MOVE_PLAYER;
-	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
-
 #ifndef _DEBUG_
 	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
 	PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
-	PrintDebugProc("PLAYER[%d] INK TYPE %d\n", ctrlNum, inkType);
+	PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
 	PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
 	PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
 	PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
@@ -230,4 +202,31 @@ void PLAYER::Change()
 		// フレームの描画順を入れ替え
 		ChangeDrawOrder(NumBlackFrame00 + ctrlNum, NumColorFrame00 + ctrlNum);
 	}
+}
+
+//=====================================================================================================
+// 移動
+//=====================================================================================================
+void PLAYER::Move()
+{
+	// ジャンプ
+	if (GetKeyboardTrigger(DIK_UP) && (!jumpFlag))
+	{
+		jumpFlag = true;
+		jumpSpeed = JUMP_SPEED;
+	}
+	// 地上にいるとき
+	if (!jumpFlag)
+	{
+		jumpSpeed = 0;
+	}
+	// 空中にいるとき
+	else
+	{
+		pos.y += jumpSpeed;
+	}
+
+	// オート移動
+	pos.x += MOVE_SPEED;
+
 }
