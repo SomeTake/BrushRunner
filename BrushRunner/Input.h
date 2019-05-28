@@ -54,6 +54,9 @@ bool IsButtonPressed(int padNo, DWORD button);
 bool IsButtonTriggered(int padNo, DWORD button);
 bool IsButtonRepeated(int padNo, DWORD button);
 bool IsButtonReleased(int padNo, DWORD button);
+float GetJoyStickAngle(int padNo);					// ジョイスティックの角度を取得する
+float GetJoyStickVec(int padNo);					// ジョイスティックのベクトルを取得する
+int GetPadCount(void);								// 接続されているコントローラの数を検出
 
 
 #endif

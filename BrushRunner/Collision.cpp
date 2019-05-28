@@ -37,40 +37,29 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 	int x = (int)((pP->GetPos().x + CHIP_SIZE / 2) / CHIP_SIZE);
 	int y = (int)((pP->GetPos().y - CHIP_SIZE / 2) / CHIP_SIZE);
 
+	// マップ外判定
+	if (!HitCheckBB(pP->GetPos(), GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
+	{
+		return false;
+	}
+
+#ifndef _DEBUG_
+	PrintDebugProc("現在プレイヤーがいるMapTbl[%d][%d]\n", -y, x);
+	PrintDebugProc("MapTblの中身:%d\n", pM->GetMapTbl(-y, x));
+#endif
 	// 当たり判定を確認するマップチップの場所
 	D3DXVECTOR3 mappos;
 	mappos.x = MAP_POS.x + CHIP_SIZE * x;
 	mappos.y = MAP_POS.y + CHIP_SIZE * y;
 	mappos.z = 0.0f;
 
-	// マップ外判定
-	if (!(pP->GetPos().x > 0 && pP->GetPos().x < (MAP_POS.x + CHIP_SIZE * MAP_SIZE_X)))
-	{
-		if (!(pP->GetPos().y < 0 && pP->GetPos().y > -(MAP_POS.y + CHIP_SIZE * MAP_SIZE_X)))
-		{
-			return false;
-		}
-	}
-
-#ifndef _DEBUG_
-	PrintDebugProc("MapTbl[%d][%d]\n", -y, x);
-	PrintDebugProc("MapTblの中身:%d\n", pM->GetMapTbl(-y, x));
-#endif
-
 	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (HitCheckBB(pP->GetPos(), mappos, PLAYER_COLLISION_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
+	if (pM->GetMapTbl(-y, x) >= 0 && pM->GetMapTbl(-y, x) < MapChipMax)
 	{
-		if (pM->GetMapTbl(-y, x) >= 0 && pM->GetMapTbl(-y, x) < MapChipMax)
-		{
-			// めり込みを修正
-			PosModification(pP, mappos);
+		// めり込みを修正
+		PosModification(pP, mappos);
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return true;
 	}
 	else
 	{

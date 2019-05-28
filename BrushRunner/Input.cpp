@@ -6,6 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "Input.h"
+#include "Debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -45,6 +46,8 @@ static DWORD PadRepeat[GAMEPAD_MAX];
 static DWORD PadRelease[GAMEPAD_MAX];
 int PadRepeatCnt[GAMEPAD_MAX];			// ゲームパッドのリピートカウンタ
 static int PadCount = 0;				// 検出したゲームパッドの数
+static float JoyStickAngle[GAMEPAD_MAX];	// ジョイスティックの角度を保存
+static float JoyStickVec[GAMEPAD_MAX];	// ジョイスティックのベクトルを保存
 
 //=============================================================================
 // 入力処理の初期化
@@ -405,6 +408,21 @@ void UpdatePad()
 				PadRepeat[i] = 0;
 			}
 		}
+
+		// ジョイスティックの角度、ベクトルを保存
+		JoyStickAngle[i] = atan2f((float)dijs.lY, (float)dijs.lX);
+		D3DXVECTOR2 temp = D3DXVECTOR2(RANGE_MAX, RANGE_MAX);
+		JoyStickVec[i] = D3DXVec2Length(&temp);
+
+#ifndef _DEBUG_
+		// 検出されたコントローラのみデバッグを表示する
+		if (i < PadCount)
+		{
+			PrintDebugProc("JoyStick[i] X:%d, Y:%d", i, dijs.lX, dijs.lY);
+			PrintDebugProc("JoyStickAngle[%d] %f", i, JoyStickAngle[i]);
+			PrintDebugProc("JoyStickAngle[%d] %f", i, JoyStickVec[i]);
+		}
+#endif
 	}
 }
 
@@ -438,4 +456,28 @@ bool IsButtonRepeated(int padNo, DWORD button)
 bool IsButtonReleased(int padNo, DWORD button)
 {
 	return (button & PadRelease[padNo]);
+}
+
+//=============================================================================
+// ジョイスティックの角度を取得する
+//=============================================================================
+float GetJoyStickAngle(int padNo)
+{
+	return JoyStickAngle[padNo];
+}
+
+//=============================================================================
+// ジョイスティックのベクトルを取得する
+//=============================================================================
+float GetJoyStickVec(int padNo)
+{
+	return JoyStickVec[padNo];
+}
+
+//=============================================================================
+// 接続されているコントローラの数を取得
+//=============================================================================
+int GetPadCount(void)
+{
+	return PadCount;
 }

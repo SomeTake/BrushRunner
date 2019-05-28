@@ -20,7 +20,7 @@
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
 #define INK_MAX				(100)										// インクの最大量
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
-#define MOVE_SPEED			(0.0f)										// 動くスピード
+#define MOVE_SPEED			(5.0f)										// 動くスピード
 
 // キャラクターのアニメーション番号
 static const char* CharaStateAnim[] =

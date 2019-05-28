@@ -11,6 +11,8 @@
 
 using namespace std;
 
+D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -43,6 +45,10 @@ MAP::MAP()
 	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
 		MAP_TEXTURE2,					// ファイルの名前
 		&D3DTexture[2]);				// 読み込むメモリー
+
+	MapCenterPos = pos;
+	MapCenterPos.x += CHIP_SIZE * MAP_SIZE_X * 0.5f;
+	MapCenterPos.y -= CHIP_SIZE * MAP_SIZE_Y * 0.5f;
 
 }
 
@@ -214,4 +220,12 @@ HRESULT MAP::MakeVertex()
 	}
 
 	return S_OK;
+}
+
+//=============================================================================
+// 表示されているマップの中心座標
+//=============================================================================
+D3DXVECTOR3 GetMapCenterPos()
+{
+	return MapCenterPos;
 }

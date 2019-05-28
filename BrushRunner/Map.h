@@ -63,4 +63,6 @@ public:
 	int GetMapTbl(int _MapX, int _MapY) { return maptbl[_MapX][_MapY]; };
 };
 
+D3DXVECTOR3 GetMapCenterPos();			// 表示されているマップの中心座標
+
 #endif
