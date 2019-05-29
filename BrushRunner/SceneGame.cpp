@@ -12,16 +12,6 @@
 #include "_2dobj.h"
 #include "Effect.h"
 
-enum {
-	HitEffect,
-	Hit1Effect,
-	RunEffect,
-	ExpEffect,
-	ItemEffect,
-
-	// エフェクトの個数
-	EffectMax,
-};
 #include "Player.h"
 #include "Collision.h"
 #include "Gravity.h"
@@ -36,6 +26,17 @@ enum {
 #include "Ink.h"
 #include "Cursor.h"
 
+
+enum {
+	HitEffect,
+	Hit1Effect,
+	RunEffect,
+	ExpEffect,
+	ItemEffect,
+
+	// エフェクトの個数
+	EffectMax,
+};
 
 // オブジェクトのポインタ
 static _2dobj *p2dobj[_2dMax];			// 2Dオブジェクト用のポインタ
@@ -63,6 +64,18 @@ HRESULT InitSceneGame()
 	// フレーム
 	p2dobj[NumFrame] = new FRAME();
 
+	// 黒インクの初期化
+	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK, BlackInk);
+	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK, BlackInk);
+	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKLINEBLACK, BlackInk);
+	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKLINEBLACK, BlackInk);
+
+	// 黒インク用フレームの初期化
+	p2dobj[NumBlackFrame00] = new INKFRAME(BLACKINKFRAME_POS01, TEXTURE_BLACKINKFRAME);
+	p2dobj[NumBlackFrame01] = new INKFRAME(BLACKINKFRAME_POS02, TEXTURE_BLACKINKFRAME);
+	p2dobj[NumBlackFrame02] = new INKFRAME(BLACKINKFRAME_POS03, TEXTURE_BLACKINKFRAME);
+	p2dobj[NumBlackFrame03] = new INKFRAME(BLACKINKFRAME_POS04, TEXTURE_BLACKINKFRAME);
+
 	// カラーインクの初期化
 	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKLINEBLUE, ColorInk);
 	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKLINERED, ColorInk);
@@ -80,25 +93,19 @@ HRESULT InitSceneGame()
 	p2dobj[NumFaceframe01] = new FACEFRAME(FACEFRAME_POS02);
 	p2dobj[NumFaceframe02] = new FACEFRAME(FACEFRAME_POS03);
 	p2dobj[NumFaceframe03] = new FACEFRAME(FACEFRAME_POS04);
-
-	// 黒インクの初期化
-	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKLINEBLACK, BlackInk);
 	
+	// カーソルの初期化
+	for (int i = Cursor0; i < Cursor0 + PLAYER_MAX; i++)
+	{
+		p2dobj[i] = new CURSOR(i - Cursor0, pPlayer[i - Cursor0]);
+	}
+
 	// エフェクトの初期化
 	pEFFECT[HitEffect] = new EFFECT(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
 	pEFFECT[Hit1Effect] = new EFFECT(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
 	pEFFECT[RunEffect] = new EFFECT(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
 	pEFFECT[ExpEffect] = new EFFECT(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
 	pEFFECT[ItemEffect] = new EFFECT(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
-
-	// カーソルの初期化
-	for (int i = Cursor0; i < Cursor0 + PLAYER_MAX; i++)
-	{
-		p2dobj[i] = new CURSOR(i - Cursor0, pPlayer[i - Cursor0]);
-	}
 
 	// 描画順の初期化
 	for (int i = 0; i < _2dMax; i++)
@@ -202,13 +209,7 @@ void DrawSceneGame()
 	for (int i = 0; i < EffectMax; i++)
 	{
 		pEFFECT[i]->Draw();
-
-		for (int i = 0; i < PLAYER_MAX; i++)
-		{
-			pPlayer[i]->Draw();
-		}
 	}
-}
 }
 
 //=============================================================================
