@@ -14,8 +14,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CURSOR_TEXTURE	_T("data/TEXTURE/pen.png")				// テクスチャ
-#define CURSOR_SIZE D3DXVECTOR2(50.0f, 100.0f)					// サイズ
+#define CURSOR_TEXTURE	_T("data/TEXTURE/brush.png")				// テクスチャ
+#define CURSOR_SIZE D3DXVECTOR2(75.0f, 75.0f)					// サイズ
 #define CURSOR_DIVIDE_X	(4)										// 横分割
 #define CURSOR_DIVIDE_Y	(2)										// 縦分割
 #define CURSOR_PATTERN	(CURSOR_DIVIDE_X * CURSOR_DIVIDE_Y)		// 分割数
@@ -29,8 +29,10 @@ class CURSOR :
 	public _2dobj
 {
 private:
-	int ctrlNum;		// 操作するコントローラ番号
+	int		ctrlNum;	// 操作するコントローラ番号
 	PLAYER *pPlayer;	// 参照するキャラクタのポインタ
+	float	angle;		// ジョイスティックの角度を保存
+	float	vec;		// ジョイスティックのベクトルを保存
 
 public:
 	CURSOR(int _ctrlNum, PLAYER *pP);

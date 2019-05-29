@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Cursor.h"
 #include "Input.h"
+#include "Debugproc.h"
 
 //=============================================================================
 // コンストラクタ
@@ -220,5 +221,9 @@ void CURSOR::KeyMove()
 //=============================================================================
 void CURSOR::PadMove()
 {
+	angle = GetJoyStickAngle(ctrlNum);
+	vec = GetJoyStickVec(ctrlNum);
 
+	pos.x += angle * vec * CURSOR_SPEED;
+	pos.y += angle * vec * CURSOR_SPEED;
 }

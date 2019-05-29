@@ -411,16 +411,16 @@ void UpdatePad()
 
 		// ジョイスティックの角度、ベクトルを保存
 		JoyStickAngle[i] = atan2f((float)dijs.lY, (float)dijs.lX);
-		D3DXVECTOR2 temp = D3DXVECTOR2(RANGE_MAX, RANGE_MAX);
+		D3DXVECTOR2 temp = D3DXVECTOR2((float)dijs.lX, (float)dijs.lY);
 		JoyStickVec[i] = D3DXVec2Length(&temp);
 
 #ifndef _DEBUG_
 		// 検出されたコントローラのみデバッグを表示する
 		if (i < PadCount)
 		{
-			PrintDebugProc("JoyStick[i] X:%d, Y:%d", i, dijs.lX, dijs.lY);
-			PrintDebugProc("JoyStickAngle[%d] %f", i, JoyStickAngle[i]);
-			PrintDebugProc("JoyStickAngle[%d] %f", i, JoyStickVec[i]);
+			PrintDebugProc("JoyStick[%d] X:%d Y:%d\n", i, dijs.lX, dijs.lY);
+			PrintDebugProc("JoyStickAngle[%d] %f\n", i, JoyStickAngle[i]);
+			PrintDebugProc("JoyStickVec[%d] %f\n", i, JoyStickVec[i]);
 		}
 #endif
 	}
