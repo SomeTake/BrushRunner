@@ -1,40 +1,39 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Faceframe.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// カーソル表示 [Cursor.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Faceframe.h"
+#include "Cursor.h"
+#include "Input.h"
+#include "Debugproc.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-FACEFRAME::FACEFRAME(D3DXVECTOR3 _pos)
+CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		TEXTURE_FACEFRAME,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
+		CURSOR_TEXTURE,					// ファイルの名前
+		&D3DTexture);					// 読み込むメモリのポインタ
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
 	use = true;
-	pos = _pos;
-	PatternAnim = 1;
+	pos = CURSOR_FIRST_POS;
+	PatternAnim = ctrlNum = _ctrlNum;
+	pPlayer = pP;
 
 	// 頂点情報の作成
 	MakeVertex();
-	///////////////////////////////////////////////////////////////////////////////////////
-
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-FACEFRAME::~FACEFRAME()
+CURSOR::~CURSOR()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,10 +45,15 @@ FACEFRAME::~FACEFRAME()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void FACEFRAME::Update()
+void CURSOR::Update()
 {
 	if (use == true)
 	{
+		// 操作
+		Move();
+
+		// テクスチャの切り替え
+		Change();
 
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
@@ -61,7 +65,7 @@ void FACEFRAME::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void FACEFRAME::Draw()
+void CURSOR::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -77,13 +81,12 @@ void FACEFRAME::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
 	}
-
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT FACEFRAME::MakeVertex(void)
+HRESULT CURSOR::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,12 +117,12 @@ HRESULT FACEFRAME::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void FACEFRAME::SetTexture(int cntPattern)
+void CURSOR::SetTexture(int cntPattern)
 {
-	int x = cntPattern;
-	int y = cntPattern;
-	float sizeX = 1.0f;
-	float sizeY = 1.0f;
+	int x = cntPattern % CURSOR_DIVIDE_X;
+	int y = cntPattern / CURSOR_DIVIDE_X;
+	float sizeX = 1.0f / CURSOR_DIVIDE_X;
+	float sizeY = 1.0f / CURSOR_DIVIDE_Y;
 
 	// テクスチャ座標の設定
 	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
@@ -131,11 +134,96 @@ void FACEFRAME::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void FACEFRAME::SetVertex(void)
+void CURSOR::SetVertex()
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + FACEFRAME_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + FACEFRAME_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + FACEFRAME_SIZE.x, pos.y + FACEFRAME_SIZE.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y + CURSOR_SIZE.y, pos.z);
+}
+
+//=============================================================================
+// 操作
+//=============================================================================
+void CURSOR::Move()
+{
+	KeyMove();	// キーボード操作
+	PadMove();	// コントローラ操作
+}
+
+//=============================================================================
+// カーソルの切り替え
+//=============================================================================
+void CURSOR::Change()
+{
+	if (GetKeyboardTrigger(DIK_P))
+	{
+		// テクスチャとプレイヤーのインクの切り替え
+		// カラー→黒
+		if (PatternAnim == ctrlNum)
+		{
+			PatternAnim = ctrlNum + CURSOR_DIVIDE_X;
+		}
+		// 黒→カラー
+		else
+		{
+			PatternAnim = ctrlNum;
+		}
+
+	}
+}
+
+//=============================================================================
+// キーボード操作
+//=============================================================================
+void CURSOR::KeyMove()
+{
+	// 上下
+	if (GetKeyboardPress(DIK_W))
+	{
+		// 画面外判定
+		if (pos.y > 0)
+		{
+			pos.y -= CURSOR_SPEED;
+		}
+	}
+	else if (GetKeyboardPress(DIK_S))
+	{
+		// 画面外判定
+		if (pos.y < SCREEN_HEIGHT - CURSOR_SIZE.y)
+		{
+			pos.y += CURSOR_SPEED;
+		}
+	}
+
+	// 左右
+	if (GetKeyboardPress(DIK_D))
+	{
+		// 画面外判定
+		if (pos.x < SCREEN_WIDTH - CURSOR_SIZE.x)
+		{
+			pos.x += CURSOR_SPEED;
+		}
+	}
+	else if (GetKeyboardPress(DIK_A))
+	{
+		// 画面外判定
+		if (pos.x > 0)
+		{
+			pos.x -= CURSOR_SPEED;
+		}
+	}
+}
+
+//=============================================================================
+// コントローラ操作
+//=============================================================================
+void CURSOR::PadMove()
+{
+	angle = GetJoyStickAngle(ctrlNum);
+	vec = GetJoyStickVec(ctrlNum);
+
+	pos.x += angle * vec * CURSOR_SPEED;
+	pos.y += angle * vec * CURSOR_SPEED;
 }

@@ -9,6 +9,7 @@
 #include "Debugproc.h"
 #include "Input.h"
 #include "Gravity.h"
+#include "SceneGame.h"
 
 //=====================================================================================================
 // コンストラクタ
@@ -82,6 +83,8 @@ PLAYER::PLAYER(int _CtrlNum)
 	jumpFlag = false;
 	jumpSpeed = 0;
 	ctrlNum = _CtrlNum;
+	inkType = false;
+	moveFlag = true;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -108,37 +111,36 @@ void PLAYER::Update()
 	// アニメーションを更新
 	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
 
-	// ジャンプ
-	if (GetKeyboardTrigger(DIK_UP))
-	{
-		jumpFlag = true;
-		jumpSpeed = JUMP_SPEED;
-	}
+	// 移動
+	Move();
 
-	// ジャンプ中または落下中は重力が加わる
-	if (jumpFlag)
+	// インク変更
+	Change();
+
+#ifndef _DEBUG_
+	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+	PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
+	PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
+	PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
+	PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
+	PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
+	PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
+
+	if (GetKeyboardPress(DIK_LEFT))
 	{
-		pos.y += jumpSpeed;
-		if (jumpSpeed > 0)
+		if (inkValue[inkType] > 0)
 		{
-			jumpSpeed -= STANDARD_GRAVITY;
+			inkValue[inkType]--;
 		}
 	}
-
-	pos.x += MOVE_SPEED;
-
-	//// 移動処理
-	//pos.x += move.x;
-	//pos.y += move.y;
-	//pos.z += move.z;
-
-	//// 移動量に慣性をかける
-	//move.x += (0.0f - move.x) * RATE_MOVE_PLAYER;
-	//move.y += (0.0f - move.y) * RATE_MOVE_PLAYER;
-	//move.z += (0.0f - move.z) * RATE_MOVE_PLAYER;
-
-	PrintDebugProc("PLAYER POS X:%f, Y:%f, Z:%f\n", pos.x, pos.y, pos.z);
-	PrintDebugProc("PLAYER MOVE X:%f, Y:%f, Z:%f\n", move.x, move.y, move.z);
+	if (GetKeyboardPress(DIK_RIGHT))
+	{
+		if (inkValue[inkType] < INK_MAX)
+		{
+			inkValue[inkType]++;
+		}
+	}
+#endif
 }
 
 //=====================================================================================================
@@ -176,4 +178,58 @@ void PLAYER::Draw()
 
 	// マテリアルをデフォルトに戻す
 	pDevice->SetMaterial(&matDef);
+}
+
+//=====================================================================================================
+// インクの種類交換
+//=====================================================================================================
+void PLAYER::Change()
+{
+	if (GetKeyboardTrigger(DIK_P))
+	{
+		// 黒→カラー
+		if (inkType == BlackInk)
+		{
+			inkType = ColorInk;
+		}
+		// カラー→黒
+		else
+		{
+			inkType = BlackInk;
+		}
+
+		// インクバーの描画順を入れ替え
+		ChangeDrawOrder(NumInkblack00 + ctrlNum, NumInkblue + ctrlNum);
+		// フレームの描画順を入れ替え
+		ChangeDrawOrder(NumBlackFrame00 + ctrlNum, NumColorFrame00 + ctrlNum);
+	}
+}
+
+//=====================================================================================================
+// 移動
+//=====================================================================================================
+void PLAYER::Move()
+{
+	// ジャンプ
+	if (GetKeyboardTrigger(DIK_UP) && (!jumpFlag))
+	{
+		jumpFlag = true;
+		jumpSpeed = JUMP_SPEED;
+	}
+	// 地上にいるとき
+	if (!jumpFlag)
+	{
+		jumpSpeed = 0;
+	}
+	// 空中にいるとき
+	else
+	{
+		pos.y += jumpSpeed;
+	}
+
+	// オート移動
+	if (moveFlag)
+	{
+		pos.x += MOVE_SPEED;
+	}
 }

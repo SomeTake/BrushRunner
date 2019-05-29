@@ -18,7 +18,7 @@
 // マクロ定義
 //*****************************************************************************
 #define CLASS_NAME		"AppClass"			// ウインドウのクラス名
-#define WINDOW_NAME		"BattleGym3D"		// ウインドウのキャプション名
+#define WINDOW_NAME		"BrushRunner"		// ウインドウのキャプション名
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -409,13 +409,6 @@ void Draw(void)
 	{
 		SetCamera();
 
-#ifdef _DEBUG
-		// FPS表示
-		DrawFPS();
-
-		DrawDebugProc();
-
-#endif
 		switch (eScene)
 		{
 		case SceneTitle:
@@ -434,6 +427,14 @@ void Draw(void)
 			break;
 		}
 
+
+#ifdef _DEBUG
+		// FPS表示
+		DrawFPS();
+
+		DrawDebugProc();
+
+#endif
 
 		// Direct3Dによる描画の終了
 		g_pD3DDevice->EndScene();

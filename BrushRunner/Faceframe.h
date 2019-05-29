@@ -15,18 +15,18 @@
 #define TEXTURE_FACEFRAME	_T("data/texture/faceframe.png")			// フレーム用画像
 #define FACEFRAME_SIZE		D3DXVECTOR3(200.0f, 88.0f, 0.0f)		// テクスチャサイズ
 
-#define FACEFRAME_POS01     D3DXVECTOR3(0.0f, 0.0f, 0.0f)
-#define FACEFRAME_POS02		D3DXVECTOR3(318.0f, 0.0f, 0.0f)
-#define FACEFRAME_POS03		D3DXVECTOR3(636.0f, 0.0f, 0.0f)
-#define FACEFRAME_POS04		D3DXVECTOR3(954.0f, 0.0f, 0.0f)
+#define FACEFRAME_POS01     D3DXVECTOR3(10.0f, 10.0f, 0.0f)
+#define FACEFRAME_POS02		D3DXVECTOR3(328.0f, 10.0f, 0.0f)
+#define FACEFRAME_POS03		D3DXVECTOR3(646.0f, 10.0f, 0.0f)
+#define FACEFRAME_POS04		D3DXVECTOR3(964.0f, 10.0f, 0.0f)
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Faceframe :
+class FACEFRAME :
 	public _2dobj {
 public:
-	Faceframe(D3DXVECTOR3 _pos);
-	~Faceframe();
+	FACEFRAME(D3DXVECTOR3 _pos);
+	~FACEFRAME();
 
 	// オーバーライド関数
 	void Update();
