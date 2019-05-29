@@ -20,7 +20,7 @@
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
 #define INK_MAX				(100)										// インクの最大量
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
-#define MOVE_SPEED			(5.0f)										// 動くスピード
+#define MOVE_SPEED			(1.0f)										// 動くスピード
 
 // キャラクターのアニメーション番号
 static const char* CharaStateAnim[] =
@@ -136,6 +136,7 @@ private:
 	int					ctrlNum;			// 操作するコントローラ番号
 	int					inkValue[InkNum];	// インクの残量
 	int					inkType;			// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
+	bool				moveFlag;			// 移動可能フラグ（進行方向にオブジェクトがある場合は移動不可）
 
 public:
 	PLAYER(int _CtrlNum);
@@ -153,6 +154,7 @@ public:
 	int GetInkValue(int _InkNum) { return inkValue[_InkNum]; };
 	int GetInkType() { return inkType; };
 	float GetJumpSpeed() { return jumpSpeed; };
+	bool GetMoveFlag() { return moveFlag; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
@@ -161,6 +163,7 @@ public:
 	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
 	void SetInkType(int _InkType) { inkType = _InkType; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
+	void SetMoveFlag(bool _moveFlag) { moveFlag = _moveFlag; };
 };
 
 #endif

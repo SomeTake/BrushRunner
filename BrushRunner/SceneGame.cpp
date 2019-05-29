@@ -150,13 +150,8 @@ void UpdateSceneGame()
 		}
 	}
 
-	// デバッグ表示
 #ifndef _DEBUG_
-	// 描画順確認
-	//for (int i = 0; i < _2dMax; i++)
-	//{
-	//	PrintDebugProc("Draw2dobjBuff[%d] = %d\n", i, Draw2dobjBuff[i]);
-	//}
+
 #endif
 }
 

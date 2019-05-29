@@ -11,7 +11,7 @@
 #include "Map.h"
 
 bool HitCheckBB(D3DXVECTOR3 posA, D3DXVECTOR3 posB, D3DXVECTOR2 sizeA, D3DXVECTOR2 sizeB);	// 矩形の当たり判定
-bool HitCheckPToM(PLAYER *pP, MAP *pM);	// プレイヤーとマップの当たり判定
+bool HitCheckPToM(PLAYER *pP, MAP *pM);	// プレイヤーと足元のマップの当たり判定
 
 #endif
 
