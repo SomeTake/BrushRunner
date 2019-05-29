@@ -210,8 +210,9 @@ void DrawSceneGame()
 	{
 		pEFFECT[i]->Draw();
 
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPlayer[i]->Draw();
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->Draw();
+		}
 	}
 }
