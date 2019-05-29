@@ -6,6 +6,8 @@
 //=============================================================================
 #include "Main.h"
 #include "Map.h"
+#include "Input.h"
+#include "Debugproc.h"
 
 using namespace std;
 
@@ -20,17 +22,27 @@ MAP::MAP()
 	ReadCsv(MAP_FILE);
 
 	// 位置・回転・スケールの初期設定
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	rot = D3DXVECTOR3(90.0f, 0.0f, 0.0f);	// 縦に向ける
+	pos = MAP_POS;
+	rot = MAP_ROT;	// 縦に向ける
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 
 	// 頂点情報の作成
 	MakeVertex();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
-		MAP_TEXTURE1,			// ファイルの名前
-		&D3DTexture);	// 読み込むメモリー
+	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+		MAP_TEXTURE0,					// ファイルの名前
+		&D3DTexture[0]);				// 読み込むメモリー
+
+	// テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+		MAP_TEXTURE1,					// ファイルの名前
+		&D3DTexture[1]);				// 読み込むメモリー
+	
+	// テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+		MAP_TEXTURE2,					// ファイルの名前
+		&D3DTexture[2]);				// 読み込むメモリー
 
 }
 
@@ -39,10 +51,13 @@ MAP::MAP()
 //=============================================================================
 MAP::~MAP()
 {
-	if (D3DTexture != NULL)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
+	for (int i = 0; i < MapChipMax; i++)
+	{
+		if (D3DTexture[i] != NULL)
+		{// テクスチャの開放
+			D3DTexture[i]->Release();
+			D3DTexture[i] = NULL;
+		}
 	}
 
 	if (D3DVtxBuff != NULL)
@@ -68,41 +83,59 @@ void MAP::Draw()
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
 
-	for (int ySize = 0; ySize < MAP_SIZE_Y; ySize++)
+	D3DXVECTOR3 oldpos = pos;	// 現在ポジションを一時的に保存
+
+	// 縦列の描画
+	for (int yNum = 0; yNum < MAP_SIZE_Y; yNum++)
 	{
-		for (int xSize = 0; xSize < MAP_SIZE_X; xSize++)
+		// 横列の描画
+		for (int xNum = 0; xNum < MAP_SIZE_X; xNum++)
 		{
-			// ワールドマトリックスの初期化
-			D3DXMatrixIdentity(&mtxWorld);
+			if (maptbl[yNum][xNum] >= 0)
+			{
+				// ワールドマトリックスの初期化
+				D3DXMatrixIdentity(&mtxWorld);
 
-			// スケールを反映
-			D3DXMatrixScaling(&mtxScl, scl.x, scl.y, scl.z);
-			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
+				// スケールを反映
+				D3DXMatrixScaling(&mtxScl, scl.x, scl.y, scl.z);
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
 
-			// 回転を反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
-			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+				// 回転を反映
+				D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
 
-			// 移動を反映
-			D3DXMatrixTranslation(&mtxTranslate, pos.x + (CHIP_SIZE * xSize), pos.y - (CHIP_SIZE * ySize), pos.z);
-			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
+				// 移動を反映
+				D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
 
-			// ワールドマトリックスの設定
-			pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+				// ワールドマトリックスの設定
+				pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
-			// 頂点バッファをデバイスのデータストリームにバインド
-			pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
+				// 頂点バッファをデバイスのデータストリームにバインド
+				pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
 
-			// 頂点フォーマットの設定
-			pDevice->SetFVF(FVF_VERTEX_3D);
+				// 頂点フォーマットの設定
+				pDevice->SetFVF(FVF_VERTEX_3D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, D3DTexture);
+				// テクスチャの設定
+				pDevice->SetTexture(0, D3DTexture[maptbl[yNum][xNum]]);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			}
+
+			// マップチップの座標更新
+			pos.x += CHIP_SIZE;
 		}
+		// マップチップの座標更新
+		pos.y -= CHIP_SIZE;
+
+		// X座標だけ戻す
+		pos.x = oldpos.x;
 	}
+
+	// 元の座標に戻す
+	pos = oldpos;
 }
 
 //=============================================================================
@@ -153,10 +186,10 @@ HRESULT MAP::MakeVertex()
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-CHIP_SIZE, 0.0f, CHIP_SIZE);
-		pVtx[1].vtx = D3DXVECTOR3(CHIP_SIZE, 0.0f, CHIP_SIZE);
-		pVtx[2].vtx = D3DXVECTOR3(-CHIP_SIZE, 0.0f, -CHIP_SIZE);
-		pVtx[3].vtx = D3DXVECTOR3(CHIP_SIZE, 0.0f, -CHIP_SIZE);
+		pVtx[0].vtx = D3DXVECTOR3(-CHIP_SIZE / 2, 0.0f, CHIP_SIZE / 2);
+		pVtx[1].vtx = D3DXVECTOR3(CHIP_SIZE / 2, 0.0f, CHIP_SIZE / 2);
+		pVtx[2].vtx = D3DXVECTOR3(-CHIP_SIZE /2 , 0.0f, -CHIP_SIZE / 2);
+		pVtx[3].vtx = D3DXVECTOR3(CHIP_SIZE / 2, 0.0f, -CHIP_SIZE / 2);
 
 		// 法線ベクトルの設定
 		pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

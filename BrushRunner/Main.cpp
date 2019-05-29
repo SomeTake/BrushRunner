@@ -11,6 +11,8 @@
 #include "SceneResult.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Input.h"
+#include "Debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -118,7 +120,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	D3DXMATRIX mat;
 	D3DXMatrixIdentity(&mat);
 	g_pD3DDevice->SetTransform(D3DTS_WORLD, &mat);
-
 
 	// --------------------------------------  メッセージループ---------------------------------------------
 	while (1)
@@ -315,7 +316,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
+	InitDebugProc();
+
 #endif
+	InitInput(hInstance,hWnd);
+
 	InitCamera();
 	InitLight();
 
@@ -339,6 +344,7 @@ void Uninit(void)
 		g_pD3DXFont = NULL;
 	}
 
+	UninitDebugProc();
 #endif
 	if (g_pD3DDevice != NULL)
 	{// デバイスの開放
@@ -351,6 +357,7 @@ void Uninit(void)
 		g_pD3D->Release();
 		g_pD3D = NULL;
 	}
+	UninitInput();
 
 	UninitSceneTitle();
 	UninitSceneCharacterSelect();
@@ -367,6 +374,7 @@ void Update(void)
 #ifdef _DEBUG
 
 #endif
+	UpdateInput();
 
 	switch (eScene)
 	{
@@ -404,6 +412,8 @@ void Draw(void)
 #ifdef _DEBUG
 		// FPS表示
 		DrawFPS();
+
+		DrawDebugProc();
 
 #endif
 		switch (eScene)
@@ -447,7 +457,7 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 //=============================================================================
 void DrawFPS(void)
 {
-
+	PrintDebugProc("FPS:%d\n", g_nCountFPS);
 }
 #endif
 
