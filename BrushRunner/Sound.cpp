@@ -35,23 +35,23 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 // 各音素材のパラメータ
 PARAM g_aParam[SOUND_LABEL_MAX] =
 {
-//SE
-	{ "data/SE/Defend0.wav", false, 1.00f },
-{ "data/SE/Hit0.wav", false, 1.00f },
-{ "data/SE/Hit1.wav", false, 1.00f },
-{ "data/SE/Swing0.wav", false, 1.00f },
-{ "data/SE/Select0.wav", false, 1.00f },
-{ "data/SE/Select1.wav", false, 1.00f },
-{ "data/SE/yattaze0.wav", false, 0.20f },
-{ "data/SE/KO.wav", false, 0.20f },
-{ "data/SE/effect0.wav", false, 1.00f },
-{ "data/SE/cutin0.wav", false, 1.00f },
-{ "data/SE/countdown0.wav", false, 1.00f },
-// BGM
-{ "data/BGM/title.wav", true, 0.50f },
-{ "data/BGM/tutorial.wav", true, 0.50f },
-{ "data/BGM/training.wav", true, 0.50f },
-{ "data/BGM/battle.wav", true, 0.50f }
+	// BGM
+	{ "data/BGM/title.wav", true, 0.50f },
+	{ "data/BGM/tutorial.wav", true, 0.50f },
+	{ "data/BGM/training.wav", true, 0.50f },
+	{ "data/BGM/battle.wav", true, 0.50f }
+	//SE
+	//{ "data/SE/Defend0.wav", false, 1.00f },
+	//{ "data/SE/Hit0.wav", false, 1.00f },
+	//{ "data/SE/Hit1.wav", false, 1.00f },
+	//{ "data/SE/Swing0.wav", false, 1.00f },
+	//{ "data/SE/Select0.wav", false, 1.00f },
+	//{ "data/SE/Select1.wav", false, 1.00f },
+	//{ "data/SE/yattaze0.wav", false, 0.20f },
+	//{ "data/SE/KO.wav", false, 0.20f },
+	//{ "data/SE/effect0.wav", false, 1.00f },
+	//{ "data/SE/cutin0.wav", false, 1.00f },
+	//{ "data/SE/countdown0.wav", false, 1.00f },
 };
 
 //=============================================================================

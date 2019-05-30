@@ -375,7 +375,7 @@ void Update(void)
 	switch (eScene)
 	{
 	case SceneTitle:
-		eScene = UpdateSceneTitle();
+		UpdateSceneTitle();
 		break;
 	case SceneCharacterSelect:
 		UpdateSceneCharacterSelect();

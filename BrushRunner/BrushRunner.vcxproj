@@ -133,6 +133,10 @@
     <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="blackinkline.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="carsl_logo.cpp" />
+    <ClCompile Include="carsl_obj.cpp" />
+    <ClCompile Include="carsl_obj2.cpp" />
+    <ClCompile Include="carsl_obj3.cpp" />
     <ClCompile Include="colorinkline.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="Faceframe.cpp" />
@@ -146,12 +150,17 @@
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="blackinkline.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="carsl_logo.h" />
+    <ClInclude Include="carsl_obj.h" />
+    <ClInclude Include="carsl_obj2.h" />
+    <ClInclude Include="carsl_obj3.h" />
     <ClInclude Include="colorinkline.h" />
     <ClInclude Include="D3DXAnimation.h" />
     <ClInclude Include="Faceframe.h" />
@@ -165,6 +174,7 @@
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

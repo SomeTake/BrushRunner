@@ -49,6 +49,12 @@
     <Filter Include="ヘッダー ファイル\System">
       <UniqueIdentifier>{37c027fe-faf8-471d-891c-6f11a5f00337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\2d\characterselect">
+      <UniqueIdentifier>{d4b27e8d-d861-4ddb-9c12-f72d6e0bc565}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\2d\characterselect">
+      <UniqueIdentifier>{245dda65-6ce2-4fb4-a3d3-bfaec976d8ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Map.cpp">
@@ -102,6 +108,21 @@
     <ClCompile Include="Player.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="carsl_logo.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
+    <ClCompile Include="carsl_obj.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
+    <ClCompile Include="carsl_obj2.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
+    <ClCompile Include="carsl_obj3.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -154,6 +175,21 @@
     </ClInclude>
     <ClInclude Include="AllocateHierarchy.h">
       <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="carsl_logo.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="carsl_obj.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="carsl_obj2.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="carsl_obj3.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

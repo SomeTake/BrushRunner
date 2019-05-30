@@ -12,23 +12,23 @@
 // サウンドファイル
 typedef enum
 {
-	// SE（サウンドエフェクト）
-	SE_DEFEND0,
-	SE_HIT0,
-	SE_HIT1,
-	SE_SWING0,
-	SE_SELECT0,
-	SE_SELECT1,
-	SE_WINNER0,
-	SE_KO,
-	SE_EFFECT0,
-	SE_CUTIN0,
-	SE_COUNTDOWN,
 	// BGM（音楽）
 	BGM_TITLE,
 	BGM_TUTORIAL,
 	BGM_TRAINING,
 	BGM_BATTLE,
+	// SE（サウンドエフェクト）
+	//SE_DEFEND0,
+	//SE_HIT0,
+	//SE_HIT1,
+	//SE_SWING0,
+	//SE_SELECT0,
+	//SE_SELECT1,
+	//SE_WINNER0,
+	//SE_KO,
+	//SE_EFFECT0,
+	//SE_CUTIN0,
+	//SE_COUNTDOWN,
 
 	//-----------------------------------------------------------------------------
 	SOUND_LABEL_MAX,

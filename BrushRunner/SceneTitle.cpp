@@ -26,11 +26,11 @@ void UninitSceneTitle()
 //=============================================================================
 // çXêV
 //=============================================================================
-int UpdateSceneTitle()
+void UpdateSceneTitle()
 {
 	if (GetKeyboardTrigger(DIK_RETURN))
 	{
-		return SceneGame;
+		SetScene(SceneCharacterSelect);
 	}
 }
 
