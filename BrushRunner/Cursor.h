@@ -20,7 +20,7 @@
 #define CURSOR_DIVIDE_Y	(2)										// 縦分割
 #define CURSOR_PATTERN	(CURSOR_DIVIDE_X * CURSOR_DIVIDE_Y)		// 分割数
 #define CURSOR_FIRST_POS	D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f)
-#define CURSOR_SPEED	(10.0f)									// 動くスピード
+#define CURSOR_SPEED	(30.0f)									// 動くスピード
 
 //*****************************************************************************
 // クラス定義
@@ -31,8 +31,10 @@ class CURSOR :
 private:
 	int		ctrlNum;	// 操作するコントローラ番号
 	PLAYER *pPlayer;	// 参照するキャラクタのポインタ
-	float	angle;		// ジョイスティックの角度を保存
-	float	vec;		// ジョイスティックのベクトルを保存
+	float	vec;		// ジョイスティックのベクトルを1/1000にして保存
+	float	moveX;		// ジョイスティックのX値を1/1000にして保存
+	float	moveY;		// ジョイスティックのY値を1/1000にして保存
+	D3DXVECTOR3 oldPos;	// 画面外判定を行いための1f前の座標
 
 public:
 	CURSOR(int _ctrlNum, PLAYER *pP);

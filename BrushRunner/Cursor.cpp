@@ -25,6 +25,9 @@ CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = _ctrlNum;
 	pPlayer = pP;
+	vec = 0.0f;
+	moveX = 0.0f;
+	moveY = 0.0f;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -60,6 +63,13 @@ void CURSOR::Update()
 
 	}
 	SetVertex();
+
+#ifndef _DEBUG_
+	//PrintDebugProc("CursorPos X:%f Y:%f\n", pos.x, pos.y);
+	//PrintDebugProc("CursorMove X:%f Y:%f\n", moveX, moveY);
+	//PrintDebugProc("CursorVec %f\n", vec);
+#endif
+
 }
 
 //=============================================================================
@@ -221,9 +231,22 @@ void CURSOR::KeyMove()
 //=============================================================================
 void CURSOR::PadMove()
 {
-	angle = GetJoyStickAngle(ctrlNum);
-	vec = GetJoyStickVec(ctrlNum);
+	vec = GetJoyStickVec(ctrlNum) / 1000.f;
+	moveX = (float)GetJoyStickLeftX(ctrlNum) / 1000.0f;
+	moveY = (float)GetJoyStickLeftY(ctrlNum) / 1000.0f;
 
-	pos.x += angle * vec * CURSOR_SPEED;
-	pos.y += angle * vec * CURSOR_SPEED;
+	oldPos = pos;
+
+	pos.x += vec * moveX * CURSOR_SPEED;
+	pos.y += vec * moveY * CURSOR_SPEED;
+
+	// 画面外に出た場合、古い座標に戻す
+	if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
+	{
+		pos.y = oldPos.y;
+	}
+	if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
+	{
+		pos.x = oldPos.x;
+	}
 }

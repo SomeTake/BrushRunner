@@ -72,7 +72,7 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 #endif
 
 	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (pM->GetMapTbl(-y, x) >= 0 && pM->GetMapTbl(-y, x) < MapChipMax)
+	if (pM->GetMapTbl(-y, x) >= 0)
 	{
 		// めり込みを修正
 		PosModification(pP, mappos);

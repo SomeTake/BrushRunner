@@ -57,6 +57,7 @@ bool IsButtonReleased(int padNo, DWORD button);
 float GetJoyStickAngle(int padNo);					// ジョイスティックの角度を取得する
 float GetJoyStickVec(int padNo);					// ジョイスティックのベクトルを取得する
 int GetPadCount(void);								// 接続されているコントローラの数を検出
-
+int GetJoyStickLeftX(int padNo);					// 左ジョイスティックのX値
+int GetJoyStickLeftY(int padNo);					// 左ジョイスティックのY値
 
 #endif

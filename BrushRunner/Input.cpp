@@ -40,14 +40,15 @@ int						g_aKeyStateRepeatCnt[NUM_KEY_MAX];	// キーボードのリピートカウンタ
 
 // ----- ゲームパッド関連 -----------------------------------------------------
 static LPDIRECTINPUTDEVICE8 pGamePad[GAMEPAD_MAX] = { NULL,NULL };	// デバイスのポインタ
-static DWORD PadState[GAMEPAD_MAX];		// パッド状態を保存
+static DWORD PadState[GAMEPAD_MAX];			// パッド状態を保存
 static DWORD PadTrigger[GAMEPAD_MAX];
 static DWORD PadRepeat[GAMEPAD_MAX];
 static DWORD PadRelease[GAMEPAD_MAX];
-int PadRepeatCnt[GAMEPAD_MAX];			// ゲームパッドのリピートカウンタ
-static int PadCount = 0;				// 検出したゲームパッドの数
+int PadRepeatCnt[GAMEPAD_MAX];				// ゲームパッドのリピートカウンタ
+static int PadCount = 0;					// 検出したゲームパッドの数
 static float JoyStickAngle[GAMEPAD_MAX];	// ジョイスティックの角度を保存
-static float JoyStickVec[GAMEPAD_MAX];	// ジョイスティックのベクトルを保存
+static float JoyStickVec[GAMEPAD_MAX];		// ジョイスティックのベクトルを保存
+static DIJOYSTATE2 dijs[GAMEPAD_MAX];		// コントローラの状態を保存
 
 //=============================================================================
 // 入力処理の初期化
@@ -321,7 +322,6 @@ void UninitPad()
 void UpdatePad()
 {
 	HRESULT result;
-	DIJOYSTATE2 dijs;	// コントローラの状態を保存
 
 	for (int i = 0; i < PadCount; i++)
 	{
@@ -353,37 +353,37 @@ void UpdatePad()
 		// コントローラの各ボタンの入力確認
 		// ----- ジョイスティック ----------------------------------
 		// 上
-		if (dijs.lY < 0)		PadState[i] |= STICK_UP;
+		if (dijs[i].lY < 0)		PadState[i] |= STICK_UP;
 		// 下
-		if (dijs.lY > 0)		PadState[i] |= STICK_DOWN;
+		if (dijs[i].lY > 0)		PadState[i] |= STICK_DOWN;
 		// 左
-		if (dijs.lX < 0)		PadState[i] |= STICK_LEFT;
+		if (dijs[i].lX < 0)		PadState[i] |= STICK_LEFT;
 		// 右
-		if (dijs.lX > 0)		PadState[i] |= STICK_RIGHT;
+		if (dijs[i].lX > 0)		PadState[i] |= STICK_RIGHT;
 
 		// ----- ボタン --------------------------------------------
 		// A(PS4□)
-		if (dijs.rgbButtons[0] & 0x80)	PadState[i] |= BUTTON_A;
+		if (dijs[i].rgbButtons[0] & 0x80)	PadState[i] |= BUTTON_A;
 		// B(PS4×)
-		if (dijs.rgbButtons[1] & 0x80)	PadState[i] |= BUTTON_B;
+		if (dijs[i].rgbButtons[1] & 0x80)	PadState[i] |= BUTTON_B;
 		// C(PS4○)
-		if (dijs.rgbButtons[2] & 0x80)	PadState[i] |= BUTTON_C;
+		if (dijs[i].rgbButtons[2] & 0x80)	PadState[i] |= BUTTON_C;
 		// D(PS4△)
-		if (dijs.rgbButtons[3] & 0x80)	PadState[i] |= BUTTON_D;
+		if (dijs[i].rgbButtons[3] & 0x80)	PadState[i] |= BUTTON_D;
 
 		// L1(PS4L1)
-		if (dijs.rgbButtons[4] & 0x80)	PadState[i] |= BUTTON_L1;
+		if (dijs[i].rgbButtons[4] & 0x80)	PadState[i] |= BUTTON_L1;
 		// R1(PS4R1)
-		if (dijs.rgbButtons[5] & 0x80)	PadState[i] |= BUTTON_R1;
+		if (dijs[i].rgbButtons[5] & 0x80)	PadState[i] |= BUTTON_R1;
 		// L2(PS4L2)
-		if (dijs.rgbButtons[6] & 0x80)	PadState[i] |= BUTTON_L2;
+		if (dijs[i].rgbButtons[6] & 0x80)	PadState[i] |= BUTTON_L2;
 		// R2(PS4R2)
-		if (dijs.rgbButtons[7] & 0x80)	PadState[i] |= BUTTON_R2;
+		if (dijs[i].rgbButtons[7] & 0x80)	PadState[i] |= BUTTON_R2;
 
 		// SHARE(PS4SHARE)
-		if (dijs.rgbButtons[8] & 0x80)	PadState[i] |= BUTTON_SHARE;
+		if (dijs[i].rgbButtons[8] & 0x80)	PadState[i] |= BUTTON_SHARE;
 		// START(PS4OPTION)
-		if (dijs.rgbButtons[9] & 0x80)	PadState[i] |= BUTTON_START;
+		if (dijs[i].rgbButtons[9] & 0x80)	PadState[i] |= BUTTON_START;
 
 		// Trigger設定
 		PadTrigger[i] = (lastPadState[i] ^ PadState[i]) & PadState[i];	// 前フレームと違っていて、現在ONのボタンを検出
@@ -410,18 +410,18 @@ void UpdatePad()
 		}
 
 		// ジョイスティックの角度、ベクトルを保存
-		JoyStickAngle[i] = atan2f((float)dijs.lY, (float)dijs.lX);
-		D3DXVECTOR2 temp = D3DXVECTOR2((float)dijs.lX, (float)dijs.lY);
+		JoyStickAngle[i] = atan2f((float)dijs[i].lY, (float)dijs[i].lX);
+		D3DXVECTOR2 temp = D3DXVECTOR2((float)dijs[i].lX, (float)dijs[i].lY);
 		JoyStickVec[i] = D3DXVec2Length(&temp);
 
 #ifndef _DEBUG_
-		// 検出されたコントローラのみデバッグを表示する
-		if (i < PadCount)
-		{
-			PrintDebugProc("JoyStick[%d] X:%d Y:%d\n", i, dijs.lX, dijs.lY);
-			PrintDebugProc("JoyStickAngle[%d] %f\n", i, JoyStickAngle[i]);
-			PrintDebugProc("JoyStickVec[%d] %f\n", i, JoyStickVec[i]);
-		}
+		//// 検出されたコントローラのみデバッグを表示する
+		//if (i < PadCount)
+		//{
+		//	PrintDebugProc("JoyStick[%d] X:%d Y:%d\n", i, dijs[i].lX, dijs[i].lY);
+		//	PrintDebugProc("JoyStickAngle[%d] %f\n", i, JoyStickAngle[i]);
+		//	PrintDebugProc("JoyStickVec[%d] %f\n", i, JoyStickVec[i]);
+		//}
 #endif
 	}
 }
@@ -480,4 +480,20 @@ float GetJoyStickVec(int padNo)
 int GetPadCount(void)
 {
 	return PadCount;
+}
+
+//=============================================================================
+// 左ジョイスティックのX値
+//=============================================================================
+int GetJoyStickLeftX(int padNo)
+{
+	return (int)dijs[padNo].lX;
+}
+
+//=============================================================================
+// 左ジョイスティックのY値
+//=============================================================================
+int GetJoyStickLeftY(int padNo)
+{
+	return (int)dijs[padNo].lY;
 }

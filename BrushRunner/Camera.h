@@ -38,7 +38,7 @@ typedef struct {
 // プロトタイプ宣言
 //*****************************************************************************
 void InitCamera();
-void UpdateCamera();
+void UpdateCamera(D3DXVECTOR3 _at);
 CAMERA *GetCamera();
 void SetCamera();
 

@@ -148,7 +148,7 @@ void UninitSceneGame()
 void UpdateSceneGame()
 {
 	// カメラの更新
-	UpdateCamera();
+	UpdateCamera(CompareXPos());
 
 	// 2Dオブジェクトの更新
 	for (int i = 0; i < _2dMax; i++)
@@ -237,4 +237,100 @@ void ChangeDrawOrder(int _NumA, int _NumB)
 	SetDraw2dobjBuff(_NumA, GetDraw2dobjBuff(_NumB));
 	SetDraw2dobjBuff(_NumB, change);
 
+}
+
+//=============================================================================
+// X座標を比較して、大きい2つの中心座標を返す
+//=============================================================================
+D3DXVECTOR3 CompareXPos()
+{
+	float CmpPos[PLAYER_MAX];
+
+	// プレイヤーの座標を格納
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		CmpPos[i] = pPlayer[i]->GetPos().x;
+	}
+
+	// QuickSort関数 引数1 比較する配列の先頭要素
+	//				 引数2 配列の要素数
+	//				 引数3 型のサイズ
+	//				 引数4 比較用の関数
+	qsort(CmpPos, PLAYER_MAX, sizeof(float), CmpDescendf);
+
+	float CmpY[2];
+
+	// 1つめの要素確定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (CmpPos[0] == pPlayer[i]->GetPos().x)
+		{
+			CmpY[0] = pPlayer[i]->GetPos().y;
+			break;
+		}
+	}
+
+	// 2つめの要素確定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (CmpPos[1] == pPlayer[i]->GetPos().x)
+		{
+			CmpY[1] = pPlayer[i]->GetPos().y;
+			break;
+		}
+	}
+
+	return D3DXVECTOR3((CmpPos[0] + CmpPos[1]) * 0.5f, (CmpY[0] + CmpY[1]) * 0.5f, 0.0f);
+}
+
+//=============================================================================
+// 比較関数(降順)float用
+// qsort関数の第4引数に入れて使う
+//=============================================================================
+int CmpDescendf(const void *p, const void *q)
+{
+	if (*(float*)p < *(float*)q)
+	{
+		return 1;
+	}
+	if (*(float*)p > *(float*)q)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+//=============================================================================
+// 比較関数(昇順)float用
+// qsort関数の第4引数に入れて使う
+//=============================================================================
+int CmpAscendf(const void *p, const void *q)
+{
+	if (*(float*)p > *(float*)q)
+	{
+		return 1;
+	}
+	if (*(float*)p < *(float*)q)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+//=============================================================================
+// 比較関数(降順)int用
+// qsort関数の第4引数に入れて使う
+//=============================================================================
+int CmpDescend(const void *p, const void *q)
+{
+	return *(int*)q - *(int*)p;
+}
+
+//=============================================================================
+// 比較関数(昇順)int用
+// qsort関数の第4引数に入れて使う
+//=============================================================================
+int CmpAscend(const void *p, const void *q)
+{
+	return *(int*)p - *(int*)q;
 }
