@@ -14,6 +14,12 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define TEXTURE_INKGAUGEBLACK	_T("data/texture/inkline.black.png")			// フレーム用画像
+#define TEXTURE_INKGAUGEBLUE		_T("data/texture/inkline.blue.png")			// フレーム用画像
+#define TEXTURE_INKGAUGERED		_T("data/texture/inkline.red.png")			// フレーム用画像
+#define TEXTURE_INKGAUGEYELLOW	_T("data/texture/inkline.yellow.png")			// フレーム用画像
+#define TEXTURE_INKGAUGEGREEN	_T("data/texture/inkline.green.png")			// フレーム用画像
+
 #define INK_SIZE	D3DXVECTOR2(135.0f, 30.0f)	// 表示サイズ
 
 #define INKLINEBLUE_POS     D3DXVECTOR3(70.0f, 35.0f, 0.0f)

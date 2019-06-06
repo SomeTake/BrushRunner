@@ -46,7 +46,7 @@ private:
 	D3DXVECTOR3				pos;
 	D3DXVECTOR3				rot;
 	D3DXVECTOR3				scl;
-	LPDIRECT3DTEXTURE9		D3DTexture[MapChipMax] = { NULL };	// テクスチャへのポインタ
+	static LPDIRECT3DTEXTURE9		D3DTexture[MapChipMax];		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;					// 頂点バッファへのポインタ
 
 

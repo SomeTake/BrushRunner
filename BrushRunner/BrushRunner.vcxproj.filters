@@ -102,12 +102,6 @@
     <ClCompile Include="Frame01.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
-    <ClCompile Include="blackinkline.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="colorinkline.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
@@ -136,7 +130,16 @@
       <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
     <ClCompile Include="Paint.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintSystem.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="InkFrameColor.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="InkFrameBlack.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,12 +182,6 @@
     <ClInclude Include="AllocateHierarchy.h">
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
-    <ClInclude Include="blackinkline.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="colorinkline.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
     <ClInclude Include="Faceframe.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
@@ -219,7 +216,16 @@
       <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
     <ClInclude Include="Paint.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintSystem.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="InkFrameColor.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="InkFrameBlack.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -24,6 +24,9 @@
 //*****************************************************************************
 class FACEFRAME :
 	public _2dobj {
+private:
+	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+
 public:
 	FACEFRAME(D3DXVECTOR3 _pos);
 	~FACEFRAME();

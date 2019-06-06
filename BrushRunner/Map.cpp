@@ -11,6 +11,14 @@
 
 using namespace std;
 
+//*****************************************************************************
+// メンバの初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9	MAP::D3DTexture[MapChipMax] = { NULL };		// テクスチャへのポインタ
+
+//*****************************************************************************
+// グローバル変数
+//*****************************************************************************
 D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 
 //=============================================================================
@@ -32,19 +40,28 @@ MAP::MAP()
 	MakeVertex();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		MAP_TEXTURE0,					// ファイルの名前
-		&D3DTexture[0]);				// 読み込むメモリー
+	if (D3DTexture[0] == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+			MAP_TEXTURE0,					// ファイルの名前
+			&D3DTexture[0]);				// 読み込むメモリー
+	}
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		MAP_TEXTURE1,					// ファイルの名前
-		&D3DTexture[1]);				// 読み込むメモリー
-	
+	if (D3DTexture[1] == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+			MAP_TEXTURE1,					// ファイルの名前
+			&D3DTexture[1]);				// 読み込むメモリー
+	}
+
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		MAP_TEXTURE2,					// ファイルの名前
-		&D3DTexture[2]);				// 読み込むメモリー
+	if (D3DTexture[2] == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+			MAP_TEXTURE2,					// ファイルの名前
+			&D3DTexture[2]);				// 読み込むメモリー
+	}
 
 	MapCenterPos = pos;
 	MapCenterPos.x += CHIP_SIZE * MAP_SIZE_X * 0.5f;

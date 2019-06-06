@@ -1,17 +1,22 @@
 //=============================================================================
 //
 // ペイント [Paint.cpp]
-// Author : HAL東京 GP11B341-17 80277 染谷武志
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
 
+//*****************************************************************************
+// メンバの初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9	PAINT::D3DTexture = NULL;		// テクスチャへのポインタ
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PAINT::PAINT(int _ctrlNum)
+PAINT::PAINT()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -19,10 +24,13 @@ PAINT::PAINT(int _ctrlNum)
 	MakeVertex();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		TEXTURE_PAINT,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリー
-
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+			TEXTURE_PAINT,					// ファイルの名前
+			&D3DTexture);					// 読み込むメモリー
+	}
+	
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
@@ -32,7 +40,7 @@ PAINT::PAINT(int _ctrlNum)
 	height = PAINT_HEIGHT;
 	use = false;
 	time = 0;
-	patternAnim = ctrlNum = _ctrlNum;
+	patternAnim = 0;
 
 }
 
@@ -62,24 +70,26 @@ void PAINT::Update()
 	// 使用しているもののみ更新
 	if (use)
 	{
-		// 透明度を減衰値に合わせて追加
-		col.a -= DecAlpha;
-		if (col.a <= 0.0f)
-		{
-			// 全て透明になったら使用をやめる
-			col.a = 0.0f;
-			use = false;
-			col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		// 色の設定
-		SetColor(0, D3DXCOLOR(col.r, col.g, col.b, col.a));
-
 		// 表示時間の更新
 		time--;
+
+		// 表示時間を超えたら消滅処理
 		if (time <= 0)
 		{
-			use = false;
-			col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			// 透明度を減衰値に合わせて追加
+			col.a -= DecAlpha;
+
+			// 色の設定
+			SetColor(0);
+
+			if (col.a <= 0.0f)
+			{
+				// 全て透明になったら使用をやめる
+				col.a = 0.0f;
+				use = false;
+				col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+
 		}
 	}
 }
@@ -247,7 +257,7 @@ HRESULT PAINT::MakeVertex()
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void PAINT::SetVertex(int nIdxParticle, float _Width, float _Height)
+void PAINT::SetVertex(int nIdxParticle)
 {
 	{//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
@@ -258,10 +268,10 @@ void PAINT::SetVertex(int nIdxParticle, float _Width, float _Height)
 		pVtx += (nIdxParticle * 4);
 
 		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-_Width / 2.0f, 0.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(-_Width / 2.0f, _Height, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(_Width / 2.0f, 0.0f, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(_Width / 2.0f, _Height, 0.0f);
+		pVtx[0].vtx = D3DXVECTOR3(-width / 2.0f, 0.0f, 0.0f);
+		pVtx[1].vtx = D3DXVECTOR3(-width / 2.0f, height, 0.0f);
+		pVtx[2].vtx = D3DXVECTOR3(width / 2.0f, 0.0f, 0.0f);
+		pVtx[3].vtx = D3DXVECTOR3(width / 2.0f, height, 0.0f);
 
 		// 頂点データをアンロックする
 		D3DVtxBuff->Unlock();
@@ -272,7 +282,7 @@ void PAINT::SetVertex(int nIdxParticle, float _Width, float _Height)
 //=============================================================================
 // 頂点カラーの設定 引数(nIdxParticle = 番号, col = 色)
 //=============================================================================
-void PAINT::SetColor(int nIdxParticle, D3DXCOLOR _col)
+void PAINT::SetColor(int nIdxParticle)
 {
 	{//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
@@ -283,10 +293,10 @@ void PAINT::SetColor(int nIdxParticle, D3DXCOLOR _col)
 		pVtx += (nIdxParticle * 4);
 
 		// 頂点座標の設定
-		pVtx[0].diffuse = _col;
-		pVtx[1].diffuse = _col;
-		pVtx[2].diffuse = _col;
-		pVtx[3].diffuse = _col;
+		pVtx[0].diffuse = col;
+		pVtx[1].diffuse = col;
+		pVtx[2].diffuse = col;
+		pVtx[3].diffuse = col;
 
 		// 頂点データをアンロックする
 		D3DVtxBuff->Unlock();

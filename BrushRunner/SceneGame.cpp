@@ -21,12 +21,17 @@
 #include "_2dobj.h"
 #include "Frame01.h"
 #include "Faceframe.h"
-#include "blackinkline.h"
-#include "colorinkline.h"
+#include "InkFrameColor.h"
+#include "InkFrameBlack.h"
 #include "Ink.h"
 #include "Cursor.h"
 
+#include "PaintSystem.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+// エフェクトの種類
 enum {
 	HitEffect,
 	Hit1Effect,
@@ -38,11 +43,15 @@ enum {
 	EffectMax,
 };
 
+//*****************************************************************************
 // オブジェクトのポインタ
-static _2dobj *p2dobj[_2dMax];			// 2Dオブジェクト用のポインタ
-MAP *pMap;
-EFFECT *pEFFECT[EffectMax];
-PLAYER *pPlayer[PLAYER_MAX];
+//*****************************************************************************
+static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
+static MAP *pMap;							// マップ用のポインタ
+static EFFECT *pEFFECT[EffectMax];			// エフェクト用のポインタ
+static PLAYER *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
+static CURSOR *pCursor[PLAYER_MAX];			// カーソル用のポインタ
+static PAINTSYSTEM *pPSystem[PLAYER_MAX];	// ペイントシステム用のポインタ
 
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 
@@ -65,28 +74,28 @@ HRESULT InitSceneGame()
 	p2dobj[NumFrame] = new FRAME();
 
 	// 黒インクの初期化
-	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKLINEBLACK, BlackInk);
-	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKLINEBLACK, BlackInk);
+	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
 
 	// 黒インク用フレームの初期化
-	p2dobj[NumBlackFrame00] = new INKFRAME(BLACKINKFRAME_POS01, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumBlackFrame01] = new INKFRAME(BLACKINKFRAME_POS02, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumBlackFrame02] = new INKFRAME(BLACKINKFRAME_POS03, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumBlackFrame03] = new INKFRAME(BLACKINKFRAME_POS04, TEXTURE_BLACKINKFRAME);
+	p2dobj[NumBlackFrame00] = new INKFRAMEBLACK(BLACKINKFRAME_POS01);
+	p2dobj[NumBlackFrame01] = new INKFRAMEBLACK(BLACKINKFRAME_POS02);
+	p2dobj[NumBlackFrame02] = new INKFRAMEBLACK(BLACKINKFRAME_POS03);
+	p2dobj[NumBlackFrame03] = new INKFRAMEBLACK(BLACKINKFRAME_POS04);
 
 	// カラーインクの初期化
-	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKLINEBLUE, ColorInk);
-	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKLINERED, ColorInk);
-	p2dobj[NumInkyellow] = new INK(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKLINEYELLOW, ColorInk);
-	p2dobj[NumInkgreen] = new INK(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKLINEGREEN, ColorInk);
+	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
+	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGERED, ColorInk);
+	p2dobj[NumInkyellow] = new INK(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
+	p2dobj[NumInkgreen] = new INK(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
 
 	// カラーインク用フレームの初期化
-	p2dobj[NumColorFrame00] = new INKFRAME(COLORINKFRAME_POS01, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorFrame01] = new INKFRAME(COLORINKFRAME_POS02, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorFrame02] = new INKFRAME(COLORINKFRAME_POS03, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorFrame03] = new INKFRAME(COLORINKFRAME_POS04, TEXTURE_COLORINKFRAME);
+	p2dobj[NumColorFrame00] = new INKFRAMECOLOR(COLORINKFRAME_POS01);
+	p2dobj[NumColorFrame01] = new INKFRAMECOLOR(COLORINKFRAME_POS02);
+	p2dobj[NumColorFrame02] = new INKFRAMECOLOR(COLORINKFRAME_POS03);
+	p2dobj[NumColorFrame03] = new INKFRAMECOLOR(COLORINKFRAME_POS04);
 
 	// 顔を表示するフレームの初期化
 	p2dobj[NumFaceframe00] = new FACEFRAME(FACEFRAME_POS01);
@@ -95,9 +104,15 @@ HRESULT InitSceneGame()
 	p2dobj[NumFaceframe03] = new FACEFRAME(FACEFRAME_POS04);
 	
 	// カーソルの初期化
-	for (int i = Cursor0; i < Cursor0 + PLAYER_MAX; i++)
+	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		p2dobj[i] = new CURSOR(i - Cursor0, pPlayer[i - Cursor0]);
+		pCursor[i] = new CURSOR(i, pPlayer[i]);
+	}
+
+	// ペイントシステムの初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPSystem[i] = new PAINTSYSTEM(pCursor[i], pPlayer[i]);
 	}
 
 	// エフェクトの初期化
@@ -140,6 +155,17 @@ void UninitSceneGame()
 		delete p2dobj[i];
 	}
 
+	// カーソルの削除
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		delete pCursor[i];
+	}
+
+	// ペイントシステムの削除
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		delete pPSystem[i];
+	}
 }
 
 //=============================================================================
@@ -156,8 +182,22 @@ void UpdateSceneGame()
 		p2dobj[i]->Update();
 	}
 
+	// カーソルの更新
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pCursor[i]->Update();
+	}
+
+	//// ペイントシステムの更新
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPSystem[i]->Update();
+	//}
+
 	// マップの更新
 	pMap->Update();
+
+	// エフェクトの更新
 	for (int i = 0; i < EffectMax; i++)
 	{
 		pEFFECT[i]->Update();
@@ -204,6 +244,18 @@ void DrawSceneGame()
 	{
 		p2dobj[Draw2dobjBuff[i]]->Draw();
 	}
+
+	// カーソルの描画
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pCursor[i]->Draw();
+	}
+
+	//// ペイントシステムの描画
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPSystem[i]->Draw();
+	//}
 
 	// エフェクトの描画
 	for (int i = 0; i < EffectMax; i++)

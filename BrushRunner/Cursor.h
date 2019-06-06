@@ -15,7 +15,7 @@
 // マクロ定義
 //*****************************************************************************
 #define CURSOR_TEXTURE	_T("data/TEXTURE/brush.png")				// テクスチャ
-#define CURSOR_SIZE D3DXVECTOR2(75.0f, 75.0f)					// サイズ
+#define CURSOR_SIZE D3DXVECTOR3(75.0f, 75.0f, 0.0f)					// サイズ
 #define CURSOR_DIVIDE_X	(4)										// 横分割
 #define CURSOR_DIVIDE_Y	(2)										// 縦分割
 #define CURSOR_PATTERN	(CURSOR_DIVIDE_X * CURSOR_DIVIDE_Y)		// 分割数
@@ -31,10 +31,12 @@ class CURSOR :
 private:
 	int		ctrlNum;	// 操作するコントローラ番号
 	PLAYER *pPlayer;	// 参照するキャラクタのポインタ
-	float	vec;		// ジョイスティックのベクトルを1/1000にして保存
-	float	moveX;		// ジョイスティックのX値を1/1000にして保存
-	float	moveY;		// ジョイスティックのY値を1/1000にして保存
-	D3DXVECTOR3 oldPos;	// 画面外判定を行いための1f前の座標
+	float	vec;		// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
+	float	moveX;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
+	float	moveY;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
+	D3DXVECTOR3 oldPos;	// 画面外判定を行うための1f前の座標
+	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+
 
 public:
 	CURSOR(int _ctrlNum, PLAYER *pP);
@@ -49,9 +51,11 @@ public:
 
 	void Move();						// 操作
 	void Change();						// 切り替え
-
 	void KeyMove();						// キーボード操作
 	void PadMove();						// コントローラ操作
+
+	// ゲッター
+	D3DXVECTOR3 GetPos() { return pos; };
 
 };
 

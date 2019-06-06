@@ -1,23 +1,31 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Colorinkline.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// カラーインク用フレーム処理 [InkFrameColor.cpp]
+// Author : HAL東京 土居郁也
 //
 //=============================================================================
 #include "Main.h"
-#include "Colorinkline.h"
+#include "InkFrameColor.h"
+
+//*****************************************************************************
+// メンバの初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9	INKFRAMECOLOR::D3DTexture = NULL;					// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-INKFRAME::INKFRAME(D3DXVECTOR3 _pos, const char *texno)
+INKFRAMECOLOR::INKFRAMECOLOR(D3DXVECTOR3 _pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		texno,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			TEXTURE_COLORINKFRAME,				// ファイルの名前
+			&D3DTexture);				// 読み込むメモリのポインタ
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// フレームの初期化
@@ -34,7 +42,7 @@ INKFRAME::INKFRAME(D3DXVECTOR3 _pos, const char *texno)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-INKFRAME::~INKFRAME()
+INKFRAMECOLOR::~INKFRAMECOLOR()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +54,7 @@ INKFRAME::~INKFRAME()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void INKFRAME::Update()
+void INKFRAMECOLOR::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +69,7 @@ void INKFRAME::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void INKFRAME::Draw()
+void INKFRAMECOLOR::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -83,7 +91,7 @@ void INKFRAME::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT INKFRAME::MakeVertex(void)
+HRESULT INKFRAMECOLOR::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +122,7 @@ HRESULT INKFRAME::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void INKFRAME::SetTexture(int cntPattern)
+void INKFRAMECOLOR::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +139,7 @@ void INKFRAME::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void INKFRAME::SetVertex(void)
+void INKFRAMECOLOR::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

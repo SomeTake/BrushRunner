@@ -47,12 +47,6 @@ enum Num2dobj
 	NumFaceframe02,
 	NumFaceframe03,
 
-	// ƒJ[ƒ\ƒ‹
-	Cursor0,
-	Cursor1,
-	Cursor2,
-	Cursor3,
-
 	// ----- Å‘å” -----
 	_2dMax,
 };

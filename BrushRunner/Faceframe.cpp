@@ -7,6 +7,8 @@
 #include "Main.h"
 #include "Faceframe.h"
 
+LPDIRECT3DTEXTURE9	FACEFRAME::D3DTexture = NULL;	// テクスチャのポインタ
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -15,19 +17,19 @@ FACEFRAME::FACEFRAME(D3DXVECTOR3 _pos)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		TEXTURE_FACEFRAME,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			TEXTURE_FACEFRAME,				// ファイルの名前
+			&D3DTexture);				// 読み込むメモリのポインタ
+	}
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
 
 	// 頂点情報の作成
 	MakeVertex();
-	///////////////////////////////////////////////////////////////////////////////////////
 
 }
 

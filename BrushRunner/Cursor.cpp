@@ -9,6 +9,8 @@
 #include "Input.h"
 #include "Debugproc.h"
 
+LPDIRECT3DTEXTURE9	CURSOR::D3DTexture = NULL;	// テクスチャのポインタ
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -17,9 +19,12 @@ CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
-		CURSOR_TEXTURE,					// ファイルの名前
-		&D3DTexture);					// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
+			CURSOR_TEXTURE,					// ファイルの名前
+			&D3DTexture);					// 読み込むメモリのポインタ
+	}
 
 	use = true;
 	pos = CURSOR_FIRST_POS;
