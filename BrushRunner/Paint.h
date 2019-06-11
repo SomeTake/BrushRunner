@@ -15,13 +15,12 @@
 // マクロ定義
 //*****************************************************************************
 #define	TEXTURE_PAINT		"data/TEXTURE/paint.png"	// 読み込むテクスチャファイル名
-#define	PAINT_WIDTH			(10.0f)						// 幅
-#define	PAINT_HEIGHT		(10.0f)						// 高さ
-#define MAX_PAINT			(100)						// 同時に表示できる最大数
+#define	PAINT_WIDTH			(30.0f)						// 幅
+#define	PAINT_HEIGHT		(30.0f)						// 高さ
 #define PAINT_DIVIDE_X		(5)
 #define PAINT_DIVIDE_Y		(1)
 #define PAINT_DIVIDE		(PAINT_DIVIDE_X * PAINT_DIVIDE_Y)
-#define PAINT_MAX			(100)
+#define PAINT_MAX			(INK_MAX * 2)				// カラーインク＆黒インク
 #define PAINT_DRAW_FRAME	(120)						// 表示しておくフレーム数
 
 //*****************************************************************************
@@ -44,8 +43,8 @@ public:
 	void Update();
 	void Draw();
 	HRESULT MakeVertex();
-	void SetVertex(int nIdxParticle);
-	void SetColor(int nIdxParticle);
+	void SetVertex();
+	void SetColor();
 	void SetTexture();
 
 	// ゲッター

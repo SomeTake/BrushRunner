@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
+#include "Debugproc.h"
 
 //*****************************************************************************
 // メンバの初期化
@@ -41,7 +42,7 @@ PAINT::PAINT()
 	use = false;
 	time = 0;
 	patternAnim = 0;
-
+	DecAlpha = 0.1f;
 }
 
 //=============================================================================
@@ -71,26 +72,32 @@ void PAINT::Update()
 	if (use)
 	{
 		// 表示時間の更新
-		time--;
-
+		if (time > 0)
+		{
+			time--;
+		}
 		// 表示時間を超えたら消滅処理
-		if (time <= 0)
+		else
 		{
 			// 透明度を減衰値に合わせて追加
 			col.a -= DecAlpha;
 
 			// 色の設定
-			SetColor(0);
+			SetColor();
 
 			if (col.a <= 0.0f)
 			{
-				// 全て透明になったら使用をやめる
+				// 透明になったら使用をやめる
 				col.a = 0.0f;
 				use = false;
 				col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 
 		}
+
+		SetTexture();
+
+		PrintDebugProc("ペイント座標 X:%f Y:%f Z:%f\n", pos.x, pos.y ,pos.z);
 	}
 }
 
@@ -212,7 +219,7 @@ HRESULT PAINT::MakeVertex()
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX * MAX_PAINT,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
@@ -257,15 +264,13 @@ HRESULT PAINT::MakeVertex()
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void PAINT::SetVertex(int nIdxParticle)
+void PAINT::SetVertex()
 {
 	{//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-		pVtx += (nIdxParticle * 4);
 
 		// 頂点座標の設定
 		pVtx[0].vtx = D3DXVECTOR3(-width / 2.0f, 0.0f, 0.0f);
@@ -282,15 +287,13 @@ void PAINT::SetVertex(int nIdxParticle)
 //=============================================================================
 // 頂点カラーの設定 引数(nIdxParticle = 番号, col = 色)
 //=============================================================================
-void PAINT::SetColor(int nIdxParticle)
+void PAINT::SetColor()
 {
 	{//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-		pVtx += (nIdxParticle * 4);
 
 		// 頂点座標の設定
 		pVtx[0].diffuse = col;

@@ -70,7 +70,7 @@ void CURSOR::Update()
 	SetVertex();
 
 #ifndef _DEBUG_
-	//PrintDebugProc("CursorPos X:%f Y:%f\n", pos.x, pos.y);
+	PrintDebugProc("CursorPos X:%f Y:%f\n", pos.x, pos.y);
 	//PrintDebugProc("CursorMove X:%f Y:%f\n", moveX, moveY);
 	//PrintDebugProc("CursorVec %f\n", vec);
 #endif

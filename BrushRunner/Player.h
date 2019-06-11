@@ -155,6 +155,7 @@ public:
 	int GetInkType() { return inkType; };
 	float GetJumpSpeed() { return jumpSpeed; };
 	bool GetMoveFlag() { return moveFlag; };
+	int GetCtrlNum() { return ctrlNum; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };

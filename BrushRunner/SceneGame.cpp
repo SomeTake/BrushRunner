@@ -16,6 +16,7 @@
 #include "Collision.h"
 #include "Gravity.h"
 #include "Input.h"
+#include "MyLibrary.h"
 
 //2d obj
 #include "_2dobj.h"
@@ -27,6 +28,7 @@
 #include "Cursor.h"
 
 #include "PaintSystem.h"
+#include "Pop.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -48,10 +50,11 @@ enum {
 //*****************************************************************************
 static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
 static MAP *pMap;							// マップ用のポインタ
-static EFFECT *pEFFECT[EffectMax];			// エフェクト用のポインタ
+static EFFECT *pEffect[EffectMax];			// エフェクト用のポインタ
 static PLAYER *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
 static CURSOR *pCursor[PLAYER_MAX];			// カーソル用のポインタ
 static PAINTSYSTEM *pPSystem[PLAYER_MAX];	// ペイントシステム用のポインタ
+static POP *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
 
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 
@@ -115,12 +118,18 @@ HRESULT InitSceneGame()
 		pPSystem[i] = new PAINTSYSTEM(pCursor[i], pPlayer[i]);
 	}
 
+	// ポップアップの初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPop[i] = new POP(i, pPlayer[i]);
+	}
+
 	// エフェクトの初期化
-	pEFFECT[HitEffect] = new EFFECT(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
-	pEFFECT[Hit1Effect] = new EFFECT(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
-	pEFFECT[RunEffect] = new EFFECT(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
-	pEFFECT[ExpEffect] = new EFFECT(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
-	pEFFECT[ItemEffect] = new EFFECT(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
+	pEffect[HitEffect] = new EFFECT(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
+	pEffect[Hit1Effect] = new EFFECT(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
+	pEffect[RunEffect] = new EFFECT(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
+	pEffect[ExpEffect] = new EFFECT(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
+	pEffect[ItemEffect] = new EFFECT(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
 
 	// 描画順の初期化
 	for (int i = 0; i < _2dMax; i++)
@@ -140,7 +149,7 @@ void UninitSceneGame()
 	delete pMap;
 	for (int i = 0; i < EffectMax; i++)
 	{
-		delete pEFFECT[i];
+		delete pEffect[i];
 	}
 
 	// プレイヤーの削除
@@ -166,6 +175,18 @@ void UninitSceneGame()
 	{
 		delete pPSystem[i];
 	}
+
+	// ポップアップ削除
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		delete pPop[i];
+	}
+
+	// エフェクトの削除
+	for (int i = 0; i < EffectMax; i++)
+	{
+		delete pEffect[i];
+	}
 }
 
 //=============================================================================
@@ -188,11 +209,11 @@ void UpdateSceneGame()
 		pCursor[i]->Update();
 	}
 
-	//// ペイントシステムの更新
-	//for (int i = 0; i < PLAYER_MAX; i++)
-	//{
-	//	pPSystem[i]->Update();
-	//}
+	// ペイントシステムの更新
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPSystem[i]->Update();
+	}
 
 	// マップの更新
 	pMap->Update();
@@ -200,7 +221,7 @@ void UpdateSceneGame()
 	// エフェクトの更新
 	for (int i = 0; i < EffectMax; i++)
 	{
-		pEFFECT[i]->Update();
+		pEffect[i]->Update();
 	}
 
 	// プレイヤーの更新
@@ -218,6 +239,12 @@ void UpdateSceneGame()
 		{
 			GravityFall(pPlayer[i]);
 		}
+	}
+
+	// ポップアップの更新
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPop[i]->Update();
 	}
 
 #ifndef _DEBUG_
@@ -251,16 +278,22 @@ void DrawSceneGame()
 		pCursor[i]->Draw();
 	}
 
-	//// ペイントシステムの描画
-	//for (int i = 0; i < PLAYER_MAX; i++)
-	//{
-	//	pPSystem[i]->Draw();
-	//}
+	// ペイントシステムの描画
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPSystem[i]->Draw();
+	}
+
+	// ポップアップの描画
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPop[i]->Draw();
+	}
 
 	// エフェクトの描画
 	for (int i = 0; i < EffectMax; i++)
 	{
-		pEFFECT[i]->Draw();
+		pEffect[i]->Draw();
 	}
 }
 
@@ -333,56 +366,4 @@ D3DXVECTOR3 CompareXPos()
 	}
 
 	return D3DXVECTOR3((CmpPos[0] + CmpPos[1]) * 0.5f, (CmpY[0] + CmpY[1]) * 0.5f, 0.0f);
-}
-
-//=============================================================================
-// 比較関数(降順)float用
-// qsort関数の第4引数に入れて使う
-//=============================================================================
-int CmpDescendf(const void *p, const void *q)
-{
-	if (*(float*)p < *(float*)q)
-	{
-		return 1;
-	}
-	if (*(float*)p > *(float*)q)
-	{
-		return -1;
-	}
-	return 0;
-}
-
-//=============================================================================
-// 比較関数(昇順)float用
-// qsort関数の第4引数に入れて使う
-//=============================================================================
-int CmpAscendf(const void *p, const void *q)
-{
-	if (*(float*)p > *(float*)q)
-	{
-		return 1;
-	}
-	if (*(float*)p < *(float*)q)
-	{
-		return -1;
-	}
-	return 0;
-}
-
-//=============================================================================
-// 比較関数(降順)int用
-// qsort関数の第4引数に入れて使う
-//=============================================================================
-int CmpDescend(const void *p, const void *q)
-{
-	return *(int*)q - *(int*)p;
-}
-
-//=============================================================================
-// 比較関数(昇順)int用
-// qsort関数の第4引数に入れて使う
-//=============================================================================
-int CmpAscend(const void *p, const void *q)
-{
-	return *(int*)p - *(int*)q;
 }

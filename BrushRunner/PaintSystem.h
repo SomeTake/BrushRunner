@@ -17,7 +17,7 @@
 class PAINTSYSTEM
 {
 private:
-	PAINT * pPaint[MAX_PAINT];		// 発生させるペイントのポインタ
+	PAINT * pPaint[PAINT_MAX];		// 発生させるペイントのポインタ
 	CURSOR *pCursor;				// 参照するカーソルクラスのポインタ
 	PLAYER *pPlayer;				// 参照するプレイヤークラスのポインタ
 	D3DXVECTOR3 pos;
