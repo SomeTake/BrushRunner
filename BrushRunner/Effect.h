@@ -93,8 +93,8 @@ private:
 	int				PatternAnim;					// アニメーションパターン
 	int				AnimationCnt;
 
-	LPDIRECT3DTEXTURE9		D3DTexture = NULL;		// テクスチャへのポインタ
-	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;		// 頂点バッファへのポインタ
+	LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
+	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff;		// 頂点バッファへのポインタ
 	int				TexAnimNum;						// アニメーションの分割数
 	int				xPattern, yPattern;				// 分割数
 	D3DXVECTOR3		size;

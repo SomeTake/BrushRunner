@@ -85,6 +85,7 @@ PLAYER::PLAYER(int _CtrlNum)
 	ctrlNum = _CtrlNum;
 	inkType = false;
 	moveFlag = true;
+	playable = false;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -228,7 +229,7 @@ void PLAYER::Move()
 	}
 
 	// ƒI[ƒgˆÚ“®
-	if (moveFlag)
+	if (moveFlag && playable)
 	{
 		pos.x += MOVE_SPEED;
 	}

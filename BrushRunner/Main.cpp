@@ -46,6 +46,8 @@ int					g_nCountFPS;					// FPSカウンタ
 
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
+HWND hWnd;										// ウインドウハンドル
+
 //=============================================================================
 // メイン関数
 //=============================================================================
@@ -77,7 +79,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		CLASS_NAME,									// ウインドウクラスの名前
 		NULL										// ウインドウのアイコン
 	};
-	HWND hWnd;										// ウインドウハンドル
 	MSG msg;										// ウインドウプロシージャに渡すメッセージ
 
 													// ウィンドウクラスの登録
@@ -515,4 +516,9 @@ bool SetWindowCenter(HWND hWnd)
 							(SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER)	//	ウィンドウ位置のオプション：ウィンドウのサイズや、位置の変更に関するフラグを指定
 						);
 
+}
+
+HWND GetWindowHandle()
+{
+	return hWnd;
 }

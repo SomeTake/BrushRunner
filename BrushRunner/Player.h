@@ -137,6 +137,7 @@ private:
 	int					inkValue[InkNum];	// インクの残量
 	int					inkType;			// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool				moveFlag;			// 移動可能フラグ（進行方向にオブジェクトがある場合は移動不可）
+	bool				playable;			// ゲーム中か判定するフラグ
 
 public:
 	PLAYER(int _CtrlNum);
@@ -156,6 +157,7 @@ public:
 	float GetJumpSpeed() { return jumpSpeed; };
 	bool GetMoveFlag() { return moveFlag; };
 	int GetCtrlNum() { return ctrlNum; };
+	bool GetPlayable() { return playable; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
@@ -165,6 +167,7 @@ public:
 	void SetInkType(int _InkType) { inkType = _InkType; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
 	void SetMoveFlag(bool _moveFlag) { moveFlag = _moveFlag; };
+	void SetPlayable(bool _playable) { playable = _playable; };
 };
 
 #endif

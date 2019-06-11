@@ -141,15 +141,17 @@ D3DXVECTOR3 Pick(D3DXVECTOR3 _pos)
 	pD3Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
 	pD3Device->GetTransform(D3DTS_VIEW, &ViewMtx);
 
-	//POINT ptCursor;
+	POINT ptCursor;
+	ptCursor.x = (LONG)_pos.x;
+	ptCursor.y = (LONG)_pos.y;
 	//GetCursorPos(&ptCursor);
-	//ScreenToClient(DXUTGetHWND(), &ptCursor);
+	ScreenToClient(GetWindowHandle(), &ptCursor);
 
 	// スクリーン座標からピックレイのベクトルを求める
 	// Compute the vector of the pick ray in screen space
 	D3DXVECTOR3 v;
-	v.x = (((2.0f * _pos.x) / SCREEN_WIDTH) - 1) / ProjMtx._11 * (SCREEN_WIDTH / ProjMtx._22);
-	v.y = -(((2.0f * _pos.y) / SCREEN_HEIGHT) - 1) / ProjMtx._22 * (SCREEN_HEIGHT / ProjMtx._11);
+	v.x = (((2.0f * ptCursor.x) / SCREEN_WIDTH) - 1) / ProjMtx._11;
+	v.y = -(((2.0f * ptCursor.y) / SCREEN_HEIGHT) - 1) / ProjMtx._22;
 	v.z = 1.0f;
 
 	// 逆ビュー行列でワールド座標へ戻す
@@ -167,5 +169,5 @@ D3DXVECTOR3 Pick(D3DXVECTOR3 _pos)
 	vPickRayOrig.y = m._42;
 	vPickRayOrig.z = m._43;
 
-	return vPickRayDir;
+	return vPickRayOrig;
 }

@@ -46,14 +46,14 @@
     <Filter Include="ソース ファイル\System">
       <UniqueIdentifier>{e7dda05f-b3f0-4643-83cb-c8b881722313}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\System">
-      <UniqueIdentifier>{37c027fe-faf8-471d-891c-6f11a5f00337}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Obj3D">
       <UniqueIdentifier>{07c0aef6-811a-4233-9e0d-b041e5730f88}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\Obj3D">
       <UniqueIdentifier>{b13e5d86-a417-445f-a411-b49bd5c9f9b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\System">
+      <UniqueIdentifier>{37c027fe-faf8-471d-891c-6f11a5f00337}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +120,6 @@
     <ClCompile Include="Ink.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
-    <ClCompile Include="Cursor.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
     <ClCompile Include="Effect.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
@@ -145,7 +142,13 @@
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Pop.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CountDown.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Cursor.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +215,6 @@
     <ClInclude Include="Ink.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
-    <ClInclude Include="Cursor.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
@@ -237,7 +237,13 @@
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Pop.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="CountDown.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Cursor.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

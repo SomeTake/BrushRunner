@@ -61,6 +61,8 @@ POP::~POP()
 void POP::Update()
 {
 	pos = pPlayer->GetPos() + POP_POS;
+
+	SetTexture();
 }
 
 //=============================================================================

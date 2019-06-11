@@ -15,12 +15,14 @@ EFFECT::EFFECT(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _A
 	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
+	D3DTexture = NULL;
+	D3DVtxBuff = NULL;
+
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
 		texture,							// ファイルの名前
 		&D3DTexture);						// 読み込むメモリのポインタ
 
-	///////////////////////////////////////////////////////////////////////////////////////
 	// フレームの初期化
 	use = true;
 	//pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -35,8 +37,6 @@ EFFECT::EFFECT(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _A
 
 	// 頂点情報の作成
 	MakeVertex();
-	///////////////////////////////////////////////////////////////////////////////////////
-
 
 }
 //=============================================================================
@@ -48,6 +48,12 @@ EFFECT::~EFFECT() {
 	{	// テクスチャの開放
 		D3DTexture->Release();
 		D3DTexture = NULL;
+	}
+
+	if (D3DVtxBuff != NULL)
+	{
+		D3DVtxBuff->Release();
+		D3DVtxBuff = NULL;
 	}
 }
 //=============================================================================

@@ -10,6 +10,7 @@
 #include "Debugproc.h"
 #include "MyLibrary.h"
 #include "Camera.h"
+#include "Collision.h"
 
 //=============================================================================
 // コンストラクタ
@@ -49,7 +50,7 @@ void PAINTSYSTEM::Update()
 {
 	// カーソルの筆先に座標を合わせる
 	pos.x = pCursor->GetPos().x;
-	pos.y = pCursor->GetPos().y/* + CURSOR_SIZE.y*/;
+	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
 	pos.z = 0.0f;
 
 	// 使用しているペイントを更新
@@ -124,27 +125,27 @@ void PAINTSYSTEM::Set(int InkType)
 		if (!pPaint[nCntPaint]->GetUse())
 		{
 			// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
-			//// スクリーン座標とXZ平面のワールド座標交点算出
-			//D3DXVECTOR3 OutPos1;
-			//CalcScreenToXZ(&OutPos1, (int)pos.x, (int)pos.y, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+			// スクリーン座標とXZ平面のワールド座標交点算出
+			D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+			CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+			CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
-			//// カメラの範囲から奥行きを1.0～0.0に変換
-			//float viewRange;
-			//viewRange = VIEW_FAR_Z - VIEW_NEAR_Z;
-			//OutPos1.z -=  (pos.z + VIEW_NEAR_Z);
-			//OutPos1.z /= viewRange;
+			TRIANGLE_WK triPos1, triPos2;
 
-			//D3DXVECTOR3 OutPos2;
-			//// スクリーン座標をワールド座標へ変換
-			//CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, OutPos1.z, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-			//OutPos2.z = 0.0f;
+			triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
 
-			//pPaint[nCntPaint]->SetPos(OutPos2);
-			
-			D3DXVECTOR3 setPos = Pick(pos);
-			setPos.z = 0.0f;
+			triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
 
-			pPaint[nCntPaint]->SetPos(setPos);
+			if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+			{
+				hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+			}
+
+			pPaint[nCntPaint]->SetPos(SetPos);
 			pPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 			pPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
 			pPaint[nCntPaint]->SetTime(PAINT_DRAW_FRAME);

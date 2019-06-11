@@ -140,6 +140,7 @@
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="InkFrameBlack.cpp" />
     <ClCompile Include="InkFrameColor.cpp" />
     <ClCompile Include="Cursor.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="CountDown.h" />
     <ClInclude Include="InkFrameBlack.h" />
     <ClInclude Include="InkFrameColor.h" />
     <ClInclude Include="Cursor.h" />

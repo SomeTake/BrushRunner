@@ -42,8 +42,8 @@ void InitCamera(void)
 void UpdateCamera(D3DXVECTOR3 _at)
 {
 	// éQè∆Ç∑ÇÈç¿ïWÇ…ëŒÇµÇƒïΩçsà⁄ìÆÇ∑ÇÈ
-	//cameraWk.at = _at;
-	//cameraWk.pos = _at + CAMERA_POS;
+	cameraWk.at = _at;
+	cameraWk.pos = _at + CAMERA_POS;
 
 #ifndef _DEBUG_
 	PrintDebugProc("CamerAt X:%f Y:%f Z:%f\n", cameraWk.at.x, cameraWk.at.y, cameraWk.at.z);

@@ -26,6 +26,7 @@
 #include "InkFrameBlack.h"
 #include "Ink.h"
 #include "Cursor.h"
+#include "CountDown.h"
 
 #include "PaintSystem.h"
 #include "Pop.h"
@@ -106,6 +107,9 @@ HRESULT InitSceneGame()
 	p2dobj[NumFaceframe02] = new FACEFRAME(FACEFRAME_POS03);
 	p2dobj[NumFaceframe03] = new FACEFRAME(FACEFRAME_POS04);
 	
+	// カウントダウンの初期化
+	p2dobj[NumCountDown] = new COUNTDOWN();
+
 	// カーソルの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -147,6 +151,8 @@ void UninitSceneGame()
 {
 	// マップの削除
 	delete pMap;
+
+	// エフェクトの削除
 	for (int i = 0; i < EffectMax; i++)
 	{
 		delete pEffect[i];
@@ -181,12 +187,6 @@ void UninitSceneGame()
 	{
 		delete pPop[i];
 	}
-
-	// エフェクトの削除
-	for (int i = 0; i < EffectMax; i++)
-	{
-		delete pEffect[i];
-	}
 }
 
 //=============================================================================
@@ -194,6 +194,22 @@ void UninitSceneGame()
 //=============================================================================
 void UpdateSceneGame()
 {
+	static int startframe = 0;
+
+	// スタートタイマー更新
+	if (startframe < START_FRAME)
+	{
+		startframe++;
+	}
+	if (startframe == START_FRAME)
+	{
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->SetPlayable(true);
+		}
+	}
+
+
 	// カメラの更新
 	UpdateCamera(CompareXPos());
 
@@ -266,16 +282,16 @@ void DrawSceneGame()
 		pPlayer[i]->Draw();
 	}
 
-	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMax; i++)
-	{
-		p2dobj[Draw2dobjBuff[i]]->Draw();
-	}
-
 	// カーソルの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pCursor[i]->Draw();
+	}
+
+	// 2Dオブジェクトの描画
+	for (int i = 0; i < _2dMax; i++)
+	{
+		p2dobj[Draw2dobjBuff[i]]->Draw();
 	}
 
 	// ペイントシステムの描画
