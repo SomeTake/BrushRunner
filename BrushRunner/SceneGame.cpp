@@ -250,10 +250,30 @@ void UpdateSceneGame()
 		{
 			pPlayer[i]->SetJumpFlag(false);
 		}
-		// 地面に接していないので、落下する
 		else
 		{
-			GravityFall(pPlayer[i]);
+			// ペイントシステムとの当たり判定
+			if (HitCheckPToS(pPlayer[i], pPSystem[i]))
+			{
+				pPlayer[i]->SetJumpFlag(false);
+			}
+			else
+			{
+				GravityFall(pPlayer[i]);
+			}
+		}
+	}
+
+	// ペイントシステム同士の当たり判定
+	for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
+	{
+		for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
+		{
+			// 自分が使用しているカラー以外との判定を行う
+			if (nBlack != nColor)
+			{
+				//HitCheckSToS(pPSystem[nBlack], pPSystem[nColor]);
+			}
 		}
 	}
 

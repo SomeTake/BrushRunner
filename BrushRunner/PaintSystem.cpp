@@ -65,7 +65,7 @@ void PAINTSYSTEM::Update()
 	}
 
 	// インクを使う
-	if (GetKeyboardPress(DIK_O))
+	if (GetKeyboardPress(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C))
 	{
 		// 使用するインクの残量チェック
 		int type = pPlayer->GetInkType();
@@ -130,8 +130,8 @@ void PAINTSYSTEM::Set(int InkType)
 			CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 			CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
+			// 判定用三角形ポリゴン
 			TRIANGLE_WK triPos1, triPos2;
-
 			triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
@@ -140,6 +140,7 @@ void PAINTSYSTEM::Set(int InkType)
 				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
 
+			// 2点を使って当たった場所をセットする場所とする
 			if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
 			{
 				hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
@@ -148,16 +149,18 @@ void PAINTSYSTEM::Set(int InkType)
 			pPaint[nCntPaint]->SetPos(SetPos);
 			pPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 			pPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-			pPaint[nCntPaint]->SetTime(PAINT_DRAW_FRAME);
+
 			pPaint[nCntPaint]->SetUse(true);
 
-			// 使用しているインクの色に合わせてテクスチャをセット
+			// 使用しているインクの色に合わせて表示時間、テクスチャをセット
 			if (InkType == BlackInk)
 			{
+				pPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
 				pPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
 			}
 			else
 			{
+				pPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
 				pPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
 			}
 

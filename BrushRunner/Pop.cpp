@@ -62,7 +62,6 @@ void POP::Update()
 {
 	pos = pPlayer->GetPos() + POP_POS;
 
-	SetTexture();
 }
 
 //=============================================================================
@@ -167,10 +166,10 @@ HRESULT POP::MakeVertex()
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, 0.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, POP_HEIGHT, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, 0.0f, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, POP_HEIGHT, 0.0f);
+		pVtx[0].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
+		pVtx[1].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
+		pVtx[2].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f,-POP_HEIGHT / 2.0f, 0.0f);
+		pVtx[3].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
 
 		// 反射光の設定
 		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -178,43 +177,20 @@ HRESULT POP::MakeVertex()
 		pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
+		int x = patternAnim % POP_DIVIDE_X;
+		int y = patternAnim / POP_DIVIDE_X;
+		float sizeX = 1.0f / POP_DIVIDE_X;
+		float sizeY = 1.0f / POP_DIVIDE_Y;
+
 		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[1].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(1.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 
 		// 頂点データをアンロックする
 		D3DVtxBuff->Unlock();
 	}
 
 	return S_OK;
-}
-
-//=============================================================================
-// テクスチャ座標の設定
-//=============================================================================
-void POP::SetTexture()
-{
-	int x = patternAnim % POP_DIVIDE_X;
-	int y = patternAnim / POP_DIVIDE_X;
-	float sizeX = 1.0f / POP_DIVIDE_X;
-	float sizeY = 1.0f / POP_DIVIDE_Y;
-
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
-		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
-	}
-
 }

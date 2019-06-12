@@ -29,6 +29,9 @@ public:
 	void Update();
 	void Draw();
 	void Set(int InkType);
+
+	// ƒQƒbƒ^[
+	PAINT *GetPaint(int _num) { return pPaint[_num]; };
 };
 
 #endif

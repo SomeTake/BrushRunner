@@ -20,7 +20,5 @@ int CmpAscendf(const void *p, const void *q);		// floatの比較（昇順）
 int CmpDescend(const void *p, const void *q);		// intの比較（降順）
 int CmpAscend(const void *p, const void *q);		// intの比較（昇順）
 
-D3DXVECTOR3 Pick(D3DXVECTOR3 _pos);
-
 #endif
 

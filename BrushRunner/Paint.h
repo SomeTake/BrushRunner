@@ -21,7 +21,17 @@
 #define PAINT_DIVIDE_Y		(1)
 #define PAINT_DIVIDE		(PAINT_DIVIDE_X * PAINT_DIVIDE_Y)
 #define PAINT_MAX			(INK_MAX * 2)				// カラーインク＆黒インク
-#define PAINT_DRAW_FRAME	(120)						// 表示しておくフレーム数
+#define DRAW_FRAME_COLOR	(300)						// 表示しておくフレーム数
+#define DRAW_FRAME_BLACK	(60)						// 表示しておくフレーム数
+
+enum InkColor
+{
+	RedInkColor,
+	BlueInkColor,
+	YellowInkColor,
+	GreenInkColor,
+	BlackInkColor
+};
 
 //*****************************************************************************
 // クラス定義
@@ -51,6 +61,7 @@ public:
 	bool GetUse() { return use; };
 	int GetTime() { return time; };
 	D3DXVECTOR3 GetPos() { return pos; };
+	int GetPatternAnim() { return patternAnim; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };

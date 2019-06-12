@@ -29,6 +29,31 @@ bool HitCheckBB(D3DXVECTOR3 posA, D3DXVECTOR3 posB, D3DXVECTOR2 sizeA, D3DXVECTO
 }
 
 //=============================================================================
+// 球の当たり判定
+//=============================================================================
+bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Range1, float Range2)
+{
+	// 当たり判定の中心の距離を測る
+	D3DXVECTOR3 unit = Pos1 - Pos2;
+	float dist = D3DXVec3Length(&unit);
+
+	// 当たり判定の範囲を足した距離を出す（球なのでXYZどれとっても同じ）
+	float hitrange = Range1 + Range2;
+
+	// 当たり判定の中心の距離よりも範囲を足した距離の方が長ければ当たる
+	if (dist <= hitrange)
+	{
+		return true;
+	}
+	// 外れ
+	else
+	{
+
+	}
+	return false;
+}
+
+//=============================================================================
 // プレイヤーと足元のマップの当たり判定
 //=============================================================================
 bool HitCheckPToM(PLAYER *pP, MAP *pM)
@@ -83,6 +108,67 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 	{
 		return false;
 	}
+}
+
+//=============================================================================
+// プレイヤーとペイントシステムの当たり判定
+//=============================================================================
+bool HitCheckPToS(PLAYER *pP, PAINTSYSTEM *pS)
+{
+	bool returnflag = false;
+
+	for (int i = 0; i < PAINT_MAX; i++)
+	{
+		// 使用しているかつ、プレイヤーカラーのインクを使用している場合当たり判定を行う
+		if (pS->GetPaint(i)->GetUse() && (pS->GetPaint(i)->GetPatternAnim() == pP->GetCtrlNum()))
+		{
+			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
+			if (HitSphere(pP->GetPos(), pS->GetPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x, PAINT_WIDTH))
+			{
+				// 当たった場合、プレイヤーの座標を修正
+				D3DXVECTOR3 setpos = pP->GetPos();
+				setpos.y = pS->GetPaint(i)->GetPos().y + PAINT_WIDTH * 0.1f;
+
+				pP->SetPos(setpos);
+
+				returnflag = true;
+			}
+		}
+	}
+
+	if (returnflag)
+	{
+		return true;
+	}
+	return false;
+}
+
+//=============================================================================
+// ペイントシステム同士の当たり判定
+// pSysBlack : 黒インク用ペイントシステムのポインタ
+// pSysColor : カラーインク用ペイントシステムのポインタ
+//=============================================================================
+void HitCheckSToS(PAINTSYSTEM *pSysBlack, PAINTSYSTEM *pSysColor)
+{
+	for (int nBlack = 0; nBlack < PAINT_MAX; nBlack++)
+	{
+		// 使用しているかつ黒の場合判定を行う
+		if (pSysBlack->GetPaint(nBlack)->GetUse() && pSysBlack->GetPaint(nBlack)->GetPatternAnim() == BlackInkColor) continue;
+		
+		for (int nColor = 0; nColor < PAINT_MAX; nColor++)
+		{
+			// 使用しているかつカラーの場合判定を行う
+			if (pSysColor->GetPaint(nColor)->GetUse() && pSysColor->GetPaint(nColor)->GetPatternAnim() != BlackInkColor) continue;
+			
+			if (HitSphere(pSysBlack->GetPaint(nBlack)->GetPos(), pSysColor->GetPaint(nColor)->GetPos(), PAINT_WIDTH, PAINT_WIDTH))
+			{
+				// ヒットした場合そのペイントを消す
+				pSysColor->GetPaint(nColor)->SetTime(0);
+			}
+
+		}
+	}
+	
 }
 
 //=============================================================================

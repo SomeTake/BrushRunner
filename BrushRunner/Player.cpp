@@ -116,7 +116,10 @@ void PLAYER::Update()
 	Move();
 
 	// インク変更
-	Change();
+	ChangeInk();
+
+	// アニメーション管理
+	ChangeAnim();
 
 #ifndef _DEBUG_
 	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
@@ -184,9 +187,9 @@ void PLAYER::Draw()
 //=====================================================================================================
 // インクの種類交換
 //=====================================================================================================
-void PLAYER::Change()
+void PLAYER::ChangeInk()
 {
-	if (GetKeyboardTrigger(DIK_P))
+	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(ctrlNum, BUTTON_R1))
 	{
 		// 黒→カラー
 		if (inkType == BlackInk)
@@ -212,7 +215,7 @@ void PLAYER::Change()
 void PLAYER::Move()
 {
 	// ジャンプ
-	if (GetKeyboardTrigger(DIK_UP) && (!jumpFlag))
+	if ((GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B)) && (!jumpFlag))
 	{
 		jumpFlag = true;
 		jumpSpeed = JUMP_SPEED;
@@ -232,5 +235,40 @@ void PLAYER::Move()
 	if (moveFlag && playable)
 	{
 		pos.x += MOVE_SPEED;
+	}
+}
+
+//=====================================================================================================
+// アニメーション管理
+//=====================================================================================================
+void PLAYER::ChangeAnim()
+{
+	// 待機状態
+	if (!playable)
+	{
+		if (Animation->CurrentAnimID != Idle)
+		{
+			Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+		}
+	}
+
+	if (playable)
+	{
+		// 歩行中
+		if (moveFlag)
+		{
+			if (Animation->CurrentAnimID != Frontwalk)
+			{
+				Animation->ChangeAnimation(Animation, Frontwalk, Data[Frontwalk].Spd);
+			}
+		}
+		// 待機中
+		else
+		{
+			if (Animation->CurrentAnimID != Idle)
+			{
+				Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+			}
+		}
 	}
 }

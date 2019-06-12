@@ -13,13 +13,13 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_POP		"data/TEXTURE/pointer001.png"	// 読み込むテクスチャファイル名
+#define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
 #define	POP_WIDTH		(20.0f)							// 半径高さ
 #define	POP_HEIGHT		(20.0f)							// 半径幅
-#define POP_POS			D3DXVECTOR3(0.0f, 80.0f, 0.0f)	// 表示場所
+#define POP_POS			D3DXVECTOR3(0.0f, 90.0f, 0.0f)	// 表示場所
 #define POP_DIVIDE_X	(4)
 #define POP_DIVIDE_Y	(1)
-#define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDDE_Y)
+#define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDE_Y)
 
 //*****************************************************************************
 // クラス定義
@@ -41,7 +41,6 @@ public:
 	void Update();
 	void Draw();
 	HRESULT MakeVertex();
-	void SetTexture();
 
 };
 

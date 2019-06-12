@@ -16,7 +16,7 @@
 #define PLAYER_MAX			(4)											// 操作するプレイヤーの数
 #define PLAYER_FIRST_POS	D3DXVECTOR3(20.0f, -40.0f, 0.0f)			// 初期位置
 #define PLAYER_FIRST_ROT	D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
-#define JUMP_SPEED			(20.0f)										// ジャンプの初速
+#define JUMP_SPEED			(12.0f)										// ジャンプの初速
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
 #define INK_MAX				(100)										// インクの最大量
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
@@ -139,14 +139,17 @@ private:
 	bool				moveFlag;			// 移動可能フラグ（進行方向にオブジェクトがある場合は移動不可）
 	bool				playable;			// ゲーム中か判定するフラグ
 
+	// メンバ関数
+	void ChangeInk();		// インクの種類交換
+	void Move();			// 移動
+	void ChangeAnim();		// アニメーション管理
+
 public:
+	// メンバ関数
 	PLAYER(int _CtrlNum);
 	~PLAYER();
 	void Update();
 	void Draw();
-
-	void Change();			// インクの種類交換
-	void Move();			// 移動
 
 	// ゲッター
 	D3DXVECTOR3	GetPos() { return pos; };
