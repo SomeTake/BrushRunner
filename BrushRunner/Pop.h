@@ -33,9 +33,8 @@ private:
 
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 
-
 public:
-	POP(int _ctrlNum, PLAYER *pP);
+	POP(PLAYER *pP);
 	~POP();
 
 	void Update();

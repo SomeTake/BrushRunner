@@ -125,7 +125,7 @@ HRESULT InitSceneGame()
 	// ポップアップの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPop[i] = new POP(i, pPlayer[i]);
+		pPop[i] = new POP(pPlayer[i]);
 	}
 
 	// エフェクトの初期化

@@ -13,7 +13,7 @@ LPDIRECT3DTEXTURE9	POP::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-POP::POP(int _ctrlNum, PLAYER *pP)
+POP::POP(PLAYER *pP)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -33,7 +33,7 @@ POP::POP(int _ctrlNum, PLAYER *pP)
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	width = POP_WIDTH;
 	height = POP_HEIGHT;
-	patternAnim = _ctrlNum;
+	patternAnim = pPlayer->GetCtrlNum();
 
 }
 
@@ -179,8 +179,8 @@ HRESULT POP::MakeVertex()
 
 		int x = patternAnim % POP_DIVIDE_X;
 		int y = patternAnim / POP_DIVIDE_X;
-		float sizeX = 1.0f / POP_DIVIDE_X;
-		float sizeY = 1.0f / POP_DIVIDE_Y;
+		float sizeX = 1.0f / (float)POP_DIVIDE_X;
+		float sizeY = 1.0f / (float)POP_DIVIDE_Y;
 
 		// テクスチャ座標の設定
 		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
