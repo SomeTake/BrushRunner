@@ -215,11 +215,16 @@ void PLAYER::ChangeInk()
 void PLAYER::Move()
 {
 	// ÉWÉÉÉìÉv
-	if ((GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B)) && (!jumpFlag))
+	if (playable)
 	{
-		jumpFlag = true;
-		jumpSpeed = JUMP_SPEED;
+		if ((GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B)) && (!jumpFlag))
+		{
+			jumpFlag = true;
+			moveFlag = true;
+			jumpSpeed = JUMP_SPEED;
+		}
 	}
+
 	// ínè„Ç…Ç¢ÇÈÇ∆Ç´
 	if (!jumpFlag)
 	{

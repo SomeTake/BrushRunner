@@ -72,14 +72,17 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 	int frontx = x + 1;
 	int fronty = y + 1;
 
-	// なにかオブジェクトに引っかかるかチェック
-	if (pM->GetMapTbl(-fronty, frontx) >= 0)
+	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
+	if (!pP->GetJumpFlag())
 	{
-		pP->SetMoveFlag(false);
-	}
-	else
-	{
-		pP->SetMoveFlag(true);
+		if (pM->GetMapTbl(-fronty, frontx) >= 0)
+		{
+			pP->SetMoveFlag(false);
+		}
+		else
+		{
+			pP->SetMoveFlag(true);
+		}
 	}
 
 	// マップ外判定
@@ -123,7 +126,7 @@ bool HitCheckPToS(PLAYER *pP, PAINTSYSTEM *pS)
 		if (pS->GetPaint(i)->GetUse() && (pS->GetPaint(i)->GetPatternAnim() == pP->GetCtrlNum()))
 		{
 			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-			if (HitSphere(pP->GetPos(), pS->GetPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x, PAINT_WIDTH))
+			if (HitSphere(pP->GetPos(), pS->GetPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
 			{
 				// 当たった場合、プレイヤーの座標を修正
 				D3DXVECTOR3 setpos = pP->GetPos();

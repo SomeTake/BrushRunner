@@ -90,8 +90,8 @@ HRESULT InitSceneGame()
 	p2dobj[NumBlackFrame03] = new INKFRAMEBLACK(BLACKINKFRAME_POS04);
 
 	// カラーインクの初期化
-	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
-	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGERED, ColorInk);
+	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
+	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
 	p2dobj[NumInkyellow] = new INK(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
 	p2dobj[NumInkgreen] = new INK(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
 
@@ -245,22 +245,36 @@ void UpdateSceneGame()
 	{
 		pPlayer[i]->Update();
 
+		bool gravflag = false;
+
 		// 地面に接しているか確認
 		if (HitCheckPToM(pPlayer[i], pMap))
 		{
 			pPlayer[i]->SetJumpFlag(false);
+			gravflag = false;
 		}
 		else
 		{
-			// ペイントシステムとの当たり判定
+			gravflag = true;
+		}
+		// ペイントシステムとの当たり判定
+		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
+		{
 			if (HitCheckPToS(pPlayer[i], pPSystem[i]))
 			{
 				pPlayer[i]->SetJumpFlag(false);
+				gravflag = false;
 			}
 			else
 			{
-				GravityFall(pPlayer[i]);
+				gravflag = true;
 			}
+		}
+
+		// 重力が有効
+		if (gravflag)
+		{
+			GravityFall(pPlayer[i]);
 		}
 	}
 
