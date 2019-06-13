@@ -46,14 +46,17 @@
     <Filter Include="ソース ファイル\System">
       <UniqueIdentifier>{e7dda05f-b3f0-4643-83cb-c8b881722313}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Obj3D">
+      <UniqueIdentifier>{07c0aef6-811a-4233-9e0d-b041e5730f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Obj3D">
+      <UniqueIdentifier>{b13e5d86-a417-445f-a411-b49bd5c9f9b1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ヘッダー ファイル\System">
       <UniqueIdentifier>{37c027fe-faf8-471d-891c-6f11a5f00337}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Map.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="SceneCharacterSelect.cpp">
       <Filter>ソース ファイル\GameScene</Filter>
     </ClCompile>
@@ -69,32 +72,20 @@
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Frame01.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
     <ClCompile Include="_2dobj.cpp">
       <Filter>ソース ファイル\2d</Filter>
     </ClCompile>
-    <ClCompile Include="Faceframe.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="colorinkline.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="blackinkline.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="AllocateHierarchy.cpp">
-      <Filter>ソース ファイル\Player</Filter>
+    <ClCompile Include="Map.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="_2dobj.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="D3DXAnimation.cpp">
       <Filter>ソース ファイル\Player</Filter>
@@ -102,11 +93,65 @@
     <ClCompile Include="Player.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
+    <ClCompile Include="AllocateHierarchy.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Faceframe.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Frame01.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugproc.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Gravity.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Ink.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Billboard.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Paint.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintSystem.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="InkFrameColor.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="InkFrameBlack.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="MyLibrary.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Pop.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CountDown.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Cursor.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Map.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="SceneCharacterSelect.h">
       <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
@@ -122,23 +167,8 @@
     <ClInclude Include="Main.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Frame01.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
     <ClInclude Include="_2dobj.h">
       <Filter>ヘッダー ファイル\2d</Filter>
-    </ClInclude>
-    <ClInclude Include="Faceframe.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="colorinkline.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="blackinkline.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>ヘッダー ファイル\System</Filter>
@@ -146,14 +176,74 @@
     <ClInclude Include="Camera.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル\Player</Filter>
+    <ClInclude Include="Map.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="_2dobj.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="D3DXAnimation.h">
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
     <ClInclude Include="AllocateHierarchy.h">
       <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Faceframe.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Frame01.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugproc.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Gravity.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Ink.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Billboard.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Paint.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintSystem.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="InkFrameColor.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="InkFrameBlack.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="MyLibrary.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Pop.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="CountDown.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Cursor.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

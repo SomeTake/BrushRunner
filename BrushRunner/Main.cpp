@@ -12,12 +12,13 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Input.h"
+#include "Debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define CLASS_NAME		"AppClass"			// ウインドウのクラス名
-#define WINDOW_NAME		"BattleGym3D"		// ウインドウのキャプション名
+#define WINDOW_NAME		"BrushRunner"		// ウインドウのキャプション名
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -44,6 +45,8 @@ int					g_nCountFPS;					// FPSカウンタ
 #endif
 
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
+
+HWND hWnd;										// ウインドウハンドル
 
 //=============================================================================
 // メイン関数
@@ -76,7 +79,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		CLASS_NAME,									// ウインドウクラスの名前
 		NULL										// ウインドウのアイコン
 	};
-	HWND hWnd;										// ウインドウハンドル
 	MSG msg;										// ウインドウプロシージャに渡すメッセージ
 
 													// ウィンドウクラスの登録
@@ -315,6 +317,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
 
+	InitDebugProc();
+
 #endif
 	InitInput(hInstance,hWnd);
 
@@ -341,6 +345,7 @@ void Uninit(void)
 		g_pD3DXFont = NULL;
 	}
 
+	UninitDebugProc();
 #endif
 	if (g_pD3DDevice != NULL)
 	{// デバイスの開放
@@ -405,11 +410,6 @@ void Draw(void)
 	{
 		SetCamera();
 
-#ifdef _DEBUG
-		// FPS表示
-		DrawFPS();
-
-#endif
 		switch (eScene)
 		{
 		case SceneTitle:
@@ -428,6 +428,14 @@ void Draw(void)
 			break;
 		}
 
+
+#ifdef _DEBUG
+		// FPS表示
+		DrawFPS();
+
+		DrawDebugProc();
+
+#endif
 
 		// Direct3Dによる描画の終了
 		g_pD3DDevice->EndScene();
@@ -451,7 +459,7 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 //=============================================================================
 void DrawFPS(void)
 {
-
+	PrintDebugProc("FPS:%d\n", g_nCountFPS);
 }
 #endif
 
@@ -508,4 +516,9 @@ bool SetWindowCenter(HWND hWnd)
 							(SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER)	//	ウィンドウ位置のオプション：ウィンドウのサイズや、位置の変更に関するフラグを指定
 						);
 
+}
+
+HWND GetWindowHandle()
+{
+	return hWnd;
 }

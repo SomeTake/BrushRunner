@@ -1,26 +1,34 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Blackinkline.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// 黒インク用フレーム処理 [InkFrameBlack.cpp]
+// Author : HAL東京 土居郁也
 //
 //=============================================================================
 #include "Main.h"
-#include "Blackinkline.h"
+#include "InkFrameBlack.h"
+
+//*****************************************************************************
+// メンバの初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9	INKFRAMEBLACK::D3DTexture = NULL;					// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Blackinkline::Blackinkline(D3DXVECTOR3 _pos, const char *texno)
+INKFRAMEBLACK::INKFRAMEBLACK(D3DXVECTOR3 _pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		texno,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			TEXTURE_BLACKINKFRAME,				// ファイルの名前
+			&D3DTexture);				// 読み込むメモリのポインタ
+	}
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
+	///////////////////////////////////////////////////////////////////////////////////////
+	// フレームの初期化
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
@@ -34,7 +42,7 @@ Blackinkline::Blackinkline(D3DXVECTOR3 _pos, const char *texno)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Blackinkline::~Blackinkline()
+INKFRAMEBLACK::~INKFRAMEBLACK()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +54,7 @@ Blackinkline::~Blackinkline()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Blackinkline::Update()
+void INKFRAMEBLACK::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +69,7 @@ void Blackinkline::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Blackinkline::Draw()
+void INKFRAMEBLACK::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -83,7 +91,7 @@ void Blackinkline::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Blackinkline::MakeVertex(void)
+HRESULT INKFRAMEBLACK::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +122,7 @@ HRESULT Blackinkline::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Blackinkline::SetTexture(int cntPattern)
+void INKFRAMEBLACK::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +139,7 @@ void Blackinkline::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Blackinkline::SetVertex(void)
+void INKFRAMEBLACK::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

@@ -1,16 +1,16 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Colorinkline.cpp]
+// インクゲージ表示処理 [Ink.cpp]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Colorinkline.h"
+#include "Ink.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Colorinkline::Colorinkline(D3DXVECTOR3 _pos,const char *texno)
+INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -19,22 +19,23 @@ Colorinkline::Colorinkline(D3DXVECTOR3 _pos,const char *texno)
 		texno,				// ファイルの名前
 		&D3DTexture);				// 読み込むメモリのポインタ
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
+	///////////////////////////////////////////////////////////////////////////////////////
+	// インクの初期化
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
+	pPlayer = pP;
+	inktype = _inktype;
 
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
-
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Colorinkline::~Colorinkline()
+INK::~INK()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +47,7 @@ Colorinkline::~Colorinkline()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Colorinkline::Update()
+void INK::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +62,7 @@ void Colorinkline::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Colorinkline::Draw()
+void INK::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -77,13 +78,12 @@ void Colorinkline::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
 	}
-
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Colorinkline::MakeVertex(void)
+HRESULT INK::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +114,7 @@ HRESULT Colorinkline::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Colorinkline::SetTexture(int cntPattern)
+void INK::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -122,20 +122,21 @@ void Colorinkline::SetTexture(int cntPattern)
 	float sizeY = 1.0f;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX + ((float)DISPLACE / INK_SIZE.x), (float)(y)* sizeY);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX - ((float)DISPLACE / INK_SIZE.x) + sizeX * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), (float)(y)* sizeY + sizeY);
 }
 
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Colorinkline::SetVertex(void)
-{
+void INK::SetVertex()
+{	
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + COLORINKLINE_SIZE.x, pos.y + COLORINKLINE_SIZE.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x + DISPLACE, pos.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x+ INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + INK_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x - DISPLACE + INK_SIZE.x * ((float)pPlayer->GetInkValue(inktype) / INK_MAX), pos.y + INK_SIZE.y, pos.z);
 }
+

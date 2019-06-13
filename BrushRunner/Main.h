@@ -88,6 +88,14 @@ typedef struct
 	D3DXVECTOR2 tex;		// テクスチャ座標
 } VERTEX_3D;
 
+// 三角形ポリゴン用の構造体
+typedef struct
+{
+	D3DXVECTOR3 pos0;
+	D3DXVECTOR3 pos1;
+	D3DXVECTOR3 pos2;
+} TRIANGLE_WK;
+
 
 //シーン遷移
 enum
@@ -105,5 +113,7 @@ enum
 LPDIRECT3DDEVICE9 GetDevice();	// デバイスを取得する
 int GetScene();					// 現在のゲームシーンを取得する
 void SetScene(int _scene);		// ゲームシーンを変更する
+
+HWND GetWindowHandle();
 
 #endif
