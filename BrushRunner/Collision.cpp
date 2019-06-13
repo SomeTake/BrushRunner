@@ -104,6 +104,7 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 	{
 		// めり込みを修正
 		PosModification(pP, mappos);
+		pP->SetJumpFlag(false);
 
 		return true;
 	}
@@ -209,7 +210,7 @@ void crossProduct(D3DXVECTOR3 *ret, D3DXVECTOR3 *vl, D3DXVECTOR3 *vr)
 // pos0   :始点（移動前）
 // pos1   :終点（移動後）
 //=============================================================================
-int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_WK tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
+int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_STR tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
 {
 	D3DXVECTOR3		nor;		// ポリゴンの法線
 

@@ -17,9 +17,6 @@ POP::POP(PLAYER *pP)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点情報の作成
-	MakeVertex();
-
 	// テクスチャの初期化
 	if (D3DTexture == NULL)
 	{
@@ -34,6 +31,9 @@ POP::POP(PLAYER *pP)
 	width = POP_WIDTH;
 	height = POP_HEIGHT;
 	patternAnim = pPlayer->GetCtrlNum();
+
+	// 頂点情報の作成
+	MakeVertex();
 
 }
 

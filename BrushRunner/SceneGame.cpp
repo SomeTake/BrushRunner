@@ -322,6 +322,12 @@ void DrawSceneGame()
 		pCursor[i]->Draw();
 	}
 
+	// ポップアップの描画
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPop[i]->Draw();
+	}
+
 	// 2Dオブジェクトの描画
 	for (int i = 0; i < _2dMax; i++)
 	{
@@ -332,12 +338,6 @@ void DrawSceneGame()
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPSystem[i]->Draw();
-	}
-
-	// ポップアップの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i]->Draw();
 	}
 
 	// エフェクトの描画

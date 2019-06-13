@@ -14,8 +14,8 @@
 // マクロ定義
 //*****************************************************************************
 #define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
-#define	POP_WIDTH		(20.0f)							// 半径高さ
-#define	POP_HEIGHT		(20.0f)							// 半径幅
+#define	POP_WIDTH		(64.0f)							// 半径高さ
+#define	POP_HEIGHT		(32.0f)							// 半径幅
 #define POP_POS			D3DXVECTOR3(0.0f, 90.0f, 0.0f)	// 表示場所
 #define POP_DIVIDE_X	(4)
 #define POP_DIVIDE_Y	(1)

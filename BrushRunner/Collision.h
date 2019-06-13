@@ -23,7 +23,7 @@ void HitCheckSToS(PAINTSYSTEM *pSysBlack, PAINTSYSTEM *pSysColor);							// ペイ
 
 float dotProduct(D3DXVECTOR3 *vl, D3DXVECTOR3 *vr);											// 内積
 void crossProduct(D3DXVECTOR3 *ret, D3DXVECTOR3 *vl, D3DXVECTOR3 *vr);						// 外積
-int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_WK tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1);		// ポリゴンと線分の当たり判定
+int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_STR tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1);		// ポリゴンと線分の当たり判定
 
 #endif
 

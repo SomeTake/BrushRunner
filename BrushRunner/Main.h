@@ -94,7 +94,7 @@ typedef struct
 	D3DXVECTOR3 pos0;
 	D3DXVECTOR3 pos1;
 	D3DXVECTOR3 pos2;
-} TRIANGLE_WK;
+} TRIANGLE_STR;
 
 
 //ƒV[ƒ“‘JˆÚ

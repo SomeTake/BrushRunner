@@ -131,7 +131,7 @@ void PAINTSYSTEM::Set(int InkType)
 			CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
 			// ”»’è—pŽOŠpŒ`ƒ|ƒŠƒSƒ“
-			TRIANGLE_WK triPos1, triPos2;
+			TRIANGLE_STR triPos1, triPos2;
 			triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };

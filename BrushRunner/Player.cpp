@@ -22,43 +22,17 @@ PLAYER::PLAYER(int _CtrlNum)
 	Animation = CreateAnimationObject();
 
 	// xFileの読み込み
-	Load_xFile(Animation, CHARA_XFILE, "Player");
+	Load_xFile(Animation, CharaModel[KouhaiModel], "Player");
 
 	// アニメーションの最終フレームをセットする
+	// 待機
+	SetupCallbackKeyframes(Animation, CharaStateAnim[Idle]);
 	// 前歩き
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Frontwalk]);
+	SetupCallbackKeyframes(Animation, CharaStateAnim[Running]);
 	// 後ろ歩き
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Backwalk]);
+	SetupCallbackKeyframes(Animation, CharaStateAnim[Jump]);
 	// 右ステップ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Rightstep]);
-	// 左ステップ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Leftstep]);
-	// 被ダメージ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Damage]);
-	// ダウン
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Down]);
-	// ダウンポーズ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Downpose]);
-	// 起き上がり
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Getup]);
-	// パンチ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Punchi]);
-	// ストレート（追撃パンチ１）
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Straight]);
-	// アッパー（追撃パンチ２）
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Upper]);
-	// キック
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Kick]);
-	// 波動
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Hadou]);
-	// 昇竜
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Shoryu]);
-	// SP技
-	SetupCallbackKeyframes(Animation, CharaStateAnim[SPattack]);
-	// 投げ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Throw]);
-	// 投げスカり
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Miss]);
+	SetupCallbackKeyframes(Animation, CharaStateAnim[Victory]);
 
 	// アニメーションセットの初期化
 	for (int i = 0; i < Animation->AnimSetNum; i++)
@@ -77,13 +51,13 @@ PLAYER::PLAYER(int _CtrlNum)
 
 	// 位置・回転・スケールの初期設定
 	pos = PLAYER_FIRST_POS;
-	rot = PLAYER_FIRST_ROT;
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	rot = PLAYER_ROT;
+	scl = ModelScl[KouhaiModel];
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	jumpFlag = false;
 	jumpSpeed = 0;
 	ctrlNum = _CtrlNum;
-	inkType = false;
+	inkType = ColorInk;
 	moveFlag = true;
 	playable = false;
 
@@ -222,6 +196,7 @@ void PLAYER::Move()
 			jumpFlag = true;
 			moveFlag = true;
 			jumpSpeed = JUMP_SPEED;
+			Animation->ChangeAnimation(Animation, Jump, Data[Jump].Spd);
 		}
 	}
 
@@ -259,20 +234,23 @@ void PLAYER::ChangeAnim()
 
 	if (playable)
 	{
-		// 歩行中
-		if (moveFlag)
+		if (!jumpFlag)
 		{
-			if (Animation->CurrentAnimID != Frontwalk)
+			// 歩行中
+			if (moveFlag)
 			{
-				Animation->ChangeAnimation(Animation, Frontwalk, Data[Frontwalk].Spd);
+				if (Animation->CurrentAnimID != Running)
+				{
+					Animation->ChangeAnimation(Animation, Running, Data[Running].Spd);
+				}
 			}
-		}
-		// 待機中
-		else
-		{
-			if (Animation->CurrentAnimID != Idle)
+			// 待機中
+			else
 			{
-				Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+				if (Animation->CurrentAnimID != Idle)
+				{
+					Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+				}
 			}
 		}
 	}
