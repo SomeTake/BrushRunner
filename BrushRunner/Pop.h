@@ -24,18 +24,18 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class POP :
-	public BILLBOARD
+class Pop :
+	public Billboard
 {
 private:
-	PLAYER * pPlayer;
+	Player * pPlayer;
 	int patternAnim;
 
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 
 public:
-	POP(PLAYER *pP);
-	~POP();
+	Pop(Player *pP);
+	~Pop();
 
 	void Update();
 	void Draw();

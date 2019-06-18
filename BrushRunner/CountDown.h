@@ -12,7 +12,7 @@
 #define ANIM_COUNTDOWN_DIVIDE (COUNTDOWN_DIVIDE_X * COUNTDOWN_DIVIDE_Y)
 #define COUNTDOWN_POS		D3DXVECTOR3(SCREEN_WIDTH / 2 - COUNTDOWN_SIZE.x / 2, SCREEN_HEIGHT / 2 - COUNTDOWN_SIZE.y / 2, 0.0f)
 
-class COUNTDOWN :
+class CountDown :
 	public _2dobj
 {
 private:
@@ -20,8 +20,8 @@ private:
 	int startsecond;
 
 public:
-	COUNTDOWN();
-	~COUNTDOWN();
+	CountDown();
+	~CountDown();
 	void Update();
 	void Draw();
 	HRESULT MakeVertex();

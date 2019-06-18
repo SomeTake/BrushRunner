@@ -8,13 +8,14 @@
 #include "Cursor.h"
 #include "Input.h"
 #include "Debugproc.h"
+#include "MyLibrary.h"
 
-LPDIRECT3DTEXTURE9	CURSOR::D3DTexture = NULL;	// テクスチャのポインタ
+LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
+Cursor::Cursor(int _ctrlNum, Player *pP)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -41,7 +42,7 @@ CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-CURSOR::~CURSOR()
+Cursor::~Cursor()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -53,7 +54,7 @@ CURSOR::~CURSOR()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void CURSOR::Update()
+void Cursor::Update()
 {
 	if (use == true)
 	{
@@ -80,7 +81,7 @@ void CURSOR::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void CURSOR::Draw()
+void Cursor::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -94,14 +95,14 @@ void CURSOR::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT CURSOR::MakeVertex()
+HRESULT Cursor::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -132,7 +133,7 @@ HRESULT CURSOR::MakeVertex()
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void CURSOR::SetTexture(int cntPattern)
+void Cursor::SetTexture(int cntPattern)
 {
 	int x = cntPattern % CURSOR_DIVIDE_X;
 	int y = cntPattern / CURSOR_DIVIDE_X;
@@ -149,7 +150,7 @@ void CURSOR::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void CURSOR::SetVertex()
+void Cursor::SetVertex()
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
@@ -161,7 +162,7 @@ void CURSOR::SetVertex()
 //=============================================================================
 // 操作
 //=============================================================================
-void CURSOR::Move()
+void Cursor::Move()
 {
 	KeyMove();	// キーボード操作
 	PadMove();	// コントローラ操作
@@ -170,7 +171,7 @@ void CURSOR::Move()
 //=============================================================================
 // カーソルの切り替え
 //=============================================================================
-void CURSOR::Change()
+void Cursor::Change()
 {
 	if (GetKeyboardTrigger(DIK_P))
 	{
@@ -192,49 +193,46 @@ void CURSOR::Change()
 //=============================================================================
 // キーボード操作
 //=============================================================================
-void CURSOR::KeyMove()
+void Cursor::KeyMove()
 {
 	// 上下
 	if (GetKeyboardPress(DIK_W))
 	{
+		pos.y -= CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.y > 0)
-		{
-			pos.y -= CURSOR_SPEED;
-		}
+		pos.y = max(pos.y, 0.0f);
 	}
 	else if (GetKeyboardPress(DIK_S))
 	{
+		pos.y += CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.y < SCREEN_HEIGHT - CURSOR_SIZE.y)
-		{
-			pos.y += CURSOR_SPEED;
-		}
+		pos.y = min(pos.y, SCREEN_HEIGHT - CURSOR_SIZE.y);
+
 	}
 
 	// 左右
 	if (GetKeyboardPress(DIK_D))
 	{
+		pos.x += CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.x < SCREEN_WIDTH - CURSOR_SIZE.x)
-		{
-			pos.x += CURSOR_SPEED;
-		}
+		pos.x = min(pos.x, SCREEN_WIDTH - CURSOR_SIZE.x);
 	}
 	else if (GetKeyboardPress(DIK_A))
 	{
+		pos.x -= CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.x > 0)
-		{
-			pos.x -= CURSOR_SPEED;
-		}
+		pos.x = max(pos.x, 0.0f);
 	}
 }
 
 //=============================================================================
 // コントローラ操作
 //=============================================================================
-void CURSOR::PadMove()
+void Cursor::PadMove()
 {
 	vec = GetJoyStickVec(ctrlNum) / 1000.f;
 	moveX = (float)GetJoyStickLeftX(ctrlNum) / 1000.0f;
@@ -246,12 +244,15 @@ void CURSOR::PadMove()
 	pos.y += vec * moveY * CURSOR_SPEED;
 
 	// 画面外に出た場合、古い座標に戻す
-	if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
-	{
-		pos.y = oldPos.y;
-	}
-	if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
-	{
-		pos.x = oldPos.x;
-	}
+	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
+	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
+
+	//if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
+	//{
+	//	pos.y = oldPos.y;
+	//}
+	//if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
+	//{
+	//	pos.x = oldPos.x;
+	//}
 }

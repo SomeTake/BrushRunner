@@ -7,12 +7,12 @@
 #include "Main.h"
 #include "Faceframe.h"
 
-LPDIRECT3DTEXTURE9	FACEFRAME::D3DTexture = NULL;	// テクスチャのポインタ
+LPDIRECT3DTEXTURE9	FaceFrame::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-FACEFRAME::FACEFRAME(D3DXVECTOR3 _pos)
+FaceFrame::FaceFrame(D3DXVECTOR3 _pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -36,7 +36,7 @@ FACEFRAME::FACEFRAME(D3DXVECTOR3 _pos)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-FACEFRAME::~FACEFRAME()
+FaceFrame::~FaceFrame()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -48,7 +48,7 @@ FACEFRAME::~FACEFRAME()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void FACEFRAME::Update()
+void FaceFrame::Update()
 {
 	if (use == true)
 	{
@@ -63,7 +63,7 @@ void FACEFRAME::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void FACEFRAME::Draw()
+void FaceFrame::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -77,7 +77,7 @@ void FACEFRAME::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -85,7 +85,7 @@ void FACEFRAME::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT FACEFRAME::MakeVertex(void)
+HRESULT FaceFrame::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -116,7 +116,7 @@ HRESULT FACEFRAME::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void FACEFRAME::SetTexture(int cntPattern)
+void FaceFrame::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -133,7 +133,7 @@ void FACEFRAME::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void FACEFRAME::SetVertex(void)
+void FaceFrame::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

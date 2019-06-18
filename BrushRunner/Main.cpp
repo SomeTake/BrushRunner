@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "Main.h"
+#include "Struct.h"
 #include "SceneTitle.h"
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"

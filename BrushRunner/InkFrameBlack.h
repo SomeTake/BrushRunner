@@ -23,14 +23,14 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class INKFRAMEBLACK :
+class InkFrameBlack :
 	public _2dobj {
 private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
 public:
-	INKFRAMEBLACK(D3DXVECTOR3 _pos);
-	~INKFRAMEBLACK();
+	InkFrameBlack(D3DXVECTOR3 _pos);
+	~InkFrameBlack();
 
 	// オーバーライド関数
 	void Update();

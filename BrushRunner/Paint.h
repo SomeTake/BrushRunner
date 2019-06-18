@@ -37,7 +37,7 @@ enum InkColor
 // クラス定義
 //*****************************************************************************
 class PAINT :
-	public BILLBOARD
+	public Billboard
 {
 private:
 	bool					use;			// 使用しているかどうか

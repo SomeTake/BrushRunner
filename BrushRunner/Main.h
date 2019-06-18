@@ -70,35 +70,8 @@ using namespace std;
 
 #define GetMonitorRect(rc) SystemParametersInfo(SPI_GETWORKAREA, 0, rc, 0)	// モニター矩形
 
-// 上記２Ｄポリゴン頂点フォーマットに合わせた構造体を定義
-typedef struct
-{
-	D3DXVECTOR3 vtx;		// 頂点座標
-	float rhw;				// テクスチャのパースペクティブコレクト用
-	D3DCOLOR diffuse;		// 反射光
-	D3DXVECTOR2 tex;		// テクスチャ座標
-} VERTEX_2D;
-
-// 上記３Ｄポリゴン頂点フォーマットに合わせた構造体を定義
-typedef struct
-{
-	D3DXVECTOR3 vtx;		// 頂点座標
-	D3DXVECTOR3 nor;		// 法線ベクトル
-	D3DCOLOR diffuse;		// 反射光
-	D3DXVECTOR2 tex;		// テクスチャ座標
-} VERTEX_3D;
-
-// 三角形ポリゴン用の構造体
-typedef struct
-{
-	D3DXVECTOR3 pos0;
-	D3DXVECTOR3 pos1;
-	D3DXVECTOR3 pos2;
-} TRIANGLE_STR;
-
-
 //シーン遷移
-enum
+enum SceneNum
 {
 	SceneTitle,				// タイトル
 	SceneCharacterSelect,	// キャラクターセレクト

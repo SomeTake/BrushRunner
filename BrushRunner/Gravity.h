@@ -18,7 +18,7 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-void GravityFall(PLAYER *pP);						// 落下する計算
-void PosModification(PLAYER *pP, D3DXVECTOR3 mappos);	// マップにめり込んでいた場合のプレイヤーの位置を修正する
+void GravityFall(Player *pP);						// 落下する計算
+void PosModification(Player *pP, D3DXVECTOR3 mappos);	// マップにめり込んでいた場合のプレイヤーの位置を修正する
 
 #endif

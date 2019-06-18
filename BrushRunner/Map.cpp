@@ -14,7 +14,7 @@ using namespace std;
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	MAP::D3DTexture[MapChipMax] = { NULL };		// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9	Map::D3DTexture[MapChipMax] = { NULL };		// テクスチャへのポインタ
 
 //*****************************************************************************
 // グローバル変数
@@ -24,7 +24,7 @@ D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-MAP::MAP()
+Map::Map()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -72,7 +72,7 @@ MAP::MAP()
 //=============================================================================
 // デストラクタ
 //=============================================================================
-MAP::~MAP()
+Map::~Map()
 {
 	for (int i = 0; i < MapChipMax; i++)
 	{
@@ -93,7 +93,7 @@ MAP::~MAP()
 //=============================================================================
 // 更新
 //=============================================================================
-void MAP::Update()
+void Map::Update()
 {
 
 }
@@ -101,7 +101,7 @@ void MAP::Update()
 //=============================================================================
 // 描画
 //=============================================================================
-void MAP::Draw()
+void Map::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
@@ -135,7 +135,7 @@ void MAP::Draw()
 				pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
 				// 頂点バッファをデバイスのデータストリームにバインド
-				pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
+				pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
 				// 頂点フォーマットの設定
 				pDevice->SetFVF(FVF_VERTEX_3D);
@@ -164,7 +164,7 @@ void MAP::Draw()
 //=============================================================================
 // CSVファイルの読み込み
 //=============================================================================
-void MAP::ReadCsv(const char *data)
+void Map::ReadCsv(const char *data)
 {
 	ifstream stream(data);		// マップの読み込み先
 
@@ -187,12 +187,12 @@ void MAP::ReadCsv(const char *data)
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT MAP::MakeVertex()
+HRESULT Map::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,			// 頂点バッファの使用法　
 		FVF_VERTEX_3D,				// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,			// リソースのバッファを保持するメモリクラスを指定
@@ -203,7 +203,7 @@ HRESULT MAP::MakeVertex()
 	}
 
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);

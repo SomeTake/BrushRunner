@@ -1,7 +1,7 @@
 #include "Main.h"
 #include "CountDown.h"
 
-COUNTDOWN::COUNTDOWN()
+CountDown::CountDown()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -21,7 +21,7 @@ COUNTDOWN::COUNTDOWN()
 
 }
 
-COUNTDOWN::~COUNTDOWN()
+CountDown::~CountDown()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -31,7 +31,7 @@ COUNTDOWN::~COUNTDOWN()
 
 }
 
-void COUNTDOWN::Update()
+void CountDown::Update()
 {
 	if (use)
 	{
@@ -50,7 +50,7 @@ void COUNTDOWN::Update()
 	}
 }
 
-void COUNTDOWN::Draw()
+void CountDown::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -64,12 +64,12 @@ void COUNTDOWN::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
 
-HRESULT COUNTDOWN::MakeVertex()
+HRESULT CountDown::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -100,7 +100,7 @@ HRESULT COUNTDOWN::MakeVertex()
 	return S_OK;
 }
 
-void COUNTDOWN::SetTexture()
+void CountDown::SetTexture()
 {
 	int x = startsecond % COUNTDOWN_DIVIDE_X;
 	int y = startsecond / COUNTDOWN_DIVIDE_X;

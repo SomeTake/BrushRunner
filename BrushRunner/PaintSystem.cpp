@@ -15,7 +15,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PAINTSYSTEM::PAINTSYSTEM(CURSOR *pC, PLAYER *pP)
+PaintManager::PaintManager(Cursor *pC, Player *pP)
 {
 	pPlayer = pP;
 	pCursor = pC;
@@ -34,7 +34,7 @@ PAINTSYSTEM::PAINTSYSTEM(CURSOR *pC, PLAYER *pP)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-PAINTSYSTEM::~PAINTSYSTEM()
+PaintManager::~PaintManager()
 {
 	for (int i = 0; i < PAINT_MAX; i++)
 	{
@@ -46,7 +46,7 @@ PAINTSYSTEM::~PAINTSYSTEM()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void PAINTSYSTEM::Update()
+void PaintManager::Update()
 {
 	// カーソルの筆先に座標を合わせる
 	pos.x = pCursor->GetPos().x;
@@ -94,7 +94,7 @@ void PAINTSYSTEM::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void PAINTSYSTEM::Draw()
+void PaintManager::Draw()
 {
 	// 使用しているペイントを描画
 	for (int i = 0; i < PAINT_MAX; i++)
@@ -109,7 +109,7 @@ void PAINTSYSTEM::Draw()
 //=============================================================================
 // ペイントのセット
 //=============================================================================
-void PAINTSYSTEM::Set(int InkType)
+void PaintManager::Set(int InkType)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	CAMERA *camerawk = GetCamera();
@@ -131,7 +131,7 @@ void PAINTSYSTEM::Set(int InkType)
 			CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
 			// 判定用三角形ポリゴン
-			TRIANGLE_STR triPos1, triPos2;
+			TriangleStr triPos1, triPos2;
 			triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
 				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };

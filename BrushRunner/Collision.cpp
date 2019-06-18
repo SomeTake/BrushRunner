@@ -56,7 +56,7 @@ bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Range1, float Range2)
 //=============================================================================
 // プレイヤーと足元のマップの当たり判定
 //=============================================================================
-bool HitCheckPToM(PLAYER *pP, MAP *pM)
+bool HitCheckPToM(Player *pP, Map *pM)
 {
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x = (int)((pP->GetPos().x + CHIP_SIZE / 2) / CHIP_SIZE);
@@ -117,7 +117,7 @@ bool HitCheckPToM(PLAYER *pP, MAP *pM)
 //=============================================================================
 // プレイヤーとペイントシステムの当たり判定
 //=============================================================================
-bool HitCheckPToS(PLAYER *pP, PAINTSYSTEM *pS)
+bool HitCheckPToS(Player *pP, PaintManager *pS)
 {
 	bool returnflag = false;
 
@@ -152,7 +152,7 @@ bool HitCheckPToS(PLAYER *pP, PAINTSYSTEM *pS)
 // pSysBlack : 黒インク用ペイントシステムのポインタ
 // pSysColor : カラーインク用ペイントシステムのポインタ
 //=============================================================================
-void HitCheckSToS(PAINTSYSTEM *pSysBlack, PAINTSYSTEM *pSysColor)
+void HitCheckSToS(PaintManager *pSysBlack, PaintManager *pSysColor)
 {
 	for (int nBlack = 0; nBlack < PAINT_MAX; nBlack++)
 	{
@@ -210,7 +210,7 @@ void crossProduct(D3DXVECTOR3 *ret, D3DXVECTOR3 *vl, D3DXVECTOR3 *vr)
 // pos0   :始点（移動前）
 // pos1   :終点（移動後）
 //=============================================================================
-int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_STR tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
+int hitCheck(D3DXVECTOR3 *OutPos, TriangleStr tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
 {
 	D3DXVECTOR3		nor;		// ポリゴンの法線
 

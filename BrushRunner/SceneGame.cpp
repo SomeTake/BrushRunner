@@ -50,12 +50,12 @@ enum {
 // オブジェクトのポインタ
 //*****************************************************************************
 static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
-static MAP *pMap;							// マップ用のポインタ
-static EFFECT *pEffect[EffectMax];			// エフェクト用のポインタ
-static PLAYER *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-static CURSOR *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-static PAINTSYSTEM *pPSystem[PLAYER_MAX];	// ペイントシステム用のポインタ
-static POP *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
+static Map *pMap;							// マップ用のポインタ
+static Effect *pEffect[EffectMax];			// エフェクト用のポインタ
+static Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
+static Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
+static PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
+static Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
 
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 
@@ -67,73 +67,73 @@ HRESULT InitSceneGame()
 	// プレイヤーの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i] = new PLAYER(i);
+		pPlayer[i] = new Player(i);
 	}
 
 	// マップの初期化
-	pMap = new MAP();
+	pMap = new Map();
 
 	// 2DUIの初期化
 	// フレーム
-	p2dobj[NumFrame] = new FRAME();
+	p2dobj[NumFrame] = new Frame();
 
 	// 黒インクの初期化
-	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack00] = new Ink(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack01] = new Ink(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack02] = new Ink(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
+	p2dobj[NumInkblack03] = new Ink(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
 
 	// 黒インク用フレームの初期化
-	p2dobj[NumBlackFrame00] = new INKFRAMEBLACK(BLACKINKFRAME_POS01);
-	p2dobj[NumBlackFrame01] = new INKFRAMEBLACK(BLACKINKFRAME_POS02);
-	p2dobj[NumBlackFrame02] = new INKFRAMEBLACK(BLACKINKFRAME_POS03);
-	p2dobj[NumBlackFrame03] = new INKFRAMEBLACK(BLACKINKFRAME_POS04);
+	p2dobj[NumBlackFrame00] = new InkFrameBlack(BLACKINKFRAME_POS01);
+	p2dobj[NumBlackFrame01] = new InkFrameBlack(BLACKINKFRAME_POS02);
+	p2dobj[NumBlackFrame02] = new InkFrameBlack(BLACKINKFRAME_POS03);
+	p2dobj[NumBlackFrame03] = new InkFrameBlack(BLACKINKFRAME_POS04);
 
 	// カラーインクの初期化
-	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
-	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
-	p2dobj[NumInkyellow] = new INK(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
-	p2dobj[NumInkgreen] = new INK(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
+	p2dobj[NumInkblue] = new Ink(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
+	p2dobj[NumInkred] = new Ink(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
+	p2dobj[NumInkyellow] = new Ink(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
+	p2dobj[NumInkgreen] = new Ink(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
 
 	// カラーインク用フレームの初期化
-	p2dobj[NumColorFrame00] = new INKFRAMECOLOR(COLORINKFRAME_POS01);
-	p2dobj[NumColorFrame01] = new INKFRAMECOLOR(COLORINKFRAME_POS02);
-	p2dobj[NumColorFrame02] = new INKFRAMECOLOR(COLORINKFRAME_POS03);
-	p2dobj[NumColorFrame03] = new INKFRAMECOLOR(COLORINKFRAME_POS04);
+	p2dobj[NumColorFrame00] = new InkFrameColor(COLORINKFRAME_POS01);
+	p2dobj[NumColorFrame01] = new InkFrameColor(COLORINKFRAME_POS02);
+	p2dobj[NumColorFrame02] = new InkFrameColor(COLORINKFRAME_POS03);
+	p2dobj[NumColorFrame03] = new InkFrameColor(COLORINKFRAME_POS04);
 
 	// 顔を表示するフレームの初期化
-	p2dobj[NumFaceframe00] = new FACEFRAME(FACEFRAME_POS01);
-	p2dobj[NumFaceframe01] = new FACEFRAME(FACEFRAME_POS02);
-	p2dobj[NumFaceframe02] = new FACEFRAME(FACEFRAME_POS03);
-	p2dobj[NumFaceframe03] = new FACEFRAME(FACEFRAME_POS04);
+	p2dobj[NumFaceframe00] = new FaceFrame(FACEFRAME_POS01);
+	p2dobj[NumFaceframe01] = new FaceFrame(FACEFRAME_POS02);
+	p2dobj[NumFaceframe02] = new FaceFrame(FACEFRAME_POS03);
+	p2dobj[NumFaceframe03] = new FaceFrame(FACEFRAME_POS04);
 	
 	// カウントダウンの初期化
-	p2dobj[NumCountDown] = new COUNTDOWN();
+	p2dobj[NumCountDown] = new CountDown();
 
 	// カーソルの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pCursor[i] = new CURSOR(i, pPlayer[i]);
+		pCursor[i] = new Cursor(i, pPlayer[i]);
 	}
 
 	// ペイントシステムの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPSystem[i] = new PAINTSYSTEM(pCursor[i], pPlayer[i]);
+		pPManager[i] = new PaintManager(pCursor[i], pPlayer[i]);
 	}
 
 	// ポップアップの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPop[i] = new POP(pPlayer[i]);
+		pPop[i] = new Pop(pPlayer[i]);
 	}
 
 	// エフェクトの初期化
-	pEffect[HitEffect] = new EFFECT(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
-	pEffect[Hit1Effect] = new EFFECT(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
-	pEffect[RunEffect] = new EFFECT(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
-	pEffect[ExpEffect] = new EFFECT(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
-	pEffect[ItemEffect] = new EFFECT(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
+	pEffect[HitEffect] = new Effect(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
+	pEffect[Hit1Effect] = new Effect(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
+	pEffect[RunEffect] = new Effect(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
+	pEffect[ExpEffect] = new Effect(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
+	pEffect[ItemEffect] = new Effect(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
 
 	// 描画順の初期化
 	for (int i = 0; i < _2dMax; i++)
@@ -179,7 +179,7 @@ void UninitSceneGame()
 	// ペイントシステムの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pPSystem[i];
+		delete pPManager[i];
 	}
 
 	// ポップアップ削除
@@ -228,7 +228,7 @@ void UpdateSceneGame()
 	// ペイントシステムの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPSystem[i]->Update();
+		pPManager[i]->Update();
 	}
 
 	// マップの更新
@@ -245,51 +245,51 @@ void UpdateSceneGame()
 	{
 		pPlayer[i]->Update();
 
-		bool gravflag = false;
+		//bool gravflag = false;
 
-		// 地面に接しているか確認
-		if (HitCheckPToM(pPlayer[i], pMap))
-		{
-			pPlayer[i]->SetJumpFlag(false);
-			gravflag = false;
-		}
-		else
-		{
-			gravflag = true;
-		}
-		// ペイントシステムとの当たり判定
-		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
-		{
-			if (HitCheckPToS(pPlayer[i], pPSystem[i]))
-			{
-				pPlayer[i]->SetJumpFlag(false);
-				gravflag = false;
-			}
-			else
-			{
-				gravflag = true;
-			}
-		}
+		//// 地面に接しているか確認
+		//if (HitCheckPToM(pPlayer[i], pMap))
+		//{
+		//	pPlayer[i]->SetJumpFlag(false);
+		//	gravflag = false;
+		//}
+		//else
+		//{
+		//	gravflag = true;
+		//}
+		//// ペイントシステムとの当たり判定
+		//if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
+		//{
+		//	if (HitCheckPToS(pPlayer[i], pPManager[i]))
+		//	{
+		//		pPlayer[i]->SetJumpFlag(false);
+		//		gravflag = false;
+		//	}
+		//	else
+		//	{
+		//		gravflag = true;
+		//	}
+		//}
 
-		// 重力が有効
-		if (gravflag)
-		{
-			GravityFall(pPlayer[i]);
-		}
+		//// 重力が有効
+		//if (gravflag)
+		//{
+		//	GravityFall(pPlayer[i]);
+		//}
 	}
 
-	// ペイントシステム同士の当たり判定
-	for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
-	{
-		for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
-		{
-			// 自分が使用しているカラー以外との判定を行う
-			if (nBlack != nColor)
-			{
-				//HitCheckSToS(pPSystem[nBlack], pPSystem[nColor]);
-			}
-		}
-	}
+	//// ペイントシステム同士の当たり判定
+	//for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
+	//{
+	//	for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
+	//	{
+	//		// 自分が使用しているカラー以外との判定を行う
+	//		if (nBlack != nColor)
+	//		{
+	//			//HitCheckSToS(pPSystem[nBlack], pPSystem[nColor]);
+	//		}
+	//	}
+	//}
 
 	// ポップアップの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -337,7 +337,7 @@ void DrawSceneGame()
 	// ペイントシステムの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPSystem[i]->Draw();
+		pPManager[i]->Draw();
 	}
 
 	// エフェクトの描画

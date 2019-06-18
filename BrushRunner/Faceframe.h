@@ -22,14 +22,14 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class FACEFRAME :
+class FaceFrame :
 	public _2dobj {
 private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
 public:
-	FACEFRAME(D3DXVECTOR3 _pos);
-	~FACEFRAME();
+	FaceFrame(D3DXVECTOR3 _pos);
+	~FaceFrame();
 
 	// オーバーライド関数
 	void Update();

@@ -184,7 +184,7 @@ void PAINT::Draw()
 		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
 
 		// 頂点バッファをデバイスのデータストリームにバインド
-		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
+		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
@@ -219,7 +219,7 @@ HRESULT PAINT::MakeVertex()
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
@@ -230,7 +230,7 @@ HRESULT PAINT::MakeVertex()
 	}
 
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -267,7 +267,7 @@ HRESULT PAINT::MakeVertex()
 void PAINT::SetVertex()
 {
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -290,7 +290,7 @@ void PAINT::SetVertex()
 void PAINT::SetColor()
 {
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -317,7 +317,7 @@ void PAINT::SetTexture()
 	float sizeY = 1.0f / PAINT_DIVIDE_Y;
 
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);

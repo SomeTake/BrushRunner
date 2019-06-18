@@ -10,12 +10,12 @@
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	INKFRAMEBLACK::D3DTexture = NULL;					// テクスチャのポインタ
+LPDIRECT3DTEXTURE9	InkFrameBlack::D3DTexture = NULL;					// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-INKFRAMEBLACK::INKFRAMEBLACK(D3DXVECTOR3 _pos)
+InkFrameBlack::InkFrameBlack(D3DXVECTOR3 _pos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -42,7 +42,7 @@ INKFRAMEBLACK::INKFRAMEBLACK(D3DXVECTOR3 _pos)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-INKFRAMEBLACK::~INKFRAMEBLACK()
+InkFrameBlack::~InkFrameBlack()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -54,7 +54,7 @@ INKFRAMEBLACK::~INKFRAMEBLACK()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void INKFRAMEBLACK::Update()
+void InkFrameBlack::Update()
 {
 	if (use == true)
 	{
@@ -69,7 +69,7 @@ void INKFRAMEBLACK::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void INKFRAMEBLACK::Draw()
+void InkFrameBlack::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -83,7 +83,7 @@ void INKFRAMEBLACK::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -91,7 +91,7 @@ void INKFRAMEBLACK::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT INKFRAMEBLACK::MakeVertex(void)
+HRESULT InkFrameBlack::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -122,7 +122,7 @@ HRESULT INKFRAMEBLACK::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void INKFRAMEBLACK::SetTexture(int cntPattern)
+void InkFrameBlack::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -139,7 +139,7 @@ void INKFRAMEBLACK::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void INKFRAMEBLACK::SetVertex(void)
+void InkFrameBlack::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

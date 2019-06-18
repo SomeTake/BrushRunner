@@ -7,10 +7,12 @@
 #ifndef _BILLBOARD_H_
 #define _BILLBOARD_H_
 
+#include "Struct.h"
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class BILLBOARD
+class Billboard
 {
 protected:
 	LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
@@ -24,8 +26,8 @@ protected:
 	float					height;			// 高さ
 
 public:
-	BILLBOARD();
-	~BILLBOARD();
+	Billboard();
+	~Billboard();
 
 	// 仮想関数
 	virtual void Update() {};

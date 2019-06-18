@@ -37,15 +37,15 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class INK :
+class Ink :
 	public _2dobj
 {
 private:
-	PLAYER * pPlayer;	// 参照するキャラクタクラスのポインタ
+	Player * pPlayer;	// 参照するキャラクタクラスのポインタ
 	int inktype;		// 使用するインクの種類(0=color,1=black)
 public:
-	INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype);
-	~INK();
+	Ink(Player *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype);
+	~Ink();
 
 	// オーバーライド関数
 	void Update();

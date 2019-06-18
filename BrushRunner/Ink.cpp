@@ -10,7 +10,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype)
+Ink::Ink(Player *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -35,7 +35,7 @@ INK::INK(PLAYER *pP, D3DXVECTOR3 _pos, const char *texno, int _inktype)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-INK::~INK()
+Ink::~Ink()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -47,7 +47,7 @@ INK::~INK()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void INK::Update()
+void Ink::Update()
 {
 	if (use == true)
 	{
@@ -62,7 +62,7 @@ void INK::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void INK::Draw()
+void Ink::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -76,14 +76,14 @@ void INK::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT INK::MakeVertex()
+HRESULT Ink::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +114,7 @@ HRESULT INK::MakeVertex()
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void INK::SetTexture(int cntPattern)
+void Ink::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +131,7 @@ void INK::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void INK::SetVertex()
+void Ink::SetVertex()
 {	
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x + DISPLACE, pos.y, pos.z);

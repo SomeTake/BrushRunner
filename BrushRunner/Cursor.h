@@ -25,12 +25,12 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class CURSOR :
+class Cursor :
 	public _2dobj
 {
 private:
 	int		ctrlNum;	// 操作するコントローラ番号
-	PLAYER *pPlayer;	// 参照するキャラクタのポインタ
+	Player *pPlayer;	// 参照するキャラクタのポインタ
 	float	vec;		// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
 	float	moveX;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
 	float	moveY;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
@@ -39,8 +39,8 @@ private:
 
 
 public:
-	CURSOR(int _ctrlNum, PLAYER *pP);
-	~CURSOR();
+	Cursor(int _ctrlNum, Player *pP);
+	~Cursor();
 
 	// オーバーライド関数
 	void Update();						// 更新

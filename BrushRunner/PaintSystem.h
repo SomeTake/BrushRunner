@@ -14,17 +14,17 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class PAINTSYSTEM
+class PaintManager
 {
 private:
 	PAINT * pPaint[PAINT_MAX];		// 発生させるペイントのポインタ
-	CURSOR *pCursor;				// 参照するカーソルクラスのポインタ
-	PLAYER *pPlayer;				// 参照するプレイヤークラスのポインタ
+	Cursor *pCursor;				// 参照するカーソルクラスのポインタ
+	Player *pPlayer;				// 参照するプレイヤークラスのポインタ
 	D3DXVECTOR3 pos;
 
 public:
-	PAINTSYSTEM(CURSOR *pC, PLAYER *pP);
-	~PAINTSYSTEM();
+	PaintManager(Cursor *pC, Player *pP);
+	~PaintManager();
 
 	void Update();
 	void Draw();

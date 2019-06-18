@@ -81,10 +81,10 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class EFFECT {
+class Effect {
 	//public _2dobj {
 private:
-	VERTEX_2D		vertexWk[NUM_VERTEX];			// 頂点情報格納構造体
+	Vertex2D		vertexWk[NUM_VERTEX];			// 頂点情報格納構造体
 	D3DXVECTOR3		pos;
 	D3DXVECTOR3		rot;
 	D3DXVECTOR3		scl;
@@ -100,8 +100,8 @@ private:
 	D3DXVECTOR3		size;
 
 public:
-	EFFECT(const char * texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos, int _AnimationCnt, int _xPattern, int _yPattern);
-	~EFFECT();
+	Effect(const char * texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos, int _AnimationCnt, int _xPattern, int _yPattern);
+	~Effect();
 
 	void Update();
 	void Draw();

@@ -11,7 +11,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-EFFECT::EFFECT(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _AnimationCnt, int _xPattern, int _yPattern) {
+Effect::Effect(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _AnimationCnt, int _xPattern, int _yPattern) {
 	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -42,7 +42,7 @@ EFFECT::EFFECT(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _A
 //=============================================================================
 // デストラクタ
 //=============================================================================
-EFFECT::~EFFECT() {
+Effect::~Effect() {
 
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -59,7 +59,7 @@ EFFECT::~EFFECT() {
 //=============================================================================
 // 更新
 //=============================================================================
-void EFFECT::Update() {
+void Effect::Update() {
 
 
 	if (use == true)
@@ -87,7 +87,7 @@ void EFFECT::Update() {
 //=============================================================================
 // 描画
 //=============================================================================
-void EFFECT::Draw() {
+void Effect::Draw() {
 
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -101,14 +101,14 @@ void EFFECT::Draw() {
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT EFFECT::MakeVertex(void) {
+HRESULT Effect::MakeVertex(void) {
 
 	// 頂点座標の設定
 	SetVertex();
@@ -137,7 +137,7 @@ HRESULT EFFECT::MakeVertex(void) {
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void EFFECT::SetTexture(int cntPattern) {
+void Effect::SetTexture(int cntPattern) {
 
 	int x = cntPattern % xPattern;
 	int y = cntPattern / xPattern;
@@ -154,7 +154,7 @@ void EFFECT::SetTexture(int cntPattern) {
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void EFFECT::SetVertex(void) {
+void Effect::SetVertex(void) {
 
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

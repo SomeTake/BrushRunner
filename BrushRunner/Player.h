@@ -8,6 +8,7 @@
 #define _PLAYER_H_
 
 #include "D3DXAnimation.h"
+#include "Struct.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -99,7 +100,7 @@ enum InkType {
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class PLAYER
+class Player
 {
 private:
 	// メンバ変数
@@ -123,8 +124,8 @@ private:
 
 public:
 	// メンバ関数
-	PLAYER(int _CtrlNum);
-	~PLAYER();
+	Player(int _CtrlNum);
+	~Player();
 	void Update();
 	void Draw();
 

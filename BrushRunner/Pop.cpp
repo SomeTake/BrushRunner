@@ -8,12 +8,12 @@
 #include "Pop.h"
 #include "Camera.h"
 
-LPDIRECT3DTEXTURE9	POP::D3DTexture = NULL;	// テクスチャのポインタ
+LPDIRECT3DTEXTURE9	Pop::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-POP::POP(PLAYER *pP)
+Pop::Pop(Player *pP)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -40,7 +40,7 @@ POP::POP(PLAYER *pP)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-POP::~POP()
+Pop::~Pop()
 {
 	if (D3DTexture != NULL)
 	{// テクスチャの開放
@@ -58,7 +58,7 @@ POP::~POP()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void POP::Update()
+void Pop::Update()
 {
 	pos = pPlayer->GetPos() + POP_POS;
 
@@ -67,7 +67,7 @@ void POP::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void POP::Draw()
+void Pop::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
@@ -122,7 +122,7 @@ void POP::Draw()
 	pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
 
 	// 頂点バッファをデバイスのデータストリームにバインド
-	pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
+	pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
@@ -144,12 +144,12 @@ void POP::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT POP::MakeVertex()
+HRESULT Pop::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX,				// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,				// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
@@ -160,7 +160,7 @@ HRESULT POP::MakeVertex()
 	}
 
 	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+		Vertex3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
