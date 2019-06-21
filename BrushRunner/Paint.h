@@ -20,7 +20,6 @@
 #define PAINT_DIVIDE_X		(5)
 #define PAINT_DIVIDE_Y		(1)
 #define PAINT_DIVIDE		(PAINT_DIVIDE_X * PAINT_DIVIDE_Y)
-#define PAINT_MAX			(INK_MAX * 2)				// カラーインク＆黒インク
 #define DRAW_FRAME_COLOR	(300)						// 表示しておくフレーム数
 #define DRAW_FRAME_BLACK	(60)						// 表示しておくフレーム数
 
@@ -36,7 +35,7 @@ enum InkColor
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class PAINT :
+class Paint :
 	public Billboard
 {
 private:
@@ -47,8 +46,8 @@ private:
 	static LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
 
 public:
-	PAINT();
-	~PAINT();
+	Paint();
+	~Paint();
 
 	void Update();
 	void Draw();

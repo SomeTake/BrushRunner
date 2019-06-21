@@ -17,7 +17,8 @@
 class PaintManager
 {
 private:
-	PAINT * pPaint[PAINT_MAX];		// 発生させるペイントのポインタ
+	Paint * pBlackPaint[INK_MAX];	// 黒用のポインタ
+	Paint * pColorPaint[INK_MAX];	// カラー用のポインタ
 	Cursor *pCursor;				// 参照するカーソルクラスのポインタ
 	Player *pPlayer;				// 参照するプレイヤークラスのポインタ
 	D3DXVECTOR3 pos;
@@ -31,7 +32,8 @@ public:
 	void Set(int InkType);
 
 	// ゲッター
-	PAINT *GetPaint(int _num) { return pPaint[_num]; };
+	Paint *GetBlackPaint(int _num) { return pBlackPaint[_num]; };
+	Paint *GetColorPaint(int _num) { return pColorPaint[_num]; };
 };
 
 #endif

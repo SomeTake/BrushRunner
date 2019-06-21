@@ -121,17 +121,17 @@ bool HitCheckPToS(Player *pP, PaintManager *pS)
 {
 	bool returnflag = false;
 
-	for (int i = 0; i < PAINT_MAX; i++)
+	for (int i = 0; i < INK_MAX; i++)
 	{
-		// 使用しているかつ、プレイヤーカラーのインクを使用している場合当たり判定を行う
-		if (pS->GetPaint(i)->GetUse() && (pS->GetPaint(i)->GetPatternAnim() == pP->GetCtrlNum()))
+		// 使用している場合当たり判定を行う
+		if (pS->GetColorPaint(i)->GetUse())
 		{
 			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-			if (HitSphere(pP->GetPos(), pS->GetPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
+			if (HitSphere(pP->GetPos(), pS->GetColorPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
 			{
 				// 当たった場合、プレイヤーの座標を修正
 				D3DXVECTOR3 setpos = pP->GetPos();
-				setpos.y = pS->GetPaint(i)->GetPos().y + PAINT_WIDTH * 0.1f;
+				setpos.y = pS->GetColorPaint(i)->GetPos().y + PAINT_WIDTH * 0.1f;
 
 				pP->SetPos(setpos);
 
@@ -154,25 +154,23 @@ bool HitCheckPToS(Player *pP, PaintManager *pS)
 //=============================================================================
 void HitCheckSToS(PaintManager *pSysBlack, PaintManager *pSysColor)
 {
-	for (int nBlack = 0; nBlack < PAINT_MAX; nBlack++)
+	for (int nBlack = 0; nBlack < INK_MAX; nBlack++)
 	{
-		// 使用しているかつ黒の場合判定を行う
-		if (pSysBlack->GetPaint(nBlack)->GetUse() && pSysBlack->GetPaint(nBlack)->GetPatternAnim() == BlackInkColor) continue;
-		
-		for (int nColor = 0; nColor < PAINT_MAX; nColor++)
+		// 使用している場合判定を行う
+		if (!pSysBlack->GetBlackPaint(nBlack)->GetUse()) continue;
+
+		for (int nColor = 0; nColor < INK_MAX; nColor++)
 		{
-			// 使用しているかつカラーの場合判定を行う
-			if (pSysColor->GetPaint(nColor)->GetUse() && pSysColor->GetPaint(nColor)->GetPatternAnim() != BlackInkColor) continue;
-			
-			if (HitSphere(pSysBlack->GetPaint(nBlack)->GetPos(), pSysColor->GetPaint(nColor)->GetPos(), PAINT_WIDTH, PAINT_WIDTH))
+			// 使用している場合判定を行う
+			if (!pSysColor->GetColorPaint(nColor)->GetUse()) continue;
+
+			if (HitSphere(pSysBlack->GetBlackPaint(nBlack)->GetPos(), pSysColor->GetColorPaint(nColor)->GetPos(), PAINT_WIDTH, PAINT_WIDTH))
 			{
 				// ヒットした場合そのペイントを消す
-				pSysColor->GetPaint(nColor)->SetTime(0);
+				pSysColor->GetColorPaint(nColor)->SetTime(0);
 			}
-
 		}
 	}
-	
 }
 
 //=============================================================================

@@ -245,51 +245,51 @@ void UpdateSceneGame()
 	{
 		pPlayer[i]->Update();
 
-		//bool gravflag = false;
+		bool gravflag = false;
 
-		//// 地面に接しているか確認
-		//if (HitCheckPToM(pPlayer[i], pMap))
-		//{
-		//	pPlayer[i]->SetJumpFlag(false);
-		//	gravflag = false;
-		//}
-		//else
-		//{
-		//	gravflag = true;
-		//}
-		//// ペイントシステムとの当たり判定
-		//if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
-		//{
-		//	if (HitCheckPToS(pPlayer[i], pPManager[i]))
-		//	{
-		//		pPlayer[i]->SetJumpFlag(false);
-		//		gravflag = false;
-		//	}
-		//	else
-		//	{
-		//		gravflag = true;
-		//	}
-		//}
+		// 地面に接しているか確認
+		if (HitCheckPToM(pPlayer[i], pMap))
+		{
+			pPlayer[i]->SetJumpFlag(false);
+			gravflag = false;
+		}
+		else
+		{
+			gravflag = true;
+		}
+		// ペイントシステムとの当たり判定
+		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
+		{
+			if (HitCheckPToS(pPlayer[i], pPManager[i]))
+			{
+				pPlayer[i]->SetJumpFlag(false);
+				gravflag = false;
+			}
+			else
+			{
+				gravflag = true;
+			}
+		}
 
-		//// 重力が有効
-		//if (gravflag)
-		//{
-		//	GravityFall(pPlayer[i]);
-		//}
+		// 重力が有効
+		if (gravflag)
+		{
+			GravityFall(pPlayer[i]);
+		}
 	}
 
-	//// ペイントシステム同士の当たり判定
-	//for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
-	//{
-	//	for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
-	//	{
-	//		// 自分が使用しているカラー以外との判定を行う
-	//		if (nBlack != nColor)
-	//		{
-	//			//HitCheckSToS(pPSystem[nBlack], pPSystem[nColor]);
-	//		}
-	//	}
-	//}
+	// ペイントシステム同士の当たり判定
+	for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
+	{
+		for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
+		{
+			// 自分が使用しているカラー以外との判定を行う
+			if (nBlack != nColor)
+			{
+				HitCheckSToS(pPManager[nBlack], pPManager[nColor]);
+			}
+		}
+	}
 
 	// ポップアップの更新
 	for (int i = 0; i < PLAYER_MAX; i++)

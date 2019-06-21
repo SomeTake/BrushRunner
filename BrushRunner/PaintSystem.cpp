@@ -24,9 +24,14 @@ PaintManager::PaintManager(Cursor *pC, Player *pP)
 	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
 	pos.z = 0.0f;
 
-	for (int i = 0; i < PAINT_MAX; i++)
+	for (int i = 0; i < INK_MAX; i++)
 	{
-		pPaint[i] = new PAINT();
+		pBlackPaint[i] = new Paint();
+	}
+
+	for (int i = 0; i < INK_MAX; i++)
+	{
+		pColorPaint[i] = new Paint();
 	}
 
 }
@@ -36,9 +41,14 @@ PaintManager::PaintManager(Cursor *pC, Player *pP)
 //=============================================================================
 PaintManager::~PaintManager()
 {
-	for (int i = 0; i < PAINT_MAX; i++)
+	for (int i = 0; i < INK_MAX; i++)
 	{
-		delete pPaint[i];
+		delete pBlackPaint[i];
+	}
+
+	for (int i = 0; i < INK_MAX; i++)
+	{
+		delete pColorPaint[i];
 	}
 
 }
@@ -54,15 +64,22 @@ void PaintManager::Update()
 	pos.z = 0.0f;
 
 	// 使用しているペイントを更新
-	for (int i = 0; i < PAINT_MAX; i++)
+	for (int i = 0; i < INK_MAX; i++)
 	{
-		if (pPaint[i]->GetUse())
+		if (pBlackPaint[i]->GetUse())
 		{
-			pPaint[i]->Update();
-			PrintDebugProc("Paint[%d]Time%d\n",i, pPaint[i]->GetTime());
+			pBlackPaint[i]->Update();
 
 		}
 	}
+	for (int i = 0; i < INK_MAX; i++)
+	{
+		if (pColorPaint[i]->GetUse())
+		{
+			pColorPaint[i]->Update();
+		}
+	}
+
 
 	// インクを使う
 	if (GetKeyboardPress(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C))
@@ -77,18 +94,7 @@ void PaintManager::Update()
 			pPlayer->SetInkValue(type, value);
 		}
 	}
-
-	// インクの使用数を数える
-	int num = 0;
-	for (int i = 0; i < PAINT_MAX; i++)
-	{
-		if (pPaint[i]->GetUse()) num++;
-	}
 	
-#ifndef _DEBUG_
-	PrintDebugProc("使用しているインクの数 %d\n", num);
-#endif
-
 }
 
 //=============================================================================
@@ -97,11 +103,19 @@ void PaintManager::Update()
 void PaintManager::Draw()
 {
 	// 使用しているペイントを描画
-	for (int i = 0; i < PAINT_MAX; i++)
+	for (int i = 0; i < INK_MAX; i++)
 	{
-		if (pPaint[i]->GetUse())
+		if (pBlackPaint[i]->GetUse())
 		{
-			pPaint[i]->Draw();
+			pBlackPaint[i]->Draw();
+		}
+	}
+
+	for (int i = 0; i < INK_MAX; i++)
+	{
+		if (pColorPaint[i]->GetUse())
+		{
+			pColorPaint[i]->Draw();
 		}
 	}
 }
@@ -116,61 +130,124 @@ void PaintManager::Set(int InkType)
 
 	D3DXMATRIX ViewMtx, ProjMtx;
 
-	 pDevice->GetTransform(D3DTS_VIEW, &ViewMtx);
-	 pDevice->GetTransform(D3DTS_PROJECTION, &ProjMtx);
+	pDevice->GetTransform(D3DTS_VIEW, &ViewMtx);
+	pDevice->GetTransform(D3DTS_PROJECTION, &ProjMtx);
 
-	for (int nCntPaint = 0; nCntPaint < PAINT_MAX; nCntPaint++)
+	// 黒インクの場合
+	if (InkType == BlackInk)
 	{
-		// 使用していないペイントから検索
-		if (!pPaint[nCntPaint]->GetUse())
+		for (int nCntPaint = 0; nCntPaint < INK_MAX; nCntPaint++)
 		{
-			// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
-			// スクリーン座標とXZ平面のワールド座標交点算出
-			D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-			CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-			CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-
-			// 判定用三角形ポリゴン
-			TriangleStr triPos1, triPos2;
-			triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-			triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-				camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
-				camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-			// 2点を使って当たった場所をセットする場所とする
-			if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+			// 使用していないペイントから検索
+			if (!pBlackPaint[nCntPaint]->GetUse())
 			{
-				hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+				// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+				// スクリーン座標とXZ平面のワールド座標交点算出
+				D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+				CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+				CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+				// 判定用三角形ポリゴン
+				TriangleStr triPos1, triPos2;
+				triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+				triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+				// 2点を使って当たった場所をセットする場所とする
+				if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+				{
+					hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+				}
+
+				pBlackPaint[nCntPaint]->SetPos(SetPos);
+				pBlackPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				pBlackPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+
+				pBlackPaint[nCntPaint]->SetUse(true);
+
+				// 使用しているインクの色に合わせて表示時間、テクスチャをセット
+				if (InkType == BlackInk)
+				{
+					pBlackPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
+					pBlackPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
+				}
+				else
+				{
+					pBlackPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
+					pBlackPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
+				}
+
+				// 頂点座標の設定
+				pBlackPaint[nCntPaint]->SetVertex();
+
+				// 頂点カラーの設定
+				pBlackPaint[nCntPaint]->SetColor();
+
+				break;
 			}
-
-			pPaint[nCntPaint]->SetPos(SetPos);
-			pPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			pPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-
-			pPaint[nCntPaint]->SetUse(true);
-
-			// 使用しているインクの色に合わせて表示時間、テクスチャをセット
-			if (InkType == BlackInk)
-			{
-				pPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
-				pPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
-			}
-			else
-			{
-				pPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
-				pPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
-			}
-
-			// 頂点座標の設定
-			pPaint[nCntPaint]->SetVertex();
-
-			// 頂点カラーの設定
-			pPaint[nCntPaint]->SetColor();
-
-			break;
 		}
 	}
+	// カラーインクの場合
+	else
+	{
+		for (int nCntPaint = 0; nCntPaint < INK_MAX; nCntPaint++)
+		{
+			// 使用していないペイントから検索
+			if (!pColorPaint[nCntPaint]->GetUse())
+			{
+				// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+				// スクリーン座標とXZ平面のワールド座標交点算出
+				D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+				CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+				CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+				// 判定用三角形ポリゴン
+				TriangleStr triPos1, triPos2;
+				triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+				triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+				// 2点を使って当たった場所をセットする場所とする
+				if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+				{
+					hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+				}
+
+				pColorPaint[nCntPaint]->SetPos(SetPos);
+				pColorPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				pColorPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+
+				pColorPaint[nCntPaint]->SetUse(true);
+
+				// 使用しているインクの色に合わせて表示時間、テクスチャをセット
+				if (InkType == BlackInk)
+				{
+					pColorPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
+					pColorPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
+				}
+				else
+				{
+					pColorPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
+					pColorPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
+				}
+
+				// 頂点座標の設定
+				pColorPaint[nCntPaint]->SetVertex();
+
+				// 頂点カラーの設定
+				pColorPaint[nCntPaint]->SetColor();
+
+				break;
+			}
+		}
+	}
+
 }
