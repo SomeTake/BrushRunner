@@ -138,8 +138,8 @@
   <ItemGroup>
     <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="Billboard.cpp" />
-    <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="InkFrameBlack.cpp" />
@@ -166,14 +166,13 @@
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="Billboard.h" />
-    <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Chip.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CountDown.h" />
     <ClInclude Include="InkFrameBlack.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sound.h" />
-    <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>

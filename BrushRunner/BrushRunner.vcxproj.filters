@@ -150,11 +150,8 @@
     <ClCompile Include="Cursor.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
-    <ClCompile Include="BoxCollider.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="SphereCollider.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Chip.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,11 +251,8 @@
     <ClInclude Include="Cursor.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
-    <ClInclude Include="BoxCollider.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SphereCollider.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Chip.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

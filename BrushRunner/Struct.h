@@ -1,8 +1,6 @@
 #ifndef _STRUCT_H_
 #define _STRUCT_H_
 
-#include "Main.h"
-
 class Player;
 class _2dobj;
 class Billboard;

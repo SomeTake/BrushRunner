@@ -15,7 +15,7 @@
 //*****************************************************************************
 #define	CHARA_XFILE			"data/MODEL/Kouhai.x"			// 読み込むモデル名(ファイルパス名)
 #define PLAYER_MAX			(4)											// 操作するプレイヤーの数
-#define PLAYER_FIRST_POS	D3DXVECTOR3(20.0f, -40.0f, 0.0f)			// 初期位置
+#define PLAYER_FIRST_POS	D3DXVECTOR3(0.0f, 0.0f, 0.0f)			// 初期位置
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速

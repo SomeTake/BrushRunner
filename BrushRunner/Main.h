@@ -20,9 +20,12 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
 #define DIRECTINPUT_VERSION (0x0800)	// Œx‘Îô
 #include "dinput.h"
+
+#include "Struct.h"
 
 using namespace std;
 
