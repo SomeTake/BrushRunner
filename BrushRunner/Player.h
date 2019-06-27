@@ -15,7 +15,6 @@
 //*****************************************************************************
 #define	CHARA_XFILE			"data/MODEL/Kouhai.x"			// 読み込むモデル名(ファイルパス名)
 #define PLAYER_MAX			(4)											// 操作するプレイヤーの数
-#define PLAYER_FIRST_POS	D3DXVECTOR3(0.0f, 0.0f, 0.0f)			// 初期位置
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速
@@ -116,15 +115,17 @@ private:
 	int					inkType;			// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool				moveFlag;			// 移動可能フラグ（進行方向にオブジェクトがある場合は移動不可）
 	bool				playable;			// ゲーム中か判定するフラグ
+	bool				use;				// 画面内にいるとき
 
 	// メンバ関数
 	void ChangeInk();		// インクの種類交換
 	void Move();			// 移動
 	void ChangeAnim();		// アニメーション管理
+	void CheckOnCamera();
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum);
+	Player(int _CtrlNum, D3DXVECTOR3 firstpos);
 	~Player();
 	void Update();
 	void Draw();

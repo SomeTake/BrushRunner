@@ -8,8 +8,7 @@
 #include "Map.h"
 #include "Input.h"
 #include "Debugproc.h"
-
-using namespace std;
+#include "MyLibrary.h"
 
 //*****************************************************************************
 // グローバル変数
@@ -21,14 +20,23 @@ D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 //=============================================================================
 Map::Map()
 {
+	// ポインタのセット
+	for (int i = 0; i < MAP_SIZE_Y; i++)
+	{
+		pMaptbl[i] = maptbl[i];
+		pObjtbl[i] = objtbl[i];
+	}
+
 	// csvデータ読み込み
-	ReadCsv(MAP_FILE);
+	ReadCsv(MAP_FILE, pMaptbl);
+	ReadCsv(OBJECT_FILE, pObjtbl);
 
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
 		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
 		{
 			pChip[cntY][cntX] = new Chip(cntX, cntY, maptbl[cntY][cntX]);
+			pObjChip[cntY][cntX] = new ObjectChip(cntX, cntY, objtbl[cntY][cntX]);
 		}
 	}
 
@@ -48,6 +56,7 @@ Map::~Map()
 		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
 		{
 			delete pChip[cntY][cntX];
+			delete pObjChip[cntY][cntX];
 		}
 	}
 }
@@ -62,6 +71,7 @@ void Map::Update()
 		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
 		{
 			pChip[cntY][cntX]->Update();
+			pObjChip[cntY][cntX]->Update();
 		}
 	}
 }
@@ -75,34 +85,16 @@ void Map::Draw()
 	{
 		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
 		{
+			// 描画判定
 			if (maptbl[cntY][cntX] >= 0)
 			{
 				pChip[cntY][cntX]->Draw();
 			}
+			if (objtbl[cntY][cntX] >= 0)
+			{
+				pObjChip[cntY][cntX]->Draw();
+			}
 		}
-	}
-}
-
-//=============================================================================
-// CSVファイルの読み込み
-//=============================================================================
-void Map::ReadCsv(const char *data)
-{
-	ifstream stream(data);		// マップの読み込み先
-
-	int row = 0;
-	int col;
-	while (getline(stream, line))
-	{
-		col = 0;
-		// delimを区切り文字として切り分け、intに変換してmaptbl[][]に格納する
-		for (string::size_type spos, epos = 0;
-			(spos = line.find_first_not_of(delim, epos)) != string::npos;)
-		{
-			string token = line.substr(spos, (epos = line.find_first_of(delim, spos)) - spos);
-			maptbl[row][col++] = stoi(token);
-		}
-		++row;
 	}
 }
 

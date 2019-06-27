@@ -10,11 +10,12 @@
 #include "Input.h"
 #include "Gravity.h"
 #include "SceneGame.h"
+#include "Camera.h"
 
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum)
+Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -50,7 +51,7 @@ Player::Player(int _CtrlNum)
 	}
 
 	// 位置・回転・スケールの初期設定
-	pos = PLAYER_FIRST_POS;
+	pos = firstpos;
 	rot = PLAYER_ROT;
 	scl = ModelScl[KouhaiModel];
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -60,6 +61,7 @@ Player::Player(int _CtrlNum)
 	inkType = ColorInk;
 	moveFlag = true;
 	playable = false;
+	use = true;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -83,42 +85,49 @@ Player::~Player()
 //=====================================================================================================
 void Player::Update()
 {
-	// アニメーションを更新
-	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
+	if (use)
+	{
+		// アニメーションを更新
+		Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
 
-	// 移動
-	Move();
+		// 移動
+		Move();
 
-	// インク変更
-	ChangeInk();
+		// インク変更
+		ChangeInk();
 
-	// アニメーション管理
-	ChangeAnim();
+		// アニメーション管理
+		ChangeAnim();
+		
+		// カメラ内判定
+		CheckOnCamera();
 
 #ifndef _DEBUG_
-	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
-	//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
-	//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
-	//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
-	//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
-	//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
-	//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
+		PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+		//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
+		//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
+		//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
+		//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
+		//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
+		//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
+		PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
 
-	if (GetKeyboardPress(DIK_LEFT))
-	{
-		if (inkValue[inkType] > 0)
+		if (GetKeyboardPress(DIK_LEFT))
 		{
-			inkValue[inkType]--;
+			if (inkValue[inkType] > 0)
+			{
+				inkValue[inkType]--;
+			}
 		}
-	}
-	if (GetKeyboardPress(DIK_RIGHT))
-	{
-		if (inkValue[inkType] < INK_MAX)
+		if (GetKeyboardPress(DIK_RIGHT))
 		{
-			inkValue[inkType]++;
+			if (inkValue[inkType] < INK_MAX)
+			{
+				inkValue[inkType]++;
+			}
 		}
-	}
 #endif
+	}
 }
 
 //=====================================================================================================
@@ -126,36 +135,39 @@ void Player::Update()
 //=====================================================================================================
 void Player::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	D3DMATERIAL9 matDef;
-	D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
+	if (use)
+	{
+		LPDIRECT3DDEVICE9 pDevice = GetDevice();
+		D3DMATERIAL9 matDef;
+		D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
 
-	// ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&WorldMtx);
+		// ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&WorldMtx);
 
-	// スケールを反映
-	D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+		// スケールを反映
+		D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
+		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
 
-	// 回転を反映
-	D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+		// 回転を反映
+		D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
+		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
 
-	// 移動を反映
-	D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+		// 移動を反映
+		D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
+		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
-	// ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+		// ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
 
-	// 現在のマテリアルを取得
-	pDevice->GetMaterial(&matDef);
+		// 現在のマテリアルを取得
+		pDevice->GetMaterial(&matDef);
 
-	// レンダリング
-	Animation->DrawAnimation(Animation, &WorldMtx);
+		// レンダリング
+		Animation->DrawAnimation(Animation, &WorldMtx);
 
-	// マテリアルをデフォルトに戻す
-	pDevice->SetMaterial(&matDef);
+		// マテリアルをデフォルトに戻す
+		pDevice->SetMaterial(&matDef);
+	}
 }
 
 //=====================================================================================================
@@ -254,4 +266,31 @@ void Player::ChangeAnim()
 			}
 		}
 	}
+}
+
+//=====================================================================================================
+// カメラ内判定
+//=====================================================================================================
+void Player::CheckOnCamera()
+{
+	CAMERA *camera = GetCamera();
+
+	// 縦
+	if ((pos.x > camera->at.x - DRAW_RANGE.x) && (pos.x < camera->at.x + DRAW_RANGE.x))
+	{
+		// 横
+		if ((pos.y > camera->at.y - DRAW_RANGE.y) && (pos.y < camera->at.y + DRAW_RANGE.y))
+		{
+			use = true;
+		}
+		else
+		{
+			use = false;
+		}
+	}
+	else
+	{
+		use = false;
+	}
+
 }

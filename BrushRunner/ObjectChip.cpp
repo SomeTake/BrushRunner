@@ -1,29 +1,30 @@
 //=============================================================================
 //
-// チップ処理 [Chip.cpp]
+// フィールドオブジェクトチップ処理 [ObjectChip.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Chip.h"
+#include "ObjectChip.h"
+#include "Map.h"
 #include "Camera.h"
 
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	Chip::D3DTexture = NULL;		// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9	ObjectChip::D3DTexture = NULL;		// テクスチャへのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Chip::Chip(int x, int y, int texnum)
+ObjectChip::ObjectChip(int x, int y, int texnum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 位置・回転・スケールの初期設定
 	pos.x = MAP_POS.x + x * CHIP_SIZE;
 	pos.y = MAP_POS.y - y * CHIP_SIZE;
-	pos.z = 0.0f;
+	pos.z = -0.01f;
 	rot = MAP_ROT;	// 縦に向ける
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
@@ -43,7 +44,7 @@ Chip::Chip(int x, int y, int texnum)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Chip::~Chip()
+ObjectChip::~ObjectChip()
 {
 	if (D3DTexture != NULL)
 	{// テクスチャの開放
@@ -56,13 +57,12 @@ Chip::~Chip()
 		D3DVtxBuff->Release();
 		D3DVtxBuff = NULL;
 	}
-
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void Chip::Update()
+void ObjectChip::Update()
 {
 	CheckOnCamera();
 }
@@ -70,7 +70,7 @@ void Chip::Update()
 //=============================================================================
 // 描画
 //=============================================================================
-void Chip::Draw()
+void ObjectChip::Draw()
 {
 	if (use)
 	{
@@ -112,7 +112,7 @@ void Chip::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT Chip::MakeVertex(int texnum)
+HRESULT ObjectChip::MakeVertex(int texnum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -182,7 +182,7 @@ HRESULT Chip::MakeVertex(int texnum)
 //=============================================================================
 // カメラ内判定
 //=============================================================================
-void Chip::CheckOnCamera()
+void ObjectChip::CheckOnCamera()
 {
 	CAMERA *camera = GetCamera();
 

@@ -28,8 +28,10 @@ private:
 	D3DXVECTOR3				scl;
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;	// 頂点バッファへのポインタ
+	bool use;
 
 	HRESULT MakeVertex(int texnum);
+	void CheckOnCamera();
 
 public:
 	Chip(int x, int y, int texnum);

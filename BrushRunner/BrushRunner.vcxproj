@@ -157,6 +157,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MyLibrary.cpp" />
+    <ClCompile Include="ObjectChip.cpp" />
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="PaintSystem.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MyLibrary.h" />
+    <ClInclude Include="ObjectChip.h" />
     <ClInclude Include="Paint.h" />
     <ClInclude Include="PaintSystem.h" />
     <ClInclude Include="Player.h" />

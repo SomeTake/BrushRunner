@@ -1,45 +1,43 @@
 //=============================================================================
 //
-// ポップアップ表示処理 [Pop.h]
+// フィールドオブジェクトチップ処理 [ObjectChip.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _POP_H_
-#define _POP_H_
-
-#include "Billboard.h"
-#include "Player.h"
+#ifndef _OBJECTCHIP_H_
+#define _OBJECTCHIP_H_
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
-#define	POP_WIDTH		(64.0f)							// 半径高さ
-#define	POP_HEIGHT		(32.0f)							// 半径幅
-#define POP_POS			D3DXVECTOR3(0.0f, 90.0f, -1.0f)	// 表示場所
-#define POP_DIVIDE_X	(4)
-#define POP_DIVIDE_Y	(1)
-#define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDE_Y)
+#define OBJECTCHIP_TEXTURE	("data/MAP/tilea5.png")
+#define OBJECTCHIP_DIVIDE_X	(8)
+#define OBJECTCHIP_DIVIDE_Y	(16)
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Pop :
-	public Billboard
+class ObjectChip
 {
 private:
-	Player * pPlayer;
-	int patternAnim;
-
+	D3DXVECTOR3	pos;
+	D3DXVECTOR3	rot;
+	D3DXVECTOR3	scl;
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
+	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;	// 頂点バッファへのポインタ
+	bool use;
+
+	HRESULT MakeVertex(int texnum);
+	void CheckOnCamera();
 
 public:
-	Pop(Player *pP);
-	~Pop();
+	ObjectChip(int x, int y, int texnum);
+	~ObjectChip();
 
 	void Update();
 	void Draw();
-	HRESULT MakeVertex();
+
+	D3DXVECTOR3 GetPos() { return pos; };
 
 };
 
