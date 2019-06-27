@@ -20,6 +20,7 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <vector>
+#include <algorithm>
 
 #define DIRECTINPUT_VERSION (0x0800)	// 警告対策
 #include "dinput.h"
@@ -64,33 +65,23 @@ using namespace std;
 
 
 // デストラクタ
+#define SAFE_FREE(object)			{if(object){free (object);			(object) = NULL;}}
 #define SAFE_DELETE(object)			{if(object){delete (object);		(object) = NULL;}}
 #define SAFE_DELETE_ARRAY(object)	{if(object){delete[] (object);		(object) = NULL;}}
-#define SAFE_RELEASE(object)		{if(object){(object)->Release();	(object)=NULL;}}
+#define SAFE_RELEASE(object)		{if(object){(object)->Release();	(object) = NULL;}}
 
 #define GetMonitorRect(rc) SystemParametersInfo(SPI_GETWORKAREA, 0, rc, 0)	// モニター矩形
 
-// 上記２Ｄポリゴン頂点フォーマットに合わせた構造体を定義
-typedef struct
+// ベクトルメモリ解放
+template <class T>
+void ReleaseVector(vector<T>& vt)
 {
-	D3DXVECTOR3 vtx;		// 頂点座標
-	float rhw;				// テクスチャのパースペクティブコレクト用
-	D3DCOLOR diffuse;		// 反射光
-	D3DXVECTOR2 tex;		// テクスチャ座標
-} VERTEX_2D;
-
-// 上記３Ｄポリゴン頂点フォーマットに合わせた構造体を定義
-typedef struct
-{
-	D3DXVECTOR3 vtx;		// 頂点座標
-	D3DXVECTOR3 nor;		// 法線ベクトル
-	D3DCOLOR diffuse;		// 反射光
-	D3DXVECTOR2 tex;		// テクスチャ座標
-} VERTEX_3D;
-
+	vector<T> vtTemp;
+	vtTemp.swap(vt);
+}
 
 //シーン遷移
-enum
+enum SceneNum
 {
 	SceneTitle,				// タイトル
 	SceneCharacterSelect,	// キャラクターセレクト
@@ -105,5 +96,7 @@ enum
 LPDIRECT3DDEVICE9 GetDevice();	// デバイスを取得する
 int GetScene();					// 現在のゲームシーンを取得する
 void SetScene(int _scene);		// ゲームシーンを変更する
+
+HWND GetWindowHandle();
 
 #endif

@@ -79,6 +79,14 @@
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -94,6 +102,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,6 +128,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,24 +136,77 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AllocateHierarchy.cpp" />
+    <ClCompile Include="AnimationSet.cpp" />
+    <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="CountDown.cpp" />
+    <ClCompile Include="InkFrameBlack.cpp" />
+    <ClCompile Include="InkFrameColor.cpp" />
+    <ClCompile Include="Cursor.cpp" />
+    <ClCompile Include="D3DXAnimation.cpp" />
+    <ClCompile Include="Debugproc.cpp" />
+    <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="Faceframe.cpp" />
+    <ClCompile Include="Frame01.cpp" />
+    <ClCompile Include="Gravity.cpp" />
+    <ClCompile Include="Ink.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MyLibrary.cpp" />
+    <ClCompile Include="Paint.cpp" />
+    <ClCompile Include="PaintSystem.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Pop.cpp" />
+    <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SphereCollider.cpp" />
+    <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllocateHierarchy.h" />
+    <ClInclude Include="AnimationSet.h" />
+    <ClInclude Include="Billboard.h" />
+    <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="CountDown.h" />
+    <ClInclude Include="InkFrameBlack.h" />
+    <ClInclude Include="InkFrameColor.h" />
+    <ClInclude Include="Cursor.h" />
+    <ClInclude Include="D3DXAnimation.h" />
+    <ClInclude Include="Debugproc.h" />
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="Faceframe.h" />
+    <ClInclude Include="Frame01.h" />
+    <ClInclude Include="Gravity.h" />
+    <ClInclude Include="Ink.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MyLibrary.h" />
+    <ClInclude Include="Paint.h" />
+    <ClInclude Include="PaintSystem.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Pop.h" />
+    <ClInclude Include="Quadtree.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="SphereCollider.h" />
+    <ClInclude Include="Struct.h" />
+    <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
