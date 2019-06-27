@@ -20,20 +20,23 @@
 // グローバル変数
 //*****************************************************************************
 static LPD3DXFONT	g_pD3DXFont = NULL;			// フォントへのポインタ
-char		g_aStrDebug[1024] = {"\0"};	// デバッグ情報
-
+char				g_aStrDebug[1024] = { "\0" };	// デバッグ情報
+// 処理速度計算
+LARGE_INTEGER		StartTime;
+double				UpdateTime = 0.0;
+double				DrawTime = 0.0;
 
 //=============================================================================
 // デバッグ表示処理の初期化
 //=============================================================================
 HRESULT InitDebugProc(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 	HRESULT hr;
 
 	// 情報表示用フォントを設定
-	hr = D3DXCreateFont(pDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-					OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
+	hr = D3DXCreateFont(Device, 24, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Consolas", &g_pD3DXFont);
 
 	// 情報クリア
 	memset(g_aStrDebug, 0, sizeof g_aStrDebug);
@@ -46,11 +49,8 @@ HRESULT InitDebugProc(void)
 //=============================================================================
 void UninitDebugProc(void)
 {
-	if(g_pD3DXFont != NULL)
-	{// 情報表示用フォントの開放
-		g_pD3DXFont->Release();
-		g_pD3DXFont = NULL;
-	}
+	// 情報表示用フォントの開放
+	SAFE_RELEASE(g_pD3DXFont);
 }
 
 //=============================================================================
@@ -65,10 +65,10 @@ void UpdateDebugProc(void)
 //=============================================================================
 void DrawDebugProc(void)
 {
-	RECT rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	// 情報表示
-	g_pD3DXFont->DrawText(NULL, g_aStrDebug, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+	g_pD3DXFont->DrawText(NULL, g_aStrDebug, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	// 情報クリア
 	memset(g_aStrDebug, 0, sizeof g_aStrDebug);
@@ -77,29 +77,20 @@ void DrawDebugProc(void)
 //=============================================================================
 // デバッグ表示の登録
 //=============================================================================
-void PrintDebugProc(const char *fmt,...)
+void PrintDebugProc(const char *fmt, ...)
 {
-#if 0
-	long *pParam;
-	static char aBuf[256];
-
-	pParam = (long*)&fmt;
-	sprintf(aBuf, fmt, pParam[1], pParam[2], pParam[3], pParam[4],
-									pParam[5], pParam[6], pParam[7], pParam[8],
-									pParam[9], pParam[10], pParam[11], pParam[12]);
-#else
 	va_list list;			// 可変引数を処理する為に使用する変数
 	char *pCur;
-	char aBuf[256]={"\0"};
+	char aBuf[256] = { "\0" };
 	char aWk[32];
 
 	// 可変引数にアクセスする前の初期処理
 	va_start(list, fmt);
 
 	pCur = (char *)fmt;
-	for( ; *pCur; ++pCur)
+	for (; *pCur; ++pCur)
 	{
-		if(*pCur != '%')
+		if (*pCur != '%')
 		{
 			sprintf(aWk, "%c", *pCur);
 		}
@@ -107,7 +98,7 @@ void PrintDebugProc(const char *fmt,...)
 		{
 			pCur++;
 
-			switch(*pCur)
+			switch (*pCur)
 			{
 			case 'd':
 				// 可変引数にアクセスしてその変数を取り出す処理
@@ -141,10 +132,60 @@ void PrintDebugProc(const char *fmt,...)
 	va_end(list);
 
 	// 連結
-	if((strlen(g_aStrDebug) + strlen(aBuf)) < ((sizeof g_aStrDebug) - 1))
+	if ((strlen(g_aStrDebug) + strlen(aBuf)) < ((sizeof g_aStrDebug) - 1))
 	{
 		strcat(g_aStrDebug, aBuf);
 	}
-#endif
 }
 
+//=============================================================================
+// 処理開始の時間を記録
+//=============================================================================
+void ProcessStart(int ProcessPhase)
+{
+	QueryPerformanceCounter(&StartTime);
+	switch (ProcessPhase)
+	{
+	case Process_Update:
+		UpdateTime = 0.0;
+		break;
+	case Process_Draw:
+		DrawTime = 0.0;
+		break;
+	default:
+		break;
+	}
+}
+
+//=============================================================================
+// 処理終了の時間を記録
+//=============================================================================
+void ProcessEnd(int ProcessPhase)
+{
+	LARGE_INTEGER e, f;
+	QueryPerformanceCounter(&e);
+	QueryPerformanceFrequency(&f);
+	switch (ProcessPhase)
+	{
+	case Process_Update:
+		UpdateTime = (double)(e.QuadPart - StartTime.QuadPart) / f.QuadPart;
+		break;
+	case Process_Draw:
+		DrawTime = (double)(e.QuadPart - StartTime.QuadPart) / f.QuadPart;
+		break;
+	default:
+		break;
+	}
+}
+
+//=============================================================================
+// FPSと処理時間を表示
+//=============================================================================
+void DrawProcessTime(int FPSCount)
+{
+	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	char ProcessTime[512];
+
+	sprintf_s(ProcessTime, 512, "FPS = %d\nUpdateTime = %f\nDrawTime = %f\n", FPSCount, UpdateTime, DrawTime);
+	g_pD3DXFont->DrawText(NULL, ProcessTime, -1, &rect, DT_LEFT | DT_BOTTOM, D3DCOLOR_ARGB(0xff, 0x00, 0x00, 0x00));
+}

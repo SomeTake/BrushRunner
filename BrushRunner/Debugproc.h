@@ -9,6 +9,14 @@
 
 #include "main.h"
 
+enum e_ProcessPhase
+{
+	Process_Init = 0,
+	Process_Update,
+	Process_Draw,
+	Process_Uninitialize,
+};
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -17,6 +25,10 @@ void UninitDebugProc(void);
 void UpdateDebugProc(void);
 void DrawDebugProc(void);
 
-void PrintDebugProc(const char *fmt,...);
+void PrintDebugProc(const char *fmt, ...);
+
+void ProcessStart(int ProcessPhase);
+void ProcessEnd(int ProcessPhase);
+void DrawProcessTime(int FPSCount);
 
 #endif

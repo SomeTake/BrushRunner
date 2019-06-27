@@ -11,29 +11,30 @@
 #include "MyLibrary.h"
 #include "Camera.h"
 #include "Collision.h"
+#include "Quadtree.h"
+
+QUADTREE *PaintManager::Quadtree = nullptr;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PaintManager::PaintManager(Cursor *pC, Player *pP)
+PaintManager::PaintManager(Cursor *pC, Player *pP, QUADTREE *Quadtree)
 {
 	pPlayer = pP;
 	pCursor = pC;
+	this->Owner = pP->GetCtrlNum();
 
 	pos.x = pCursor->GetPos().x;
 	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
 	pos.z = 0.0f;
 
-	for (int i = 0; i < INK_MAX; i++)
-	{
-		pBlackPaint[i] = new Paint();
-	}
+	BlackPaint.reserve(INK_MAX);
+	ColorPaint.reserve(INK_MAX);
 
-	for (int i = 0; i < INK_MAX; i++)
+	if (PaintManager::Quadtree == nullptr)
 	{
-		pColorPaint[i] = new Paint();
+		PaintManager::Quadtree = Quadtree;
 	}
-
 }
 
 //=============================================================================
@@ -41,60 +42,102 @@ PaintManager::PaintManager(Cursor *pC, Player *pP)
 //=============================================================================
 PaintManager::~PaintManager()
 {
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Paint : this->BlackPaint)
 	{
-		delete pBlackPaint[i];
+		SAFE_DELETE(Paint);
 	}
+	this->BlackPaint.clear();
+	ReleaseVector(BlackPaint);
 
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Paint : this->ColorPaint)
 	{
-		delete pColorPaint[i];
+		SAFE_DELETE(Paint);
 	}
-
+	this->ColorPaint.clear();
+	ReleaseVector(ColorPaint);
 }
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void PaintManager::Update()
+void PaintManager::Update(bool PressMode)
 {
 	// カーソルの筆先に座標を合わせる
 	pos.x = pCursor->GetPos().x;
 	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
 	pos.z = 0.0f;
 
+	// 使用していないペイントがVectorから削除
+	CheckPaintUse();
+
 	// 使用しているペイントを更新
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Black : this->BlackPaint)
 	{
-		if (pBlackPaint[i]->GetUse())
+		// オブジェクトが画面内かつ、ノードの範囲内じゃないなら、もう一度四分木に入れる
+		if (Black->GetInScreen() && !PaintManager::Quadtree->CheckObjectInNode(Black))
 		{
-			pBlackPaint[i]->Update();
-
+			PaintManager::Quadtree->InsertObject(Black);
 		}
+		Black->Update();
 	}
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Color : this->ColorPaint)
 	{
-		if (pColorPaint[i]->GetUse())
+		if (Color->GetInScreen() && !PaintManager::Quadtree->CheckObjectInNode(Color))
 		{
-			pColorPaint[i]->Update();
+			PaintManager::Quadtree->InsertObject(Color);
 		}
+		Color->Update();
 	}
-
 
 	// インクを使う
-	if (GetKeyboardPress(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C))
+	if ((GetKeyboardPress(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C)) && PressMode)
 	{
 		// 使用するインクの残量チェック
 		int type = pPlayer->GetInkType();
 		if (pPlayer->GetInkValue(type) > 0)
 		{
-			Set(pPlayer->GetInkType());
+			// ペイントを設置する
+			SetPaint(pPlayer->GetInkType());
 			// インクを減らす
 			int value = pPlayer->GetInkValue(type) - 1;
 			pPlayer->SetInkValue(type, value);
 		}
 	}
-	
+	else if ((GetKeyboardTrigger(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C)) && !PressMode)
+	{
+		// 使用するインクの残量チェック
+		int type = pPlayer->GetInkType();
+		if (pPlayer->GetInkValue(type) > 0)
+		{
+			// ペイントを設置する
+			SetPaint(pPlayer->GetInkType());
+			// インクを減らす
+			int value = pPlayer->GetInkValue(type) - 1;
+			pPlayer->SetInkValue(type, value);
+		}
+	}
+
+#if _DEBUG
+	//PrintDebugProc("Player %d BlackPaintNum：%d\n", this->Owner, this->BlackPaint.size());
+	//PrintDebugProc("Player %d ColorPaintNum：%d\n", this->Owner, this->ColorPaint.size());
+
+	if (GetKeyboardTrigger(DIK_L))
+	{
+		for (auto Paint = this->BlackPaint.begin(); Paint != this->BlackPaint.end(); Paint++)
+		{
+			(*Paint)->SetUse(false);
+			SAFE_DELETE((*Paint));
+		}
+		this->BlackPaint.clear();
+
+		for (auto Paint = this->ColorPaint.begin(); Paint != this->ColorPaint.end(); Paint++)
+		{
+			(*Paint)->SetUse(false);
+			SAFE_DELETE((*Paint));
+		}
+		this->ColorPaint.clear();
+	}
+#endif
 }
 
 //=============================================================================
@@ -103,151 +146,158 @@ void PaintManager::Update()
 void PaintManager::Draw()
 {
 	// 使用しているペイントを描画
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Black : this->BlackPaint)
 	{
-		if (pBlackPaint[i]->GetUse())
-		{
-			pBlackPaint[i]->Draw();
-		}
+		Black->Draw();
 	}
-
-	for (int i = 0; i < INK_MAX; i++)
+	for (auto &Color : this->ColorPaint)
 	{
-		if (pColorPaint[i]->GetUse())
-		{
-			pColorPaint[i]->Draw();
-		}
+		Color->Draw();
 	}
 }
 
 //=============================================================================
 // ペイントのセット
 //=============================================================================
-void PaintManager::Set(int InkType)
+void PaintManager::SetPaint(int InkType)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 	CAMERA *camerawk = GetCamera();
-
 	D3DXMATRIX ViewMtx, ProjMtx;
 
-	pDevice->GetTransform(D3DTS_VIEW, &ViewMtx);
-	pDevice->GetTransform(D3DTS_PROJECTION, &ProjMtx);
+	Device->GetTransform(D3DTS_VIEW, &ViewMtx);
+	Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
 
 	// 黒インクの場合
 	if (InkType == BlackInk)
 	{
-		for (int nCntPaint = 0; nCntPaint < INK_MAX; nCntPaint++)
+		if (this->BlackPaint.size() >= INK_MAX)
 		{
-			// 使用していないペイントから検索
-			if (!pBlackPaint[nCntPaint]->GetUse())
-			{
-				// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
-				// スクリーン座標とXZ平面のワールド座標交点算出
-				D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-				CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-				CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-
-				// 判定用三角形ポリゴン
-				TriangleStr triPos1, triPos2;
-				triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-				triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-				// 2点を使って当たった場所をセットする場所とする
-				if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
-				{
-					hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
-				}
-
-				pBlackPaint[nCntPaint]->SetPos(SetPos);
-				pBlackPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				pBlackPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
-
-				pBlackPaint[nCntPaint]->SetUse(true);
-
-				// 使用しているインクの色に合わせて表示時間、テクスチャをセット
-				if (InkType == BlackInk)
-				{
-					pBlackPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
-					pBlackPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
-				}
-				else
-				{
-					pBlackPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
-					pBlackPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
-				}
-
-				// 頂点座標の設定
-				pBlackPaint[nCntPaint]->SetVertex();
-
-				// 頂点カラーの設定
-				pBlackPaint[nCntPaint]->SetColor();
-
-				break;
-			}
+			return;
 		}
+
+		Paint *Object = new Paint(this->Owner, BlackInkColor);
+
+		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+		// スクリーン座標とXZ平面のワールド座標交点算出
+		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+		CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+		// 判定用三角形ポリゴン
+		TriangleStr triPos1, triPos2;
+		triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		// 2点を使って当たった場所をセットする場所とする
+		if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+		{
+			hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+		}
+
+		Object->SetPos(SetPos);
+		Object->SetUse(true);
+
+		// スクリーン座標を保存する
+		Object->SetScreenPos((D3DXVECTOR2)this->pos);
+		// 四分木に入れる
+		PaintManager::Quadtree->InsertObject(Object);
+
+		// 使用しているインクの色に合わせて表示時間、テクスチャをセット
+		Object->SetTime(DRAW_FRAME_BLACK);
+
+		// Vectorに入れる
+		this->BlackPaint.push_back(Object);
 	}
 	// カラーインクの場合
 	else
 	{
-		for (int nCntPaint = 0; nCntPaint < INK_MAX; nCntPaint++)
+		if (this->ColorPaint.size() >= INK_MAX)
 		{
-			// 使用していないペイントから検索
-			if (!pColorPaint[nCntPaint]->GetUse())
-			{
-				// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
-				// スクリーン座標とXZ平面のワールド座標交点算出
-				D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-				CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-				CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+			return;
+		}
 
-				// 判定用三角形ポリゴン
-				TriangleStr triPos1, triPos2;
-				triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+		Paint *Object = new Paint(this->Owner, this->Owner);
 
-				triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
-					camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+		// スクリーン座標とXZ平面のワールド座標交点算出
+		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+		CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
-				// 2点を使って当たった場所をセットする場所とする
-				if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
-				{
-					hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
-				}
+		// 判定用三角形ポリゴン
+		TriangleStr triPos1, triPos2;
+		triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
 
-				pColorPaint[nCntPaint]->SetPos(SetPos);
-				pColorPaint[nCntPaint]->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-				pColorPaint[nCntPaint]->SetScl(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+		triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
 
-				pColorPaint[nCntPaint]->SetUse(true);
+		// 2点を使って当たった場所をセットする場所とする
+		if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+		{
+			hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+		}
 
-				// 使用しているインクの色に合わせて表示時間、テクスチャをセット
-				if (InkType == BlackInk)
-				{
-					pColorPaint[nCntPaint]->SetTime(DRAW_FRAME_BLACK);
-					pColorPaint[nCntPaint]->SetPatternAnim(GAMEPAD_MAX);
-				}
-				else
-				{
-					pColorPaint[nCntPaint]->SetTime(DRAW_FRAME_COLOR);
-					pColorPaint[nCntPaint]->SetPatternAnim(pPlayer->GetCtrlNum());
-				}
+		Object->SetPos(SetPos);
+		Object->SetUse(true);
 
-				// 頂点座標の設定
-				pColorPaint[nCntPaint]->SetVertex();
+		// スクリーン座標を保存する
+		Object->SetScreenPos((D3DXVECTOR2)this->pos);
+		// 四分木に入れる
+		PaintManager::Quadtree->InsertObject(Object);
 
-				// 頂点カラーの設定
-				pColorPaint[nCntPaint]->SetColor();
+		// 使用しているインクの色に合わせて表示時間、テクスチャをセット
+		Object->SetTime(DRAW_FRAME_COLOR);
 
-				break;
-			}
+		// Vectorに入れる
+		this->ColorPaint.push_back(Object);
+	}
+}
+
+//=============================================================================
+// 使用していないペイントがVectorから削除
+//=============================================================================
+void PaintManager::CheckPaintUse(void)
+{
+	for (auto Paint = this->BlackPaint.begin(); Paint != this->BlackPaint.end();)
+	{
+		if ((*Paint)->GetUse() == false)
+		{
+			SAFE_DELETE((*Paint));
+			Paint = this->BlackPaint.erase(Paint);
+		}
+		else
+		{
+			Paint++;
 		}
 	}
 
+	for (auto Paint = this->ColorPaint.begin(); Paint != this->ColorPaint.end();)
+	{
+		if ((*Paint)->GetUse() == false)
+		{
+			SAFE_DELETE((*Paint));
+			Paint = this->ColorPaint.erase(Paint);
+		}
+		else
+		{
+			Paint++;
+		}
+	}
+}
+
+//=============================================================================
+// 四分木から衝突可能なオブジェクトを探す
+//=============================================================================
+std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
+{
+	return PaintManager::Quadtree->GetObjectsAt(NodeID);
 }

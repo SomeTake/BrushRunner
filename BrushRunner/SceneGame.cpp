@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "_2dobj.h"
 #include "Effect.h"
+#include "Quadtree.h"
 
 #include "Player.h"
 #include "Collision.h"
@@ -56,6 +57,7 @@ static Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
 static Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
 static PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
 static Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
+static QUADTREE *Quadtree = nullptr;
 
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 
@@ -72,6 +74,9 @@ HRESULT InitSceneGame()
 
 	// マップの初期化
 	pMap = new Map();
+
+	// 四分木の初期化
+	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
 	// 2DUIの初期化
 	// フレーム
@@ -106,7 +111,7 @@ HRESULT InitSceneGame()
 	p2dobj[NumFaceframe01] = new FaceFrame(FACEFRAME_POS02);
 	p2dobj[NumFaceframe02] = new FaceFrame(FACEFRAME_POS03);
 	p2dobj[NumFaceframe03] = new FaceFrame(FACEFRAME_POS04);
-	
+
 	// カウントダウンの初期化
 	p2dobj[NumCountDown] = new CountDown();
 
@@ -119,7 +124,7 @@ HRESULT InitSceneGame()
 	// ペイントシステムの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPManager[i] = new PaintManager(pCursor[i], pPlayer[i]);
+		pPManager[i] = new PaintManager(pCursor[i], pPlayer[i], Quadtree);
 	}
 
 	// ポップアップの初期化
@@ -150,42 +155,48 @@ HRESULT InitSceneGame()
 void UninitSceneGame()
 {
 	// マップの削除
-	delete pMap;
+	SAFE_DELETE(pMap);
+
+	// 四分木の削除
+	SAFE_DELETE(Quadtree);
+
+	// ペイントテクスチャの削除
+	Paint::ReleaseTexture();
 
 	// エフェクトの削除
 	for (int i = 0; i < EffectMax; i++)
 	{
-		delete pEffect[i];
+		SAFE_DELETE(pEffect[i]);
 	}
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pPlayer[i];
+		SAFE_DELETE(pPlayer[i]);
 	}
 
 	// 2Dオブジェクトの削除
 	for (int i = 0; i < _2dMax; i++)
 	{
-		delete p2dobj[i];
+		SAFE_DELETE(p2dobj[i]);
 	}
 
 	// カーソルの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pCursor[i];
+		SAFE_DELETE(pCursor[i]);
 	}
 
 	// ペイントシステムの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pPManager[i];
+		SAFE_DELETE(pPManager[i]);
 	}
 
 	// ポップアップ削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pPop[i];
+		SAFE_DELETE(pPop[i]);
 	}
 }
 
@@ -209,7 +220,6 @@ void UpdateSceneGame()
 		}
 	}
 
-
 	// カメラの更新
 	UpdateCamera(CompareXPos());
 
@@ -226,9 +236,16 @@ void UpdateSceneGame()
 	}
 
 	// ペイントシステムの更新
+	static bool PressMode = false;
+
+	if (GetKeyboardTrigger(DIK_F1))
+	{
+		PressMode = PressMode ? false : true;
+	}
+
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPManager[i]->Update();
+		pPManager[i]->Update(PressMode);
 	}
 
 	// マップの更新
@@ -279,17 +296,17 @@ void UpdateSceneGame()
 	}
 
 	// ペイントシステム同士の当たり判定
-	for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
 	{
-		for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
 		{
-			// 自分が使用しているカラー以外との判定を行う
-			if (nBlack != nColor)
-			{
-				HitCheckSToS(pPManager[nBlack], pPManager[nColor]);
-			}
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
 		}
 	}
+
+	// 四分木を更新する
+	Quadtree->Update();
 
 	// ポップアップの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -298,7 +315,14 @@ void UpdateSceneGame()
 	}
 
 #ifndef _DEBUG_
-
+	if (PressMode)
+	{
+		PrintDebugProc("Paint Mode：Press\n");
+	}
+	else
+	{
+		PrintDebugProc("Paint Mode：Trigger\n");
+	}
 #endif
 }
 

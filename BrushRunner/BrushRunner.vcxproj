@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AllocateHierarchy.cpp" />
+    <ClCompile Include="AnimationSet.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="PaintSystem.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pop.cpp" />
+    <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneResult.cpp" />
@@ -171,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
+    <ClInclude Include="AnimationSet.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="Camera.h" />
@@ -195,6 +198,7 @@
     <ClInclude Include="PaintSystem.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Pop.h" />
+    <ClInclude Include="Quadtree.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneResult.h" />

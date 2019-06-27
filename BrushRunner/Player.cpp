@@ -10,6 +10,43 @@
 #include "Input.h"
 #include "Gravity.h"
 #include "SceneGame.h"
+#include "D3DXAnimation.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+// 読み込むキャラクターモデル
+static const char* CharaModel[] =
+{
+	"data/MODEL/Boy.x",
+	"data/MODEL/Shachiku/Shachiku.x",
+	"data/MODEL/Kouhai/Kouhai.x",
+};
+
+// キャラクターモデルの番号
+enum CharaModelNum
+{
+	BoyModel,
+	ShachikuModel,
+	KouhaiModel,
+
+	// モデルの種類
+	MaxModel
+};
+
+// モデルの大きさ設定
+static D3DXVECTOR3 ModelScl[MaxModel] =
+{
+	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
+};
+
+enum CallbackKeyType
+{
+	e_NoEvent = 0,
+	e_MotionEnd,				// モーション終了
+};
 
 //=====================================================================================================
 // コンストラクタ
@@ -18,36 +55,14 @@ Player::Player(int _CtrlNum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	//オブジェクトの初期化
-	Animation = CreateAnimationObject();
+	// xFileを読み込む
+	this->Load_xFile(CharaModel[KouhaiModel], "Player");
 
-	// xFileの読み込み
-	Load_xFile(Animation, CharaModel[KouhaiModel], "Player");
-
-	// アニメーションの最終フレームをセットする
-	// 待機
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Idle]);
-	// 前歩き
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Running]);
-	// 後ろ歩き
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Jump]);
-	// 右ステップ
-	SetupCallbackKeyframes(Animation, CharaStateAnim[Victory]);
-
-	// アニメーションセットの初期化
-	for (int i = 0; i < Animation->AnimSetNum; i++)
-	{
-		Animation->InitAnimation(Animation, CharaStateAnim[i], i);
-	}
+	// アニメーションセットを設置する
+	this->CreateAnimSet();
 
 	// 現在のアニメーションをアイドル状態とする
-	Animation->CurrentAnimID = Idle;
-
-	// アニメーション間の補完を設定
-	for (int i = 0; i < Animation->AnimSetNum; i++)
-	{
-		Animation->SetShiftTime(Animation, i, Data[i].ShiftTime);
-	}
+	this->ChangeAnim(Idle);
 
 	// 位置・回転・スケールの初期設定
 	pos = PLAYER_FIRST_POS;
@@ -73,8 +88,6 @@ Player::Player(int _CtrlNum)
 //=====================================================================================================
 Player::~Player()
 {
-	// アニメーションをリリース
-	Animation->UninitAnimation(Animation);
 
 }
 
@@ -83,9 +96,6 @@ Player::~Player()
 //=====================================================================================================
 void Player::Update()
 {
-	// アニメーションを更新
-	Animation->UpdateAnimation(Animation, TIME_PER_FRAME);
-
 	// 移動
 	Move();
 
@@ -93,10 +103,10 @@ void Player::Update()
 	ChangeInk();
 
 	// アニメーション管理
-	ChangeAnim();
+	AnimationManager();
 
 #ifndef _DEBUG_
-	PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+	//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
 	//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
 	//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
 	//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
@@ -152,7 +162,7 @@ void Player::Draw()
 	pDevice->GetMaterial(&matDef);
 
 	// レンダリング
-	Animation->DrawAnimation(Animation, &WorldMtx);
+	this->DrawAnim(&WorldMtx);
 
 	// マテリアルをデフォルトに戻す
 	pDevice->SetMaterial(&matDef);
@@ -196,7 +206,7 @@ void Player::Move()
 			jumpFlag = true;
 			moveFlag = true;
 			jumpSpeed = JUMP_SPEED;
-			Animation->ChangeAnimation(Animation, Jump, Data[Jump].Spd);
+			this->ChangeAnim(Jump);
 		}
 	}
 
@@ -216,42 +226,111 @@ void Player::Move()
 	{
 		pos.x += MOVE_SPEED;
 	}
+
+#if _DEBUG
+	//if (GetKeyboardPress(DIK_RIGHT))
+	//{
+	//	pos.x += MOVE_SPEED;
+	//}
+	//if (GetKeyboardPress(DIK_LEFT))
+	//{
+	//	pos.x -= MOVE_SPEED;
+	//}
+#endif
 }
 
 //=====================================================================================================
 // アニメーション管理
 //=====================================================================================================
-void Player::ChangeAnim()
+void Player::AnimationManager()
 {
 	// 待機状態
 	if (!playable)
 	{
-		if (Animation->CurrentAnimID != Idle)
+		if (this->GetAnimCurtID() != Idle)
 		{
-			Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+			this->ChangeAnim(Idle);
 		}
 	}
-
-	if (playable)
+	else
 	{
 		if (!jumpFlag)
 		{
 			// 歩行中
 			if (moveFlag)
 			{
-				if (Animation->CurrentAnimID != Running)
+				if (this->GetAnimCurtID() != Running)
 				{
-					Animation->ChangeAnimation(Animation, Running, Data[Running].Spd);
+					this->ChangeAnim(Running);
 				}
 			}
 			// 待機中
 			else
 			{
-				if (Animation->CurrentAnimID != Idle)
+				if (this->GetAnimCurtID() != Idle)
 				{
-					Animation->ChangeAnimation(Animation, Idle, Data[Idle].Spd);
+					this->ChangeAnim(Idle);
 				}
 			}
 		}
 	}
+
+	// アニメーションを更新
+	this->UpdateAnim(TIME_PER_FRAME);
+
+	//PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
+}
+
+void Player::CreateAnimSet(void)
+{
+	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
+	vector<KEYDATA>Keydata;
+	Keydata.reserve(Keydata_Max);
+
+	for (int Set_No = 0; Set_No < GetAnimSetNum(); Set_No++)
+	{
+		switch (Set_No)
+		{
+		case Idle:
+
+			Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Running:
+
+			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+			AnimationSet->SetData("Running", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Jump:
+
+			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Victory:
+
+			AnimationSet->SetData("Victory", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		default:
+			break;
+		}
+
+		this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
+
+		AnimationSet->SetAnimSetPtr(this->AnimController);
+
+		this->AnimSet.push_back(*AnimationSet);
+
+		Keydata.clear();
+	}
+
+	SAFE_DELETE(AnimationSet);
+	ReleaseVector(Keydata);
+}
+
+HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+{
+	return S_OK;
 }

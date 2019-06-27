@@ -10,6 +10,7 @@
 #include "Paint.h"
 #include "Player.h"
 #include "Cursor.h"
+#include "Quadtree.h"
 
 //*****************************************************************************
 // クラス定義
@@ -17,23 +18,30 @@
 class PaintManager
 {
 private:
-	Paint * pBlackPaint[INK_MAX];	// 黒用のポインタ
-	Paint * pColorPaint[INK_MAX];	// カラー用のポインタ
-	Cursor *pCursor;				// 参照するカーソルクラスのポインタ
-	Player *pPlayer;				// 参照するプレイヤークラスのポインタ
-	D3DXVECTOR3 pos;
+	std::vector<Paint*> BlackPaint;
+	std::vector<Paint*> ColorPaint;
+	Cursor				*pCursor;				// 参照するカーソルクラスのポインタ
+	Player				*pPlayer;				// 参照するプレイヤークラスのポインタ
+	D3DXVECTOR3			pos;
+	int					Owner;
+	static QUADTREE		*Quadtree;
+
+	void CheckPaintUse(void);
 
 public:
-	PaintManager(Cursor *pC, Player *pP);
+	PaintManager(Cursor *pC, Player *pP, QUADTREE *Quadtree);
 	~PaintManager();
 
-	void Update();
+	void Update(bool PressMode);
 	void Draw();
-	void Set(int InkType);
+	void SetPaint(int InkType);
 
 	// ゲッター
-	Paint *GetBlackPaint(int _num) { return pBlackPaint[_num]; };
-	Paint *GetColorPaint(int _num) { return pColorPaint[_num]; };
+	int GetOwner(void) { return this->Owner; };
+	std::vector<Paint*> GetBlackPaint(void) { return this->BlackPaint; };
+	std::vector<Paint*> GetColorPaint(void) { return this->ColorPaint; };
+	// 四分木から衝突可能なオブジェクトを探す
+	std::vector<Paint*> GetCollisionList(int NodeID);
 };
 
 #endif

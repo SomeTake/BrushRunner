@@ -37,6 +37,11 @@ private:
 	D3DXVECTOR3 oldPos;	// 画面外判定を行うための1f前の座標
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
+	HRESULT MakeVertex();				// 頂点の作成
+	void SetTexture(int cntPattern);	// テクスチャ座標の設定
+	void SetVertex();					// 頂点座標の設定
+	void KeyMove();						// キーボード操作
+	void PadMove();						// コントローラ操作
 
 public:
 	Cursor(int _ctrlNum, Player *pP);
@@ -45,18 +50,11 @@ public:
 	// オーバーライド関数
 	void Update();						// 更新
 	void Draw();						// 描画
-	HRESULT MakeVertex();				// 頂点の作成
-	void SetTexture(int cntPattern);	// テクスチャ座標の設定
-	void SetVertex();					// 頂点座標の設定
-
 	void Move();						// 操作
 	void Change();						// 切り替え
-	void KeyMove();						// キーボード操作
-	void PadMove();						// コントローラ操作
 
 	// ゲッター
 	D3DXVECTOR3 GetPos() { return pos; };
-
 };
 
 #endif

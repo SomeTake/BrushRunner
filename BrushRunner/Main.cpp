@@ -29,25 +29,19 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
 void Update(void);
 void Draw(void);
-#ifdef _DEBUG
-void DrawFPS(void);
-#endif
 bool SetWindowCenter(HWND hWnd);
 
 //*****************************************************************************
 // グローバル変数:
 //*****************************************************************************
+HWND hWnd;											// ウインドウハンドル
 LPDIRECT3D9			g_pD3D = NULL;					// Direct3D オブジェクト
 LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
-
-#ifdef _DEBUG
-static LPD3DXFONT	g_pD3DXFont = NULL;				// フォントへのポインタ
-int					g_nCountFPS;					// FPSカウンタ
-#endif
-
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
-HWND hWnd;										// ウインドウハンドル
+#ifdef _DEBUG
+int					FPSCount;					// FPSカウンタ
+#endif
 
 //=============================================================================
 // メイン関数
@@ -152,7 +146,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			if ((dwCurrentTime - dwFPSLastTime) >= 500)	// 0.5秒ごとに実行
 			{
 #ifdef _DEBUG
-				g_nCountFPS = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
+				FPSCount = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
 #endif
 				dwFPSLastTime = dwCurrentTime;
 				dwFrameCount = 0;
@@ -299,13 +293,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);		// αソースカラーの指定
 	g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// αデスティネーションカラーの指定
 
-																			// サンプラーステートパラメータの設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(U値)を設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(V値)を設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);	// テクスチャ縮小フィルタモードを設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);	// テクスチャ拡大フィルタモードを設定
 
-																			// テクスチャステージステートの設定
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);	// アルファブレンディング処理
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);	// 最初のアルファ引数
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);	// ２番目のアルファ引数
@@ -314,21 +306,21 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
-	// 情報表示用フォントを設定
-	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
-
 	InitDebugProc();
-
 #endif
+
 	InitInput(hInstance,hWnd);
 
 	InitCamera();
+
 	InitLight();
 
 	InitSceneTitle();
+
 	InitSceneCharacterSelect();
+
 	InitSceneGame();
+
 	InitSceneResult();
 
 	return S_OK;
@@ -340,32 +332,24 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 void Uninit(void)
 {
 #ifdef _DEBUG
-	if (g_pD3DXFont != NULL)
-	{// 情報表示用フォントの開放
-		g_pD3DXFont->Release();
-		g_pD3DXFont = NULL;
-	}
-
 	UninitDebugProc();
 #endif
-	if (g_pD3DDevice != NULL)
-	{// デバイスの開放
-		g_pD3DDevice->Release();
-		g_pD3DDevice = NULL;
-	}
 
-	if (g_pD3D != NULL)
-	{// Direct3Dオブジェクトの開放
-		g_pD3D->Release();
-		g_pD3D = NULL;
-	}
 	UninitInput();
 
 	UninitSceneTitle();
+
 	UninitSceneCharacterSelect();
+
 	UninitSceneGame();
+
 	UninitSceneResult();
 
+	// デバイスの開放
+	SAFE_RELEASE(g_pD3DDevice);
+
+	// Direct3Dオブジェクトの開放
+	SAFE_RELEASE(g_pD3D);
 }
 
 //=============================================================================
@@ -374,8 +358,10 @@ void Uninit(void)
 void Update(void)
 {
 #ifdef _DEBUG
-
+	// 処理開始の時間を記録
+	ProcessStart(Process_Update);
 #endif
+
 	UpdateInput();
 
 	switch (eScene)
@@ -396,6 +382,11 @@ void Update(void)
 		break;
 	}
 
+#ifdef _DEBUG
+	// 処理終了の時間を記録
+	ProcessEnd(Process_Update);
+#endif
+
 }
 
 //=============================================================================
@@ -405,6 +396,11 @@ void Draw(void)
 {
 	// バックバッファ＆Ｚバッファのクリア
 	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 255, 255, 0), 1.0f, 0);
+
+#ifdef _DEBUG
+	// 処理開始の時間を記録
+	ProcessStart(Process_Draw);
+#endif
 
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
@@ -431,11 +427,11 @@ void Draw(void)
 
 
 #ifdef _DEBUG
-		// FPS表示
-		DrawFPS();
-
+		// 処理終了の時間を記録
+		ProcessEnd(Process_Draw);
 		DrawDebugProc();
-
+		// FPSと処理時間表示
+		DrawProcessTime(FPSCount);
 #endif
 
 		// Direct3Dによる描画の終了
@@ -453,16 +449,6 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 {
 	return g_pD3DDevice;
 }
-
-#ifdef _DEBUG
-//=============================================================================
-// FPS表示
-//=============================================================================
-void DrawFPS(void)
-{
-	PrintDebugProc("FPS:%d\n", g_nCountFPS);
-}
-#endif
 
 //=====================================================================================================
 // シーン遷移

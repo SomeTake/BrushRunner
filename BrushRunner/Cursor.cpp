@@ -17,12 +17,12 @@ LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 Cursor::Cursor(int _ctrlNum, Player *pP)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// テクスチャの読み込み
 	if (D3DTexture == NULL)
 	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
+		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
 			CURSOR_TEXTURE,					// ファイルの名前
 			&D3DTexture);					// 読み込むメモリのポインタ
 	}
@@ -44,11 +44,8 @@ Cursor::Cursor(int _ctrlNum, Player *pP)
 //=============================================================================
 Cursor::~Cursor()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// テクスチャの開放
+	SAFE_RELEASE(Cursor::D3DTexture)
 }
 
 //=============================================================================
@@ -67,11 +64,11 @@ void Cursor::Update()
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
+		SetVertex();
 	}
-	SetVertex();
 
 #ifndef _DEBUG_
-	PrintDebugProc("CursorPos X:%f Y:%f\n", pos.x, pos.y);
+	//PrintDebugProc("CursorPos X：%f Y：%f\n", pos.x, pos.y + CURSOR_SIZE.y);
 	//PrintDebugProc("CursorMove X:%f Y:%f\n", moveX, moveY);
 	//PrintDebugProc("CursorVec %f\n", vec);
 #endif
@@ -83,19 +80,19 @@ void Cursor::Update()
 //=============================================================================
 void Cursor::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
+	Device->SetFVF(FVF_VERTEX_2D);
 
 	if (use == true)
 	{
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
-		pDevice->SetTexture(0, D3DTexture);
+		Device->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 }
 
@@ -104,16 +101,16 @@ void Cursor::Draw()
 //=============================================================================
 HRESULT Cursor::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// 頂点座標の設定
 	SetVertex();
 
 	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// 反射光の設定
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);

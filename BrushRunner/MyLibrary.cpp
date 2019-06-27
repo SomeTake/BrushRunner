@@ -18,15 +18,17 @@ D3DXVECTOR3* CalcScreenToWorld(
 	int Screen_w,
 	int Screen_h,
 	D3DXMATRIX* View,
-	D3DXMATRIX* Prj
-) {
+	D3DXMATRIX* Proj)
+{
 	// äeçsóÒÇÃãtçsóÒÇéZèo
 	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
 	D3DXMatrixInverse(&InvView, NULL, View);
-	D3DXMatrixInverse(&InvPrj, NULL, Prj);
+	D3DXMatrixInverse(&InvPrj, NULL, Proj);
 	D3DXMatrixIdentity(&VP);
-	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;
-	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;
+	VP._11 = Screen_w / 2.0f;
+	VP._22 = -Screen_h / 2.0f;
+	VP._41 = Screen_w / 2.0f;
+	VP._42 = Screen_h / 2.0f;
 	D3DXMatrixInverse(&InvViewport, NULL, &VP);
 
 	// ãtïœä∑
@@ -46,8 +48,8 @@ D3DXVECTOR3* CalcScreenToXZ(
 	int Screen_w,
 	int Screen_h,
 	D3DXMATRIX* View,
-	D3DXMATRIX* Prj
-) {
+	D3DXMATRIX* Prj)
+{
 	D3DXVECTOR3 nearpos;
 	D3DXVECTOR3 farpos;
 	D3DXVECTOR3 ray;

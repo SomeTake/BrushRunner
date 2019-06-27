@@ -33,7 +33,6 @@ public:
 	virtual void Update() {};
 	virtual void Draw() {};
 	virtual int Set() { return 0; };
-
 };
 
 #endif

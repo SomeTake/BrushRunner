@@ -20,45 +20,9 @@
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
-#define INK_MAX				(100)										// インクの最大量
+#define INK_MAX				(50)										// インクの最大量
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
 #define MOVE_SPEED			(2.0f)										// 動くスピード
-
-// 読み込むキャラクターモデル
-static const char* CharaModel[] = 
-{
-	"data/MODEL/Boy.x",
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
-};
-
-// キャラクターモデルの番号
-enum CharaModelNum
-{
-	BoyModel,
-	ShachikuModel,
-	KouhaiModel,
-
-	// モデルの種類
-	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] = 
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
-};
-
-// キャラクターのアニメーション番号
-static const char* CharaStateAnim[] =
-{
-	"idle",				// 待機
-	"Running",			// ダッシュ
-	"Jump",				// ジャンプ
-	"Victory"			// ガッツポーズ
-};
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -68,24 +32,6 @@ enum CharaStateNum
 	Jump,
 	Victory,
 	AnimMax,			// アニメーションの最大数
-};
-
-// バトル用データ構造体
-typedef struct
-{
-	int Damage;					// そのモーションによって与えるダメージ量（SPゲージ、スコアなども）
-	float Spd;					// アニメーションを再生するスピード
-	float ShiftTime;			// アニメーションの切り替え時間
-	int CollisionStartTime;		// 攻撃当たり判定の発生する時間
-	int CollisionFinishTime;	// 攻撃当たり判定の終了する時間
-}BATTLEDATA;
-
-// バトル用データ構造体配列
-static BATTLEDATA Data[AnimMax] = {
-	{ 0, 1.5f, 0.1f, 0, 0 },		// Idle
-{ 0, 1.0f, 0.1f, 0, 0 },		// Running
-{ 0, 1.0f, 0.1f, 0, 0 },		// Jump
-{ 0, 1.0f, 0.1f, 0, 0 },		// Victory
 };
 
 // インクの種類
@@ -100,11 +46,11 @@ enum InkType {
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Player
+class Player : public D3DXANIMATION
 {
 private:
 	// メンバ変数
-	D3DXANIMATION * Animation;				// アニメーション構造体
+	//D3DXANIMATION		*Animation;			// アニメーション構造体
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			move;				// モデルの移動量
 	D3DXVECTOR3			rot;				// 現在の向き
@@ -120,7 +66,9 @@ private:
 	// メンバ関数
 	void ChangeInk();		// インクの種類交換
 	void Move();			// 移動
-	void ChangeAnim();		// アニメーション管理
+	void AnimationManager();		// アニメーション管理
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
+	void CreateAnimSet(void);
 
 public:
 	// メンバ関数
