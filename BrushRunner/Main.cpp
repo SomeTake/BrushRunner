@@ -40,12 +40,9 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
 #ifdef _DEBUG
-int					FPSCount;					// FPSカウンタ
+static LPD3DXFONT	g_pD3DXFont = NULL;				// フォントへのポインタ
+int					FPSCount;						// FPSカウンタ
 #endif
-
-int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
-
-HWND hWnd;											// ウインドウハンドル
 bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
 
 //=============================================================================
