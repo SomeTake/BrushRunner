@@ -186,6 +186,9 @@
     <ClCompile Include="AnimationSet.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
+    <ClCompile Include="DebugWindow.cpp">
+      <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneCharacterSelect.h">
@@ -318,6 +321,9 @@
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
     <ClInclude Include="Quadtree.h">
+      <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugWindow.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
   </ItemGroup>

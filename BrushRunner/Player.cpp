@@ -12,6 +12,7 @@
 #include "SceneGame.h"
 #include "D3DXAnimation.h"
 #include "Camera.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // É}ÉNÉçíËã`
@@ -113,14 +114,20 @@ void Player::Update()
 		CheckOnCamera();
 
 #ifndef _DEBUG_
-		PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+		//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
 		//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
 		//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
 		//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
 		//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
 		//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
 		//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
-		PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
+		//PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
+		
+		BeginDebugWindow("Player");
+
+		DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
+
+		EndDebugWindow("Player");
 #endif
 
 		if (GetKeyboardPress(DIK_LEFT))
