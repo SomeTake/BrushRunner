@@ -66,7 +66,7 @@ bool HitCheckPToM(Player *pP, Map *pM)
 	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
 	if (!pP->GetJumpFlag())
 	{
-		if (pM->GetMapTbl(-fronty, frontx) >= 0)
+		if (pM->GetMapTbl(frontx, -fronty) >= 0)
 		{
 			pP->SetMoveFlag(false);
 		}
@@ -91,7 +91,7 @@ bool HitCheckPToM(Player *pP, Map *pM)
 #endif
 
 	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (pM->GetMapTbl(-y, x) >= 0)
+	if (pM->GetMapTbl(x, -y) >= 0)
 	{
 		// めり込みを修正
 		PosModification(pP, mappos);

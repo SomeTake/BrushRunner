@@ -43,6 +43,11 @@ int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 int					FPSCount;					// FPSカウンタ
 #endif
 
+int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
+
+HWND hWnd;											// ウインドウハンドル
+bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
+
 //=============================================================================
 // メイン関数
 //=============================================================================
@@ -306,6 +311,19 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
+	// 情報表示用フォントを設定
+	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
+
+	// Setup ImGui binding
+	ImGui::CreateContext();
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX9_Init(g_pD3DDevice);
+
+	// Setup style
+	ImGui::StyleColorsClassic();
+	//ImGui::StyleColorsDark();
+
 	InitDebugProc();
 #endif
 
@@ -345,11 +363,15 @@ void Uninit(void)
 
 	UninitSceneResult();
 
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+
 	// デバイスの開放
 	SAFE_RELEASE(g_pD3DDevice);
 
 	// Direct3Dオブジェクトの開放
 	SAFE_RELEASE(g_pD3D);
+
 }
 
 //=============================================================================
@@ -360,6 +382,18 @@ void Update(void)
 #ifdef _DEBUG
 	// 処理開始の時間を記録
 	ProcessStart(Process_Update);
+
+	ImGui_ImplWin32_NewFrame();
+	ImGui_ImplDX9_NewFrame();
+	ImGui::NewFrame();
+
+	// サンプル表示
+	ImGui::Begin("Another Window", &ShowAnotherWindow);
+	ImGui::Text("Hello from another window");
+	ImGui::End();
+
+	ImGui::EndFrame();
+
 #endif
 
 	UpdateInput();
@@ -395,7 +429,7 @@ void Update(void)
 void Draw(void)
 {
 	// バックバッファ＆Ｚバッファのクリア
-	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 255, 255, 0), 1.0f, 0);
+	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 255, 0), 1.0f, 0);
 
 #ifdef _DEBUG
 	// 処理開始の時間を記録
@@ -432,6 +466,10 @@ void Draw(void)
 		DrawDebugProc();
 		// FPSと処理時間表示
 		DrawProcessTime(FPSCount);
+
+		ImGui::Render();
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
 #endif
 
 		// Direct3Dによる描画の終了

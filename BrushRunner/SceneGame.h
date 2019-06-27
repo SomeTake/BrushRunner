@@ -67,6 +67,4 @@ int GetDraw2dobjBuff(int _num);						// 2Dオブジェクトの描画順を取得
 void SetDraw2dobjBuff(int _BuffNum, int _DrawNum);	// 2Dオブジェクトの描画順をセット
 void ChangeDrawOrder(int _NumA, int _NumB);			// 描画順を入れ替える
 
-D3DXVECTOR3 CompareXPos();							// X座標を比較して大きい2つの中心座標を返す
-
 #endif

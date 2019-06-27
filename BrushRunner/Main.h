@@ -20,10 +20,23 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 #include <algorithm>
 
 #define DIRECTINPUT_VERSION (0x0800)	// Œx‘Îô
 #include "dinput.h"
+
+// ImGuiŠÖŒW
+#include "imgui\imgui.h"
+#include "imgui\imconfig.h"
+#include "imgui\imgui_internal.h"
+#include "imgui\imstb_rectpack.h"
+#include "imgui\imstb_textedit.h"
+#include "imgui\imstb_truetype.h"
+#include "imgui\imgui_impl_dx9.h"
+#include "imgui\imgui_impl_win32.h"
+
+#include "Struct.h"
 
 using namespace std;
 
