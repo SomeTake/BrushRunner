@@ -39,7 +39,7 @@ public:
 	void Update();
 	void Draw();
 
-	int GetMapTbl(int _MapX, int _MapY) { return maptbl[_MapY][_MapX]; };
+	int GetMapTbl(int _MapX, int _MapY) { return maptbl[-_MapY][_MapX]; };
 	int GetObjTbl(int _ObjX, int _ObjY) { return objtbl[_ObjY][_ObjX]; };
 };
 
