@@ -93,23 +93,9 @@ void ReleaseVector(vector<T>& vt)
 	vtTemp.swap(vt);
 }
 
-//シーン遷移
-enum SceneNum
-{
-	SceneTitle,				// タイトル
-	SceneCharacterSelect,	// キャラクターセレクト
-	SceneGame,				// ゲーム
-	SceneResult,			// リザルト
-	SceneExit				// ゲーム終了
-};
-
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 LPDIRECT3DDEVICE9 GetDevice();	// デバイスを取得する
-int GetScene();					// 現在のゲームシーンを取得する
-void SetScene(int _scene);		// ゲームシーンを変更する
-
-HWND GetWindowHandle();
 
 #endif

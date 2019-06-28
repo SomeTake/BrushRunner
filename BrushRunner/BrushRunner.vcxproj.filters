@@ -186,6 +186,9 @@
     <ClCompile Include="DebugWindow.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>ソース ファイル\GameScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneCharacterSelect.h">
@@ -319,6 +322,9 @@
     </ClInclude>
     <ClInclude Include="DebugWindow.h">
       <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>ヘッダー ファイル\GameScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

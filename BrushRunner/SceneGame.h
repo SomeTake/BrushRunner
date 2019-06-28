@@ -7,6 +7,15 @@
 #ifndef _SCENEGAME_H_
 #define _SCENEGAME_H_
 
+// ポインタとして取得する必要のあるクラス
+#include "Map.h"
+#include "_2dobj.h"
+#include "Effect.h"
+#include "Quadtree.h"
+#include "Player.h"
+#include "PaintSystem.h"
+#include "Pop.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -56,14 +65,29 @@ enum Num2dobj
 };
 
 //*****************************************************************************
-// プロトタイプ宣言
+// クラス定義
 //*****************************************************************************
-HRESULT InitSceneGame();
-void UninitSceneGame();
-void UpdateSceneGame();
-void DrawSceneGame();
+class SceneGame
+{
+private:
+	_2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
+	Map *pMap;							// マップ用のポインタ
+	Effect *pEffect[EffectMax];			// エフェクト用のポインタ
+	Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
+	Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
+	PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
+	Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
+	QUADTREE *Quadtree = nullptr;
 
-void CollisionSceneGame();
+	void Collision();
+
+public:
+	SceneGame();
+	~SceneGame();
+	void Update();
+	void Draw();
+
+};
 
 int GetDraw2dobjBuff(int _num);						// 2Dオブジェクトの描画順を取得
 void SetDraw2dobjBuff(int _BuffNum, int _DrawNum);	// 2Dオブジェクトの描画順をセット

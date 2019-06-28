@@ -7,19 +7,12 @@
 #include "Main.h"
 #include "SceneGame.h"
 #include "Debugproc.h"
-#include "Map.h"
 #include "Camera.h"
-#include "_2dobj.h"
-#include "Effect.h"
-#include "Quadtree.h"
-
-#include "Player.h"
 #include "Collision.h"
 #include "Input.h"
 #include "MyLibrary.h"
 
 //2d obj
-#include "_2dobj.h"
 #include "Frame01.h"
 #include "Faceframe.h"
 #include "InkFrameColor.h"
@@ -28,24 +21,9 @@
 #include "Cursor.h"
 #include "CountDown.h"
 
-#include "PaintSystem.h"
-#include "Pop.h"
-
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-// エフェクトの種類
-enum {
-	HitEffect,
-	Hit1Effect,
-	RunEffect,
-	ExpEffect,
-	ItemEffect,
-
-	// エフェクトの個数
-	EffectMax,
-};
-
 // プレイヤー初期位置
 D3DXVECTOR3 firstpos[PLAYER_MAX] = {
 	D3DXVECTOR3(45.0f, 0.0f, 0.0f),
@@ -54,24 +32,12 @@ D3DXVECTOR3 firstpos[PLAYER_MAX] = {
 	D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 };
 
-//*****************************************************************************
-// オブジェクトのポインタ
-//*****************************************************************************
-static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
-static Map *pMap;							// マップ用のポインタ
-static Effect *pEffect[EffectMax];			// エフェクト用のポインタ
-static Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-static Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-static PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
-static Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
-static QUADTREE *Quadtree = nullptr;
-
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 
 //=============================================================================
-// 初期化
+// コンストラクタ
 //=============================================================================
-HRESULT InitSceneGame()
+SceneGame::SceneGame()
 {
 	// プレイヤーの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -152,14 +118,12 @@ HRESULT InitSceneGame()
 	{
 		Draw2dobjBuff[i] = i;
 	}
-
-	return S_OK;
 }
 
 //=============================================================================
-// 終了
+// デストラクタ
 //=============================================================================
-void UninitSceneGame()
+SceneGame::~SceneGame()
 {
 	// マップの削除
 	SAFE_DELETE(pMap);
@@ -210,7 +174,7 @@ void UninitSceneGame()
 //=============================================================================
 // 更新
 //=============================================================================
-void UpdateSceneGame()
+void SceneGame::Update()
 {
 	static int startframe = 0;
 
@@ -286,7 +250,7 @@ void UpdateSceneGame()
 	}
 
 	// 当たり判定の更新
-	CollisionSceneGame();
+	Collision();
 
 #ifndef _DEBUG_
 	if (PressMode)
@@ -303,7 +267,7 @@ void UpdateSceneGame()
 //=============================================================================
 // 描画
 //=============================================================================
-void DrawSceneGame()
+void SceneGame::Draw()
 {
 	// マップの描画
 	pMap->Draw();
@@ -348,7 +312,7 @@ void DrawSceneGame()
 //=============================================================================
 // 当たり判定の更新
 //=============================================================================
-void CollisionSceneGame()
+void SceneGame::Collision()
 {
 
 	// プレイヤーとマップの当たり判定

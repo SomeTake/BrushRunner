@@ -8,11 +8,16 @@
 #define _SCENERESULT_H_
 
 //*****************************************************************************
-// プロトタイプ宣言
+// クラス定義
 //*****************************************************************************
-HRESULT InitSceneResult();
-void UninitSceneResult();
-void UpdateSceneResult();
-void DrawSceneResult();
+class SceneResult
+{
+public:
+	SceneResult();
+	~SceneResult();
+
+	void Update();
+	void Draw();
+};
 
 #endif

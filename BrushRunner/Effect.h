@@ -18,7 +18,17 @@
 #define EFFECT_TEXTURE3				_T("data/EFFECT/explo000.png")			// 画像2(爆発エフェクト)
 #define EFFECT_TEXTURE4				_T("data/EFFECT/ief001.png")			// 画像2(アイテムエフェクト)
 
+// エフェクトの種類
+enum {
+	HitEffect,
+	Hit1Effect,
+	RunEffect,
+	ExpEffect,
+	ItemEffect,
 
+	// エフェクトの個数
+	EffectMax,
+};
 
 #define EFFET0_POS					D3DXVECTOR3(0.0f, 0.0f, 0.0f)			// テクスチャ0の表示位置
 #define EFFECT0_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ0のサイズ

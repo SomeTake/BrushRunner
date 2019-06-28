@@ -8,11 +8,16 @@
 #define _SCENETITLE_H_
 
 //*****************************************************************************
-// プロトタイプ宣言
+// クラス定義
 //*****************************************************************************
-HRESULT InitSceneTitle();
-void UninitSceneTitle();
-void UpdateSceneTitle();
-void DrawSceneTitle();
+class SceneTitle
+{
+public:
+	SceneTitle();
+	~SceneTitle();
+
+	void Update();
+	void Draw();
+};
 
 #endif
