@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Collision.h"
 #include "Quadtree.h"
+#include "Player.h"
 
 QUADTREE *PaintManager::Quadtree = nullptr;
 

@@ -8,11 +8,12 @@
 #include "Player.h"
 #include "Debugproc.h"
 #include "Input.h"
-#include "Gravity.h"
 #include "SceneGame.h"
 #include "D3DXAnimation.h"
 #include "Camera.h"
 #include "DebugWindow.h"
+#include "Collision.h"
+#include "PaintSystem.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -128,7 +129,6 @@ void Player::Update()
 		DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
 
 		EndDebugWindow("Player");
-#endif
 
 		if (GetKeyboardPress(DIK_LEFT))
 		{
@@ -144,6 +144,7 @@ void Player::Update()
 				inkValue[inkType]++;
 			}
 		}
+#endif
 	}
 }
 
@@ -238,6 +239,8 @@ void Player::Move()
 	else
 	{
 		pos.y += jumpSpeed;
+		// 重力
+		Gravity();
 	}
 
 	// オート移動
@@ -300,7 +303,10 @@ void Player::AnimationManager()
 	//PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
 }
 
-void Player::CreateAnimSet(void)
+//=====================================================================================================
+// アニメーションのセット
+//=====================================================================================================
+void Player::CreateAnimSet()
 {
 	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
 	vector<KEYDATA>Keydata;
@@ -349,6 +355,9 @@ void Player::CreateAnimSet(void)
 	ReleaseVector(Keydata);
 }
 
+//=====================================================================================================
+// アニメーションのコールバック
+//=====================================================================================================
 HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 {
 	return S_OK;
@@ -377,5 +386,92 @@ void Player::CheckOnCamera()
 	else
 	{
 		use = false;
+	}
+}
+
+//=====================================================================================================
+// マップとの当たり判定
+//=====================================================================================================
+void Player::Collision(Map *pMap)
+{
+	// キャラクターの座標からマップ配列の場所を調べる
+	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
+	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+
+	// 当たり判定を確認するマップチップの場所
+	D3DXVECTOR3 mappos;
+	mappos.x = MAP_POS.x + CHIP_SIZE * x;
+	mappos.y = MAP_POS.y + CHIP_SIZE * y;
+	mappos.z = 0.0f;
+
+	// プレイヤーの足元のマップチップから右上のマップチップの番号
+	int frontx = x + 1;
+	int fronty = y + 1;
+
+	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
+	if (!jumpFlag)
+	{
+		if (pMap->GetMapTbl(frontx, fronty) >= 0)
+		{
+			moveFlag = false;
+		}
+		else
+		{
+			moveFlag = true;
+		}
+		
+		return;
+	}
+
+	// マップ外判定
+	if (!HitCheckBB(pos, GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
+	{
+		moveFlag = true;
+
+		return;
+	}
+
+	// 現在座標があるところになにかオブジェクトがあればヒットしている
+	if (pMap->GetMapTbl(x, y) >= 0)
+	{
+		// めり込みを修正
+		pos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
+
+		jumpFlag = false;
+	}
+}
+
+//=====================================================================================================
+// ペイントとの当たり判定
+//=====================================================================================================
+void Player::Collision(PaintManager *pPManager)
+{
+	for (auto &Paint : pPManager->GetColorPaint())
+	{
+		if (!Paint->GetUse())
+		{
+			continue;
+		}
+
+		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
+		if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
+		{
+			// 当たった場合、プレイヤーの座標を修正
+			pos.y = Paint->GetPos().y + PAINT_WIDTH * 0.1f;
+			jumpFlag = false;
+		}
+	}
+
+}
+
+//=====================================================================================================
+// 重力処理
+//=====================================================================================================
+void Player::Gravity()
+{
+	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
+	if (jumpSpeed > -FALL_VELOCITY_MAX)
+	{
+		jumpSpeed -= STANDARD_GRAVITY;
 	}
 }

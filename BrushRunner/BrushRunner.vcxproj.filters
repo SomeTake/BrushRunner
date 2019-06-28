@@ -114,9 +114,6 @@
     <ClCompile Include="Debugproc.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Gravity.cpp">
-      <Filter>ソース ファイル\Obj3D</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
@@ -241,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="Debugproc.h">
       <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Gravity.h">
-      <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
     <ClInclude Include="Sound.h">
       <Filter>ヘッダー ファイル\System</Filter>

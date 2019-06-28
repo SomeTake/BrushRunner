@@ -9,19 +9,22 @@
 
 #include "D3DXAnimation.h"
 #include "Struct.h"
+#include "Map.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	CHARA_XFILE			"data/MODEL/Kouhai.x"			// 読み込むモデル名(ファイルパス名)
+#define	CHARA_XFILE			"data/MODEL/Kouhai.x"						// 読み込むモデル名(ファイルパス名)
 #define PLAYER_MAX			(4)											// 操作するプレイヤーの数
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速
 #define	RATE_MOVE_PLAYER	(0.025f)									// 移動慣性係数
 #define INK_MAX				(50)										// インクの最大量
-#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)				// 当たり判定を有効にするサイズ
+#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
 #define MOVE_SPEED			(2.0f)										// 動くスピード
+#define STANDARD_GRAVITY	(0.98f)										// 重力加速度
+#define FALL_VELOCITY_MAX	(30.0f)										// 落下中最大速度
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -41,6 +44,8 @@ enum InkType {
 	// インクの最大数
 	InkNum,
 };
+
+class PaintManager;
 
 //*****************************************************************************
 // クラス定義
@@ -71,6 +76,7 @@ private:
 	void ChangeInk();		// インクの種類交換
 	void Move();			// 移動
 	void CheckOnCamera();
+	void Gravity();
 
 public:
 	// メンバ関数
@@ -78,6 +84,10 @@ public:
 	~Player();
 	void Update();
 	void Draw();
+
+	// 当たり判定
+	void Collision(Map *pMap);
+	void Collision(PaintManager *pPManager);
 
 	// ゲッター
 	D3DXVECTOR3	GetPos() { return pos; };
@@ -91,13 +101,13 @@ public:
 	bool GetPlayable() { return playable; };
 
 	// セッター
-	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
-	void SetMove(D3DXVECTOR3 _move) { move = _move; };
-	void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
+	//void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
+	//void SetMove(D3DXVECTOR3 _move) { move = _move; };
+	//void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
 	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
-	void SetInkType(int _InkType) { inkType = _InkType; };
-	void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
-	void SetMoveFlag(bool _moveFlag) { moveFlag = _moveFlag; };
+	//void SetInkType(int _InkType) { inkType = _InkType; };
+	//void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
+	//void SetMoveFlag(bool _moveFlag) { moveFlag = _moveFlag; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 };
 

@@ -158,7 +158,6 @@
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Faceframe.cpp" />
     <ClCompile Include="Frame01.cpp" />
-    <ClCompile Include="Gravity.cpp" />
     <ClCompile Include="Ink.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
@@ -203,7 +202,6 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="Frame01.h" />
-    <ClInclude Include="Gravity.h" />
     <ClInclude Include="Ink.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />

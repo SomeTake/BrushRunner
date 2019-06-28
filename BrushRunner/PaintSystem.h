@@ -8,9 +8,10 @@
 #define _PAINTSYSTEM_H_
 
 #include "Paint.h"
-#include "Player.h"
 #include "Cursor.h"
 #include "Quadtree.h"
+
+class Player;
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`

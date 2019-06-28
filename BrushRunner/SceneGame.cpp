@@ -15,7 +15,6 @@
 
 #include "Player.h"
 #include "Collision.h"
-#include "Gravity.h"
 #include "Input.h"
 #include "MyLibrary.h"
 
@@ -278,58 +277,16 @@ void UpdateSceneGame()
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPlayer[i]->Update();
-
-		bool gravflag = false;
-
-		// 地面に接しているか確認
-		if (HitCheckPToM(pPlayer[i], pMap))
-		{
-			pPlayer[i]->SetJumpFlag(false);
-			gravflag = false;
-		}
-		else
-		{
-			gravflag = true;
-		}
-		// ペイントシステムとの当たり判定
-		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
-		{
-			if (HitCheckPToS(pPlayer[i], pPManager[i]))
-			{
-				pPlayer[i]->SetJumpFlag(false);
-				gravflag = false;
-			}
-			else
-			{
-				gravflag = true;
-			}
-		}
-
-		// 重力が有効
-		if (gravflag)
-		{
-			GravityFall(pPlayer[i]);
-		}
 	}
-
-	// ペイントシステム同士の当たり判定
-	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
-	{
-		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
-		{
-			// 画面を16分割、それぞれのオブジェクトを判定する
-			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
-		}
-	}
-
-	// 四分木を更新する
-	Quadtree->Update();
 
 	// ポップアップの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPop[i]->Update();
 	}
+
+	// 当たり判定の更新
+	CollisionSceneGame();
 
 #ifndef _DEBUG_
 	if (PressMode)
@@ -386,6 +343,39 @@ void DrawSceneGame()
 	{
 		pEffect[i]->Draw();
 	}
+}
+
+//=============================================================================
+// 当たり判定の更新
+//=============================================================================
+void CollisionSceneGame()
+{
+
+	// プレイヤーとマップの当たり判定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Collision(pMap);
+	}
+
+	// プレイヤーとペイントシステムの当たり判定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Collision(pPManager[i]);
+	}
+
+	// ペイントシステム同士の当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
+		{
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
+	// 四分木を更新する
+	Quadtree->Update();
+
 }
 
 //=============================================================================
