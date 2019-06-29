@@ -54,7 +54,7 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
+Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -72,19 +72,22 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
 	rot = PLAYER_ROT;
 	scl = ModelScl[KouhaiModel];
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	jumpFlag = false;
+	hitGround = false;
+	hitPaint = false;
 	jumpSpeed = 0;
 	ctrlNum = _CtrlNum;
 	inkType = ColorInk;
-	moveFlag = true;
+	hitHorizon = true;
 	playable = false;
-	use = true;
+	onCamera = true;
 
 	for (int i = 0; i < InkNum; i++)
 	{
 		inkValue[i] = INK_MAX;
 	}
 
+	// 待機状態からスタートする
+	new IdleState(this);
 }
 
 //=====================================================================================================
@@ -92,7 +95,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
 //=====================================================================================================
 Player::~Player()
 {
-
+	delete state;
 }
 
 //=====================================================================================================
@@ -100,7 +103,7 @@ Player::~Player()
 //=====================================================================================================
 void Player::Update()
 {
-	if (use)
+	if (onCamera)
 	{
 		// 移動
 		Move();
@@ -114,38 +117,13 @@ void Player::Update()
 		// カメラ内判定
 		CheckOnCamera();
 
-#ifndef _DEBUG_
-		//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
-		//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
-		//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
-		//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
-		//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
-		//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
-		//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
-		//PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
-		
-		BeginDebugWindow("Player");
+		// 状態抽象インターフェースの更新
+		UpdateState(this->GetAnimCurtID());
 
-		DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
-
-		EndDebugWindow("Player");
-
-		if (GetKeyboardPress(DIK_LEFT))
-		{
-			if (inkValue[inkType] > 0)
-			{
-				inkValue[inkType]--;
-			}
-		}
-		if (GetKeyboardPress(DIK_RIGHT))
-		{
-			if (inkValue[inkType] < INK_MAX)
-			{
-				inkValue[inkType]++;
-			}
-		}
-#endif
 	}
+
+	// デバッグ表示＆操作
+	Debug();
 }
 
 //=====================================================================================================
@@ -153,7 +131,7 @@ void Player::Update()
 //=====================================================================================================
 void Player::Draw()
 {
-	if (use)
+	if (onCamera)
 	{
 		LPDIRECT3DDEVICE9 pDevice = GetDevice();
 		D3DMATERIAL9 matDef;
@@ -189,6 +167,29 @@ void Player::Draw()
 }
 
 //=====================================================================================================
+// 状態抽象インターフェースの更新
+//=====================================================================================================
+void Player::UpdateState(int AnimCurtID)
+{
+	state->Update(AnimCurtID);
+}
+
+//=====================================================================================================
+// 状態抽象インターフェースの変更
+//=====================================================================================================
+void Player::ChangeState(PlayerState *NewState, int NextAnimID)
+{
+	delete state;
+	state = NewState;
+
+	// アニメーション変更
+	if (this->GetAnimCurtID() != NextAnimID)
+	{
+		this->ChangeAnim(NextAnimID);
+	}
+}
+
+//=====================================================================================================
 // インクの種類交換
 //=====================================================================================================
 void Player::ChangeInk()
@@ -218,33 +219,31 @@ void Player::ChangeInk()
 //=====================================================================================================
 void Player::Move()
 {
-	// ジャンプ
-	if (playable)
+	// マップとペイントどちらかに当たっていれば地上判定
+	if(hitGround || hitPaint)
 	{
-		if ((GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B)) && (!jumpFlag))
+		// ジャンプ
+		if (playable)
 		{
-			jumpFlag = true;
-			moveFlag = true;
-			jumpSpeed = JUMP_SPEED;
-			this->ChangeAnim(Jump);
+			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B))
+			{
+				hitGround = false;
+				hitPaint = false;
+				hitHorizon = false;
+				jumpSpeed = JUMP_SPEED;
+				this->ChangeAnim(Jump);
+			}
 		}
 	}
-
-	// 地上にいるとき
-	if (!jumpFlag)
-	{
-		jumpSpeed = 0;
-	}
-	// 空中にいるとき
 	else
 	{
 		pos.y += jumpSpeed;
 		// 重力
-		Gravity();
+		//Gravity();
 	}
 
 	// オート移動
-	if (moveFlag && playable)
+	if (!hitHorizon && playable)
 	{
 		pos.x += MOVE_SPEED;
 	}
@@ -266,7 +265,7 @@ void Player::Move()
 //=====================================================================================================
 void Player::AnimationManager()
 {
-	// 待機状態
+	// 操作不可
 	if (!playable)
 	{
 		if (this->GetAnimCurtID() != Idle)
@@ -276,10 +275,10 @@ void Player::AnimationManager()
 	}
 	else
 	{
-		if (!jumpFlag)
+		if (hitGround && hitPaint)
 		{
 			// 歩行中
-			if (moveFlag)
+			if (!hitHorizon)
 			{
 				if (this->GetAnimCurtID() != Running)
 				{
@@ -300,7 +299,6 @@ void Player::AnimationManager()
 	// アニメーションを更新
 	this->UpdateAnim(TIME_PER_FRAME);
 
-	//PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
 }
 
 //=====================================================================================================
@@ -376,23 +374,23 @@ void Player::CheckOnCamera()
 		// 横
 		if ((pos.y > camera->at.y - DRAW_RANGE.y) && (pos.y < camera->at.y + DRAW_RANGE.y))
 		{
-			use = true;
+			onCamera = true;
 		}
 		else
 		{
-			use = false;
+			onCamera = false;
 		}
 	}
 	else
 	{
-		use = false;
+		onCamera = false;
 	}
 }
 
 //=====================================================================================================
 // マップとの当たり判定
 //=====================================================================================================
-void Player::Collision(Map *pMap)
+void Player::GroundCollider(Map *pMap)
 {
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
@@ -409,15 +407,15 @@ void Player::Collision(Map *pMap)
 	int fronty = y + 1;
 
 	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
-	if (!jumpFlag)
+	if (!hitGround && !hitPaint)
 	{
 		if (pMap->GetMapTbl(frontx, fronty) >= 0)
 		{
-			moveFlag = false;
+			hitHorizon = false;
 		}
 		else
 		{
-			moveFlag = true;
+			hitHorizon = true;
 		}
 		
 		return;
@@ -426,8 +424,8 @@ void Player::Collision(Map *pMap)
 	// マップ外判定
 	if (!HitCheckBB(pos, GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
 	{
-		moveFlag = true;
-
+		hitHorizon = true;
+		hitGround = false;
 		return;
 	}
 
@@ -436,15 +434,20 @@ void Player::Collision(Map *pMap)
 	{
 		// めり込みを修正
 		pos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
-
-		jumpFlag = false;
+		jumpSpeed = 0.0f;
+		hitGround = true;
+		return;
+	}
+	else
+	{
+		hitGround = false;
 	}
 }
 
 //=====================================================================================================
 // ペイントとの当たり判定
 //=====================================================================================================
-void Player::Collision(PaintManager *pPManager)
+void Player::PaintCollider(PaintManager *pPManager)
 {
 	for (auto &Paint : pPManager->GetColorPaint())
 	{
@@ -458,11 +461,26 @@ void Player::Collision(PaintManager *pPManager)
 		{
 			// 当たった場合、プレイヤーの座標を修正
 			pos.y = Paint->GetPos().y + PAINT_WIDTH * 0.1f;
-			jumpFlag = false;
+			jumpSpeed = 0.0f;
+			hitPaint = true;
+			return;
+		}
+		else
+		{
+			hitPaint = false;
 		}
 	}
 
 }
+
+//=====================================================================================================
+// 前方のマップとの当たり判定
+//=====================================================================================================
+void Player::HorizonCollider(Map *pMap)
+{
+	
+}
+
 
 //=====================================================================================================
 // 重力処理
@@ -474,4 +492,44 @@ void Player::Gravity()
 	{
 		jumpSpeed -= STANDARD_GRAVITY;
 	}
+}
+
+//=====================================================================================================
+// デバッグ表示&操作
+//=====================================================================================================
+void Player::Debug()
+{
+#ifndef _DEBUG_
+	//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
+	//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
+	//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
+	//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
+	//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
+	//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
+	//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
+	//PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
+
+	BeginDebugWindow("Player");
+
+	DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
+	DebugText("[%d] HitGround:%s HitPaint:%s", ctrlNum, hitGround ? "True" : "False", hitPaint ? "True" : "False");
+
+	EndDebugWindow("Player");
+
+	if (GetKeyboardPress(DIK_LEFT))
+	{
+		if (inkValue[inkType] > 0)
+		{
+			inkValue[inkType]--;
+		}
+	}
+	if (GetKeyboardPress(DIK_RIGHT))
+	{
+		if (inkValue[inkType] < INK_MAX)
+		{
+			inkValue[inkType]++;
+		}
+	}
+#endif
+
 }

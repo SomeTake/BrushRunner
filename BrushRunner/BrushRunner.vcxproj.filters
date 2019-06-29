@@ -61,6 +61,12 @@
     <Filter Include="ヘッダー ファイル\imGui">
       <UniqueIdentifier>{2a9d6885-49d4-4aef-88af-e47b13d35684}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Player\State">
+      <UniqueIdentifier>{5fb010ac-a78e-4387-8fc5-fb78b57835c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Player\State">
+      <UniqueIdentifier>{ba195b4f-c291-4bad-a30b-6ac87eb65999}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SceneCharacterSelect.cpp">
@@ -188,6 +194,21 @@
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>ソース ファイル\GameScene</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="IdleState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="JumpState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="RunningState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="VictoryState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -325,6 +346,21 @@
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>ヘッダー ファイル\GameScene</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="IdleState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="JumpState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="RunningState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="VictoryState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

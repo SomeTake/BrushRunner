@@ -11,6 +11,9 @@
 #include "Struct.h"
 #include "Map.h"
 
+#include "PlayerState.h"
+#include "IdleState.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -54,19 +57,24 @@ class Player : public D3DXANIMATION
 {
 private:
 	// メンバ変数
-	//D3DXANIMATION		*Animation;			// アニメーション構造体
+	PlayerState			*state;				// ステータス管理抽象クラス
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			move;				// モデルの移動量
 	D3DXVECTOR3			rot;				// 現在の向き
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
-	bool				jumpFlag;			// ジャンプフラグ
 	float				jumpSpeed;			// ジャンプスピード
 	int					ctrlNum;			// 操作するコントローラ番号
 	int					inkValue[InkNum];	// インクの残量
 	int					inkType;			// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
-	bool				moveFlag;			// 移動可能フラグ（進行方向にオブジェクトがある場合は移動不可）
-	bool				playable;			// ゲーム中か判定するフラグ
-	bool				use;				// 画面内にいるとき
+
+	bool				playable;			// 操作可能
+	bool				onCamera;			// 画面内にいるとき
+
+	// 当たり判定関係のフラグ
+	bool				hitGround;			// 地上判定(↓と合わせて両方falseだと空中状態)
+	bool				hitPaint;
+	bool				hitHorizon;			// 進行方向のオブジェクトとの当たり判定
+
 
 	// メンバ関数
 	void AnimationManager();		// アニメーション管理
@@ -75,8 +83,10 @@ private:
 
 	void ChangeInk();		// インクの種類交換
 	void Move();			// 移動
-	void CheckOnCamera();
-	void Gravity();
+	void CheckOnCamera();	// 画面内判定
+	void Gravity();			// 重力処理
+
+	void Debug();			// デバッグ
 
 public:
 	// メンバ関数
@@ -85,20 +95,26 @@ public:
 	void Update();
 	void Draw();
 
+	// 状態抽象インターフェース
+	void UpdateState(int AnimCurtID);
+	void ChangeState(PlayerState *NewState, int NextAnimID);
+
 	// 当たり判定
-	void Collision(Map *pMap);
-	void Collision(PaintManager *pPManager);
+	void GroundCollider(Map *pMap);
+	void HorizonCollider(Map *pMap);
+	void PaintCollider(PaintManager *pPManager);
 
 	// ゲッター
 	D3DXVECTOR3	GetPos() { return pos; };
 	D3DXVECTOR3 GetMove() { return move; };
-	bool GetJumpFlag() { return jumpFlag; };
+	bool GetHitGround() { return hitGround; };
 	int GetInkValue(int _InkNum) { return inkValue[_InkNum]; };
 	int GetInkType() { return inkType; };
 	float GetJumpSpeed() { return jumpSpeed; };
-	bool GetMoveFlag() { return moveFlag; };
+	bool GetHitHorizon() { return hitHorizon; };
 	int GetCtrlNum() { return ctrlNum; };
 	bool GetPlayable() { return playable; };
+	bool GetHitPaint() { return hitPaint; };
 
 	// セッター
 	//void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };

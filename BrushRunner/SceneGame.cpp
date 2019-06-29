@@ -317,13 +317,14 @@ void SceneGame::Collision()
 	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i]->Collision(pMap);
+		pPlayer[i]->GroundCollider(pMap);
+		pPlayer[i]->HorizonCollider(pMap);
 	}
 
 	// プレイヤーとペイントシステムの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i]->Collision(pPManager[i]);
+		pPlayer[i]->PaintCollider(pPManager[i]);
 	}
 
 	// ペイントシステム同士の当たり判定

@@ -144,6 +144,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
+    <ClCompile Include="IdleState.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="Frame01.cpp" />
     <ClCompile Include="Ink.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="JumpState.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -168,14 +170,17 @@
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="PaintSystem.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerState.cpp" />
     <ClCompile Include="Pop.cpp" />
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="RunningState.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +192,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CountDown.h" />
     <ClInclude Include="DebugWindow.h" />
+    <ClInclude Include="IdleState.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx9.h" />
@@ -205,6 +211,7 @@
     <ClInclude Include="Frame01.h" />
     <ClInclude Include="Ink.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="JumpState.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
@@ -213,8 +220,10 @@
     <ClInclude Include="Paint.h" />
     <ClInclude Include="PaintSystem.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerState.h" />
     <ClInclude Include="Pop.h" />
     <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="RunningState.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />
@@ -222,6 +231,7 @@
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Struct.h" />
+    <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
