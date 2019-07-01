@@ -14,6 +14,7 @@
 #include "Light.h"
 #include "Input.h"
 #include "Debugproc.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -208,6 +209,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
+	// デバッグウィンドウ
+	DebugWindPrcHandler(hWnd, uMsg, wParam, lParam);
+
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -343,6 +347,9 @@ void Uninit(void)
 {
 #ifdef _DEBUG
 	UninitDebugProc();
+
+	UninitDebugWindow(0);
+
 #endif
 
 	UninitInput();
@@ -354,9 +361,6 @@ void Uninit(void)
 	UninitSceneGame();
 
 	UninitSceneResult();
-
-	ImGui_ImplDX9_Shutdown();
-	ImGui_ImplWin32_Shutdown();
 
 	// デバイスの開放
 	SAFE_RELEASE(g_pD3DDevice);
@@ -375,16 +379,7 @@ void Update(void)
 	// 処理開始の時間を記録
 	ProcessStart(Process_Update);
 
-	ImGui_ImplWin32_NewFrame();
-	ImGui_ImplDX9_NewFrame();
-	ImGui::NewFrame();
-
-	// サンプル表示
-	ImGui::Begin("Another Window", &ShowAnotherWindow);
-	ImGui::Text("Hello from another window");
-	ImGui::End();
-
-	ImGui::EndFrame();
+	UpdateDebugWindow();
 
 #endif
 
@@ -409,6 +404,7 @@ void Update(void)
 	}
 
 #ifdef _DEBUG
+	
 	// 処理終了の時間を記録
 	ProcessEnd(Process_Update);
 #endif
@@ -459,8 +455,7 @@ void Draw(void)
 		// FPSと処理時間表示
 		DrawProcessTime(FPSCount);
 
-		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		DrawDebugWindow();
 
 #endif
 
