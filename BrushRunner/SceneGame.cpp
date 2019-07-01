@@ -253,12 +253,14 @@ void UpdateSceneGame()
 	}
 
 	// ペイントシステムの更新
+#if _DEBUG
 	static bool PressMode = false;
 
 	if (GetKeyboardTrigger(DIK_F1))
 	{
 		PressMode = PressMode ? false : true;
 	}
+#endif
 
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{

@@ -95,12 +95,33 @@ int CmpAscend(const void *p, const void *q)
 // 引数：data = define定義したcsvデータ
 // 引数：table = 2次元配列のX要素1番目を取得したポインタ配列
 //=============================================================================
-void ReadCsv(const char *data, int **table)
+//void ReadCsv(const char *data, int **table)
+//{
+//	ifstream stream(data);		// マップの読み込み先
+//	string line;				// 文字列を一時的に保存
+//	const string delim = ",";	// データ区切り用の文字
+//
+//	int row = 0;
+//	int col;
+//	while (getline(stream, line))
+//	{
+//		col = 0;
+//		// delimを区切り文字として切り分け、intに変換してmaptbl[][]に格納する
+//		for (string::size_type spos, epos = 0;
+//			(spos = line.find_first_not_of(delim, epos)) != string::npos;)
+//		{
+//			string token = line.substr(spos, (epos = line.find_first_of(delim, spos)) - spos);
+//			table[row][col++] = stoi(token);
+//		}
+//		++row;
+//	}
+//}
+
+void ReadCsv(const char *data, vector<vector<int>> *MapVector)
 {
 	ifstream stream(data);		// マップの読み込み先
 	string line;				// 文字列を一時的に保存
 	const string delim = ",";	// データ区切り用の文字
-
 
 	int row = 0;
 	int col;
@@ -112,7 +133,8 @@ void ReadCsv(const char *data, int **table)
 			(spos = line.find_first_not_of(delim, epos)) != string::npos;)
 		{
 			string token = line.substr(spos, (epos = line.find_first_of(delim, spos)) - spos);
-			table[row][col++] = stoi(token);
+			MapVector->at(row).push_back(stoi(token));
+			MapVector->at(row).at(col++) = stoi(token);
 		}
 		++row;
 	}

@@ -45,18 +45,11 @@ Chip::Chip(int x, int y, int texnum)
 //=============================================================================
 Chip::~Chip()
 {
-	if (D3DTexture != NULL)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// テクスチャの開放
+	//SAFE_RELEASE(Chip::D3DTexture);
 
-	if (D3DVtxBuff != NULL)
-	{// 頂点バッファの開放
-		D3DVtxBuff->Release();
-		D3DVtxBuff = NULL;
-	}
-
+	// 頂点バッファの開放
+	SAFE_RELEASE(this->D3DVtxBuff);
 }
 
 //=============================================================================
@@ -140,10 +133,10 @@ HRESULT Chip::MakeVertex(int texnum)
 		pVtx[3].vtx = D3DXVECTOR3(CHIP_SIZE / 2, 0.0f, -CHIP_SIZE / 2);
 
 		// 法線ベクトルの設定
-		pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
 		// 反射光の設定
 		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);

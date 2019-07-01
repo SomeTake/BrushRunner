@@ -290,7 +290,7 @@ void Player::AnimationManager()
 	// アニメーションを更新
 	this->UpdateAnim(TIME_PER_FRAME);
 
-	//PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
+	PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
 }
 
 void Player::CreateAnimSet(void)

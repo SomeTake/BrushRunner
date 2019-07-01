@@ -36,6 +36,7 @@ public:
 
 	void Update();
 	void Draw();
+	static void ReleaseTexture(void) { SAFE_RELEASE(ObjectChip::D3DTexture); };
 
 	D3DXVECTOR3 GetPos() { return pos; };
 

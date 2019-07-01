@@ -40,10 +40,9 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
 #ifdef _DEBUG
-static LPD3DXFONT	g_pD3DXFont = NULL;				// フォントへのポインタ
 int					FPSCount;						// FPSカウンタ
-#endif
 bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
+#endif
 
 //=============================================================================
 // メイン関数
@@ -308,10 +307,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
-	// 情報表示用フォントを設定
-	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
-
 	// Setup ImGui binding
 	ImGui::CreateContext();
 	ImGui_ImplWin32_Init(hWnd);

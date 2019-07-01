@@ -26,8 +26,8 @@ private:
 	D3DXVECTOR3				pos;
 	D3DXVECTOR3				rot;
 	D3DXVECTOR3				scl;
-	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;	// 頂点バッファへのポインタ
+	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 	bool use;
 
 	HRESULT MakeVertex(int texnum);
@@ -39,9 +39,9 @@ public:
 
 	void Update();
 	void Draw();
+	static void ReleaseTexture(void) { SAFE_RELEASE(Chip::D3DTexture); };
 
 	D3DXVECTOR3 GetPos() { return pos; };
-
 };
 
 #endif

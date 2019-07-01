@@ -50,18 +50,18 @@ bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Radius1, float Radius2)
 bool HitCheckPToM(Player *pP, Map *pM)
 {
 	// キャラクターの座標からマップ配列の場所を調べる
-	int x = (int)((pP->GetPos().x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pP->GetPos().y - CHIP_SIZE / 2) / CHIP_SIZE);
+	int x = 0, y = 0;
+	Map::GetMapChipXY(pP->GetPos(), &x, &y);
 
 	// 当たり判定を確認するマップチップの場所
-	D3DXVECTOR3 mappos;
-	mappos.x = MAP_POS.x + CHIP_SIZE * x;
-	mappos.y = MAP_POS.y + CHIP_SIZE * y;
-	mappos.z = 0.0f;
+	D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y);
+	//mappos.x = MAP_POS.x + CHIP_SIZE * x;
+	//mappos.y = -(MAP_POS.y + CHIP_SIZE * y);
+	//mappos.z = 0.0f;
 
 	// プレイヤーの足元のマップチップから右上のマップチップの番号
 	int frontx = x + 1;
-	int fronty = y + 1;
+	int fronty = y - 1;
 
 	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
 	if (!pP->GetJumpFlag())
@@ -77,12 +77,12 @@ bool HitCheckPToM(Player *pP, Map *pM)
 	}
 
 	// マップ外判定
-	if (!HitCheckBB(pP->GetPos(), GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
-	{
-		pP->SetMoveFlag(true);
+	//if (!HitCheckBB(pP->GetPos(), GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
+	//{
+	//	pP->SetMoveFlag(true);
 
-		return false;
-	}
+	//	return false;
+	//}
 
 #ifndef _DEBUG_
 	//PrintDebugProc("現在プレイヤーがいるMapTbl[%d][%d]\n", -y, x);

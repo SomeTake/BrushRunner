@@ -49,7 +49,6 @@ class Player : public D3DXANIMATION
 {
 private:
 	// メンバ変数
-	//D3DXANIMATION		*Animation;			// アニメーション構造体
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			move;				// モデルの移動量
 	D3DXVECTOR3			rot;				// 現在の向き
