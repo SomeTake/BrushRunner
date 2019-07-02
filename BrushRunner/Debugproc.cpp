@@ -186,7 +186,7 @@ void ProcessEnd(int ProcessPhase)
 void DrawProcessTime(int FPSCount)
 {
 	RECT rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	char ProcessTime[512];
+	//char ProcessTime[512];
 
 	//sprintf_s(ProcessTime, 512, "FPS = %d\nUpdateTime = %f\nDrawTime = %f\n", FPSCount, UpdateTime, DrawTime);
 	//g_pD3DXFont->DrawText(NULL, ProcessTime, -1, &rect, DT_LEFT | DT_BOTTOM, D3DCOLOR_ARGB(0xff, 0x00, 0x00, 0x00));

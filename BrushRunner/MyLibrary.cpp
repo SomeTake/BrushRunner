@@ -134,7 +134,6 @@ void ReadCsv(const char *data, vector<vector<int>> *MapVector)
 		{
 			string token = line.substr(spos, (epos = line.find_first_of(delim, spos)) - spos);
 			MapVector->at(row).push_back(stoi(token));
-			MapVector->at(row).at(col++) = stoi(token);
 		}
 		++row;
 	}

@@ -30,7 +30,7 @@ private:
 	//std::vector<Chip*>				NoEmptyMapChip;
 
 	std::vector<std::vector<int>>	objtbl;
-	std::vector<Chip*>				ObjectChipVector;
+	std::vector<ObjectChip*>		ObjectChipVector;
 	//int objtbl[MAP_SIZE_Y][MAP_SIZE_X];		// フィールドオブジェクト用の配列
 	//int *pObjtbl[MAP_SIZE_Y];
 	//ObjectChip *pObjChip[MAP_SIZE_Y][MAP_SIZE_X];

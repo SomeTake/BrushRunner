@@ -67,7 +67,7 @@ Map::Map()
 
 			if (objtbl.at(cntY).at(cntX) >= 0)
 			{
-				ObjectChipVector.push_back(new Chip(cntX, cntY, maptbl.at(cntY).at(cntX)));
+				ObjectChipVector.push_back(new ObjectChip(cntX, cntY, objtbl.at(cntY).at(cntX)));
 			}
 		}
 	}
