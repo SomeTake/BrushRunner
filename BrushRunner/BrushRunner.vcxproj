@@ -139,10 +139,17 @@
     <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="AnimationSet.cpp" />
     <ClCompile Include="Billboard.cpp" />
-    <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CountDown.cpp" />
+    <ClCompile Include="DebugWindow.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="InkFrameBlack.cpp" />
     <ClCompile Include="InkFrameColor.cpp" />
     <ClCompile Include="Cursor.cpp" />
@@ -158,6 +165,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MyLibrary.cpp" />
+    <ClCompile Include="ObjectChip.cpp" />
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="PaintSystem.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -168,17 +176,25 @@
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="AnimationSet.h" />
     <ClInclude Include="Billboard.h" />
-    <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Chip.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CountDown.h" />
+    <ClInclude Include="DebugWindow.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="InkFrameBlack.h" />
     <ClInclude Include="InkFrameColor.h" />
     <ClInclude Include="Cursor.h" />
@@ -194,6 +210,7 @@
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MyLibrary.h" />
+    <ClInclude Include="ObjectChip.h" />
     <ClInclude Include="Paint.h" />
     <ClInclude Include="PaintSystem.h" />
     <ClInclude Include="Player.h" />
@@ -204,7 +221,6 @@
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sound.h" />
-    <ClInclude Include="SphereCollider.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>

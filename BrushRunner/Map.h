@@ -7,33 +7,14 @@
 #ifndef _MAP_H_
 #define _MAP_H_
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include "Struct.h"
+#include "Chip.h"
+#include "ObjectChip.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_TEXTURE0	("data/MAP/map0.jpg")
-#define MAP_TEXTURE1	("data/MAP/map1.jpg")
-#define MAP_TEXTURE2	("data/MAP/map2.jpg")
-#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)		// 表示場所
-#define MAP_ROT			D3DXVECTOR3(D3DXToRadian(-90), 0.0f, 0.0f)	// 回転
-#define MAP_FILE		("data/MAP/data.csv")				// 読み込むマップデータ
-#define MAP_SIZE_X		(100)									// マップの横の枚数
-#define MAP_SIZE_Y		(10)									// マップの縦の枚数
-#define CHIP_SIZE		(20.0f)								// マップチップ一枚のサイズ
-
-// マップチップの種類
-enum MapStateNum{
-	MapField,
-	MapTrap,
-	MapItem,
-
-	// マップチップの種類数
-	MapChipMax
-};
+#define MAP_SIZE_X		(500)								// マップの横の枚数
+#define MAP_SIZE_Y		(50)								// マップの縦の枚数
 
 //*****************************************************************************
 // クラス定義
@@ -41,15 +22,19 @@ enum MapStateNum{
 class Map
 {
 private:
-	string					line;								// 文字列を一時的に保存
-	int						maptbl[MAP_SIZE_Y][MAP_SIZE_X];		// マップ用の配列
-	const string			delim = ",";						// データ区切り用の文字
-	D3DXVECTOR3				pos;
-	D3DXVECTOR3				rot;
-	D3DXVECTOR3				scl;
-	static LPDIRECT3DTEXTURE9		D3DTexture[MapChipMax];		// テクスチャへのポインタ
-	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;					// 頂点バッファへのポインタ
+	std::vector<std::vector<int>>	maptbl;
+	std::vector<Chip*>				MapChipVector;
+	//int maptbl[MAP_SIZE_Y][MAP_SIZE_X];		// マップ用の配列
+	//int	*pMaptbl[MAP_SIZE_Y];				// 配列のポインタ
+	//Chip *pChip[MAP_SIZE_Y][MAP_SIZE_X];	// チップのポインタ
+	//std::vector<Chip*>				NoEmptyMapChip;
 
+	std::vector<std::vector<int>>	objtbl;
+	std::vector<ObjectChip*>		ObjectChipVector;
+	//int objtbl[MAP_SIZE_Y][MAP_SIZE_X];		// フィールドオブジェクト用の配列
+	//int *pObjtbl[MAP_SIZE_Y];
+	//ObjectChip *pObjChip[MAP_SIZE_Y][MAP_SIZE_X];
+	//std::vector<ObjectChip *> NoEmptyObjectChip;
 
 public:
 	Map();
@@ -58,12 +43,12 @@ public:
 	void Update();
 	void Draw();
 
-	void ReadCsv(const char *data);		// CSVファイルの読み込み
-	HRESULT MakeVertex();				// 頂点情報の作成
-
-	int GetMapTbl(int _MapX, int _MapY) { return maptbl[_MapX][_MapY]; };
+	int GetMapTbl(int MapX, int MapY);
+	int GetObjTbl(int ObjX, int ObjY);
+	static void GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY);
+	static D3DXVECTOR3 GetMapChipPos(int MapX, int MapY);
 };
 
-D3DXVECTOR3 GetMapCenterPos();			// 表示されているマップの中心座標
+//D3DXVECTOR3 GetMapCenterPos();					// 表示されているマップの中心座標
 
 #endif

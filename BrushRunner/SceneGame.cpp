@@ -47,6 +47,14 @@ enum {
 	EffectMax,
 };
 
+// プレイヤー初期位置
+D3DXVECTOR3 firstpos[PLAYER_MAX] = {
+	D3DXVECTOR3(45.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(30.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(15.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+};
+
 //*****************************************************************************
 // オブジェクトのポインタ
 //*****************************************************************************
@@ -69,7 +77,7 @@ HRESULT InitSceneGame()
 	// プレイヤーの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i] = new Player(i);
+		pPlayer[i] = new Player(i, firstpos[i]);
 	}
 
 	// マップの初期化
@@ -220,8 +228,17 @@ void UpdateSceneGame()
 		}
 	}
 
+	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+	std::vector<float> vec(PLAYER_MAX);
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		vec[i] = pPlayer[i]->GetPos().x;
+	}
+	auto max = std::max_element(vec.begin(), vec.end());
+	size_t maxIdx = std::distance(vec.begin(), max);
+
 	// カメラの更新
-	UpdateCamera(CompareXPos());
+	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
 
 	// 2Dオブジェクトの更新
 	for (int i = 0; i < _2dMax; i++)
@@ -236,12 +253,14 @@ void UpdateSceneGame()
 	}
 
 	// ペイントシステムの更新
+#if _DEBUG
 	static bool PressMode = false;
 
 	if (GetKeyboardTrigger(DIK_F1))
 	{
 		PressMode = PressMode ? false : true;
 	}
+#endif
 
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -396,48 +415,4 @@ void ChangeDrawOrder(int _NumA, int _NumB)
 	SetDraw2dobjBuff(_NumA, GetDraw2dobjBuff(_NumB));
 	SetDraw2dobjBuff(_NumB, change);
 
-}
-
-//=============================================================================
-// X座標を比較して、大きい2つの中心座標を返す
-//=============================================================================
-D3DXVECTOR3 CompareXPos()
-{
-	float CmpPos[PLAYER_MAX];
-
-	// プレイヤーの座標を格納
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		CmpPos[i] = pPlayer[i]->GetPos().x;
-	}
-
-	// QuickSort関数 引数1 比較する配列の先頭要素
-	//				 引数2 配列の要素数
-	//				 引数3 型のサイズ
-	//				 引数4 比較用の関数
-	qsort(CmpPos, PLAYER_MAX, sizeof(float), CmpDescendf);
-
-	float CmpY[2];
-
-	// 1つめの要素確定
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (CmpPos[0] == pPlayer[i]->GetPos().x)
-		{
-			CmpY[0] = pPlayer[i]->GetPos().y;
-			break;
-		}
-	}
-
-	// 2つめの要素確定
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (CmpPos[1] == pPlayer[i]->GetPos().x)
-		{
-			CmpY[1] = pPlayer[i]->GetPos().y;
-			break;
-		}
-	}
-
-	return D3DXVECTOR3((CmpPos[0] + CmpPos[1]) * 0.5f, (CmpY[0] + CmpY[1]) * 0.5f, 0.0f);
 }

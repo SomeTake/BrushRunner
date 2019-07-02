@@ -235,7 +235,7 @@ void Cursor::PadMove()
 	moveX = (float)GetJoyStickLeftX(ctrlNum) / 1000.0f;
 	moveY = (float)GetJoyStickLeftY(ctrlNum) / 1000.0f;
 
-	oldPos = pos;
+	//oldPos = pos;
 
 	pos.x += vec * moveX * CURSOR_SPEED;
 	pos.y += vec * moveY * CURSOR_SPEED;

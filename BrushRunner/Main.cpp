@@ -14,6 +14,7 @@
 #include "Light.h"
 #include "Input.h"
 #include "Debugproc.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -40,7 +41,8 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
 int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
 #ifdef _DEBUG
-int					FPSCount;					// FPSカウンタ
+int					FPSCount;						// FPSカウンタ
+bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
 #endif
 
 //=============================================================================
@@ -207,6 +209,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
+	// デバッグウィンドウ
+	DebugWindPrcHandler(hWnd, uMsg, wParam, lParam);
+
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -306,6 +311,15 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
+	// Setup ImGui binding
+	ImGui::CreateContext();
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX9_Init(g_pD3DDevice);
+
+	// Setup style
+	ImGui::StyleColorsClassic();
+	//ImGui::StyleColorsDark();
+
 	InitDebugProc();
 #endif
 
@@ -333,6 +347,9 @@ void Uninit(void)
 {
 #ifdef _DEBUG
 	UninitDebugProc();
+
+	UninitDebugWindow(0);
+
 #endif
 
 	UninitInput();
@@ -350,6 +367,7 @@ void Uninit(void)
 
 	// Direct3Dオブジェクトの開放
 	SAFE_RELEASE(g_pD3D);
+
 }
 
 //=============================================================================
@@ -360,6 +378,9 @@ void Update(void)
 #ifdef _DEBUG
 	// 処理開始の時間を記録
 	ProcessStart(Process_Update);
+
+	UpdateDebugWindow();
+
 #endif
 
 	UpdateInput();
@@ -383,6 +404,7 @@ void Update(void)
 	}
 
 #ifdef _DEBUG
+	
 	// 処理終了の時間を記録
 	ProcessEnd(Process_Update);
 #endif
@@ -395,7 +417,7 @@ void Update(void)
 void Draw(void)
 {
 	// バックバッファ＆Ｚバッファのクリア
-	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 255, 255, 0), 1.0f, 0);
+	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 255, 0), 1.0f, 0);
 
 #ifdef _DEBUG
 	// 処理開始の時間を記録
@@ -432,6 +454,9 @@ void Draw(void)
 		DrawDebugProc();
 		// FPSと処理時間表示
 		DrawProcessTime(FPSCount);
+
+		DrawDebugWindow();
+
 #endif
 
 		// Direct3Dによる描画の終了
