@@ -14,6 +14,7 @@
 #include "DebugWindow.h"
 #include "Collision.h"
 #include "PaintSystem.h"
+#include "IdleState.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -74,12 +75,13 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	hitGround = false;
 	hitPaint = false;
-	jumpSpeed = 0;
+	jumpSpd = 0;
 	ctrlNum = _CtrlNum;
 	inkType = ColorInk;
-	hitHorizon = true;
+	hitHorizon = false;
 	playable = false;
 	onCamera = true;
+	animSpd = 1.0f;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -87,7 +89,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	}
 
 	// 待機状態からスタートする
-	new IdleState(this);
+	state = new IdleState(this);
 }
 
 //=====================================================================================================
@@ -111,15 +113,14 @@ void Player::Update()
 		// インク変更
 		ChangeInk();
 
-		// アニメーション管理
-		AnimationManager();
-
-		// カメラ内判定
-		CheckOnCamera();
+		// アニメーションを更新
+		this->UpdateAnim(TIME_PER_FRAME * animSpd);
 
 		// 状態抽象インターフェースの更新
 		UpdateState(this->GetAnimCurtID());
 
+		// カメラ内判定
+		CheckOnCamera();
 	}
 
 	// デバッグ表示＆操作
@@ -177,16 +178,10 @@ void Player::UpdateState(int AnimCurtID)
 //=====================================================================================================
 // 状態抽象インターフェースの変更
 //=====================================================================================================
-void Player::ChangeState(PlayerState *NewState, int NextAnimID)
+void Player::ChangeState(PlayerState *NewState)
 {
 	delete state;
 	state = NewState;
-
-	// アニメーション変更
-	if (this->GetAnimCurtID() != NextAnimID)
-	{
-		this->ChangeAnim(NextAnimID);
-	}
 }
 
 //=====================================================================================================
@@ -219,34 +214,14 @@ void Player::ChangeInk()
 //=====================================================================================================
 void Player::Move()
 {
-	// マップとペイントどちらかに当たっていれば地上判定
-	if(hitGround || hitPaint)
-	{
-		// ジャンプ
-		if (playable)
-		{
-			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(ctrlNum, BUTTON_B))
-			{
-				hitGround = false;
-				hitPaint = false;
-				hitHorizon = false;
-				jumpSpeed = JUMP_SPEED;
-				this->ChangeAnim(Jump);
-			}
-		}
-	}
-	else
-	{
-		pos.y += jumpSpeed;
-		// 重力
-		//Gravity();
-	}
-
 	// オート移動
-	if (!hitHorizon && playable)
+	if (!hitHorizon && playable && pos.x < GOAL_POS.x)
 	{
 		pos.x += MOVE_SPEED;
 	}
+
+	// 空中判定
+	JumpMove();
 
 #if _DEBUG
 	//if (GetKeyboardPress(DIK_RIGHT))
@@ -261,44 +236,16 @@ void Player::Move()
 }
 
 //=====================================================================================================
-// アニメーション管理
+// ジャンプ移動
 //=====================================================================================================
-void Player::AnimationManager()
+void Player::JumpMove()
 {
-	// 操作不可
-	if (!playable)
+	pos.y += jumpSpd;
+	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
+	if (jumpSpd > -FALL_VELOCITY_MAX)
 	{
-		if (this->GetAnimCurtID() != Idle)
-		{
-			this->ChangeAnim(Idle);
-		}
+		jumpSpd -= STANDARD_GRAVITY;
 	}
-	else
-	{
-		if (hitGround && hitPaint)
-		{
-			// 歩行中
-			if (!hitHorizon)
-			{
-				if (this->GetAnimCurtID() != Running)
-				{
-					this->ChangeAnim(Running);
-				}
-			}
-			// 待機中
-			else
-			{
-				if (this->GetAnimCurtID() != Idle)
-				{
-					this->ChangeAnim(Idle);
-				}
-			}
-		}
-	}
-
-	// アニメーションを更新
-	this->UpdateAnim(TIME_PER_FRAME);
-
 }
 
 //=====================================================================================================
@@ -328,6 +275,7 @@ void Player::CreateAnimSet()
 
 		case Jump:
 
+			Keydata.push_back(KEYDATA{ 0.80f, e_MotionEnd });
 			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
@@ -358,6 +306,17 @@ void Player::CreateAnimSet()
 //=====================================================================================================
 HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 {
+	int eventNo = (int)pCallbackData;
+
+	switch (eventNo)
+	{
+	case e_MotionEnd:
+		animSpd = 0.0f;
+		break;
+	default:
+		break;
+	}
+
 	return S_OK;
 }
 
@@ -392,51 +351,40 @@ void Player::CheckOnCamera()
 //=====================================================================================================
 void Player::GroundCollider(Map *pMap)
 {
-	// キャラクターの座標からマップ配列の場所を調べる
-	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
-
-	// 当たり判定を確認するマップチップの場所
-	D3DXVECTOR3 mappos;
-	mappos.x = MAP_POS.x + CHIP_SIZE * x;
-	mappos.y = MAP_POS.y + CHIP_SIZE * y;
-	mappos.z = 0.0f;
-
-	// プレイヤーの足元のマップチップから右上のマップチップの番号
-	int frontx = x + 1;
-	int fronty = y + 1;
-
-	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
-	if (!hitGround && !hitPaint)
+	// 上昇中は判定しない
+	if (jumpSpd <= 0)
 	{
-		if (pMap->GetMapTbl(frontx, fronty) >= 0)
+		// キャラクターの座標からマップ配列の場所を調べる
+		int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
+		int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+
+		// 当たり判定を確認するマップチップの場所
+		D3DXVECTOR3 mappos;
+		mappos.x = MAP_POS.x + CHIP_SIZE * x;
+		mappos.y = MAP_POS.y + CHIP_SIZE * y;
+		mappos.z = 0.0f;
+
+		// マップ外判定
+		if (x < 0 || y > 0)
 		{
-			hitHorizon = false;
+			hitGround = false;
+			return;
+		}
+
+		// 現在座標があるところになにかオブジェクトがあればヒットしている
+		if (pMap->GetMapTbl(x, y) >= 0)
+		{
+			// めり込みを修正
+			pos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
+			jumpSpd = 0.0f;
+			animSpd = 1.0f;
+			hitGround = true;
+			return;
 		}
 		else
 		{
-			hitHorizon = true;
+			hitGround = false;
 		}
-		
-		return;
-	}
-
-	// マップ外判定
-	if (!HitCheckBB(pos, GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
-	{
-		hitHorizon = true;
-		hitGround = false;
-		return;
-	}
-
-	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (pMap->GetMapTbl(x, y) >= 0)
-	{
-		// めり込みを修正
-		pos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
-		jumpSpeed = 0.0f;
-		hitGround = true;
-		return;
 	}
 	else
 	{
@@ -452,16 +400,15 @@ void Player::PaintCollider(PaintManager *pPManager)
 	for (auto &Paint : pPManager->GetColorPaint())
 	{
 		if (!Paint->GetUse())
-		{
 			continue;
-		}
 
 		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
 		if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
 		{
 			// 当たった場合、プレイヤーの座標を修正
 			pos.y = Paint->GetPos().y + PAINT_WIDTH * 0.1f;
-			jumpSpeed = 0.0f;
+			jumpSpd = 0.0f;
+			animSpd = 1.0f;
 			hitPaint = true;
 			return;
 		}
@@ -478,19 +425,31 @@ void Player::PaintCollider(PaintManager *pPManager)
 //=====================================================================================================
 void Player::HorizonCollider(Map *pMap)
 {
-	
-}
+	// プレイヤーの座標から当たり判定を取得するマップチップの番号を取得
+	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
+	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
 
+	// 足元から見て右上なので
+	x++;
+	y++;
 
-//=====================================================================================================
-// 重力処理
-//=====================================================================================================
-void Player::Gravity()
-{
-	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
-	if (jumpSpeed > -FALL_VELOCITY_MAX)
+	// マップ外
+	if (x < 0 || y > 0)
 	{
-		jumpSpeed -= STANDARD_GRAVITY;
+		hitHorizon = false;
+		return;
+	}
+
+	// テーブルを調べて0以上ならヒット
+	if (pMap->GetMapTbl(x,y) >= 0)
+	{
+		hitHorizon = true;
+		return;
+	}
+	else
+	{
+		hitHorizon = false;
+		return;
 	}
 }
 
@@ -511,8 +470,9 @@ void Player::Debug()
 
 	BeginDebugWindow("Player");
 
-	DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
-	DebugText("[%d] HitGround:%s HitPaint:%s", ctrlNum, hitGround ? "True" : "False", hitPaint ? "True" : "False");
+	DebugText("[%d] POS X:%f Y:%f Z:%d\n", ctrlNum, pos.x, pos.y, pos.z);
+	DebugText("[%d] HitGround:%s HitPaint:%s HitHorizon:%s\n", ctrlNum, hitGround ? "True" : "False", hitPaint ? "True" : "False", hitHorizon ? "True" : "False");
+	DebugText("[%d] AnimID:%d",ctrlNum, this->GetAnimCurtID());
 
 	EndDebugWindow("Player");
 

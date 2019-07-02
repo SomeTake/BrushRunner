@@ -17,6 +17,8 @@
 #define OBJECT_FILE		("data/MAP/obj.csv")
 #define MAP_SIZE_X		(500)								// マップの横の枚数
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
+#define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
+#define GOAL_POS		D3DXVECTOR3(1000.0f, 0.0f, 0.0f)	// ゴール地点
 
 //*****************************************************************************
 // クラス定義

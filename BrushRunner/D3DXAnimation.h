@@ -36,7 +36,6 @@ protected:
 	HRESULT SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetName);
 	void UpdateAnim(float Time);
 	void DrawAnim(LPD3DXMATRIX WorldMatrix);
-	void ChangeAnim(UINT AnimID);
 	D3DXMATRIX GetBoneMatrix(const char* BoneName);
 	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
 	int GetAnimCurtID(void) { return this->CurrentAnimID; };
@@ -46,6 +45,9 @@ protected:
 public:
 	D3DXANIMATION();
 	~D3DXANIMATION();
+
+	void ChangeAnim(UINT AnimID);
+
 };
 
 
