@@ -319,6 +319,7 @@ void SceneGame::Collision()
 	{
 		pPlayer[i]->GroundCollider(pMap);
 		pPlayer[i]->HorizonCollider(pMap);
+		pPlayer[i]->ObjectCollider(pMap);
 	}
 
 	// プレイヤーとペイントシステムの当たり判定

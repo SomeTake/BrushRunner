@@ -99,6 +99,7 @@ public:
 	// 当たり判定
 	void GroundCollider(Map *pMap);
 	void HorizonCollider(Map *pMap);
+	void ObjectCollider(Map *pMap);
 	void PaintCollider(PaintManager *pPManager);
 
 	// ゲッター(なるべく使わない)
