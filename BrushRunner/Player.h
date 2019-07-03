@@ -65,8 +65,9 @@ private:
 	bool				onCamera;			// 画面内にいるとき
 
 	// ステータス関係
-	float				runSpd;				// ダッシュ速度
+	float				runSpd;				// ダッシュ速度(0.0-1.0)
 	float				jumpSpd;			// ジャンプ速度
+	float				jumpValue;			// ジャンプ速度に掛けて使う(0.0-1.0)
 	int					inkValue[InkNum];	// インクの残量
 	int					inkType;			// 使用中のインクの種類(enum ColorInk=カラー, BlackInk=黒)
 

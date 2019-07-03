@@ -15,7 +15,13 @@
 #define OBJECTCHIP_DIVIDE_Y	(16)
 
 // フィールドオブジェクトの種類
-#define OBJ_NUM_POISON		(55)
+#define OBJ_NUM_SPDUP		(0)	// 加速板
+#define OBJ_NUM_SPDDOWN		(1)	// 減速板
+#define OBJ_NUM_NUMA		(2)	// 沼地（減速）
+#define OBJ_NUM_JUMP		(3)	// ジャンプ台
+#define OBJ_NUM_DRAIN		(4)	// ドレインフロア
+#define OBJ_NUM_HEAL		(5)	// 回復板
+#define OBJ_NUM_ITEM		(6)	// アイテム
 
 //*****************************************************************************
 // クラス定義

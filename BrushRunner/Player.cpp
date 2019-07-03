@@ -86,6 +86,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	hitItem = false;
 	animSpd = 1.0f;
 	hitObjCnt = 0;
+	jumpValue = 1.0f;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -244,7 +245,7 @@ void Player::Move()
 //=====================================================================================================
 void Player::JumpMove()
 {
-	pos.y += jumpSpd;
+	pos.y += jumpSpd * jumpValue;
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
 	if (jumpSpd > -FALL_VELOCITY_MAX)
 	{
@@ -489,6 +490,7 @@ void Player::HitObjectInfluence(int type)
 	if (type == -1)
 	{
 		runSpd = 1.0f;
+		jumpValue = 1.0f;
 		hitObjCnt = 0;
 		return;
 	}
@@ -496,18 +498,63 @@ void Player::HitObjectInfluence(int type)
 	// オブジェクトの種類に合わせて効果変更
 	switch (type)
 	{
-	case OBJ_NUM_POISON:
-		hitItem = true;
-		//runSpd = 2.0f;
-		//hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-		//if (hitObjCnt == 0)
-		//{
-		//	inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
-		//	inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
-		//}
+	case OBJ_NUM_SPDUP:
+		runSpd = 2.0f;
 
 		// 他のステータスはリセット
 		hitObjCnt = 0;
+		jumpValue = 1.0f;
+		break;
+
+	case OBJ_NUM_SPDDOWN:
+		runSpd = 0.5f;
+
+		// 他のステータスはリセット
+		hitObjCnt = 0;
+		jumpValue = 1.0f;
+		break;
+
+	case OBJ_NUM_NUMA:
+		runSpd = 0.5f;
+		jumpValue = 0.5f;
+
+		// 他のステータスはリセット
+		hitObjCnt = 0;
+		break;
+
+	case OBJ_NUM_DRAIN:
+		hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+		if (hitObjCnt == 0)
+		{
+			inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
+			inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+		}
+
+		// 他のステータスはリセット
+		runSpd = 1.0f;
+		jumpValue = 1.0f;
+		break;
+
+	case OBJ_NUM_HEAL:
+		hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+		if (hitObjCnt == 0)
+		{
+			inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
+			inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
+		}
+
+		// 他のステータスはリセット
+		runSpd = 1.0f;
+		jumpValue = 1.0f;
+		break;
+
+	case OBJ_NUM_ITEM:
+		hitItem = true;
+
+		// 他のステータスはリセット
+		hitObjCnt = 0;
+		runSpd = 1.0f;
+		jumpValue = 1.0f;
 		break;
 	default:
 		break;
