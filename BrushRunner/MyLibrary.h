@@ -25,6 +25,7 @@ T clamp(T x, T low, T high)	// 上限、下限のチェック
 }
 
 void ReadCsv(const char *data, int **table);		// CSVファイルの読み込み
+int LoopCountUp(int counter, int low, int high);	// カウントアップ関数
 
 #endif
 

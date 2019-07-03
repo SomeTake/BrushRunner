@@ -7,9 +7,6 @@
 #include "Main.h"
 #include "Struct.h"
 #include "SceneManager.h"
-//#include "Camera.h"
-//#include "Light.h"
-//#include "Input.h"
 #include "Debugproc.h"
 #include "DebugWindow.h"
 

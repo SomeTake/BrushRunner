@@ -15,14 +15,18 @@
 #include "Collision.h"
 #include "PaintSystem.h"
 #include "IdleState.h"
+#include "MyLibrary.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+// 特に調整が必要そうなの
+#define OBJECT_HIT_COUNTER	(10)				// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define MOVE_SPEED			(2.0f)				// 動くスピード
+
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
 {
-	"data/MODEL/Boy.x",
 	"data/MODEL/Shachiku/Shachiku.x",
 	"data/MODEL/Kouhai/Kouhai.x",
 };
@@ -30,7 +34,6 @@ static const char* CharaModel[] =
 // キャラクターモデルの番号
 enum CharaModelNum
 {
-	BoyModel,
 	ShachikuModel,
 	KouhaiModel,
 
@@ -41,7 +44,6 @@ enum CharaModelNum
 // モデルの大きさ設定
 static D3DXVECTOR3 ModelScl[MaxModel] =
 {
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
 	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
 	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
 };
@@ -72,16 +74,17 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	pos = firstpos;
 	rot = PLAYER_ROT;
 	scl = ModelScl[KouhaiModel];
-	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	hitGround = false;
 	hitPaint = false;
-	jumpSpd = 0;
+	runSpd = 1.0f;
+	jumpSpd = 0.0f;
 	ctrlNum = _CtrlNum;
 	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
 	animSpd = 1.0f;
+	hitObjCnt = 0;
 
 	for (int i = 0; i < InkNum; i++)
 	{
@@ -217,7 +220,7 @@ void Player::Move()
 	// オート移動
 	if (!hitHorizon && playable && pos.x < GOAL_POS.x)
 	{
-		pos.x += MOVE_SPEED;
+		pos.x += MOVE_SPEED * runSpd;
 	}
 
 	// 空中判定
@@ -465,25 +468,49 @@ void Player::ObjectCollider(Map *pMap)
 	// マップ外判定
 	if (x < 0 || y > 0)
 	{
+		runSpd = 1.0f;
+		hitObjCnt = 0;
+		return;
+	}
+
+	int objType = pMap->GetObjTbl(x, -y);
+
+	HitObjectInfluence(objType);
+
+}
+
+//=====================================================================================================
+// オブジェクトにヒットしているときの効果
+//=====================================================================================================
+void Player::HitObjectInfluence(int type)
+{
+	// 何も存在しないとき
+	if (type == -1)
+	{
+		runSpd = 1.0f;
+		hitObjCnt = 0;
 		return;
 	}
 
 	// オブジェクトの種類に合わせて効果変更
-	switch (pMap->GetObjTbl(x, -y))
+	switch (type)
 	{
 	case OBJ_NUM_POISON:
-		if (0 < inkValue[BlackInk])
-		{
-			inkValue[BlackInk]--;
-		}
-		if (0 < inkValue[ColorInk])
-		{
-			inkValue[ColorInk]--;
-		}
+		runSpd = 2.0f;
+		//hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+		//if (hitObjCnt == 0)
+		//{
+		//	inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
+		//	inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+		//}
+
+		// 他のステータスはリセット
+		hitObjCnt = 0;
 		break;
 	default:
 		break;
 	}
+
 }
 
 //=====================================================================================================
@@ -506,6 +533,7 @@ void Player::Debug()
 	DebugText("[%d] POS X:%f Y:%f Z:%d\n", ctrlNum, pos.x, pos.y, pos.z);
 	DebugText("[%d] HitGround:%s HitPaint:%s HitHorizon:%s\n", ctrlNum, hitGround ? "True" : "False", hitPaint ? "True" : "False", hitHorizon ? "True" : "False");
 	DebugText("[%d] AnimID:%d",ctrlNum, this->GetAnimCurtID());
+	DebugText("[%d] HitObjCnt:%d", ctrlNum, hitObjCnt);
 
 	EndDebugWindow("Player");
 
