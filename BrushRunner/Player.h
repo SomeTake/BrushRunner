@@ -74,6 +74,7 @@ private:
 	bool				hitGround;			// 地上判定(↓と合わせて両方falseだと空中状態)
 	bool				hitPaint;
 	bool				hitHorizon;			// 進行方向のオブジェクトとの当たり判定
+	bool				hitItem;			// アイテムとの当たり判定
 
 	// カウンタ
 	int					hitObjCnt;			// オブジェクトにあたったときのカウンタ
@@ -118,11 +119,13 @@ public:
 	bool GetHitGround() { return hitGround; };
 	bool GetHitHorizon() { return hitHorizon; };
 	bool GetHitPaint() { return hitPaint; };
+	bool GetHitItem() { return hitItem; };
 
 	// セッター(なるべく使わない)
 	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
+	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
 };
 
 #endif

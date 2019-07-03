@@ -20,6 +20,7 @@
 #include "Ink.h"
 #include "Cursor.h"
 #include "CountDown.h"
+#include "Item.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -87,6 +88,12 @@ SceneGame::SceneGame()
 
 	// カウントダウンの初期化
 	p2dobj[NumCountDown] = new CountDown();
+
+	// アイテムの初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		p2dobj[NumItem00 + i] = new Item(ItemPos[i], pPlayer[i]);
+	}
 
 	// カーソルの初期化
 	for (int i = 0; i < PLAYER_MAX; i++)

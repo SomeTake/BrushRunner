@@ -161,6 +161,7 @@
     <ClCompile Include="Frame01.cpp" />
     <ClCompile Include="Ink.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="JumpState.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="Frame01.h" />
     <ClInclude Include="Ink.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="JumpState.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />

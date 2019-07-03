@@ -210,6 +210,9 @@
     <ClCompile Include="VictoryState.cpp">
       <Filter>ソース ファイル\Player\State</Filter>
     </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneCharacterSelect.h">
@@ -361,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="VictoryState.h">
       <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

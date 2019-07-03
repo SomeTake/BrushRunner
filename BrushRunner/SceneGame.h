@@ -60,6 +60,12 @@ enum Num2dobj
 	// カウントダウン
 	NumCountDown,
 
+	// アイテム表示
+	NumItem00,
+	NumItem01,
+	NumItem02,
+	NumItem03,
+
 	// ----- 最大数 -----
 	_2dMax,
 };

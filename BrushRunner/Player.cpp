@@ -83,6 +83,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
+	hitItem = false;
 	animSpd = 1.0f;
 	hitObjCnt = 0;
 
@@ -496,7 +497,8 @@ void Player::HitObjectInfluence(int type)
 	switch (type)
 	{
 	case OBJ_NUM_POISON:
-		runSpd = 2.0f;
+		hitItem = true;
+		//runSpd = 2.0f;
 		//hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
 		//if (hitObjCnt == 0)
 		//{

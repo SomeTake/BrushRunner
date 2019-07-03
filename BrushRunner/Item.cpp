@@ -1,81 +1,93 @@
 //=============================================================================
 //
-// カウントダウン処理 [CountDown.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// アイテム処理[Item.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "CountDown.h"
+#include "Item.h"
+#include "MyLibrary.h"
+#include "Input.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CountDown::CountDown()
+Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
-		TEXTURE_COUNTDOWN,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			TEXTURE_ITEM,						// ファイルの名前
+			&D3DTexture);						// 読み込むメモリのポインタ
+	}
 
-	use = true;
-	pos = COUNTDOWN_POS;
+	pPlayer = ptr;
+	use = false;
+	pos = _pos;
 	PatternAnim = 0;
-	starttimer = 0;
-	startsecond = 0;
+	rouletteCnt = 0;
+	useCnt = 0;
 
 	// 頂点情報の作成
 	MakeVertex();
-
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-CountDown::~CountDown()
+Item::~Item()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
 		D3DTexture->Release();
 		D3DTexture = NULL;
 	}
-
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void CountDown::Update()
+void Item::Update()
 {
+	// アイテムを取得した瞬間の処理
+	if (!use && pPlayer->GetHitItem())
+	{
+		Start();
+
+		//テクスチャ座標をセット
+		SetTexture();
+	}
+
 	if (use)
 	{
-		if (starttimer < START_TIMER)
+		// アイテムを使用する
+		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
 		{
-			starttimer++;
-			startsecond = starttimer / SECOND_PER_FRAME;
-
-			SetTexture();
-		}
-		// カウントダウン終了
-		else
-		{
+			UseInfluence();
+			PatternAnim = 0;
 			use = false;
+			pPlayer->SetHitItem(false);
 		}
+
+		//テクスチャ座標をセット
+		SetTexture();
 	}
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void CountDown::Draw()
+void Item::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	if (use == true)
+	if (use || (!use && pPlayer->GetHitItem()))
 	{
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
@@ -84,21 +96,17 @@ void CountDown::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
-
 }
 
 //=============================================================================
-// 頂点情報の作成
+// 頂点の作成
 //=============================================================================
-HRESULT CountDown::MakeVertex()
+HRESULT Item::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + COUNTDOWN_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + COUNTDOWN_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + COUNTDOWN_SIZE.x, pos.y + COUNTDOWN_SIZE.y, pos.z);
+	SetVertex();
 
 	// rhwの設定
 	vertexWk[0].rhw =
@@ -122,19 +130,70 @@ HRESULT CountDown::MakeVertex()
 }
 
 //=============================================================================
-// テクスチャ座標のセット
+// テクスチャ座標の設定
 //=============================================================================
-void CountDown::SetTexture()
+void Item::SetTexture()
 {
-	int x = startsecond % COUNTDOWN_DIVIDE_X;
-	int y = startsecond / COUNTDOWN_DIVIDE_X;
-	float sizeX = 1.0f / COUNTDOWN_DIVIDE_X;
-	float sizeY = 1.0f / COUNTDOWN_DIVIDE_Y;
+	int x = PatternAnim % DIVIDE_ITEM_X;
+	int y = PatternAnim / DIVIDE_ITEM_X;
+	float sizeX = 1.0f / DIVIDE_ITEM_X;
+	float sizeY = 1.0f / DIVIDE_ITEM_Y;
 
 	// テクスチャ座標の設定
 	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
 	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
 	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+}
 
+//=============================================================================
+// 頂点座標の設定
+//=============================================================================
+void Item::SetVertex()
+{
+	// 頂点座標の設定
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + ITEM_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + ITEM_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + ITEM_SIZE.x, pos.y + ITEM_SIZE.y, pos.z);
+}
+
+//=============================================================================
+// 取得したときの処理
+//=============================================================================
+void Item::Start()
+{
+	// ルーレットを回す
+	rouletteCnt = LoopCountUp(rouletteCnt, 0, ROULETTE_COUNTER);
+	if (rouletteCnt == 0)
+	{
+		// テクスチャも回す
+		PatternAnim = LoopCountUp(PatternAnim, 0, TEXTURE_DIVIDE_ITEM);
+		if (PatternAnim == 0)
+		{
+			useCnt++;
+			// 一定回数回したら使えるようにする
+			if (useCnt == USE_COUNTER)
+			{
+				use = true;
+				rouletteCnt = 0;
+				useCnt = 0;
+
+				// ランダムでアイテムの種類をセット
+				PatternAnim = rand() % (TEXTURE_DIVIDE_ITEM + 1);
+			}
+		}
+	}
+}
+
+//=============================================================================
+// アイテムを使用したときの効果
+//=============================================================================
+void Item::UseInfluence()
+{
+	switch (PatternAnim)
+	{
+	default:
+		break;
+	}
 }
