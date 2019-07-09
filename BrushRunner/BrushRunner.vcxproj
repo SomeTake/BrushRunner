@@ -138,12 +138,17 @@
   <ItemGroup>
     <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="AnimationSet.cpp" />
+    <ClCompile Include="BanananoKawaState.cpp" />
     <ClCompile Include="Billboard.cpp" />
+    <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
+    <ClCompile Include="FieldItem.cpp" />
+    <ClCompile Include="FieldItemManager.cpp" />
+    <ClCompile Include="GunState.cpp" />
     <ClCompile Include="IdleState.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -162,6 +167,8 @@
     <ClCompile Include="Ink.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemState.cpp" />
+    <ClCompile Include="JetState.cpp" />
     <ClCompile Include="JumpState.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -169,10 +176,11 @@
     <ClCompile Include="MyLibrary.cpp" />
     <ClCompile Include="ObjectChip.cpp" />
     <ClCompile Include="Paint.cpp" />
-    <ClCompile Include="PaintSystem.cpp" />
+    <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerState.cpp" />
     <ClCompile Include="Pop.cpp" />
+    <ClCompile Include="PowerUpBananaState.cpp" />
     <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="RunningState.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
@@ -180,19 +188,28 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="SlipState.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SpikeState.cpp" />
+    <ClCompile Include="SpInkState.cpp" />
+    <ClCompile Include="StopState.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="AnimationSet.h" />
+    <ClInclude Include="BanananoKawaState.h" />
     <ClInclude Include="Billboard.h" />
+    <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Chip.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CountDown.h" />
     <ClInclude Include="DebugWindow.h" />
+    <ClInclude Include="FieldItem.h" />
+    <ClInclude Include="FieldItemManager.h" />
+    <ClInclude Include="GunState.h" />
     <ClInclude Include="IdleState.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -213,6 +230,8 @@
     <ClInclude Include="Ink.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemState.h" />
+    <ClInclude Include="JetState.h" />
     <ClInclude Include="JumpState.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
@@ -220,10 +239,11 @@
     <ClInclude Include="MyLibrary.h" />
     <ClInclude Include="ObjectChip.h" />
     <ClInclude Include="Paint.h" />
-    <ClInclude Include="PaintSystem.h" />
+    <ClInclude Include="PaintManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerState.h" />
     <ClInclude Include="Pop.h" />
+    <ClInclude Include="PowerUpBananaState.h" />
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="RunningState.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
@@ -231,7 +251,11 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="SlipState.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="SpikeState.h" />
+    <ClInclude Include="SpInkState.h" />
+    <ClInclude Include="StopState.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />

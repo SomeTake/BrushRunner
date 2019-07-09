@@ -8,6 +8,13 @@
 #include "Item.h"
 #include "MyLibrary.h"
 #include "Input.h"
+#include "BanananoKawaState.h"
+#include "BlindState.h"
+#include "GunState.h"
+#include "JetState.h"
+#include "PowerUpBananaState.h"
+#include "SpikeState.h"
+#include "SpInkState.h"
 
 //=============================================================================
 // コンストラクタ
@@ -30,9 +37,19 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	PatternAnim = 0;
 	rouletteCnt = 0;
 	useCnt = 0;
+	active = false;
 
 	// 頂点情報の作成
 	MakeVertex();
+
+	// ステートパターンの初期化
+	state[NumJet] = new JetState(this);
+	state[NumSpike] = new SpikeState(this);
+	state[NumPowerUp] = new PowerUpBananaState(this);
+	state[NumKawa] = new BanananoKawaState(this);
+	state[NumBlind] = new BlindState(this);
+	state[NumSpInk] = new SpInkState(this);
+	state[NumGun] = new GunState(this);
 }
 
 //=============================================================================
@@ -45,6 +62,12 @@ Item::~Item()
 		D3DTexture->Release();
 		D3DTexture = NULL;
 	}
+
+	// ステートパターンの削除
+	for (int i = 0; i < NumItemMax; i++)
+	{
+		delete state[i];
+	}
 }
 
 //=============================================================================
@@ -53,7 +76,7 @@ Item::~Item()
 void Item::Update()
 {
 	// アイテムを取得した瞬間の処理
-	if (!use && pPlayer->GetHitItem())
+	if (!use && pPlayer->GetHitItem() && !active)
 	{
 		Start();
 
@@ -61,19 +84,26 @@ void Item::Update()
 		SetTexture();
 	}
 
+	// 取得している状態
 	if (use)
 	{
 		// アイテムを使用する
 		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
 		{
-			UseInfluence();
-			PatternAnim = 0;
 			use = false;
+			active = true;
 			pPlayer->SetHitItem(false);
+			state[PatternAnim]->Start();
 		}
 
 		//テクスチャ座標をセット
 		SetTexture();
+	}
+
+	// アイテム使用中
+	if (active)
+	{
+		ActiveState(PatternAnim);
 	}
 }
 
@@ -87,7 +117,7 @@ void Item::Draw()
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	if (use || (!use && pPlayer->GetHitItem()))
+	if (use || (!use && pPlayer->GetHitItem()) || active)
 	{
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
@@ -178,6 +208,7 @@ void Item::Start()
 				use = true;
 				rouletteCnt = 0;
 				useCnt = 0;
+				active = true;
 
 				// ランダムでアイテムの種類をセット
 				PatternAnim = rand() % (TEXTURE_DIVIDE_ITEM + 1);
@@ -189,11 +220,15 @@ void Item::Start()
 //=============================================================================
 // アイテムを使用したときの効果
 //=============================================================================
-void Item::UseInfluence()
+void Item::ActiveState(int ItemID)
 {
-	switch (PatternAnim)
-	{
-	default:
-		break;
-	}
+	state[ItemID]->Update();
+}
+
+//=============================================================================
+// アイテムが変化したときに呼び出す
+//=============================================================================
+void Item::ChangeState(int ItemID)
+{
+	state[ItemID]->Start();
 }

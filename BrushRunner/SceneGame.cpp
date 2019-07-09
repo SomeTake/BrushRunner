@@ -345,6 +345,18 @@ void SceneGame::Collision()
 		}
 	}
 
+	// フィールド上に発生したアイテムとの当たり判定
+	for (int nPlayer = 0; nPlayer < PLAYER_MAX; nPlayer++)
+	{
+		for (int nItem = 0; nItem < PLAYER_MAX; nItem++)
+		{
+			if (nPlayer != nItem)
+			{
+				pPlayer[nPlayer]->FieldItemCollider(pPlayer[nItem]->GetFieldItemManager());
+			}
+		}
+	}
+
 	// 四分木を更新する
 	Quadtree->Update();
 

@@ -244,12 +244,4 @@ void Cursor::PadMove()
 	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
 	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 
-	//if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
-	//{
-	//	pos.y = oldPos.y;
-	//}
-	//if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
-	//{
-	//	pos.x = oldPos.x;
-	//}
 }

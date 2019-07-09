@@ -10,8 +10,8 @@
 #include "D3DXAnimation.h"
 #include "Struct.h"
 #include "Map.h"
-
 #include "PlayerState.h"
+#include "FieldItemManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -25,7 +25,7 @@
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
-#define FALL_VELOCITY_MAX	(30.0f)										// 落下中最大速度
+#define FALL_VELOCITY_MAX	(20.0f)										// 落下中最大速度
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -34,6 +34,8 @@ enum CharaStateNum
 	Running,
 	Jump,
 	Victory,
+	Slip,
+	Stop,
 	AnimMax,			// アニメーションの最大数
 };
 
@@ -56,6 +58,8 @@ class Player : public D3DXANIMATION
 private:
 	// メンバ変数
 	PlayerState			*state;				// ステータス管理抽象クラス
+	FieldItemManager	*itemManager;		// フィールドアイテム管理クラス
+
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			rot;				// 現在の向き
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
@@ -65,9 +69,9 @@ private:
 	bool				onCamera;			// 画面内にいるとき
 
 	// ステータス関係
-	float				runSpd;				// ダッシュ速度(0.0-1.0)
+	float				runSpd;				// ダッシュ速度(0.0-1.0-2.0)
 	float				jumpSpd;			// ジャンプ速度
-	float				jumpValue;			// ジャンプ速度に掛けて使う(0.0-1.0)
+	float				jumpValue;			// ジャンプ速度に掛けて使う(0.0-1.0-2.0)
 	int					inkValue[InkNum];	// インクの残量
 	int					inkType;			// 使用中のインクの種類(enum ColorInk=カラー, BlackInk=黒)
 
@@ -79,6 +83,12 @@ private:
 
 	// カウンタ
 	int					hitObjCnt;			// オブジェクトにあたったときのカウンタ
+
+	// アイテム関連のステータス
+	bool				spike;				// スパイクブーツ装備中
+	bool				gun;				// トリモチガン装備中
+	bool				blind;				// ブラインド中
+	bool				spink;				// SPインク
 
 public:
 	// メンバ関数
@@ -107,10 +117,12 @@ public:
 	void HorizonCollider(Map *pMap);
 	void ObjectCollider(Map *pMap);
 	void PaintCollider(PaintManager *pPManager);
+	void FieldItemCollider(FieldItemManager *pFIManager);
 
-	void HitObjectInfluence(int type);
+	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
 	// ゲッター(なるべく使わない)
+	FieldItemManager *GetFieldItemManager() { return itemManager; };
 	D3DXVECTOR3	GetPos() { return pos; };
 	int GetInkValue(int _InkNum) { return inkValue[_InkNum]; };
 	int GetInkType() { return inkType; };
@@ -122,11 +134,23 @@ public:
 	bool GetHitPaint() { return hitPaint; };
 	bool GetHitItem() { return hitItem; };
 
+	bool GetSpike() { return spike; };
+	bool GetGun() { return gun; };
+	bool GetBlind() { return blind; };
+	bool GetSpInk() { return spink; };
+
 	// セッター(なるべく使わない)
 	void SetInkValue(int _InkNum, int _InkValue) { inkValue[_InkNum] = _InkValue; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
+
+	void SetSpike(bool _spike) { spike = _spike; };
+	void SetGun(bool _gun) { gun = _gun; };
+	void SetBlind(bool _blind){ blind = _blind; };
+	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
+	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
+	void SetSpInk(bool _spink) { spink = spink; };
 };
 
 #endif

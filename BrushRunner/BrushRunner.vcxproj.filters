@@ -67,6 +67,12 @@
     <Filter Include="ヘッダー ファイル\Player\State">
       <UniqueIdentifier>{ba195b4f-c291-4bad-a30b-6ac87eb65999}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\2d\game\ItemState">
+      <UniqueIdentifier>{415cae11-77d6-4f2f-b957-02d46ad77c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\2d\game\ItemState">
+      <UniqueIdentifier>{423e2cb4-69b3-40bb-966f-072ab2ed1e5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SceneCharacterSelect.cpp">
@@ -136,9 +142,6 @@
       <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
     <ClCompile Include="Paint.cpp">
-      <Filter>ソース ファイル\Obj3D</Filter>
-    </ClCompile>
-    <ClCompile Include="PaintSystem.cpp">
       <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
     <ClCompile Include="InkFrameColor.cpp">
@@ -213,6 +216,45 @@
     <ClCompile Include="Item.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
+    <ClCompile Include="ItemState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="BanananoKawaState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="BlindState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="GunState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="JetState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerUpBananaState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="SpikeState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="SpInkState.cpp">
+      <Filter>ソース ファイル\2d\game\ItemState</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintManager.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldItem.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldItemManager.cpp">
+      <Filter>ソース ファイル\Obj3D</Filter>
+    </ClCompile>
+    <ClCompile Include="SlipState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="StopState.cpp">
+      <Filter>ソース ファイル\Player\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneCharacterSelect.h">
@@ -282,9 +324,6 @@
       <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
     <ClInclude Include="Paint.h">
-      <Filter>ヘッダー ファイル\Obj3D</Filter>
-    </ClInclude>
-    <ClInclude Include="PaintSystem.h">
       <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
     <ClInclude Include="InkFrameColor.h">
@@ -367,6 +406,45 @@
     </ClInclude>
     <ClInclude Include="Item.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="BanananoKawaState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="BlindState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="GunState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="JetState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerUpBananaState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="SpikeState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="SpInkState.h">
+      <Filter>ヘッダー ファイル\2d\game\ItemState</Filter>
+    </ClInclude>
+    <ClInclude Include="PaintManager.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldItem.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldItemManager.h">
+      <Filter>ヘッダー ファイル\Obj3D</Filter>
+    </ClInclude>
+    <ClInclude Include="SlipState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="StopState.h">
+      <Filter>ヘッダー ファイル\Player\State</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

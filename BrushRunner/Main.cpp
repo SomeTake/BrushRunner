@@ -5,7 +5,6 @@
 //
 //=============================================================================
 #include "Main.h"
-#include "Struct.h"
 #include "SceneManager.h"
 #include "Debugproc.h"
 #include "DebugWindow.h"

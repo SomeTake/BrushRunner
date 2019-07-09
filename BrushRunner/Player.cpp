@@ -13,9 +13,13 @@
 #include "Camera.h"
 #include "DebugWindow.h"
 #include "Collision.h"
-#include "PaintSystem.h"
+#include "PaintManager.h"
 #include "IdleState.h"
 #include "MyLibrary.h"
+#include "JumpState.h"
+#include "StopState.h"
+#include "SlipState.h"
+#include "Item.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -52,6 +56,7 @@ enum CallbackKeyType
 {
 	e_NoEvent = 0,
 	e_MotionEnd,				// モーション終了
+	e_MotionChange,				// モーションを変更する
 };
 
 //=====================================================================================================
@@ -88,6 +93,11 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	hitObjCnt = 0;
 	jumpValue = 1.0f;
 
+	spike = false;
+	gun = false;
+	blind = false;
+	spink = false;
+
 	for (int i = 0; i < InkNum; i++)
 	{
 		inkValue[i] = INK_MAX;
@@ -95,6 +105,9 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 
 	// 待機状態からスタートする
 	state = new IdleState(this);
+
+	// フィールド上のアイテム管理クラス初期化
+	itemManager = new FieldItemManager();
 }
 
 //=====================================================================================================
@@ -103,6 +116,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 Player::~Player()
 {
 	delete state;
+	delete itemManager;
 }
 
 //=====================================================================================================
@@ -126,6 +140,12 @@ void Player::Update()
 
 		// カメラ内判定
 		CheckOnCamera();
+
+		// フィールド上に生成したアイテムの更新
+		itemManager->Update();
+		
+		// フィールド上に生成したアイテムのチェック
+		itemManager->Check();
 	}
 
 	// デバッグ表示＆操作
@@ -137,7 +157,7 @@ void Player::Update()
 //=====================================================================================================
 void Player::Draw()
 {
-	if (onCamera)
+	if (onCamera && !blind)
 	{
 		LPDIRECT3DDEVICE9 pDevice = GetDevice();
 		D3DMATERIAL9 matDef;
@@ -170,6 +190,9 @@ void Player::Draw()
 		// マテリアルをデフォルトに戻す
 		pDevice->SetMaterial(&matDef);
 	}
+
+	// フィールド上に生成したアイテムの描画
+	itemManager->Draw();
 }
 
 //=====================================================================================================
@@ -289,6 +312,17 @@ void Player::CreateAnimSet()
 			AnimationSet->SetData("Victory", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
+		case Slip:
+
+			Keydata.push_back(KEYDATA{ 0.95f, e_MotionChange });
+			AnimationSet->SetData("Slip", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Stop:
+
+			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
 		default:
 			break;
 		}
@@ -317,6 +351,11 @@ HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 	{
 	case e_MotionEnd:
 		animSpd = 0.0f;
+		break;
+	case e_MotionChange:
+		playable = true;
+		ChangeAnim(Idle);
+		ChangeState(new IdleState(this));
 		break;
 	default:
 		break;
@@ -380,7 +419,7 @@ void Player::GroundCollider(Map *pMap)
 		if (pMap->GetMapTbl(x, y) >= 0)
 		{
 			// めり込みを修正
-			pos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
+			pos.y = max(mappos.y + (CHIP_SIZE / 2) - 0.01f, pos.y);
 			jumpSpd = 0.0f;
 			animSpd = 1.0f;
 			hitGround = true;
@@ -411,7 +450,7 @@ void Player::PaintCollider(PaintManager *pPManager)
 		if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
 		{
 			// 当たった場合、プレイヤーの座標を修正
-			pos.y = Paint->GetPos().y + PAINT_WIDTH * 0.1f;
+			pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
 			jumpSpd = 0.0f;
 			animSpd = 1.0f;
 			hitPaint = true;
@@ -482,6 +521,36 @@ void Player::ObjectCollider(Map *pMap)
 }
 
 //=====================================================================================================
+// フィールド上に発生したアイテムとの当たり判定
+//=====================================================================================================
+void Player::FieldItemCollider(FieldItemManager *pFIManager)
+{
+	for (auto &item : pFIManager->GetItem())
+	{
+		if (HitCheckBB(pos, item->GetPos(), PLAYER_COLLISION_SIZE, FIELDITEM_SIZE))
+		{
+			switch (item->GetTexNo())
+			{
+				// バナナの皮
+			case NumKawa:
+				playable = false;
+				ChangeAnim(Slip);
+				ChangeState(new SlipState(this));
+				break;
+				// トリモチガン
+			case NumGun:
+				playable = false;
+				ChangeAnim(Stop);
+				ChangeState(new StopState(this));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+//=====================================================================================================
 // オブジェクトにヒットしているときの効果
 //=====================================================================================================
 void Player::HitObjectInfluence(int type)
@@ -499,7 +568,10 @@ void Player::HitObjectInfluence(int type)
 	switch (type)
 	{
 	case OBJ_NUM_SPDUP:
-		runSpd = 2.0f;
+		if (!spike)
+		{
+			runSpd = 2.0f;
+		}
 
 		// 他のステータスはリセット
 		hitObjCnt = 0;
@@ -507,7 +579,10 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case OBJ_NUM_SPDDOWN:
-		runSpd = 0.5f;
+		if (!spike)
+		{
+			runSpd = 0.5f;
+		}
 
 		// 他のステータスはリセット
 		hitObjCnt = 0;
@@ -515,19 +590,30 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case OBJ_NUM_NUMA:
-		runSpd = 0.5f;
-		jumpValue = 0.5f;
+		if (!spike)
+		{
+			runSpd = 0.5f;
+			jumpValue = 0.5f;
+		}
 
 		// 他のステータスはリセット
 		hitObjCnt = 0;
 		break;
 
+	case OBJ_NUM_JUMP:
+		jumpSpd = JUMP_SPEED;
+		ChangeAnim(Jump);
+		ChangeState(new JumpState(this));
+
 	case OBJ_NUM_DRAIN:
-		hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-		if (hitObjCnt == 0)
+		if (!spike)
 		{
-			inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
-			inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+			if (hitObjCnt == 0)
+			{
+				inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
+				inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+			}
 		}
 
 		// 他のステータスはリセット
@@ -536,11 +622,14 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case OBJ_NUM_HEAL:
-		hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-		if (hitObjCnt == 0)
+		if (!spike)
 		{
-			inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
-			inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
+			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+			if (hitObjCnt == 0)
+			{
+				inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
+				inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
+			}
 		}
 
 		// 他のステータスはリセット

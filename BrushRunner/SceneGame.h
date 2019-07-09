@@ -13,7 +13,7 @@
 #include "Effect.h"
 #include "Quadtree.h"
 #include "Player.h"
-#include "PaintSystem.h"
+#include "PaintManager.h"
 #include "Pop.h"
 
 //*****************************************************************************
