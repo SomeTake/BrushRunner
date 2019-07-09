@@ -13,7 +13,6 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Input.h"
-#include "Debugproc.h"
 #include "DebugWindow.h"
 
 //*****************************************************************************
@@ -311,19 +310,10 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
-	// Setup ImGui binding
-	ImGui::CreateContext();
-	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX9_Init(g_pD3DDevice);
-
-	// Setup style
-	ImGui::StyleColorsClassic();
-	//ImGui::StyleColorsDark();
-
-	InitDebugProc();
+	InitDebugWindow(hWnd, g_pD3DDevice);
 #endif
 
-	InitInput(hInstance,hWnd);
+	InitInput(hInstance, hWnd);
 
 	InitCamera();
 
@@ -346,10 +336,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 void Uninit(void)
 {
 #ifdef _DEBUG
-	UninitDebugProc();
-
 	UninitDebugWindow(0);
-
 #endif
 
 	UninitInput();
@@ -377,10 +364,9 @@ void Update(void)
 {
 #ifdef _DEBUG
 	// 処理開始の時間を記録
-	ProcessStart(Process_Update);
+	BeginTimerCount();
 
 	UpdateDebugWindow();
-
 #endif
 
 	UpdateInput();
@@ -404,9 +390,14 @@ void Update(void)
 	}
 
 #ifdef _DEBUG
-	
-	// 処理終了の時間を記録
-	ProcessEnd(Process_Update);
+	// 処理終了の時間を表示
+	BeginDebugWindow("Information");
+
+	ImGui::SetNextWindowPos(ImVec2(5, 600), ImGuiSetCond_Once);
+
+	DebugText("UpdateTime = %.3f ms", GetProgressTimerCount());
+
+	EndDebugWindow("Information");
 #endif
 
 }
@@ -417,11 +408,11 @@ void Update(void)
 void Draw(void)
 {
 	// バックバッファ＆Ｚバッファのクリア
-	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 255, 0), 1.0f, 0);
+	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(255, 255, 255, 255), 1.0f, 0);
 
 #ifdef _DEBUG
 	// 処理開始の時間を記録
-	ProcessStart(Process_Draw);
+	BeginTimerCount();
 #endif
 
 	// Direct3Dによる描画の開始
@@ -449,14 +440,14 @@ void Draw(void)
 
 
 #ifdef _DEBUG
-		// 処理終了の時間を記録
-		ProcessEnd(Process_Draw);
-		DrawDebugProc();
-		// FPSと処理時間表示
-		DrawProcessTime(FPSCount);
+		// 処理終了の時間を表示
+		BeginDebugWindow("Information");
+
+		DebugText("DrawTime = %.3f ms\nFPS = %d\n", GetProgressTimerCount(), FPSCount);
+
+		EndDebugWindow("Information");
 
 		DrawDebugWindow();
-
 #endif
 
 		// Direct3Dによる描画の終了

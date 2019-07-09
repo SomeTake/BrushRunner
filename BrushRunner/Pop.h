@@ -8,39 +8,28 @@
 #define _POP_H_
 
 #include "Billboard.h"
-#include "Player.h"
-
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-#define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
-#define	POP_WIDTH		(64.0f)							// 半径高さ
-#define	POP_HEIGHT		(32.0f)							// 半径幅
-#define POP_POS			D3DXVECTOR3(0.0f, 90.0f, -1.0f)	// 表示場所
-#define POP_DIVIDE_X	(4)
-#define POP_DIVIDE_Y	(1)
-#define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDE_Y)
+//#include "Player.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Pop :
-	public Billboard
+class Pop : public Billboard
 {
 private:
-	Player * pPlayer;
-	int patternAnim;
+	//Player * pPlayer;
+	int PlayerNo;
 
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 
-public:
-	Pop(Player *pP);
-	~Pop();
-
-	void Update();
-	void Draw();
 	HRESULT MakeVertex();
 
+public:
+	//Pop(Player *pP);
+	Pop(int PlayerNo);
+	~Pop();
+
+	void Update(D3DXVECTOR3 PlayerPos);
+	void Draw();
 };
 
 #endif

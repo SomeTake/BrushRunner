@@ -6,17 +6,24 @@
 //=============================================================================
 #include "Main.h"
 #include "Player.h"
-#include "Debugproc.h"
 #include "Input.h"
 #include "Gravity.h"
 #include "SceneGame.h"
 #include "D3DXAnimation.h"
 #include "Camera.h"
 #include "DebugWindow.h"
+#include "Map.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define	CHARA_XFILE			"data/MODEL/Kouhai.x"						// 読み込むモデル名(ファイルパス名)
+#define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
+#define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
+#define JUMP_SPEED			(12.0f)										// ジャンプの初速
+#define MOVE_SPEED			(2.0f)										// 動くスピード
+#define DefaultPosition		D3DXVECTOR3(45.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
 {
@@ -53,7 +60,7 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
+Player::Player(int _CtrlNum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -67,23 +74,20 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
 	this->ChangeAnim(Idle);
 
 	// 位置・回転・スケールの初期設定
-	pos = firstpos;
+	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
 	rot = PLAYER_ROT;
 	scl = ModelScl[KouhaiModel];
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	jumpFlag = false;
 	jumpSpeed = 0;
 	ctrlNum = _CtrlNum;
-	inkType = ColorInk;
 	moveFlag = true;
 	playable = false;
 	use = true;
-
-	for (int i = 0; i < InkNum; i++)
-	{
-		inkValue[i] = INK_MAX;
-	}
-
+	this->ActionSpeed = 1.0f;
+	this->AI = new CharacterAI(true);
+	this->PaintSystem = new PaintManager(_CtrlNum);
+	this->PopUp = new Pop(ctrlNum);
 }
 
 //=====================================================================================================
@@ -91,7 +95,9 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos)
 //=====================================================================================================
 Player::~Player()
 {
-
+	SAFE_DELETE(this->AI);
+	SAFE_DELETE(this->PaintSystem);
+	SAFE_DELETE(this->PopUp);
 }
 
 //=====================================================================================================
@@ -104,8 +110,14 @@ void Player::Update()
 		// 移動
 		Move();
 
-		// インク変更
-		ChangeInk();
+		// AIの更新処理
+		AI->Update(this->pos, this->PaintSystem);
+
+		// ペイントシステムの更新処理
+		PaintSystem->Update();
+
+		// ポップアップの更新処理
+		PopUp->Update(this->pos);
 
 		// アニメーション管理
 		AnimationManager();
@@ -114,37 +126,33 @@ void Player::Update()
 		CheckOnCamera();
 
 #ifndef _DEBUG_
-		//PrintDebugProc("PLAYER[%d] POS X:%f, Y:%f, Z:%f\n", ctrlNum, pos.x, pos.y, pos.z);
-		//PrintDebugProc("PLAYER[%d] MOVE X:%f, Y:%f, Z:%f\n", ctrlNum, move.x, move.y, move.z);
-		//PrintDebugProc("PLAYER[%d] INK TYPE %s\n", ctrlNum, inkType ? "Balck" : "Color");
-		//PrintDebugProc("PLAYER[%d] INK VALUE COLOR %d\n", ctrlNum, inkValue[ColorInk]);
-		//PrintDebugProc("PLAYER[%d] INK VALUE BLACK %d\n", ctrlNum, inkValue[BlackInk]);
-		//PrintDebugProc("PLAYER[%d] JUMP FLAG:%d\n", ctrlNum, jumpFlag);
-		//PrintDebugProc("PLAYER[%d] JUMP SPEED:%f\n", ctrlNum, jumpSpeed);
-		//PrintDebugProc("PLAYER[%d] OnCamera:%s\n", ctrlNum, use ? "OnCamera" : "OffCamera");
-		
+
+		ImGui::SetNextWindowPos(ImVec2(5, 120), ImGuiSetCond_Once);
+
 		BeginDebugWindow("Player");
 
-		DebugText("[%d] POS X:%f Y:%f Z:%d", ctrlNum, pos.x, pos.y, pos.z);
+		ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+		if (ImGui::TreeNode((void*)(intptr_t)ctrlNum, "Player %d", ctrlNum))
+		{
+			if (ImGui::TreeNode("Position"))
+			{
+				DebugText("Pos X:%.2f\nPos Y:%.2f\nPos Z:%.2f\n", pos.x, pos.y, pos.z);
+				ImGui::TreePop();
+			}
+
+			DebugText("AnimSetName:%s\nCurrentFrame:%d / %d", this->GetCurtAnimName(), this->GetAnimCurtFrame(), this->GetAnimPeriodFrame());
+
+			int x = 0, y = 0;
+			Map::GetMapChipXY(pos, &x, &y);
+			DebugText("X : %d  Y : %d", x, y);
+			DebugText("MapTable : %d\nMapTable_Up : %d", Map::GetMapTbl(pos, eCenter), Map::GetMapTbl(pos, eCenterUp));
+
+			ImGui::TreePop();
+		}
 
 		EndDebugWindow("Player");
-#endif
-
-		if (GetKeyboardPress(DIK_LEFT))
-		{
-			if (inkValue[inkType] > 0)
-			{
-				inkValue[inkType]--;
-			}
-		}
-		if (GetKeyboardPress(DIK_RIGHT))
-		{
-			if (inkValue[inkType] < INK_MAX)
-			{
-				inkValue[inkType]++;
-			}
-		}
 	}
+#endif
 }
 
 //=====================================================================================================
@@ -184,31 +192,15 @@ void Player::Draw()
 
 		// マテリアルをデフォルトに戻す
 		pDevice->SetMaterial(&matDef);
-	}
-}
 
-//=====================================================================================================
-// インクの種類交換
-//=====================================================================================================
-void Player::ChangeInk()
-{
-	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(ctrlNum, BUTTON_R1))
-	{
-		// 黒→カラー
-		if (inkType == BlackInk)
-		{
-			inkType = ColorInk;
-		}
-		// カラー→黒
-		else
-		{
-			inkType = BlackInk;
-		}
+		// ペイントの描画
+		this->PaintSystem->Draw();
 
-		// インクバーの描画順を入れ替え
-		ChangeDrawOrder(NumInkblack00 + ctrlNum, NumInkblue + ctrlNum);
-		// フレームの描画順を入れ替え
-		ChangeDrawOrder(NumBlackFrame00 + ctrlNum, NumColorFrame00 + ctrlNum);
+		this->PopUp->Draw();
+
+#if _DEBUG
+		this->AI->Draw();
+#endif
 	}
 }
 
@@ -225,6 +217,7 @@ void Player::Move()
 			jumpFlag = true;
 			moveFlag = true;
 			jumpSpeed = JUMP_SPEED;
+			//jumpSpeed = 100.0f;
 			this->ChangeAnim(Jump);
 		}
 	}
@@ -243,18 +236,18 @@ void Player::Move()
 	// オート移動
 	if (moveFlag && playable)
 	{
-		pos.x += MOVE_SPEED;
+		//pos.x += MOVE_SPEED;
 	}
 
 #if _DEBUG
-	//if (GetKeyboardPress(DIK_RIGHT))
-	//{
-	//	pos.x += MOVE_SPEED;
-	//}
-	//if (GetKeyboardPress(DIK_LEFT))
-	//{
-	//	pos.x -= MOVE_SPEED;
-	//}
+	if (GetKeyboardPress(DIK_RIGHT))
+	{
+		pos.x += MOVE_SPEED;
+	}
+	if (GetKeyboardPress(DIK_LEFT))
+	{
+		pos.x -= MOVE_SPEED;
+	}
 #endif
 }
 
@@ -280,6 +273,7 @@ void Player::AnimationManager()
 			{
 				if (this->GetAnimCurtID() != Running)
 				{
+					this->ActionSpeed = 1.0f;
 					this->ChangeAnim(Running);
 				}
 			}
@@ -295,9 +289,7 @@ void Player::AnimationManager()
 	}
 
 	// アニメーションを更新
-	this->UpdateAnim(TIME_PER_FRAME);
-
-	PrintDebugProc("Player Animation：%s\n", this->GetCurtAnimName());
+	this->UpdateAnim(TIME_PER_FRAME * ActionSpeed);
 }
 
 void Player::CreateAnimSet(void)
@@ -312,7 +304,7 @@ void Player::CreateAnimSet(void)
 		{
 		case Idle:
 
-			Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
 			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
@@ -324,6 +316,8 @@ void Player::CreateAnimSet(void)
 
 		case Jump:
 
+			Keydata.push_back(KEYDATA{ 0.8f,e_MotionEnd });
+			//Keydata.push_back(KEYDATA{ (23 / 32),e_MotionEnd });
 			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
@@ -349,8 +343,23 @@ void Player::CreateAnimSet(void)
 	ReleaseVector(Keydata);
 }
 
+//=====================================================================================================
+// アニメーションCallbackKeyの処理イベント
+//=====================================================================================================
 HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 {
+	int EventNo = (int)pCallbackData;
+	int i = 0;
+
+	switch (EventNo)
+	{
+	case e_MotionEnd:
+		this->ActionSpeed = 0.0f;
+		break;
+	default:
+		break;
+	}
+
 	return S_OK;
 }
 

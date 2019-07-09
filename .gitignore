@@ -34,4 +34,6 @@
 .vs
 Debug
 Release
+一時保存
+廃棄cpp
 *.vcxproj.user

@@ -38,6 +38,7 @@ public:
 	float GetSpeed(void) { return this->Speed; };
 	float GetShiftTime(void) { return this->ShiftTime; };
 	float GetCurWeightTime(void) { return this->CurWeightTime; };
+	double GetPeriod(void) { return this->SetPtr->GetPeriod(); };
 	LPCSTR GetSetName(void) { return this->SetName; };
 
 	void SetData(LPCSTR Name, ID3DXAnimationSet *SetPtr, float Speed, float ShiftTime, float CurWeightTime);

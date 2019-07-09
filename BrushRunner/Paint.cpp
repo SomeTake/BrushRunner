@@ -7,7 +7,6 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
-#include "Debugproc.h"
 
 #define DecAlpha (0.1f)
 
@@ -80,7 +79,7 @@ void Paint::Update()
 		else
 		{
 			// 透明度を減衰値に合わせて追加
-			//col.a -= DecAlpha;
+			col.a -= DecAlpha;
 
 			if (col.a <= 0.0f)
 			{
@@ -95,7 +94,6 @@ void Paint::Update()
 		}
 
 #if _DEBUG
-		//PrintDebugProc("ペイント座標 X:%f Y:%f Z:%f\n", pos.x, pos.y, pos.z);
 #endif
 	}
 }
@@ -189,7 +187,7 @@ HRESULT Paint::MakeVertex()
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
-		&D3DVtxBuff,						// 頂点バッファインターフェースへのポインタ
+		&D3DVtxBuff,							// 頂点バッファインターフェースへのポインタ
 		NULL)))									// NULLに設定
 	{
 		return E_FAIL;

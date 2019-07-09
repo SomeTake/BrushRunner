@@ -6,7 +6,6 @@
 //=============================================================================
 #include "Main.h"
 #include "Collision.h"
-#include "Debugproc.h"
 #include "Gravity.h"
 #include "Input.h"
 
@@ -54,7 +53,7 @@ bool HitCheckPToM(Player *pP, Map *pM)
 	Map::GetMapChipXY(pP->GetPos(), &x, &y);
 
 	// 当たり判定を確認するマップチップの場所
-	D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y);
+	D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
 	//mappos.x = MAP_POS.x + CHIP_SIZE * x;
 	//mappos.y = -(MAP_POS.y + CHIP_SIZE * y);
 	//mappos.z = 0.0f;
@@ -108,9 +107,9 @@ bool HitCheckPToM(Player *pP, Map *pM)
 //=============================================================================
 // プレイヤーとペイントシステムの当たり判定
 //=============================================================================
-bool HitCheckPToS(Player *pP, PaintManager *pS)
+bool HitCheckPToS(Player *pP)
 {
-	for (auto &Paint : pS->GetColorPaint())
+	for (auto &Paint : pP->GetPaintManager()->GetColorPaint())
 	{
 		if (!Paint->GetUse())
 		{

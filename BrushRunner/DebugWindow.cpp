@@ -15,8 +15,8 @@
 /**************************************
 グローバル変数
 ***************************************/
-LARGE_INTEGER timeCountBegin;
-static unsigned int cntFrame = 0;
+LARGE_INTEGER StartTime;
+//static unsigned int cntFrame = 0;
 static bool enableDraw = true;		// デバッグウィンドウ表示可否
 
 /**************************************
@@ -43,9 +43,7 @@ void InitDebugWindow(HWND hwnd, LPDIRECT3DDEVICE9 pDevice)
 	ImGui_ImplDX9_Init(pDevice);
 
 	// ウィンドウの色
-	//ImGui::StyleColorsDark();
 	ImGui::StyleColorsLight();
-	//ImGui::StyleColorsClassic();
 }
 
 //=============================================================================
@@ -55,6 +53,7 @@ void UninitDebugWindow(int num)
 {
 	ImGui_ImplDX9_Shutdown();
 	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 //=============================================================================
@@ -67,7 +66,7 @@ void UpdateDebugWindow()
 	ImGui::NewFrame();
 
 	// 経過フレームのカウント
-	cntFrame++;
+	//cntFrame++;
 }
 
 //=============================================================================
@@ -99,7 +98,7 @@ void SetActiveDebugWindow(bool state)
 //=============================================================================
 void BeginTimerCount()
 {
-	QueryPerformanceCounter(&timeCountBegin);
+	QueryPerformanceCounter(&StartTime);
 }
 
 //=============================================================================
@@ -116,7 +115,7 @@ double GetProgressTimerCount()
 	QueryPerformanceCounter(&timeCurrent);
 
 	// 計測開始からの経過時間を計算
-	LONGLONG span = timeCurrent.QuadPart - timeCountBegin.QuadPart;
+	LONGLONG span = timeCurrent.QuadPart - StartTime.QuadPart;
 	return (double)span * 1000 / (double)frequencyTimer.QuadPart;
 }
 
@@ -125,10 +124,10 @@ double GetProgressTimerCount()
 //=============================================================================
 void GetTimerCount(LARGE_INTEGER *ptr)
 {
-	if (cntFrame % INTERBAL_GETTIMER != 0)
-		return;
+	//if (cntFrame % INTERBAL_GETTIMER != 0)
+	//	return;
 
-	QueryPerformanceCounter(ptr);
+	//QueryPerformanceCounter(ptr);
 }
 
 //=============================================================================
@@ -151,6 +150,7 @@ double CalcProgressTime(LARGE_INTEGER start, LARGE_INTEGER end)
 void BeginDebugWindow(const char *label)
 {
 	ImGui::Begin(label);
+	ImGui::SetWindowFontScale(1.3f);
 }
 
 //=============================================================================

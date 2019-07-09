@@ -109,8 +109,6 @@ public:
 	HRESULT MakeVertex();						// 頂点情報の作成
 	void SetTexture(int cntPattern);			// テクスチャ座標の設定
 	void SetVertex();							// 頂点座標の設定
-
-
 };
 
 #endif

@@ -7,7 +7,6 @@
 #include "Main.h"
 #include "Map.h"
 #include "Input.h"
-#include "Debugproc.h"
 #include "MyLibrary.h"
 
 //*****************************************************************************
@@ -20,6 +19,8 @@
 // グローバル変数
 //*****************************************************************************
 //D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
+std::vector<std::vector<int>> Map::maptbl;
+std::vector<std::vector<int>> Map::objtbl;
 
 //=============================================================================
 // コンストラクタ
@@ -42,16 +43,6 @@ Map::Map()
 		objtbl.at(i).reserve(MAP_SIZE_X);
 	}
 
-	//this->MapChipVector.reserve(1000);
-	//this->ObjectChipVector.reserve(1000);
-
-	// ポインタのセット
-	//for (int i = 0; i < MAP_SIZE_Y; i++)
-	//{
-	//	pMaptbl[i] = maptbl[i];
-	//	pObjtbl[i] = objtbl[i];
-	//}
-
 	// csvデータ読み込み
 	ReadCsv(MAP_FILE, &this->maptbl);
 	ReadCsv(OBJECT_FILE, &this->objtbl);
@@ -62,15 +53,16 @@ Map::Map()
 		{
 			if (maptbl.at(cntY).at(cntX) >= 0)
 			{
-				MapChipVector.push_back(new Chip(cntX, cntY, maptbl.at(cntY).at(cntX)));
+				MapChipVector.push_back(new Chip(cntX, cntY, maptbl.at(cntY).at(cntX), eMapChip));
 			}
 
 			if (objtbl.at(cntY).at(cntX) >= 0)
 			{
-				ObjectChipVector.push_back(new ObjectChip(cntX, cntY, objtbl.at(cntY).at(cntX)));
+				ObjectChipVector.push_back(new Chip(cntX, cntY, objtbl.at(cntY).at(cntX), eObjectChip));
 			}
 		}
 	}
+
 #if 0
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
@@ -90,7 +82,6 @@ Map::Map()
 		}
 	}
 #endif
-
 	//MapCenterPos = pChip[0][0]->GetPos();
 	//MapCenterPos.x += CHIP_SIZE * MAP_SIZE_X * 0.5f;
 	//MapCenterPos.y -= CHIP_SIZE * MAP_SIZE_Y * 0.5f;
@@ -101,12 +92,18 @@ Map::Map()
 //=============================================================================
 Map::~Map()
 {
+	// マップテーブルクリア
 	maptbl.clear();
 	ReleaseVector(maptbl);
+
+	// オブジェクトテーブルクリア
 	objtbl.clear();
 	ReleaseVector(objtbl);
 
+	// チップテクスチャリリース
 	Chip::ReleaseTexture();
+
+	// マップチップベクトルクリア
 	for (auto &MapChip : this->MapChipVector)
 	{
 		SAFE_DELETE(MapChip);
@@ -114,7 +111,7 @@ Map::~Map()
 	MapChipVector.clear();
 	ReleaseVector(MapChipVector);
 
-	ObjectChip::ReleaseTexture();
+	// オブジェクトチップベクトルクリア
 	for (auto &ObjectChip : this->ObjectChipVector)
 	{
 		SAFE_DELETE(ObjectChip);
@@ -161,17 +158,47 @@ void Map::Draw()
 //	return MapCenterPos;
 //}
 
+//=============================================================================
+// 現在の座標から足元マップチップのXYを取得する
+//=============================================================================
 void Map::GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY)
 {
 	*MapX = (int)((Pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
 	*MapY = abs((int)((Pos.y - CHIP_SIZE / 2) / CHIP_SIZE));
 }
 
-D3DXVECTOR3 Map::GetMapChipPos(int MapX, int MapY)
+//=============================================================================
+// マップチップの座標を取得する
+//=============================================================================
+D3DXVECTOR3 Map::GetMapChipPos(int x, int y, int PosType)
 {
-	return D3DXVECTOR3(CHIP_SIZE * MapX, -(CHIP_SIZE * MapY), 0.0f);
+	D3DXVECTOR3 Pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	// 2DのY座標と3DのY座標の方向は逆
+	switch (PosType)
+	{
+	case eLeftUp:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE - CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
+		break;
+	case eRightUp:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE + CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
+		break;
+	case eCenter:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE, -(y * CHIP_SIZE), 0.0f);
+		break;
+	case eCenterUp:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
+		break;
+	default:
+		break;
+	}
+
+	return Pos;
 }
 
+//=============================================================================
+// マップチップXYからマップテーブルの数値を取得する
+//=============================================================================
 int Map::GetMapTbl(int MapX, int MapY)
 {
 	if (MapX < 0 ||
@@ -185,6 +212,32 @@ int Map::GetMapTbl(int MapX, int MapY)
 	{
 		return maptbl.at(MapY).at(MapX);
 	}
+}
+
+//=============================================================================
+// 座標からマップテーブルの数値を取得する
+//=============================================================================
+// □□□
+// □■□	■：CenterChip
+// □□□
+int Map::GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection)
+{
+	int x = 0;
+	int y = 0;
+
+	GetMapChipXY(Pos, &x, &y);
+
+	switch (ChipDirection)
+	{
+	case eCenterUp:
+		// 中央の上のチップ
+		y--;
+		break;
+	default:
+		break;
+	}
+
+	return GetMapTbl(x, y);
 }
 
 int Map::GetObjTbl(int ObjX, int ObjY)

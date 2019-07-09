@@ -19,7 +19,8 @@ bool HitCheckBB(D3DXVECTOR3 posA, D3DXVECTOR3 posB, D3DXVECTOR2 sizeA, D3DXVECTO
 bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Range1, float Range2);				// 球の当たり判定
 
 bool HitCheckPToM(Player *pP, Map *pM);														// プレイヤーと足元のマップの当たり判定
-bool HitCheckPToS(Player *pP, PaintManager *pS);											// プレイヤーとペイントシステムの当たり判定
+//bool HitCheckPToS(Player *pP, PaintManager *pS);											// プレイヤーとペイントシステムの当たり判定
+bool HitCheckPToS(Player *pP);											// プレイヤーとペイントシステムの当たり判定
 void HitCheckSToS(QUADTREE *Quadtree, int NodeID);													// ペイントシステム同士の当たり判定（引数1:黒用、引数2:カラー用）
 
 float dotProduct(D3DXVECTOR3 *vl, D3DXVECTOR3 *vr);											// 内積

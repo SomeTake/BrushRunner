@@ -63,8 +63,6 @@ void UninitSceneGame();
 void UpdateSceneGame();
 void DrawSceneGame();
 
-int GetDraw2dobjBuff(int _num);						// 2Dオブジェクトの描画順を取得
-void SetDraw2dobjBuff(int _BuffNum, int _DrawNum);	// 2Dオブジェクトの描画順をセット
-void ChangeDrawOrder(int _NumA, int _NumB);			// 描画順を入れ替える
+void ChangeDrawOrder(int NumA, int NumB);			// 描画順を入れ替える
 
 #endif

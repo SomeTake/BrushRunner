@@ -9,6 +9,15 @@
 #include "Camera.h"
 
 //*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define CHIP_TEXTURE	("data/MAP/tilea5.png")
+//#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)		// 表示場所
+//#define MAP_ROT			D3DXVECTOR3(D3DXToRadian(-90), 0.0f, 0.0f)	// 回転
+#define CHIP_DIVIDE_X	(8)
+#define CHIP_DIVIDE_Y	(16)
+
+//*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
 LPDIRECT3DTEXTURE9	Chip::D3DTexture = NULL;		// テクスチャへのポインタ
@@ -16,17 +25,18 @@ LPDIRECT3DTEXTURE9	Chip::D3DTexture = NULL;		// テクスチャへのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Chip::Chip(int x, int y, int texnum)
+Chip::Chip(int x, int y, int texnum, int ChipType)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 位置・回転・スケールの初期設定
-	pos.x = MAP_POS.x + x * CHIP_SIZE;
-	pos.y = MAP_POS.y - y * CHIP_SIZE;
+	pos.x = x * CHIP_SIZE;
+	pos.y = -(y * CHIP_SIZE);
 	pos.z = 0.0f;
-	rot = MAP_ROT;	// 縦に向ける
+	//rot = MAP_ROT;	// 縦に向ける
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
+	this->ChipType = ChipType;
 
 	// 頂点情報の作成
 	MakeVertex(texnum);
@@ -45,9 +55,6 @@ Chip::Chip(int x, int y, int texnum)
 //=============================================================================
 Chip::~Chip()
 {
-	// テクスチャの開放
-	//SAFE_RELEASE(Chip::D3DTexture);
-
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
 }
@@ -127,10 +134,10 @@ HRESULT Chip::MakeVertex(int texnum)
 		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-CHIP_SIZE / 2, 0.0f, CHIP_SIZE / 2);
-		pVtx[1].vtx = D3DXVECTOR3(CHIP_SIZE / 2, 0.0f, CHIP_SIZE / 2);
-		pVtx[2].vtx = D3DXVECTOR3(-CHIP_SIZE / 2, 0.0f, -CHIP_SIZE / 2);
-		pVtx[3].vtx = D3DXVECTOR3(CHIP_SIZE / 2, 0.0f, -CHIP_SIZE / 2);
+		pVtx[0].vtx = D3DXVECTOR3(-CHIP_SIZE / 2, CHIP_SIZE / 2, 0.0f);
+		pVtx[1].vtx = D3DXVECTOR3(CHIP_SIZE / 2, CHIP_SIZE / 2, 0.0f);
+		pVtx[2].vtx = D3DXVECTOR3(-CHIP_SIZE / 2, -CHIP_SIZE / 2, 0.0f);
+		pVtx[3].vtx = D3DXVECTOR3(CHIP_SIZE / 2, -CHIP_SIZE / 2, 0.0f);
 
 		// 法線ベクトルの設定
 		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
@@ -197,5 +204,4 @@ void Chip::CheckOnCamera()
 	{
 		use = false;
 	}
-
 }

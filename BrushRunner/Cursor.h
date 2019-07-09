@@ -9,7 +9,6 @@
 #define _CURSOR_H_
 
 #include "_2dobj.h"
-#include "Player.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -25,12 +24,10 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Cursor :
-	public _2dobj
+class Cursor : public _2dobj
 {
 private:
 	int		ctrlNum;	// 操作するコントローラ番号
-	Player *pPlayer;	// 参照するキャラクタのポインタ
 	float	vec;		// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
 	float	moveX;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
 	float	moveY;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
@@ -38,13 +35,13 @@ private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
 	HRESULT MakeVertex();				// 頂点の作成
-	void SetTexture(int cntPattern);	// テクスチャ座標の設定
+	void SetTexture();	// テクスチャ座標の設定
 	void SetVertex();					// 頂点座標の設定
 	void KeyMove();						// キーボード操作
 	void PadMove();						// コントローラ操作
 
 public:
-	Cursor(int _ctrlNum, Player *pP);
+	Cursor(int _ctrlNum);
 	~Cursor();
 
 	// オーバーライド関数
@@ -53,8 +50,8 @@ public:
 	void Move();						// 操作
 	void Change();						// 切り替え
 
-	// ゲッター
-	D3DXVECTOR3 GetPos() { return pos; };
+	// カーソルの筆先の座標を取得
+	D3DXVECTOR3 GetPenPoint();
 };
 
 #endif

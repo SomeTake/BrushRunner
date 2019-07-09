@@ -6,7 +6,6 @@
 //=============================================================================
 #include "main.h"
 #include "Quadtree.h"
-#include "Debugproc.h"
 #include "Input.h"
 
 //*****************************************************************************
@@ -80,14 +79,14 @@ void QUADTREE::Update()
 
 	if (!this->Objects.empty())
 	{
-		PrintDebugProc("Quadtree Level：%d\n", this->Level);
+		//PrintDebugProc("Quadtree Level：%d\n", this->Level);
 		for (auto &Paint : this->Objects)
 		{
-			PrintDebugProc("Object Pos x：%f, y：%f Color：%d ID：%d\n",
-				Paint->GetScreenPos().x,
-				Paint->GetScreenPos().y,
-				Paint->GetPaintColor(),
-				Paint->GetNodeID());
+			//PrintDebugProc("Object Pos x：%f, y：%f Color：%d ID：%d\n",
+			//	Paint->GetScreenPos().x,
+			//	Paint->GetScreenPos().y,
+			//	Paint->GetPaintColor(),
+			//	Paint->GetNodeID());
 		}
 	}
 #endif

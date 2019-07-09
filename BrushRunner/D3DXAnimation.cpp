@@ -499,3 +499,16 @@ void D3DXANIMATION::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pPa
 	UpdateFrameMatrices(pFrame->pFrameSibling, pParentMatrix);
 	UpdateFrameMatrices(pFrame->pFrameFirstChild, &pFrame->CombinedTransformationMatrix);
 }
+
+int D3DXANIMATION::GetAnimCurtFrame(void)
+{
+	// 60 FPS
+	double TrackTime = this->AnimController->GetTime() * 60;
+	double SetPeriod = GetAnimPeriodFrame();
+	return (int)(fmod(TrackTime, SetPeriod));
+}
+
+int D3DXANIMATION::GetAnimPeriodFrame(void)
+{
+	return (int)(this->AnimSet.at(this->CurrentAnimID).GetPeriod() * 60);
+}

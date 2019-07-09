@@ -7,7 +7,6 @@
 #include "main.h"
 #include "Camera.h"
 #include "Input.h"
-#include "Debugproc.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -46,8 +45,8 @@ void UpdateCamera(D3DXVECTOR3 _at)
 	cameraWk.pos = _at + CAMERA_POS;
 
 #ifndef _DEBUG_
-	PrintDebugProc("CamerAt X:%f Y:%f Z:%f\n", cameraWk.at.x, cameraWk.at.y, cameraWk.at.z);
-	PrintDebugProc("CamerPos X:%f Y:%f Z:%f\n", cameraWk.pos.x, cameraWk.pos.y, cameraWk.pos.z);
+	//PrintDebugProc("CamerAt X:%f Y:%f Z:%f\n", cameraWk.at.x, cameraWk.at.y, cameraWk.at.z);
+	//PrintDebugProc("CamerPos X:%f Y:%f Z:%f\n", cameraWk.pos.x, cameraWk.pos.y, cameraWk.pos.z);
 #endif
 
 	//if (GetKeyboardPress(DIK_A))

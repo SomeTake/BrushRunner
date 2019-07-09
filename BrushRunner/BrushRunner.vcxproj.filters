@@ -111,9 +111,6 @@
     <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル\System</Filter>
     </ClCompile>
-    <ClCompile Include="Debugproc.cpp">
-      <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
     <ClCompile Include="Gravity.cpp">
       <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
@@ -122,9 +119,6 @@
     </ClCompile>
     <ClCompile Include="Sound.cpp">
       <Filter>ソース ファイル\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Ink.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
     <ClCompile Include="Effect.cpp">
       <Filter>ソース ファイル\2d\game</Filter>
@@ -137,12 +131,6 @@
     </ClCompile>
     <ClCompile Include="PaintSystem.cpp">
       <Filter>ソース ファイル\Obj3D</Filter>
-    </ClCompile>
-    <ClCompile Include="InkFrameColor.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
-    </ClCompile>
-    <ClCompile Include="InkFrameBlack.cpp">
-      <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
     <ClCompile Include="MyLibrary.cpp">
       <Filter>ソース ファイル\System</Filter>
@@ -157,9 +145,6 @@
       <Filter>ソース ファイル\2d\game</Filter>
     </ClCompile>
     <ClCompile Include="Chip.cpp">
-      <Filter>ソース ファイル\Obj3D</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectChip.cpp">
       <Filter>ソース ファイル\Obj3D</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_demo.cpp">
@@ -188,6 +173,12 @@
     </ClCompile>
     <ClCompile Include="DebugWindow.cpp">
       <Filter>ソース ファイル\System</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterAI.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="InkGauge.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -239,9 +230,6 @@
     <ClInclude Include="Collision.h">
       <Filter>ヘッダー ファイル\System</Filter>
     </ClInclude>
-    <ClInclude Include="Debugproc.h">
-      <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
     <ClInclude Include="Gravity.h">
       <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
@@ -250,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>ヘッダー ファイル\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Ink.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>ヘッダー ファイル\2d\game</Filter>
@@ -265,12 +250,6 @@
     </ClInclude>
     <ClInclude Include="PaintSystem.h">
       <Filter>ヘッダー ファイル\Obj3D</Filter>
-    </ClInclude>
-    <ClInclude Include="InkFrameColor.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
-    </ClInclude>
-    <ClInclude Include="InkFrameBlack.h">
-      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
     <ClInclude Include="MyLibrary.h">
       <Filter>ヘッダー ファイル\System</Filter>
@@ -288,9 +267,6 @@
       <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
     <ClInclude Include="Chip.h">
-      <Filter>ヘッダー ファイル\Obj3D</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectChip.h">
       <Filter>ヘッダー ファイル\Obj3D</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imstb_rectpack.h">
@@ -325,6 +301,12 @@
     </ClInclude>
     <ClInclude Include="DebugWindow.h">
       <Filter>ヘッダー ファイル\System</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterAI.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="InkGauge.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,27 +7,32 @@
 #include "Main.h"
 #include "PaintSystem.h"
 #include "Input.h"
-#include "Debugproc.h"
 #include "MyLibrary.h"
 #include "Camera.h"
 #include "Collision.h"
 #include "Quadtree.h"
+#include "DebugWindow.h"
+#include "SceneGame.h"
 
 QUADTREE *PaintManager::Quadtree = nullptr;
+bool PaintManager::PressMode = true;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PaintManager::PaintManager(Cursor *pC, Player *pP, QUADTREE *Quadtree)
+PaintManager::PaintManager(int PlayerNo)
 {
-	pPlayer = pP;
-	pCursor = pC;
-	this->Owner = pP->GetCtrlNum();
+	this->Owner = PlayerNo;
+	this->InkType = ColorInk;
+	for (int i = 0; i < InkNum; i++)
+	{
+		this->InkValue[i] = INK_MAX;
+	}
+	this->pCursor = new Cursor(this->Owner);
+	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
+	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
 
-	pos.x = pCursor->GetPos().x;
-	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
-	pos.z = 0.0f;
-
+	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
 	ColorPaint.reserve(INK_MAX);
 
@@ -42,6 +47,16 @@ PaintManager::PaintManager(Cursor *pC, Player *pP, QUADTREE *Quadtree)
 //=============================================================================
 PaintManager::~PaintManager()
 {
+	// メモリリリース
+	SAFE_DELETE(this->pCursor);
+
+	for (auto &Object : this->inkGauge)
+	{
+		SAFE_DELETE(Object);
+	}
+	this->inkGauge.clear();
+	ReleaseVector(inkGauge);
+
 	for (auto &Paint : this->BlackPaint)
 	{
 		SAFE_DELETE(Paint);
@@ -60,14 +75,12 @@ PaintManager::~PaintManager()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void PaintManager::Update(bool PressMode)
+void PaintManager::Update()
 {
-	// カーソルの筆先に座標を合わせる
-	pos.x = pCursor->GetPos().x;
-	pos.y = pCursor->GetPos().y + CURSOR_SIZE.y;
-	pos.z = 0.0f;
+	// カーソルの更新
+	this->pCursor->Update();
 
-	// 使用していないペイントがVectorから削除
+	// 使用していないペイントがベクトルから削除
 	CheckPaintUse();
 
 	// 使用しているペイントを更新
@@ -89,37 +102,59 @@ void PaintManager::Update(bool PressMode)
 		Color->Update();
 	}
 
+	// インクの種類交換
+	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(Owner, BUTTON_R1))
+	{
+		InkType = InkType == BlackInk ? ColorInk : BlackInk;
+	}
+
 	// インクを使う
-	if ((GetKeyboardPress(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C)) && PressMode)
+	if ((GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && PressMode)
 	{
 		// 使用するインクの残量チェック
-		int type = pPlayer->GetInkType();
-		if (pPlayer->GetInkValue(type) > 0)
+		if (this->InkValue[InkType] > 0)
 		{
 			// ペイントを設置する
-			SetPaint(pPlayer->GetInkType());
+			SetPaint(InkType);
 			// インクを減らす
-			int value = pPlayer->GetInkValue(type) - 1;
-			pPlayer->SetInkValue(type, value);
+			InkValue[InkType]--;
 		}
 	}
-	else if ((GetKeyboardTrigger(DIK_O) || IsButtonPressed(pPlayer->GetCtrlNum(), BUTTON_C)) && !PressMode)
+#if _DEBUG
+	else if ((GetKeyboardTrigger(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && !PressMode)
 	{
 		// 使用するインクの残量チェック
-		int type = pPlayer->GetInkType();
-		if (pPlayer->GetInkValue(type) > 0)
+		if (this->InkValue[InkType] > 0)
 		{
 			// ペイントを設置する
-			SetPaint(pPlayer->GetInkType());
+			SetPaint(InkType);
 			// インクを減らす
-			int value = pPlayer->GetInkValue(type) - 1;
-			pPlayer->SetInkValue(type, value);
+			InkValue[InkType]--;
+		}
+	}
+#endif
+
+	// インクゲージを更新
+	inkGauge.at(ColorInk)->Update(InkValue[ColorInk]);
+	inkGauge.at(BlackInk)->Update(InkValue[BlackInk]);
+
+#if _DEBUG
+	// インクの残量を調整
+	if (GetKeyboardPress(DIK_LEFT) || GetKeyboardPress(DIK_Z))
+	{
+		if (InkValue[InkType] > 0)
+		{
+			InkValue[InkType]--;
 		}
 	}
 
-#if _DEBUG
-	//PrintDebugProc("Player %d BlackPaintNum：%d\n", this->Owner, this->BlackPaint.size());
-	//PrintDebugProc("Player %d ColorPaintNum：%d\n", this->Owner, this->ColorPaint.size());
+	if (GetKeyboardPress(DIK_RIGHT) || GetKeyboardPress(DIK_X))
+	{
+		if (InkValue[InkType] < INK_MAX)
+		{
+			InkValue[InkType]++;
+		}
+	}
 
 	if (GetKeyboardTrigger(DIK_L))
 	{
@@ -137,7 +172,36 @@ void PaintManager::Update(bool PressMode)
 		}
 		this->ColorPaint.clear();
 	}
+
+	if (this->Owner == 0)
+	{
+		BeginDebugWindow("Information");
+
+		enum ePaintMode
+		{
+			ePress,
+			eTrigger,
+		};
+		static int Mode = 0;
+
+		DebugText("PaintMode : ");
+		ImGui::SameLine();
+		ImGui::RadioButton("Press", &Mode, ePress);
+		ImGui::SameLine();
+		ImGui::RadioButton("Trigger", &Mode, eTrigger);
+		if (Mode == ePress)
+		{
+			PressMode = true;
+		}
+		else
+		{
+			PressMode = false;
+		}
+
+		EndDebugWindow("Information");
+	}
 #endif
+
 }
 
 //=============================================================================
@@ -145,6 +209,9 @@ void PaintManager::Update(bool PressMode)
 //=============================================================================
 void PaintManager::Draw()
 {
+	// カーソルを描画
+	this->pCursor->Draw();
+
 	// 使用しているペイントを描画
 	for (auto &Black : this->BlackPaint)
 	{
@@ -153,6 +220,20 @@ void PaintManager::Draw()
 	for (auto &Color : this->ColorPaint)
 	{
 		Color->Draw();
+	}
+
+	// インクゲージを描画
+	// 現在使用しているインクはカラー、カラーインクゲージは前
+	if (this->InkType == ColorInk)
+	{
+		inkGauge.at(BlackInk)->Draw();
+		inkGauge.at(ColorInk)->Draw();
+	}
+	// 現在使用しているインクは黒、黒インクゲージは前
+	else if (this->InkType == BlackInk)
+	{
+		inkGauge.at(ColorInk)->Draw();
+		inkGauge.at(BlackInk)->Draw();
 	}
 }
 
@@ -164,6 +245,7 @@ void PaintManager::SetPaint(int InkType)
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 	CAMERA *camerawk = GetCamera();
 	D3DXMATRIX ViewMtx, ProjMtx;
+	D3DXVECTOR3 CursorPos = pCursor->GetPenPoint();
 
 	Device->GetTransform(D3DTS_VIEW, &ViewMtx);
 	Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
@@ -181,8 +263,8 @@ void PaintManager::SetPaint(int InkType)
 		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
 		// スクリーン座標とXZ平面のワールド座標交点算出
 		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-		CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-		CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos1, (int)CursorPos.x, (int)CursorPos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)CursorPos.x, (int)CursorPos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
 		// 判定用三角形ポリゴン
 		TriangleStr triPos1, triPos2;
@@ -204,7 +286,7 @@ void PaintManager::SetPaint(int InkType)
 		Object->SetUse(true);
 
 		// スクリーン座標を保存する
-		Object->SetScreenPos((D3DXVECTOR2)this->pos);
+		Object->SetScreenPos((D3DXVECTOR2)CursorPos);
 		// 四分木に入れる
 		PaintManager::Quadtree->InsertObject(Object);
 
@@ -227,8 +309,8 @@ void PaintManager::SetPaint(int InkType)
 		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
 		// スクリーン座標とXZ平面のワールド座標交点算出
 		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-		CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-		CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos1, (int)CursorPos.x, (int)CursorPos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)CursorPos.x, (int)CursorPos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
 
 		// 判定用三角形ポリゴン
 		TriangleStr triPos1, triPos2;
@@ -250,7 +332,7 @@ void PaintManager::SetPaint(int InkType)
 		Object->SetUse(true);
 
 		// スクリーン座標を保存する
-		Object->SetScreenPos((D3DXVECTOR2)this->pos);
+		Object->SetScreenPos((D3DXVECTOR2)CursorPos);
 		// 四分木に入れる
 		PaintManager::Quadtree->InsertObject(Object);
 
@@ -261,6 +343,29 @@ void PaintManager::SetPaint(int InkType)
 		this->ColorPaint.push_back(Object);
 	}
 }
+
+//=====================================================================================================
+// インクの種類交換
+//=====================================================================================================
+//void PaintManager::ChangeInk()
+//{
+	//InkType = InkType == BlackInk ? ColorInk : BlackInk;
+	//// 黒→カラー
+	//if (InkType == BlackInk)
+	//{
+	//	InkType = ColorInk;
+	//}
+	//// カラー→黒
+	//else
+	//{
+	//	inkType = BlackInk;
+	//}
+
+	// インクバーの描画順を入れ替え
+	//ChangeDrawOrder(NumInkblack00 + Owner, NumInkblue + Owner);
+	// フレームの描画順を入れ替え
+	//ChangeDrawOrder(NumBlackFrame00 + Owner, NumColorFrame00 + Owner);
+//}
 
 //=============================================================================
 // 使用していないペイントがVectorから削除
@@ -300,4 +405,9 @@ void PaintManager::CheckPaintUse(void)
 std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
 {
 	return PaintManager::Quadtree->GetObjectsAt(NodeID);
+}
+
+void CursorMove(D3DXVECTOR3 DestPos)
+{
+
 }

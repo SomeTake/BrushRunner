@@ -6,7 +6,6 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
-#include "Debugproc.h"
 #include "Map.h"
 #include "Camera.h"
 #include "_2dobj.h"
@@ -23,10 +22,6 @@
 #include "_2dobj.h"
 #include "Frame01.h"
 #include "Faceframe.h"
-#include "InkFrameColor.h"
-#include "InkFrameBlack.h"
-#include "Ink.h"
-#include "Cursor.h"
 #include "CountDown.h"
 
 #include "PaintSystem.h"
@@ -47,27 +42,18 @@ enum {
 	EffectMax,
 };
 
-// プレイヤー初期位置
-D3DXVECTOR3 firstpos[PLAYER_MAX] = {
-	D3DXVECTOR3(45.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(30.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(15.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-};
 
 //*****************************************************************************
 // オブジェクトのポインタ
 //*****************************************************************************
-static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
-static Map *pMap;							// マップ用のポインタ
-static Effect *pEffect[EffectMax];			// エフェクト用のポインタ
-static Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-static Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-static PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
-static Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
+static std::vector<_2dobj*> UIObject;
+static Map		*pMap;							// マップ用のポインタ
+static Effect	*pEffect[EffectMax];			// エフェクト用のポインタ
+static Player	*pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
 static QUADTREE *Quadtree = nullptr;
 
-static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
+//static Pop		*pPop[PLAYER_MAX];				// ポップアップ用のポインタ
+//static int Draw2dobjBuff[_2dMax];				// UIの描画順を変更するための配列
 
 //=============================================================================
 // 初期化
@@ -75,9 +61,9 @@ static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
 HRESULT InitSceneGame()
 {
 	// プレイヤーの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[i] = new Player(i, firstpos[i]);
+		pPlayer[PlayerNo] = new Player(PlayerNo);
 	}
 
 	// マップの初期化
@@ -85,61 +71,75 @@ HRESULT InitSceneGame()
 
 	// 四分木の初期化
 	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	PaintManager::SetQuadtreePtr(Quadtree);
 
 	// 2DUIの初期化
 	// フレーム
-	p2dobj[NumFrame] = new Frame();
-
-	// 黒インクの初期化
-	p2dobj[NumInkblack00] = new Ink(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack01] = new Ink(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack02] = new Ink(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack03] = new Ink(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
-
-	// 黒インク用フレームの初期化
-	p2dobj[NumBlackFrame00] = new InkFrameBlack(BLACKINKFRAME_POS01);
-	p2dobj[NumBlackFrame01] = new InkFrameBlack(BLACKINKFRAME_POS02);
-	p2dobj[NumBlackFrame02] = new InkFrameBlack(BLACKINKFRAME_POS03);
-	p2dobj[NumBlackFrame03] = new InkFrameBlack(BLACKINKFRAME_POS04);
-
-	// カラーインクの初期化
-	p2dobj[NumInkblue] = new Ink(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
-	p2dobj[NumInkred] = new Ink(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
-	p2dobj[NumInkyellow] = new Ink(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
-	p2dobj[NumInkgreen] = new Ink(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
-
-	// カラーインク用フレームの初期化
-	p2dobj[NumColorFrame00] = new InkFrameColor(COLORINKFRAME_POS01);
-	p2dobj[NumColorFrame01] = new InkFrameColor(COLORINKFRAME_POS02);
-	p2dobj[NumColorFrame02] = new InkFrameColor(COLORINKFRAME_POS03);
-	p2dobj[NumColorFrame03] = new InkFrameColor(COLORINKFRAME_POS04);
+	UIObject.push_back(new Frame());
 
 	// 顔を表示するフレームの初期化
-	p2dobj[NumFaceframe00] = new FaceFrame(FACEFRAME_POS01);
-	p2dobj[NumFaceframe01] = new FaceFrame(FACEFRAME_POS02);
-	p2dobj[NumFaceframe02] = new FaceFrame(FACEFRAME_POS03);
-	p2dobj[NumFaceframe03] = new FaceFrame(FACEFRAME_POS04);
+	UIObject.push_back(new FaceFrame(FACEFRAME_POS01));
+	UIObject.push_back(new FaceFrame(FACEFRAME_POS02));
+	UIObject.push_back(new FaceFrame(FACEFRAME_POS03));
+	UIObject.push_back(new FaceFrame(FACEFRAME_POS04));
 
 	// カウントダウンの初期化
-	p2dobj[NumCountDown] = new CountDown();
+	UIObject.push_back(new CountDown());
 
-	// カーソルの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i] = new Cursor(i, pPlayer[i]);
-	}
+#if 0
+	// ポップアップの初期化
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPop[i] = new Pop(pPlayer[i]);
+	//}
+
+	// 黒インクの初期化
+	//p2dobj[NumInkblack00] = new Ink(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
+	//p2dobj[NumInkblack01] = new Ink(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
+	//p2dobj[NumInkblack02] = new Ink(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
+	//p2dobj[NumInkblack03] = new Ink(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
+
+	// 黒インク用フレームの初期化
+	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS01));
+	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS02));
+	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS03));
+	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS04));
+
+	//p2dobj[NumBlackFrame00] = new InkFrameBlack(BLACKINKFRAME_POS01);
+	//p2dobj[NumBlackFrame01] = new InkFrameBlack(BLACKINKFRAME_POS02);
+	//p2dobj[NumBlackFrame02] = new InkFrameBlack(BLACKINKFRAME_POS03);
+	//p2dobj[NumBlackFrame03] = new InkFrameBlack(BLACKINKFRAME_POS04);
+
+	// カラーインクの初期化
+	//p2dobj[NumInkblue] = new Ink(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
+	//p2dobj[NumInkred] = new Ink(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
+	//p2dobj[NumInkyellow] = new Ink(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
+	//p2dobj[NumInkgreen] = new Ink(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
+
+	// カラーインク用フレームの初期化
+	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS01));
+	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS02));
+	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS03));
+	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS04));
+	//p2dobj[NumColorFrame00] = new InkFrameColor(COLORINKFRAME_POS01);
+	//p2dobj[NumColorFrame01] = new InkFrameColor(COLORINKFRAME_POS02);
+	//p2dobj[NumColorFrame02] = new InkFrameColor(COLORINKFRAME_POS03);
+	//p2dobj[NumColorFrame03] = new InkFrameColor(COLORINKFRAME_POS04);
+
+
+	//p2dobj[NumFaceframe00] = new FaceFrame(FACEFRAME_POS01);
+	//p2dobj[NumFaceframe01] = new FaceFrame(FACEFRAME_POS02);
+	//p2dobj[NumFaceframe02] = new FaceFrame(FACEFRAME_POS03);
+	//p2dobj[NumFaceframe03] = new FaceFrame(FACEFRAME_POS04);
+
+	// カウントダウンの初期化
+	//p2dobj[NumCountDown] = new CountDown();
 
 	// ペイントシステムの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPManager[i] = new PaintManager(pCursor[i], pPlayer[i], Quadtree);
-	}
-
-	// ポップアップの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i] = new Pop(pPlayer[i]);
-	}
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPManager[i] = new PaintManager(pPlayer[i], Quadtree);
+	//}
 
 	// エフェクトの初期化
 	pEffect[HitEffect] = new Effect(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
@@ -149,10 +149,11 @@ HRESULT InitSceneGame()
 	pEffect[ItemEffect] = new Effect(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
 
 	// 描画順の初期化
-	for (int i = 0; i < _2dMax; i++)
-	{
-		Draw2dobjBuff[i] = i;
-	}
+	//for (int i = 0; i < _2dMax; i++)
+	//{
+	//	Draw2dobjBuff[i] = i;
+	//}
+#endif
 
 	return S_OK;
 }
@@ -184,28 +185,18 @@ void UninitSceneGame()
 	}
 
 	// 2Dオブジェクトの削除
-	for (int i = 0; i < _2dMax; i++)
+	for (auto &Object : UIObject)
 	{
-		SAFE_DELETE(p2dobj[i]);
+		SAFE_DELETE(Object);
 	}
-
-	// カーソルの削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		SAFE_DELETE(pCursor[i]);
-	}
-
-	// ペイントシステムの削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		SAFE_DELETE(pPManager[i]);
-	}
+	UIObject.clear();
+	ReleaseVector(UIObject);
 
 	// ポップアップ削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		SAFE_DELETE(pPop[i]);
-	}
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	SAFE_DELETE(pPop[i]);
+	//}
 }
 
 //=============================================================================
@@ -232,7 +223,7 @@ void UpdateSceneGame()
 	std::vector<float> vec(PLAYER_MAX);
 	for (size_t i = 0; i < vec.size(); i++)
 	{
-		vec[i] = pPlayer[i]->GetPos().x;
+		vec.at(i) = pPlayer[i]->GetPos().x;
 	}
 	auto max = std::max_element(vec.begin(), vec.end());
 	size_t maxIdx = std::distance(vec.begin(), max);
@@ -241,40 +232,21 @@ void UpdateSceneGame()
 	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
 
 	// 2Dオブジェクトの更新
-	for (int i = 0; i < _2dMax; i++)
+	for (auto &Object : UIObject)
 	{
-		p2dobj[i]->Update();
-	}
-
-	// カーソルの更新
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i]->Update();
-	}
-
-	// ペイントシステムの更新
-#if _DEBUG
-	static bool PressMode = false;
-
-	if (GetKeyboardTrigger(DIK_F1))
-	{
-		PressMode = PressMode ? false : true;
-	}
-#endif
-
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPManager[i]->Update(PressMode);
+		Object->Update();
 	}
 
 	// マップの更新
 	pMap->Update();
 
 	// エフェクトの更新
+#if 0
 	for (int i = 0; i < EffectMax; i++)
 	{
 		pEffect[i]->Update();
 	}
+#endif
 
 	// プレイヤーの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -296,7 +268,7 @@ void UpdateSceneGame()
 		// ペイントシステムとの当たり判定
 		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
 		{
-			if (HitCheckPToS(pPlayer[i], pPManager[i]))
+			if (HitCheckPToS(pPlayer[i]))
 			{
 				pPlayer[i]->SetJumpFlag(false);
 				gravflag = false;
@@ -328,21 +300,10 @@ void UpdateSceneGame()
 	Quadtree->Update();
 
 	// ポップアップの更新
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i]->Update();
-	}
-
-#ifndef _DEBUG_
-	if (PressMode)
-	{
-		PrintDebugProc("Paint Mode：Press\n");
-	}
-	else
-	{
-		PrintDebugProc("Paint Mode：Trigger\n");
-	}
-#endif
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPop[i]->Update();
+	//}
 }
 
 //=============================================================================
@@ -353,43 +314,34 @@ void DrawSceneGame()
 	// マップの描画
 	pMap->Draw();
 
+	// ポップアップの描画
+	//for (int i = 0; i < PLAYER_MAX; i++)
+	//{
+	//	pPop[i]->Draw();
+	//}
+
+	// 2Dオブジェクトの描画
+	for (auto &Object : UIObject)
+	{
+		Object->Draw();
+	}
+
 	// プレイヤーの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPlayer[i]->Draw();
 	}
 
-	// カーソルの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i]->Draw();
-	}
-
-	// ポップアップの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i]->Draw();
-	}
-
-	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMax; i++)
-	{
-		p2dobj[Draw2dobjBuff[i]]->Draw();
-	}
-
-	// ペイントシステムの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPManager[i]->Draw();
-	}
-
+#if 0
 	// エフェクトの描画
 	for (int i = 0; i < EffectMax; i++)
 	{
 		pEffect[i]->Draw();
 	}
+#endif
 }
 
+#if 0
 //=============================================================================
 // 2Dオブジェクトの描画順を取得
 //=============================================================================
@@ -409,10 +361,10 @@ void SetDraw2dobjBuff(int _BuffNum, int _DrawNum)
 //=============================================================================
 // 描画順を入れ替える
 //=============================================================================
-void ChangeDrawOrder(int _NumA, int _NumB)
+void ChangeDrawOrder(int NumA, int NumB)
 {
-	int change = GetDraw2dobjBuff(_NumA);
-	SetDraw2dobjBuff(_NumA, GetDraw2dobjBuff(_NumB));
-	SetDraw2dobjBuff(_NumB, change);
-
+	int Temp = Draw2dobjBuff[NumA];
+	Draw2dobjBuff[NumA] = NumB;
+	Draw2dobjBuff[NumB] = Temp;
 }
+#endif

@@ -10,12 +10,14 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CHIP_TEXTURE	("data/MAP/tilea5.png")
-#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)		// 表示場所
-#define MAP_ROT			D3DXVECTOR3(D3DXToRadian(-90), 0.0f, 0.0f)	// 回転
 #define CHIP_SIZE		(20.0f)								// マップチップ一枚のサイズ
-#define CHIP_DIVIDE_X	(8)
-#define CHIP_DIVIDE_Y	(16)
+
+
+enum eChipType
+{
+	eMapChip,
+	eObjectChip,
+};
 
 //*****************************************************************************
 // クラス定義
@@ -29,12 +31,13 @@ private:
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;	// 頂点バッファへのポインタ
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 	bool use;
+	int ChipType;
 
 	HRESULT MakeVertex(int texnum);
 	void CheckOnCamera();
 
 public:
-	Chip(int x, int y, int texnum);
+	Chip(int x, int y, int texnum, int ChipType);
 	~Chip();
 
 	void Update();

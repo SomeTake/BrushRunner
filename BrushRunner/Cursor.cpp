@@ -7,7 +7,6 @@
 #include "Main.h"
 #include "Cursor.h"
 #include "Input.h"
-#include "Debugproc.h"
 #include "MyLibrary.h"
 
 LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
@@ -15,9 +14,16 @@ LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Cursor::Cursor(int _ctrlNum, Player *pP)
+Cursor::Cursor(int PlayerNo)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	use = true;
+	pos = CURSOR_FIRST_POS;
+	PatternAnim = ctrlNum = PlayerNo;
+	vec = 0.0f;
+	moveX = 0.0f;
+	moveY = 0.0f;
 
 	// テクスチャの読み込み
 	if (D3DTexture == NULL)
@@ -26,14 +32,6 @@ Cursor::Cursor(int _ctrlNum, Player *pP)
 			CURSOR_TEXTURE,					// ファイルの名前
 			&D3DTexture);					// 読み込むメモリのポインタ
 	}
-
-	use = true;
-	pos = CURSOR_FIRST_POS;
-	PatternAnim = ctrlNum = _ctrlNum;
-	pPlayer = pP;
-	vec = 0.0f;
-	moveX = 0.0f;
-	moveY = 0.0f;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -61,18 +59,9 @@ void Cursor::Update()
 		// テクスチャの切り替え
 		Change();
 
-		//テクスチャ座標をセット
-		SetTexture(PatternAnim);
-
+		// 頂点座標の設定
 		SetVertex();
 	}
-
-#ifndef _DEBUG_
-	//PrintDebugProc("CursorPos X：%f Y：%f\n", pos.x, pos.y + CURSOR_SIZE.y);
-	//PrintDebugProc("CursorMove X:%f Y:%f\n", moveX, moveY);
-	//PrintDebugProc("CursorVec %f\n", vec);
-#endif
-
 }
 
 //=============================================================================
@@ -119,10 +108,7 @@ HRESULT Cursor::MakeVertex()
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture();
 
 	return S_OK;
 }
@@ -130,10 +116,10 @@ HRESULT Cursor::MakeVertex()
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Cursor::SetTexture(int cntPattern)
+void Cursor::SetTexture()
 {
-	int x = cntPattern % CURSOR_DIVIDE_X;
-	int y = cntPattern / CURSOR_DIVIDE_X;
+	int x = PatternAnim % CURSOR_DIVIDE_X;
+	int y = PatternAnim / CURSOR_DIVIDE_X;
 	float sizeX = 1.0f / CURSOR_DIVIDE_X;
 	float sizeY = 1.0f / CURSOR_DIVIDE_Y;
 
@@ -184,6 +170,8 @@ void Cursor::Change()
 			PatternAnim = ctrlNum;
 		}
 
+		//テクスチャ座標をセット
+		SetTexture();
 	}
 }
 
@@ -235,21 +223,18 @@ void Cursor::PadMove()
 	moveX = (float)GetJoyStickLeftX(ctrlNum) / 1000.0f;
 	moveY = (float)GetJoyStickLeftY(ctrlNum) / 1000.0f;
 
-	//oldPos = pos;
-
 	pos.x += vec * moveX * CURSOR_SPEED;
 	pos.y += vec * moveY * CURSOR_SPEED;
 
 	// 画面外に出た場合、古い座標に戻す
 	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
 	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
+}
 
-	//if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
-	//{
-	//	pos.y = oldPos.y;
-	//}
-	//if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
-	//{
-	//	pos.x = oldPos.x;
-	//}
+//=============================================================================
+// カーソルの筆先の座標を取得
+//=============================================================================
+D3DXVECTOR3 Cursor::GetPenPoint()
+{
+	return D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, 0.0f);
 }

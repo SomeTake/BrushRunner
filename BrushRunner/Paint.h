@@ -8,8 +8,6 @@
 #define _PAINT_H_
 
 #include "Billboard.h"
-#include "Player.h"
-#include "Cursor.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -71,7 +69,6 @@ public:
 	int GetPaintColor(void) { return this->PaintColor; };
 	D3DXVECTOR2 GetScreenPos(void) { return this->ScreenPos; };
 	static float GetPaintRadius(void) { return Paint::HalfSize; };
-
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };

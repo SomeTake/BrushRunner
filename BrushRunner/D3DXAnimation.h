@@ -37,12 +37,15 @@ protected:
 	void UpdateAnim(float Time);
 	void DrawAnim(LPD3DXMATRIX WorldMatrix);
 	void ChangeAnim(UINT AnimID);
+
 	D3DXMATRIX GetBoneMatrix(const char* BoneName);
 	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
 	int GetAnimCurtID(void) { return this->CurrentAnimID; };
+	int GetAnimCurtFrame(void);
+	int GetAnimPeriodFrame(void);
 	LPCSTR GetCurtAnimName(void) { return this->AnimSet.at(this->CurrentAnimID).GetSetName(); };
-	virtual void CreateAnimSet(void) = 0;
 
+	virtual void CreateAnimSet(void) = 0;
 public:
 	D3DXANIMATION();
 	~D3DXANIMATION();

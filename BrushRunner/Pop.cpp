@@ -8,33 +8,42 @@
 #include "Pop.h"
 #include "Camera.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
+#define	POP_WIDTH		(64.0f)							// 半径高さ
+#define	POP_HEIGHT		(32.0f)							// 半径幅
+#define POP_POS			D3DXVECTOR3(0.0f, 90.0f, -1.0f)	// 表示場所
+#define POP_DIVIDE_X	(4)
+#define POP_DIVIDE_Y	(1)
+#define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDE_Y)
+
 LPDIRECT3DTEXTURE9	Pop::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Pop::Pop(Player *pP)
+Pop::Pop(int PlayerNo)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	this->PlayerNo = PlayerNo;
+	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	width = POP_WIDTH;
+	height = POP_HEIGHT;
 
 	// テクスチャの初期化
 	if (D3DTexture == NULL)
 	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
 			TEXTURE_POP,						// ファイルの名前
 			&D3DTexture);					// 読み込むメモリー
 	}
 
-	pPlayer = pP;
-	pos = pPlayer->GetPos() + POP_POS;
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	width = POP_WIDTH;
-	height = POP_HEIGHT;
-	patternAnim = pPlayer->GetCtrlNum();
-
 	// 頂点情報の作成
 	MakeVertex();
-
 }
 
 //=============================================================================
@@ -42,26 +51,19 @@ Pop::Pop(Player *pP)
 //=============================================================================
 Pop::~Pop()
 {
-	if (D3DTexture != NULL)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// テクスチャの開放
+	SAFE_RELEASE(Pop::D3DTexture);
 
-	if (D3DVtxBuff != NULL)
-	{// 頂点バッファの開放
-		D3DVtxBuff->Release();
-		D3DVtxBuff = NULL;
-	}
+	// 頂点バッファの開放
+	SAFE_RELEASE(D3DVtxBuff);
 }
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Pop::Update()
+void Pop::Update(D3DXVECTOR3 PlayerPos)
 {
-	pos = pPlayer->GetPos() + POP_POS;
-
+	pos = PlayerPos + POP_POS;
 }
 
 //=============================================================================
@@ -69,17 +71,17 @@ void Pop::Update()
 //=============================================================================
 void Pop::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
 	CAMERA *cameraWk = GetCamera();
 
 	// αテストを有効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	// ラインティングを無効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	Device->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&WorldMtx);
@@ -119,25 +121,25 @@ void Pop::Draw()
 	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
 	// ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+	Device->SetTransform(D3DTS_WORLD, &WorldMtx);
 
 	// 頂点バッファをデバイスのデータストリームにバインド
-	pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
+	Device->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_3D);
+	Device->SetFVF(FVF_VERTEX_3D);
 
 	// テクスチャの設定
-	pDevice->SetTexture(0, D3DTexture);
+	Device->SetTexture(0, D3DTexture);
 
 	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 
 	// ラインティングを有効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+	Device->SetRenderState(D3DRS_LIGHTING, TRUE);
 
 	// αテストを無効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 }
 
@@ -146,10 +148,10 @@ void Pop::Draw()
 //=============================================================================
 HRESULT Pop::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,				// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(Device->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,				// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
@@ -159,38 +161,35 @@ HRESULT Pop::MakeVertex()
 		return E_FAIL;
 	}
 
-	{//頂点バッファの中身を埋める
-		Vertex3D *pVtx;
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
 
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f,-POP_HEIGHT / 2.0f, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
+	// 頂点座標の設定
+	pVtx[0].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
+	pVtx[1].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
+	pVtx[2].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
+	pVtx[3].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
 
-		// 反射光の設定
-		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	// 反射光の設定
+	pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-		int x = patternAnim % POP_DIVIDE_X;
-		int y = patternAnim / POP_DIVIDE_X;
-		float sizeX = 1.0f / (float)POP_DIVIDE_X;
-		float sizeY = 1.0f / (float)POP_DIVIDE_Y;
+	int x = this->PlayerNo;
+	float sizeX = 1.0f / (float)POP_DIVIDE_X;
 
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	// テクスチャ座標の設定
+	pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
 
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
-	}
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
 
 	return S_OK;
 }

@@ -17,7 +17,7 @@ void GravityFall(Player *pP)
 	pP->SetJumpFlag(true);
 
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
-	if (pP->GetJumpSpeed() > - FALL_VELOCITY_MAX)
+	if (pP->GetJumpSpeed() > -FALL_VELOCITY_MAX)
 	{
 		float speed = pP->GetJumpSpeed() - STANDARD_GRAVITY;
 		pP->SetJumpSpeed(speed);
@@ -33,7 +33,8 @@ void PosModification(Player *pP, D3DXVECTOR3 mappos)
 {
 	D3DXVECTOR3 newpos = pP->GetPos();
 
-	newpos.y = mappos.y + (CHIP_SIZE / 2) - 0.01f;
+	// マップチップの座標のちょっと下
+	newpos.y = mappos.y - 0.01f;
 
 	pP->SetPos(newpos);
 }
