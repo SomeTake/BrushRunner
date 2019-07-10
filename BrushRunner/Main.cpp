@@ -5,14 +5,7 @@
 //
 //=============================================================================
 #include "Main.h"
-#include "Struct.h"
-#include "SceneTitle.h"
-#include "SceneCharacterSelect.h"
-#include "SceneGame.h"
-#include "SceneResult.h"
-#include "Camera.h"
-#include "Light.h"
-#include "Input.h"
+#include "SceneManager.h"
 #include "DebugWindow.h"
 
 //*****************************************************************************
@@ -37,12 +30,13 @@ bool SetWindowCenter(HWND hWnd);
 HWND hWnd;											// ウインドウハンドル
 LPDIRECT3D9			g_pD3D = NULL;					// Direct3D オブジェクト
 LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
-int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
 
 #ifdef _DEBUG
 int					FPSCount;						// FPSカウンタ
 bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
 #endif
+
+SceneManager *pSceneManager;						// シーン管理
 
 //=============================================================================
 // メイン関数
@@ -121,8 +115,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// --------------------------------------  メッセージループ---------------------------------------------
 	while (1)
 	{
+		int scene = GetScene();
 		// ゲーム終了処理
-		if (eScene == SceneExit)
+		if (scene == nSceneExit)
 		{
 			break;
 		}
@@ -312,20 +307,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 #ifdef _DEBUG
 	InitDebugWindow(hWnd, g_pD3DDevice);
 #endif
-
-	InitInput(hInstance, hWnd);
-
-	InitCamera();
-
-	InitLight();
-
-	InitSceneTitle();
-
-	InitSceneCharacterSelect();
-
-	InitSceneGame();
-
-	InitSceneResult();
+	pSceneManager = new SceneManager(hInstance, hWnd);
 
 	return S_OK;
 }
@@ -339,15 +321,7 @@ void Uninit(void)
 	UninitDebugWindow(0);
 #endif
 
-	UninitInput();
-
-	UninitSceneTitle();
-
-	UninitSceneCharacterSelect();
-
-	UninitSceneGame();
-
-	UninitSceneResult();
+	delete pSceneManager;
 
 	// デバイスの開放
 	SAFE_RELEASE(g_pD3DDevice);
@@ -369,25 +343,7 @@ void Update(void)
 	UpdateDebugWindow();
 #endif
 
-	UpdateInput();
-
-	switch (eScene)
-	{
-	case SceneTitle:
-		UpdateSceneTitle();
-		break;
-	case SceneCharacterSelect:
-		UpdateSceneCharacterSelect();
-		break;
-	case SceneGame:
-		UpdateSceneGame();
-		break;
-	case SceneResult:
-		UpdateSceneResult();
-		break;
-	default:
-		break;
-	}
+	pSceneManager->Update();
 
 #ifdef _DEBUG
 	// 処理終了の時間を表示
@@ -418,26 +374,7 @@ void Draw(void)
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{
-		SetCamera();
-
-		switch (eScene)
-		{
-		case SceneTitle:
-			DrawSceneTitle();
-			break;
-		case SceneCharacterSelect:
-			DrawSceneCharacterSelect();
-			break;
-		case SceneGame:
-			DrawSceneGame();
-			break;
-		case SceneResult:
-			DrawSceneResult();
-			break;
-		default:
-			break;
-		}
-
+		pSceneManager->Draw();
 
 #ifdef _DEBUG
 		// 処理終了の時間を表示
@@ -464,22 +401,6 @@ void Draw(void)
 LPDIRECT3DDEVICE9 GetDevice(void)
 {
 	return g_pD3DDevice;
-}
-
-//=====================================================================================================
-// シーン遷移
-//=====================================================================================================
-void SetScene(int _scene)
-{
-	eScene = _scene;
-}
-
-//=====================================================================================================
-// シーンのゲッター
-//=====================================================================================================
-int GetScene()
-{
-	return eScene;
 }
 
 //=====================================================================================================
@@ -519,9 +440,4 @@ bool SetWindowCenter(HWND hWnd)
 							(SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER)	//	ウィンドウ位置のオプション：ウィンドウのサイズや、位置の変更に関するフラグを指定
 						);
 
-}
-
-HWND GetWindowHandle()
-{
-	return hWnd;
 }

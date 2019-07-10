@@ -8,11 +8,16 @@
 #define _SCENECHARACTERSELECT_H_
 
 //*****************************************************************************
-// プロトタイプ宣言
+// クラス定義
 //*****************************************************************************
-HRESULT InitSceneCharacterSelect();
-void UninitSceneCharacterSelect();
-void UpdateSceneCharacterSelect();
-void DrawSceneCharacterSelect();
+class SceneCharacterSelect
+{
+public:
+	SceneCharacterSelect();
+	~SceneCharacterSelect();
+
+	void Update();
+	void Draw();
+};
 
 #endif

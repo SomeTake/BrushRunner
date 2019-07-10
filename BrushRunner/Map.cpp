@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "Input.h"
 #include "MyLibrary.h"
+#include "Collision.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -147,6 +148,54 @@ void Map::Draw()
 	for (auto &ObjectChip : this->ObjectChipVector)
 	{
 		ObjectChip->Draw();
+	}
+}
+
+//=============================================================================
+// ペイントマネージャとの当たり判定
+//=============================================================================
+void Map::PaintCollider(QUADTREE *Quadtree, int NodeID)
+{
+	std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt(NodeID);
+
+	// 現在のノードはオブジェクトがない
+	if (CollisionList.empty())
+	{
+		return;
+	}
+
+	for (auto &BlackPaint : CollisionList)
+	{
+		// 使用している、カラーが黒のものを探す
+		if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor)
+			continue;
+
+		for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
+		{
+			for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
+			{
+				// 存在している、かつ反転していないものを探す
+				if (objtbl[cntY][cntX] = -1 || pObjChip[cntY][cntX]->GetReverse() ||
+					!pObjChip[cntY][cntX]->GetUse())
+					continue;
+
+				// 中身の確認
+				if (!(objtbl[cntY][cntX] == OBJ_NUM_SPDUP || objtbl[cntY][cntX] == OBJ_NUM_SPDDOWN ||
+					objtbl[cntY][cntX] == OBJ_NUM_DRAIN || objtbl[cntY][cntX] == OBJ_NUM_HEAL))
+					continue;
+
+				// ペイントとフィールドオブジェクトを判定する
+				if (HitSphere(BlackPaint->GetPos(), pObjChip[cntY][cntX]->GetPos(), Paint::GetPaintRadius(), CHIP_SIZE))
+				{
+					// ヒットした場合そのペイントを消す
+					BlackPaint->SetUse(false);
+					// フィールドオブジェクトを反転させる
+					pObjChip[cntY][cntX]->SetReverse(true);
+					pObjChip[cntY][cntX]->ReverseTexture();
+					break;
+				}
+			}
+		}
 	}
 }
 

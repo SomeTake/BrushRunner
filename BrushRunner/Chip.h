@@ -45,6 +45,7 @@ public:
 	static void ReleaseTexture(void) { SAFE_RELEASE(Chip::D3DTexture); };
 
 	D3DXVECTOR3 GetPos() { return pos; };
+	bool GetUse() { return use; };
 };
 
 #endif

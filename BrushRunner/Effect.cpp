@@ -7,11 +7,10 @@
 #include "Main.h"
 #include "Effect.h"
 
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Effect::Effect(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _AnimationCnt, int _xPattern, int _yPattern) {
+Effect::Effect(EffectData data) {
 	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -20,7 +19,7 @@ Effect::Effect(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _A
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		texture,							// ファイルの名前
+		data.texture,							// ファイルの名前
 		&D3DTexture);						// 読み込むメモリのポインタ
 
 	// フレームの初期化
@@ -28,12 +27,12 @@ Effect::Effect(const char *texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos , int _A
 	//pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	CountAnim = 0;
 	PatternAnim = 0;
-	size = _size;
-	pos = _pos;
-	xPattern = _xPattern;
-	yPattern = _yPattern;
+	size = data.size;
+	pos = data.pos;
+	xPattern = data.pattern.x;
+	yPattern = data.pattern.y;
 	TexAnimNum = xPattern * yPattern;
-	AnimationCnt = _AnimationCnt;
+	AnimationCnt = data.count;
 
 	// 頂点情報の作成
 	MakeVertex();

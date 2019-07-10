@@ -138,3 +138,13 @@ void ReadCsv(const char *data, vector<vector<int>> *MapVector)
 		++row;
 	}
 }
+
+//=============================================================================
+// カウントアップ関数
+//=============================================================================
+int LoopCountUp(int counter, int low, int high)
+{
+	counter++;
+	const int n = (counter - low) % (high - low);
+	return (n >= 0) ? (n + low) : (n + high);
+}

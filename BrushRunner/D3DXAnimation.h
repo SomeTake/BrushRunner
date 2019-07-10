@@ -49,6 +49,9 @@ protected:
 public:
 	D3DXANIMATION();
 	~D3DXANIMATION();
+
+	void ChangeAnim(UINT AnimID);
+
 };
 
 

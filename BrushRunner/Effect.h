@@ -9,74 +9,42 @@
 
 #include "_2dobj.h"
 
+// エフェクトの種類
+enum EffectNum{
+	HitEffect,
+	Hit1Effect,
+	RunEffect,
+	ExpEffect,
+	ItemEffect,
+
+	// エフェクトの個数
+	EffectMax,
+};
+
 //*****************************************************************************
-// マクロ定義
+// 構造体定義
 //*****************************************************************************
-#define EFFECT_TEXTURE0				_T("data/EFFECT/anmef000.png")			// 画像0
-#define EFFECT_TEXTURE1				_T("data/EFFECT/anmef001.png")			// 画像1
-#define EFFECT_TEXTURE2				_T("data/EFFECT/anmef002.png")			// 画像2(Runエフェクト)
-#define EFFECT_TEXTURE3				_T("data/EFFECT/explo000.png")			// 画像2(爆発エフェクト)
-#define EFFECT_TEXTURE4				_T("data/EFFECT/ief001.png")			// 画像2(アイテムエフェクト)
+// エフェクトデータ構造体
+struct EffectData
+{
+	const char *texture;	// テクスチャファイル
+	D3DXVECTOR3 size;		// サイズ
+	D3DXVECTOR3 pos;		// 場所
+	int count;				// 更新フレーム
+	Int2D pattern;			// テクスチャ分割数(x,y)
+};
 
-
-
-#define EFFET0_POS					D3DXVECTOR3(0.0f, 0.0f, 0.0f)			// テクスチャ0の表示位置
-#define EFFECT0_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ0のサイズ
-
-#define EFFET1_POS					D3DXVECTOR3(200.0f, 0.0f, 0.0f)			// テクスチャ1の表示位置
-#define EFFECT1_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ1のサイズ
-
-#define EFFET2_POS					D3DXVECTOR3(400.0f, 0.0f, 0.0f)			// テクスチャ2の表示位置
-#define EFFECT2_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ2のサイズ
-
-#define EFFET3_POS					D3DXVECTOR3(600.0f, 0.0f, 0.0f)			// テクスチャ3の表示位置
-#define EFFECT3_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ3のサイズ
-
-#define EFFET4_POS					D3DXVECTOR3(800.0f, 0.0f, 0.0f)			// テクスチャ4の表示位置
-#define EFFECT4_SIZE				D3DXVECTOR3(100.0f, 100.0f, 0.0f)		// テクスチャ4のサイズ
-
-
-
-#define EFFECT_PATTERN_X			(5)										// テクスチャ0内分割数(X)
-#define EFFECT_PATTERN_Y			(1)										// テクスチャ0内分割数(Y)
-
-#define EFFECT1_PATTERN_X			(1)										// テクスチャ1内分割数(X)
-#define EFFECT1_PATTERN_Y			(5)										// テクスチャ1内分割数(Y)
-
-#define EFFECT2_PATTERN_X			(2)										// テクスチャ2内分割数(X)
-#define EFFECT2_PATTERN_Y			(2)										// テクスチャ2内分割数(Y)
-
-#define EFFECT3_PATTERN_X			(5)										// テクスチャ3内分割数(X)
-#define EFFECT3_PATTERN_Y			(3)										// テクスチャ3内分割数(Y)
-
-#define EFFECT4_PATTERN_X			(5)										// テクスチャ4内分割数(X)
-#define EFFECT4_PATTERN_Y			(2)										// テクスチャ4内分割数(Y)
-
-
-#define ANIME_PATTERN_NUM_EFFECT0	(EFFECT_PATTERN_X*EFFECT_PATTERN_Y)		// アニメーションパターン数
-
-#define ANIME_PATTERN_NUM_EFFECT1	(EFFECT1_PATTERN_X*EFFECT1_PATTERN_Y)	// アニメーションパターン数
-
-#define ANIME_PATTERN_NUM_EFFECT2	(EFFECT2_PATTERN_X*EFFECT2_PATTERN_Y)	// アニメーションパターン数
-
-#define ANIME_PATTERN_NUM_EFFECT3	(EFFECT3_PATTERN_X*EFFECT3_PATTERN_Y)	// アニメーションパターン数
-
-#define ANIME_PATTERN_NUM_EFFECT4	(EFFECT4_PATTERN_X*EFFECT4_PATTERN_Y)	// アニメーションパターン数
-
-
-#define TIME_ANIMATION_EFFECT0		(7)										// アニメーションカウント
-
-#define TIME_ANIMATION_EFFECT1		(7)										// アニメーションカウント
-
-#define TIME_ANIMATION_EFFECT2		(7)										// アニメーションカウント
-
-#define TIME_ANIMATION_EFFECT3		(3)										// アニメーションカウント
-
-#define TIME_ANIMATION_EFFECT4		(10)									// アニメーションカウント
-
-
-#define EFFECT_MAX					(16)									// エフェクトの最大数
-
+//*****************************************************************************
+// グローバル変数
+//*****************************************************************************
+static EffectData EffectDataWk[EffectMax] =
+{
+	{"data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 7, Int2D(5, 1) },
+{ "data/EFFECT/anmef001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(200.0f, 0.0f, 0.0f), 7, Int2D(1, 5) },
+{ "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(400.0f, 0.0f, 0.0f), 7, Int2D(2, 2) },
+{ "data/EFFECT/explo000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(600.0f, 0.0f, 0.0f), 3, Int2D(5, 3) },
+{ "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(800.0f, 0.0f, 0.0f), 10, Int2D(5, 2) }
+};
 
 //*****************************************************************************
 // クラス定義
@@ -100,7 +68,7 @@ private:
 	D3DXVECTOR3		size;
 
 public:
-	Effect(const char * texture, D3DXVECTOR3 _size, D3DXVECTOR3 _pos, int _AnimationCnt, int _xPattern, int _yPattern);
+	Effect(EffectData data);
 	~Effect();
 
 	void Update();

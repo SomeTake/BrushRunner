@@ -29,10 +29,9 @@ public:
 	Billboard();
 	~Billboard();
 
-	// ‰¼‘zŠÖ”
-	virtual void Update() {};
-	virtual void Draw() {};
-	virtual int Set() { return 0; };
+	// ƒˆ‰¼‘zŠÖ”
+	virtual void Update() = 0;
+	virtual void Draw() = 0;
 };
 
 #endif

@@ -6,7 +6,6 @@
 //=============================================================================
 #include "Main.h"
 #include "Collision.h"
-#include "Gravity.h"
 #include "Input.h"
 
 //=============================================================================
@@ -41,114 +40,6 @@ bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Radius1, float Radius2)
 
 	// 当たり判定の中心の距離よりも範囲を足した距離の方が長ければ当たる
 	return dist <= hitrange ? true : false;
-}
-
-//=============================================================================
-// プレイヤーと足元のマップの当たり判定
-//=============================================================================
-bool HitCheckPToM(Player *pP, Map *pM)
-{
-	// キャラクターの座標からマップ配列の場所を調べる
-	int x = 0, y = 0;
-	Map::GetMapChipXY(pP->GetPos(), &x, &y);
-
-	// 当たり判定を確認するマップチップの場所
-	D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
-	//mappos.x = MAP_POS.x + CHIP_SIZE * x;
-	//mappos.y = -(MAP_POS.y + CHIP_SIZE * y);
-	//mappos.z = 0.0f;
-
-	// プレイヤーの足元のマップチップから右上のマップチップの番号
-	int frontx = x + 1;
-	int fronty = y - 1;
-
-	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
-	if (!pP->GetJumpFlag())
-	{
-		if (pM->GetMapTbl(frontx, fronty) >= 0)
-		{
-			pP->SetMoveFlag(false);
-		}
-		else
-		{
-			pP->SetMoveFlag(true);
-		}
-	}
-
-	// マップ外判定
-	//if (!HitCheckBB(pP->GetPos(), GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
-	//{
-	//	pP->SetMoveFlag(true);
-
-	//	return false;
-	//}
-
-#ifndef _DEBUG_
-	//PrintDebugProc("現在プレイヤーがいるMapTbl[%d][%d]\n", -y, x);
-	//PrintDebugProc("プレイヤーの前のMapTbl[%d][%d]\n", -fronty, frontx);
-	//PrintDebugProc("MapTblの中身:%d\n", pM->GetMapTbl(-y, x));
-#endif
-
-	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (pM->GetMapTbl(x, y) >= 0)
-	{
-		// めり込みを修正
-		PosModification(pP, mappos);
-		pP->SetJumpFlag(false);
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//=============================================================================
-// プレイヤーとペイントシステムの当たり判定
-//=============================================================================
-bool HitCheckPToS(Player *pP)
-{
-	for (auto &Paint : pP->GetPaintManager()->GetColorPaint())
-	{
-		if (!Paint->GetUse())
-		{
-			continue;
-		}
-
-		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-		if (HitSphere(pP->GetPos(), Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
-		{
-			// 当たった場合、プレイヤーの座標を修正
-			D3DXVECTOR3 setpos = pP->GetPos();
-			setpos.y = Paint->GetPos().y + PAINT_WIDTH * 0.1f;
-
-			pP->SetPos(setpos);
-
-			return true;
-		}
-	}
-
-	return false;
-
-	//for (int i = 0; i < INK_MAX; i++)
-	//{
-	//	// 使用している場合当たり判定を行う
-	//	if (pS->GetColorPaint(i)->GetUse())
-	//	{
-	//		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-	//		if (HitSphere(pP->GetPos(), pS->GetColorPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
-	//		{
-	//			// 当たった場合、プレイヤーの座標を修正
-	//			D3DXVECTOR3 setpos = pP->GetPos();
-	//			setpos.y = pS->GetColorPaint(i)->GetPos().y + PAINT_WIDTH * 0.1f;
-
-	//			pP->SetPos(setpos);
-
-	//			returnflag = true;
-	//		}
-	//	}
-	//}
 }
 
 //=============================================================================
