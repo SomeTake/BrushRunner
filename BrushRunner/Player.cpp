@@ -27,12 +27,13 @@
 #define	CHARA_XFILE			"data/MODEL/Kouhai.x"						// 読み込むモデル名(ファイルパス名)
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
-#define JUMP_SPEED			(12.0f)										// ジャンプの初速
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(45.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
 #define OBJECT_HIT_COUNTER	(10)				// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)				// 動くスピード
+#define FALL_VELOCITY_MAX	(20.0f)				// 最大の落下速度
+#define STANDARD_GRAVITY	(0.98f)				// 重力加速度
 
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
@@ -222,8 +223,6 @@ void Player::Draw()
 #endif
 }
 
-}
-
 //=====================================================================================================
 // 状態抽象インターフェースの更新
 //=====================================================================================================
@@ -397,33 +396,38 @@ void Player::CheckOnCamera()
 //=====================================================================================================
 // マップとの当たり判定
 //=====================================================================================================
-void Player::GroundCollider(Map *pMap)
+void Player::GroundCollider()
 {
 	// 上昇中は判定しない
 	if (jumpSpd <= 0)
 	{
 		// キャラクターの座標からマップ配列の場所を調べる
-		int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-		int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+		int x, y;
+		Map::GetMapChipXY(pos, &x, &y);
 
-		// 当たり判定を確認するマップチップの場所
-		D3DXVECTOR3 mappos;
-		mappos.x = MAP_POS.x + CHIP_SIZE * x;
-		mappos.y = MAP_POS.y + CHIP_SIZE * y;
-		mappos.z = 0.0f;
+		D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
 
-		// マップ外判定
-		if (x < 0 || y > 0)
-		{
-			hitGround = false;
-			return;
-		}
+		//int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
+		//int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+
+		//// 当たり判定を確認するマップチップの場所
+		//D3DXVECTOR3 mappos;
+		//mappos.x = MAP_POS.x + CHIP_SIZE * x;
+		//mappos.y = MAP_POS.y + CHIP_SIZE * y;
+		//mappos.z = 0.0f;
+
+		//// マップ外判定
+		//if (x < 0 || y > 0)
+		//{
+		//	hitGround = false;
+		//	return;
+		//}
 
 		// 現在座標があるところになにかオブジェクトがあればヒットしている
-		if (pMap->GetMapTbl(x, y) >= 0)
+		if (Map::GetMapTbl(x, y) >= 0)
 		{
 			// めり込みを修正
-			pos.y = max(mappos.y + (CHIP_SIZE / 2) - 0.01f, pos.y);
+			pos.y = max(mappos.y - 0.01f, pos.y);
 			jumpSpd = 0.0f;
 			animSpd = 1.0f;
 			hitGround = true;
@@ -443,9 +447,9 @@ void Player::GroundCollider(Map *pMap)
 //=====================================================================================================
 // ペイントとの当たり判定
 //=====================================================================================================
-void Player::PaintCollider(PaintManager *pPManager)
+void Player::PaintCollider()
 {
-	for (auto &Paint : pPManager->GetColorPaint())
+	for (auto &Paint : PaintSystem->GetColorPaint())
 	{
 		if (!Paint->GetUse())
 			continue;
@@ -471,25 +475,25 @@ void Player::PaintCollider(PaintManager *pPManager)
 //=====================================================================================================
 // 前方のマップとの当たり判定
 //=====================================================================================================
-void Player::HorizonCollider(Map *pMap)
+void Player::HorizonCollider()
 {
-	// プレイヤーの座標から当たり判定を取得するマップチップの番号を取得
-	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+	// キャラクターの座標からマップ配列の場所を調べる
+	int x, y;
+	Map::GetMapChipXY(pos, &x, &y);
 
 	// 足元から見て右上なので
 	x++;
-	y++;
+	y--;
 
 	// マップ外
-	if (x < 0 || y > 0)
-	{
-		hitHorizon = false;
-		return;
-	}
+	//if (x < 0 || y > 0)
+	//{
+	//	hitHorizon = false;
+	//	return;
+	//}
 
 	// テーブルを調べて0以上ならヒット
-	if (pMap->GetMapTbl(x,y) >= 0)
+	if (Map::GetMapTbl(x,y) >= 0)
 	{
 		hitHorizon = true;
 		return;
@@ -504,7 +508,7 @@ void Player::HorizonCollider(Map *pMap)
 //=====================================================================================================
 // フィールドオブジェクトとの当たり判定
 //=====================================================================================================
-void Player::ObjectCollider(Map *pMap)
+void Player::ObjectCollider()
 {
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
@@ -518,7 +522,7 @@ void Player::ObjectCollider(Map *pMap)
 		return;
 	}
 
-	int objType = pMap->GetObjTbl(x, -y);
+	int objType = Map::GetObjTbl(x, -y);
 
 	HitObjectInfluence(objType);
 
@@ -661,7 +665,7 @@ void Player::HitObjectInfluence(int type)
 //=====================================================================================================
 void Player::Debug()
 {
-#ifnef _DEBUG_
+#ifndef _DEBUG_
 
 	ImGui::SetNextWindowPos(ImVec2(5, 120), ImGuiSetCond_Once);
 

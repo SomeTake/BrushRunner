@@ -13,8 +13,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_FILE		("data/MAP/map.csv")				// 読み込むマップデータ
-#define OBJECT_FILE		("data/MAP/obj.csv")
+#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
+#define OBJECT_FILE		("data/MAP/map_object.csv")
 
 //*****************************************************************************
 // グローバル変数
@@ -156,47 +156,47 @@ void Map::Draw()
 //=============================================================================
 void Map::PaintCollider(QUADTREE *Quadtree, int NodeID)
 {
-	std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt(NodeID);
+	//std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt(NodeID);
 
-	// 現在のノードはオブジェクトがない
-	if (CollisionList.empty())
-	{
-		return;
-	}
+	//// 現在のノードはオブジェクトがない
+	//if (CollisionList.empty())
+	//{
+	//	return;
+	//}
 
-	for (auto &BlackPaint : CollisionList)
-	{
-		// 使用している、カラーが黒のものを探す
-		if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor)
-			continue;
+	//for (auto &BlackPaint : CollisionList)
+	//{
+	//	// 使用している、カラーが黒のものを探す
+	//	if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor)
+	//		continue;
 
-		for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
-		{
-			for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
-			{
-				// 存在している、かつ反転していないものを探す
-				if (objtbl[cntY][cntX] = -1 || pObjChip[cntY][cntX]->GetReverse() ||
-					!pObjChip[cntY][cntX]->GetUse())
-					continue;
+	//	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
+	//	{
+	//		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
+	//		{
+	//			// 存在している、かつ反転していないものを探す
+	//			if (objtbl[cntY][cntX] = -1 || pObjChip[cntY][cntX]->GetReverse() ||
+	//				!pObjChip[cntY][cntX]->GetUse())
+	//				continue;
 
-				// 中身の確認
-				if (!(objtbl[cntY][cntX] == OBJ_NUM_SPDUP || objtbl[cntY][cntX] == OBJ_NUM_SPDDOWN ||
-					objtbl[cntY][cntX] == OBJ_NUM_DRAIN || objtbl[cntY][cntX] == OBJ_NUM_HEAL))
-					continue;
+	//			// 中身の確認
+	//			if (!(objtbl[cntY][cntX] == OBJ_NUM_SPDUP || objtbl[cntY][cntX] == OBJ_NUM_SPDDOWN ||
+	//				objtbl[cntY][cntX] == OBJ_NUM_DRAIN || objtbl[cntY][cntX] == OBJ_NUM_HEAL))
+	//				continue;
 
-				// ペイントとフィールドオブジェクトを判定する
-				if (HitSphere(BlackPaint->GetPos(), pObjChip[cntY][cntX]->GetPos(), Paint::GetPaintRadius(), CHIP_SIZE))
-				{
-					// ヒットした場合そのペイントを消す
-					BlackPaint->SetUse(false);
-					// フィールドオブジェクトを反転させる
-					pObjChip[cntY][cntX]->SetReverse(true);
-					pObjChip[cntY][cntX]->ReverseTexture();
-					break;
-				}
-			}
-		}
-	}
+	//			// ペイントとフィールドオブジェクトを判定する
+	//			if (HitSphere(BlackPaint->GetPos(), pObjChip[cntY][cntX]->GetPos(), Paint::GetPaintRadius(), CHIP_SIZE))
+	//			{
+	//				// ヒットした場合そのペイントを消す
+	//				BlackPaint->SetUse(false);
+	//				// フィールドオブジェクトを反転させる
+	//				pObjChip[cntY][cntX]->SetReverse(true);
+	//				pObjChip[cntY][cntX]->ReverseTexture();
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 //=============================================================================

@@ -118,10 +118,12 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			if (!pPlayer->GetSpInk())
-			{
-				InkValue[InkType]--;
-			}
+			InkValue[InkType]--;
+
+			//if (!pPlayer->GetSpInk())
+			//{
+			//	InkValue[InkType]--;
+			//}
 		}
 	}
 #if _DEBUG
@@ -133,10 +135,12 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			if (!pPlayer->GetSpInk())
-			{
-				InkValue[InkType]--;
-			}
+			InkValue[InkType]--;
+
+			//if (!pPlayer->GetSpInk())
+			//{
+			//	InkValue[InkType]--;
+			//}
 		}
 	}
 #endif

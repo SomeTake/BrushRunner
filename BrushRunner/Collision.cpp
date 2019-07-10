@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Collision.h"
 #include "Input.h"
+#include "Player.h"
 
 //=============================================================================
 // ‹éŒ`‚Ì“–‚½‚è”»’è

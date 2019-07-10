@@ -12,15 +12,20 @@
 // マクロ定義
 //*****************************************************************************
 #define CHIP_TEXTURE	("data/MAP/tilea5.png")
+#define OBJECT_TEXTURE	("data/MAP/mapchip_object.png")
 //#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)		// 表示場所
 //#define MAP_ROT			D3DXVECTOR3(D3DXToRadian(-90), 0.0f, 0.0f)	// 回転
 #define CHIP_DIVIDE_X	(8)
 #define CHIP_DIVIDE_Y	(16)
 
+#define OBJ_DIVIDE_X	(7)
+#define OBJ_DIVIDE_Y	(1)
+
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	Chip::D3DTexture = NULL;		// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9	Chip::D3DTextureMap = NULL;		// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9	Chip::D3DTextureObj = NULL;		// テクスチャへのポインタ
 
 //=============================================================================
 // コンストラクタ
@@ -42,12 +47,19 @@ Chip::Chip(int x, int y, int texnum, int ChipType)
 	MakeVertex(texnum);
 
 	// テクスチャの読み込み
-	if (D3DTexture == NULL)
+	if (D3DTextureMap == NULL)
 	{
 		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
 			CHIP_TEXTURE,					// ファイルの名前
-			&D3DTexture);				// 読み込むメモリー
+			&D3DTextureMap);				// 読み込むメモリー
 	}
+	if (D3DTextureObj == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
+			OBJECT_TEXTURE,					// ファイルの名前
+			&D3DTextureObj);				// 読み込むメモリー
+	}
+
 }
 
 //=============================================================================
@@ -102,7 +114,14 @@ void Chip::Draw()
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, D3DTexture);
+		if (ChipType == eMapChip)
+		{
+			pDevice->SetTexture(0, D3DTextureMap);
+		}
+		else if (ChipType == eObjectChip)
+		{
+			pDevice->SetTexture(0, D3DTextureObj);
+		}
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
@@ -161,15 +180,27 @@ HRESULT Chip::MakeVertex(int texnum)
 		}
 		else
 		{
-			int x = texnum % CHIP_DIVIDE_X;
-			int y = texnum / CHIP_DIVIDE_X;
-			float sizeX = 1.0f / CHIP_DIVIDE_X;
-			float sizeY = 1.0f / CHIP_DIVIDE_Y;
+			if (ChipType == eMapChip)
+			{
+				int x = texnum % CHIP_DIVIDE_X;
+				int y = texnum / CHIP_DIVIDE_X;
+				float sizeX = 1.0f / CHIP_DIVIDE_X;
+				float sizeY = 1.0f / CHIP_DIVIDE_Y;
 
-			pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-			pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-			pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-			pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+				pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+				pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+				pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+				pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+			}
+			else if (ChipType == eObjectChip)
+			{
+				float sizeX = 1.0f / OBJ_DIVIDE_X;
+
+				pVtx[0].tex = D3DXVECTOR2((float)texnum * sizeX, 0.0f);
+				pVtx[1].tex = D3DXVECTOR2((float)texnum * sizeX + sizeX, 0.0f);
+				pVtx[2].tex = D3DXVECTOR2((float)texnum * sizeX, 1.0f);
+				pVtx[3].tex = D3DXVECTOR2((float)texnum * sizeX + sizeX, 1.0f);
+			}
 		}
 
 		// 頂点データをアンロックする

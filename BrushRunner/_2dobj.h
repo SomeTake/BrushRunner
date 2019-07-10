@@ -30,8 +30,8 @@ public:
 	_2dobj();
 	~_2dobj();
 
-	// 純粋仮想関数
-	virtual void Update() = 0;						// 更新
+	// 仮想関数
+	virtual void Update() {};						// 更新
 	virtual void Draw() = 0;						// 描画
 
 };

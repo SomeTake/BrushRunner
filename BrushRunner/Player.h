@@ -20,6 +20,7 @@
 //*****************************************************************************
 #define PLAYER_MAX				(4)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
+#define JUMP_SPEED			(12.0f)										// ジャンプの初速
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -96,15 +97,11 @@ public:
 	void UpdateState(int AnimCurtID);
 	void ChangeState(PlayerState *NewState);
 
-	// アニメーション
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
-	void CreateAnimSet(void);
-
 	// 当たり判定
-	void GroundCollider(Map *pMap);
-	void HorizonCollider(Map *pMap);
-	void ObjectCollider(Map *pMap);
-	void PaintCollider(PaintManager *pPManager);
+	void GroundCollider();
+	void HorizonCollider();
+	void ObjectCollider();
+	void PaintCollider();
 	void FieldItemCollider(FieldItemManager *pFIManager);
 
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
@@ -112,8 +109,7 @@ public:
 	// ゲッター(なるべく使わない)
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
 	D3DXVECTOR3	GetPos() { return pos; };
-	bool GetJumpFlag() { return jumpFlag; };
-	float GetJumpSpeed() { return jumpSpeed; };
+	float GetJumpSpeed() { return jumpSpd; };
 	PaintManager* GetPaintManager(void) { return this->PaintSystem; };
 
 	int GetCtrlNum() { return ctrlNum; };
@@ -130,11 +126,6 @@ public:
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
-	void SetMove(D3DXVECTOR3 _move) { move = _move; };
-	void SetJumpFlag(bool _jumpflag) { jumpFlag = _jumpflag; };
-	void SetJumpSpeed(float _JumpSpeed) { jumpSpeed = _JumpSpeed; };
-	void SetMoveFlag(bool _moveFlag) { moveFlag = _moveFlag; };
-
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };

@@ -34,10 +34,10 @@ static QUADTREE *Quadtree = nullptr;
 
 // プレイヤー初期位置
 D3DXVECTOR3 firstpos[PLAYER_MAX] = {
-	D3DXVECTOR3(145.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(130.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(115.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(100.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(245.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(230.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(215.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(200.0f, 0.0f, 0.0f),
 };
 
 //=============================================================================
@@ -48,7 +48,7 @@ SceneGame::SceneGame()
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo);
+		pPlayer[PlayerNo] = new Player(PlayerNo, firstpos[PlayerNo]);
 	}
 
 	// マップの初期化
@@ -269,15 +269,15 @@ void SceneGame::Collision()
 	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i]->GroundCollider(pMap);
-		pPlayer[i]->HorizonCollider(pMap);
-		pPlayer[i]->ObjectCollider(pMap);
+		pPlayer[i]->GroundCollider();
+		pPlayer[i]->HorizonCollider();
+		pPlayer[i]->ObjectCollider();
 	}
 
 	// プレイヤーとペイントマネージャの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i]->PaintCollider(pPManager[i]);
+		pPlayer[i]->PaintCollider();
 	}
 
 	// ペイントマネージャ同士の当たり判定
