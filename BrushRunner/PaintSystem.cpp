@@ -20,26 +20,28 @@ bool PaintManager::PressMode = true;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PaintManager::PaintManager(int PlayerNo)
+PaintManager::PaintManager(int PlayerNo, bool AIFlag)
 {
 	this->Owner = PlayerNo;
 	this->InkType = ColorInk;
+	this->AIFlag = AIFlag;
+
+	// インク残量が最大値にする
 	for (int i = 0; i < InkNum; i++)
 	{
 		this->InkValue[i] = INK_MAX;
 	}
-	this->pCursor = new Cursor(this->Owner);
+
+	// カーソルオブジェクト作成
+	this->pCursor = new Cursor(this->Owner, AIFlag);
+
+	// インクゲージUIオブジェクト作成
 	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
 	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
 
 	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
 	ColorPaint.reserve(INK_MAX);
-
-	if (PaintManager::Quadtree == nullptr)
-	{
-		PaintManager::Quadtree = Quadtree;
-	}
 }
 
 //=============================================================================
@@ -201,7 +203,6 @@ void PaintManager::Update()
 		EndDebugWindow("Information");
 	}
 #endif
-
 }
 
 //=============================================================================
@@ -407,7 +408,7 @@ std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
 	return PaintManager::Quadtree->GetObjectsAt(NodeID);
 }
 
-void CursorMove(D3DXVECTOR3 DestPos)
+void PaintManager::CursorMove(D3DXVECTOR3 DestPos)
 {
 
 }

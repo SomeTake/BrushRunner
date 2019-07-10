@@ -38,7 +38,6 @@ private:
 	bool AIFlag = false;
 
 	void FindPlatform(D3DXVECTOR3 Pos);
-	void DrawPaint(PaintManager *ManagerPtr);
 
 public:
 	CharacterAI(bool AIFlag);

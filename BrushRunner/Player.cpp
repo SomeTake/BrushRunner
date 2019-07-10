@@ -86,7 +86,7 @@ Player::Player(int _CtrlNum)
 	use = true;
 	this->ActionSpeed = 1.0f;
 	this->AI = new CharacterAI(true);
-	this->PaintSystem = new PaintManager(_CtrlNum);
+	this->PaintSystem = new PaintManager(_CtrlNum, true);
 	this->PopUp = new Pop(ctrlNum);
 }
 

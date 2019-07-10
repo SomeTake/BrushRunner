@@ -33,6 +33,7 @@ private:
 	int						Owner;
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
+	bool					AIFlag;
 
 	static QUADTREE			*Quadtree;
 #if _DEBUG
@@ -42,7 +43,7 @@ private:
 	void CheckPaintUse(void);
 
 public:
-	PaintManager(int PlayerNo);
+	PaintManager(int PlayerNo, bool AIFlag);
 	~PaintManager();
 
 	void Update();

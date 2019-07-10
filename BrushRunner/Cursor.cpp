@@ -14,11 +14,12 @@ LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Cursor::Cursor(int PlayerNo)
+Cursor::Cursor(int PlayerNo, bool AIFlag)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	use = true;
+	this->AIFlag = AIFlag;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
 	vec = 0.0f;
@@ -56,8 +57,11 @@ void Cursor::Update()
 		// 操作
 		Move();
 
-		// テクスチャの切り替え
-		Change();
+		if (GetKeyboardTrigger(DIK_P))
+		{
+			// テクスチャの切り替え
+			Change();
+		}
 
 		// 頂点座標の設定
 		SetVertex();
@@ -147,8 +151,15 @@ void Cursor::SetVertex()
 //=============================================================================
 void Cursor::Move()
 {
-	KeyMove();	// キーボード操作
-	PadMove();	// コントローラ操作
+	if (!AIFlag)
+	{
+		KeyMove();	// キーボード操作
+		PadMove();	// コントローラ操作
+	}
+	else
+	{
+		AIMove();
+	}
 }
 
 //=============================================================================
@@ -156,23 +167,20 @@ void Cursor::Move()
 //=============================================================================
 void Cursor::Change()
 {
-	if (GetKeyboardTrigger(DIK_P))
+	// テクスチャとプレイヤーのインクの切り替え
+	// カラー→黒
+	if (PatternAnim == ctrlNum)
 	{
-		// テクスチャとプレイヤーのインクの切り替え
-		// カラー→黒
-		if (PatternAnim == ctrlNum)
-		{
-			PatternAnim = ctrlNum + CURSOR_DIVIDE_X;
-		}
-		// 黒→カラー
-		else
-		{
-			PatternAnim = ctrlNum;
-		}
-
-		//テクスチャ座標をセット
-		SetTexture();
+		PatternAnim = ctrlNum + CURSOR_DIVIDE_X;
 	}
+	// 黒→カラー
+	else
+	{
+		PatternAnim = ctrlNum;
+	}
+
+	//テクスチャ座標をセット
+	SetTexture();
 }
 
 //=============================================================================
@@ -237,4 +245,9 @@ void Cursor::PadMove()
 D3DXVECTOR3 Cursor::GetPenPoint()
 {
 	return D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, 0.0f);
+}
+
+void Cursor::AIMove()
+{
+
 }
