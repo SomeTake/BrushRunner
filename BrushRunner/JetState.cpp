@@ -38,8 +38,9 @@ void JetState::Update()
 	if (cnt == ACTIVE_TIME)
 	{
 		owner_->GetPlayer()->SetJumpValue(1.0f);
-		// アイテムを使用
+		// アイテムの効果終了
 		owner_->SetActive(false);
+		owner_->GetPlayer()->SetHitItem(false);
 	}
 }
 

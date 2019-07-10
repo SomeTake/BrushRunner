@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Chip.h"
 #include "Camera.h"
+#include "Map.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -21,6 +22,8 @@
 #define OBJ_DIVIDE_X	(7)
 #define OBJ_DIVIDE_Y	(1)
 
+#define REVERSE_TIME	(300)	// 反転時間
+
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
@@ -30,7 +33,7 @@ LPDIRECT3DTEXTURE9	Chip::D3DTextureObj = NULL;		// テクスチャへのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Chip::Chip(int x, int y, int texnum, int ChipType)
+Chip::Chip(int x, int y, int _texnum, int ChipType)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -42,9 +45,14 @@ Chip::Chip(int x, int y, int texnum, int ChipType)
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
 	this->ChipType = ChipType;
+	texnum = _texnum;
+	cnt = 0;
+	reverse = false;
+	mapX = x;
+	mapY = y;
 
 	// 頂点情報の作成
-	MakeVertex(texnum);
+	MakeVertex();
 
 	// テクスチャの読み込み
 	if (D3DTextureMap == NULL)
@@ -77,6 +85,19 @@ Chip::~Chip()
 void Chip::Update()
 {
 	CheckOnCamera();
+
+	// 反転中の処理
+	if (use && reverse)
+	{
+		cnt++;
+
+		if (cnt == REVERSE_TIME)
+		{
+			cnt = 0;
+			reverse = false;
+			ReverseTexture();
+		}
+	}
 }
 
 //=============================================================================
@@ -131,7 +152,7 @@ void Chip::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT Chip::MakeVertex(int texnum)
+HRESULT Chip::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -211,6 +232,56 @@ HRESULT Chip::MakeVertex(int texnum)
 }
 
 //=============================================================================
+// テクスチャ座標のセット
+//=============================================================================
+void Chip::SetTexture()
+{
+	{//頂点バッファの中身を埋める
+		Vertex3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		// テクスチャ座標の設定
+		if (texnum < 0)
+		{
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[3].tex = D3DXVECTOR2(0.0f, 0.0f);
+		}
+		else
+		{
+			if (ChipType == eMapChip)
+			{
+				int x = texnum % CHIP_DIVIDE_X;
+				int y = texnum / CHIP_DIVIDE_X;
+				float sizeX = 1.0f / CHIP_DIVIDE_X;
+				float sizeY = 1.0f / CHIP_DIVIDE_Y;
+
+				pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+				pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+				pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+				pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+			}
+			else if (ChipType == eObjectChip)
+			{
+				float sizeX = 1.0f / OBJ_DIVIDE_X;
+
+				pVtx[0].tex = D3DXVECTOR2((float)texnum * sizeX, 0.0f);
+				pVtx[1].tex = D3DXVECTOR2((float)texnum * sizeX + sizeX, 0.0f);
+				pVtx[2].tex = D3DXVECTOR2((float)texnum * sizeX, 1.0f);
+				pVtx[3].tex = D3DXVECTOR2((float)texnum * sizeX + sizeX, 1.0f);
+			}
+		}
+
+		// 頂点データをアンロックする
+		D3DVtxBuff->Unlock();
+	}
+
+}
+
+//=============================================================================
 // カメラ内判定
 //=============================================================================
 void Chip::CheckOnCamera()
@@ -235,4 +306,33 @@ void Chip::CheckOnCamera()
 	{
 		use = false;
 	}
+}
+
+//=============================================================================
+// テクスチャを反転させる
+//=============================================================================
+void Chip::ReverseTexture()
+{
+	switch (texnum)
+	{
+	case eObjSpdup:
+		texnum = eObjSpddown;
+		break;
+	case eObjSpddown:
+		texnum = eObjSpdup;
+		break;
+	case eObjDrain:
+		texnum = eObjHeal;
+		break;
+	case eObjHeal:
+		texnum = eObjDrain;
+		break;
+
+	default:
+		break;
+	}
+
+	// オブジェクトテーブルの中身も変更する
+	Map::SetObjTbl(mapX, mapY, texnum);
+	SetTexture();
 }

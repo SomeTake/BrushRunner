@@ -29,13 +29,17 @@ enum e_ChipPosType
 	eCenterUp,	// マップチップの中央の上の座標
 };
 
-#define OBJ_NUM_SPDUP	(0)
-#define OBJ_NUM_SPDDOWN	(1)
-#define OBJ_NUM_NUMA	(2)
-#define OBJ_NUM_JUMP	(3)
-#define OBJ_NUM_DRAIN	(4)
-#define OBJ_NUM_HEAL	(5)
-#define OBJ_NUM_ITEM	(6)
+// フィールドオブジェクトの種類
+enum e_ChipType
+{
+	eObjSpdup,		// スピードアップ
+	eObjSpddown,	// スピードダウン
+	eObjNuma,		// 沼（スピードダウン＆ジャンプ力ダウン）
+	eObjJump,		// 強制ジャンプ
+	eObjDrain,		// インクゲージ減少
+	eObjHeal,		// インクゲージ増加
+	eObjItem,		// アイテム取得
+};
 
 //*****************************************************************************
 // クラス定義
@@ -71,6 +75,8 @@ public:
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
 
 	void PaintCollider(QUADTREE *Quadtree, int NodeID);
+
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
 
 };
 

@@ -407,15 +407,6 @@ void Player::GroundCollider()
 
 		D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
 
-		//int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-		//int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
-
-		//// 当たり判定を確認するマップチップの場所
-		//D3DXVECTOR3 mappos;
-		//mappos.x = MAP_POS.x + CHIP_SIZE * x;
-		//mappos.y = MAP_POS.y + CHIP_SIZE * y;
-		//mappos.z = 0.0f;
-
 		//// マップ外判定
 		//if (x < 0 || y > 0)
 		//{
@@ -514,14 +505,6 @@ void Player::ObjectCollider()
 	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
 	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
 
-	// マップ外判定
-	if (x < 0 || y > 0)
-	{
-		runSpd = 1.0f;
-		hitObjCnt = 0;
-		return;
-	}
-
 	int objType = Map::GetObjTbl(x, -y);
 
 	HitObjectInfluence(objType);
@@ -576,7 +559,7 @@ void Player::HitObjectInfluence(int type)
 	// オブジェクトの種類に合わせて効果変更
 	switch (type)
 	{
-	case OBJ_NUM_SPDUP:
+	case eObjSpdup:
 		if (!spike)
 		{
 			runSpd = 2.0f;
@@ -587,7 +570,7 @@ void Player::HitObjectInfluence(int type)
 		jumpValue = 1.0f;
 		break;
 
-	case OBJ_NUM_SPDDOWN:
+	case eObjSpddown:
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -598,7 +581,7 @@ void Player::HitObjectInfluence(int type)
 		jumpValue = 1.0f;
 		break;
 
-	case OBJ_NUM_NUMA:
+	case eObjNuma:
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -609,12 +592,12 @@ void Player::HitObjectInfluence(int type)
 		hitObjCnt = 0;
 		break;
 
-	case OBJ_NUM_JUMP:
+	case eObjJump:
 		jumpSpd = JUMP_SPEED;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 
-	case OBJ_NUM_DRAIN:
+	case eObjDrain:
 		if (!spike)
 		{
 			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
@@ -630,7 +613,7 @@ void Player::HitObjectInfluence(int type)
 		jumpValue = 1.0f;
 		break;
 
-	case OBJ_NUM_HEAL:
+	case eObjHeal:
 		if (!spike)
 		{
 			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
@@ -646,7 +629,7 @@ void Player::HitObjectInfluence(int type)
 		jumpValue = 1.0f;
 		break;
 
-	case OBJ_NUM_ITEM:
+	case eObjItem:
 		hitItem = true;
 
 		// 他のステータスはリセット

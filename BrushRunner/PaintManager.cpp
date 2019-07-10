@@ -355,29 +355,6 @@ void PaintManager::SetPaint(int InkType)
 	}
 }
 
-//=====================================================================================================
-// インクの種類交換
-//=====================================================================================================
-//void PaintManager::ChangeInk()
-//{
-	//InkType = InkType == BlackInk ? ColorInk : BlackInk;
-	//// 黒→カラー
-	//if (InkType == BlackInk)
-	//{
-	//	InkType = ColorInk;
-	//}
-	//// カラー→黒
-	//else
-	//{
-	//	inkType = BlackInk;
-	//}
-
-	// インクバーの描画順を入れ替え
-	//ChangeDrawOrder(NumInkblack00 + Owner, NumInkblue + Owner);
-	// フレームの描画順を入れ替え
-	//ChangeDrawOrder(NumBlackFrame00 + Owner, NumColorFrame00 + Owner);
-//}
-
 //=============================================================================
 // 使用していないペイントがVectorから削除
 //=============================================================================

@@ -308,7 +308,7 @@ void SceneGame::Collision()
 		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
 		{
 			// 画面を16分割、それぞれのオブジェクトを判定する
-			//pMap->PaintCollider(Quadtree, (TenDigit * 10 + OneDigit));
+			pMap->PaintCollider(Quadtree, (TenDigit * 10 + OneDigit));
 		}
 	}
 

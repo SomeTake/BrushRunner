@@ -40,6 +40,7 @@ void SpikeState::Update()
 	{
 		owner_->SetActive(false);
 		owner_->GetPlayer()->SetSpike(false);
+		owner_->GetPlayer()->SetHitItem(false);
 	}
 }
 

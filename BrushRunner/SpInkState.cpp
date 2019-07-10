@@ -35,11 +35,12 @@ void SpInkState::Update()
 {
 	cnt++;
 
+	// アイテムの効果が終了
 	if (cnt == ACTIVE_TIME)
 	{
-		// アイテムを使用
 		owner_->SetActive(false);
 		owner_->GetPlayer()->SetSpInk(false);
+		owner_->GetPlayer()->SetHitItem(false);
 	}
 }
 

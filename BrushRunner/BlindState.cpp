@@ -37,8 +37,9 @@ void BlindState::Update()
 
 	if (cnt == ACTIVE_TIME)
 	{
-		// アイテムを使用
+		// アイテムの効果終了
 		owner_->SetActive(false);
+		owner_->GetPlayer()->SetHitItem(false);
 	}
 }
 
