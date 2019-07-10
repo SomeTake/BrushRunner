@@ -19,7 +19,6 @@
 #define USE_COUNTER				(3)							// 何回ルーレットを動かしたらアイテムを確定させるか
 #define DIVIDE_ITEM_X			(7)
 #define DIVIDE_ITEM_Y			(1)
-#define TEXTURE_DIVIDE_ITEM		(DIVIDE_ITEM_X * DIVIDE_ITEM_Y)
 
 static D3DXVECTOR3 ItemPos[PLAYER_MAX] = {
 	D3DXVECTOR3(245.0f, 30.0f, 0.0f),
@@ -49,7 +48,7 @@ class Item :
 	public _2dobj
 {
 private:
-	ItemState * state[TEXTURE_DIVIDE_ITEM];	// ステータス抽象クラス
+	ItemState * state[NumItemMax];			// ステータス抽象クラス
 	Player * pPlayer;						// 参照するプレイヤークラスのポインタ
 	int rouletteCnt;						// ルーレットのカウンタ
 	int useCnt;								// ルーレットでアイテムのテクスチャも回すためのカウンタ

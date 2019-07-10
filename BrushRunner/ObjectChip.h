@@ -10,9 +10,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define OBJECTCHIP_TEXTURE	("data/MAP/tilea5.png")
-#define OBJECTCHIP_DIVIDE_X	(8)
-#define OBJECTCHIP_DIVIDE_Y	(16)
+#define OBJECTCHIP_TEXTURE	("data/MAP/mapchip_object.png")
+#define OBJECTCHIP_DIVIDE_X	(7)
+#define OBJECTCHIP_DIVIDE_Y	(1)
 
 // フィールドオブジェクトの種類
 #define OBJ_NUM_SPDUP		(0)	// 加速板
@@ -35,19 +35,29 @@ private:
 	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;	// 頂点バッファへのポインタ
 	bool use;
+	bool reverse;
+	int texnum;
+	int reversecnt;
 
-	HRESULT MakeVertex(int texnum);
+	HRESULT MakeVertex();
+	void SetTexture();
 	void CheckOnCamera();
 
 public:
-	ObjectChip(int x, int y, int texnum);
+	ObjectChip(int x, int y, int _texnum);
 	~ObjectChip();
 
 	void Update();
 	void Draw();
 
-	D3DXVECTOR3 GetPos() { return pos; };
+	void ReverseTexture();	// テクスチャを反転させる
 
+	D3DXVECTOR3 GetPos() { return pos; };
+	bool GetUse() { return use; };
+	bool GetReverse() { return reverse; };
+	int GetTextureNum() { return texnum; };
+
+	void SetReverse(bool _reverse) { reverse = _reverse; };
 };
 
 #endif

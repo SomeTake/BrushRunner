@@ -198,7 +198,7 @@ void Item::Start()
 	if (rouletteCnt == 0)
 	{
 		// テクスチャも回す
-		PatternAnim = LoopCountUp(PatternAnim, 0, TEXTURE_DIVIDE_ITEM);
+		PatternAnim = LoopCountUp(PatternAnim, 0, NumItemMax);
 		if (PatternAnim == 0)
 		{
 			useCnt++;
@@ -211,7 +211,7 @@ void Item::Start()
 				active = true;
 
 				// ランダムでアイテムの種類をセット
-				PatternAnim = rand() % (TEXTURE_DIVIDE_ITEM + 1);
+				PatternAnim = rand() % NumItemMax;
 			}
 		}
 	}

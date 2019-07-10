@@ -11,6 +11,10 @@
 #include "JetState.h"
 #include "SpikeState.h"
 #include "SpikeState.h"
+#include "Input.h"
+
+#define MOVE_SPEED		(30.0f)
+#define FIRE_POS_PLUS	(10.0f)
 
 //=============================================================================
 // コンストラクタ
@@ -32,8 +36,14 @@ GunState::~GunState()
 //=============================================================================
 void GunState::Update()
 {
-	// アイテムを使用
-	owner_->SetActive(false);
+	if (IsButtonTriggered(owner_->GetPlayer()->GetCtrlNum(), BUTTON_D) || GetKeyboardTrigger(DIK_I))
+	{
+		D3DXVECTOR3 setpos = owner_->GetPlayer()->GetPos();
+		setpos.y += FIRE_POS_PLUS;
+		owner_->GetPlayer()->GetFieldItemManager()->Set(NumKawa, setpos, D3DXVECTOR3(MOVE_SPEED, 0.0f, 0.0f));
+		// アイテムを使用
+		owner_->SetActive(false);
+	}
 }
 
 //=============================================================================

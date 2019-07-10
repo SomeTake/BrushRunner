@@ -33,6 +33,9 @@ public:
 	HRESULT MakeVertex();
 	void SetColor();
 
+	void OnCamera();
+
+
 	D3DXVECTOR3 GetPos() { return pos; };
 	bool GetUse() { return use; };
 	int GetTexNo() { return texno; };

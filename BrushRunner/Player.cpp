@@ -243,7 +243,7 @@ void Player::ChangeInk()
 void Player::Move()
 {
 	// ƒI[ƒgˆÚ“®
-	if (!hitHorizon && playable && pos.x < GOAL_POS.x)
+	if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
 	{
 		pos.x += MOVE_SPEED * runSpd;
 	}
@@ -291,7 +291,7 @@ void Player::CreateAnimSet()
 		{
 		case Idle:
 
-			Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
 			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
@@ -546,6 +546,7 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 			default:
 				break;
 			}
+			item->SetUse(false);
 		}
 	}
 }

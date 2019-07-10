@@ -9,6 +9,8 @@
 #include "Map.h"
 #include "Camera.h"
 
+#define REVERSE_TIME	(300)	// 反転時間
+
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
@@ -17,7 +19,7 @@ LPDIRECT3DTEXTURE9	ObjectChip::D3DTexture = NULL;		// テクスチャへのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-ObjectChip::ObjectChip(int x, int y, int texnum)
+ObjectChip::ObjectChip(int x, int y, int _texnum)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -28,15 +30,18 @@ ObjectChip::ObjectChip(int x, int y, int texnum)
 	rot = MAP_ROT;	// 縦に向ける
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
+	reverse = false;
+	texnum = _texnum;
+	reversecnt = 0;
 
 	// 頂点情報の作成
-	MakeVertex(texnum);
+	MakeVertex();
 
 	// テクスチャの読み込み
 	if (D3DTexture == NULL)
 	{
 		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-			CHIP_TEXTURE,					// ファイルの名前
+			OBJECTCHIP_TEXTURE,					// ファイルの名前
 			&D3DTexture);				// 読み込むメモリー
 	}
 }
@@ -65,6 +70,20 @@ ObjectChip::~ObjectChip()
 void ObjectChip::Update()
 {
 	CheckOnCamera();
+
+	// 中身が反転している場合の処理
+	if (use && reverse)
+	{
+		reversecnt++;
+
+		// 一定時間に達したら反転終了
+		if (reversecnt == REVERSE_TIME)
+		{
+			reversecnt = 0;
+			reverse = false;
+			ReverseTexture();
+		}
+	}
 }
 
 //=============================================================================
@@ -112,7 +131,7 @@ void ObjectChip::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT ObjectChip::MakeVertex(int texnum)
+HRESULT ObjectChip::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -161,6 +180,45 @@ HRESULT ObjectChip::MakeVertex(int texnum)
 		}
 		else
 		{
+			int x = texnum % OBJECTCHIP_DIVIDE_X;
+			int y = texnum / OBJECTCHIP_DIVIDE_X;
+			float sizeX = 1.0f / OBJECTCHIP_DIVIDE_X;
+			float sizeY = 1.0f / OBJECTCHIP_DIVIDE_Y;
+
+			pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+			pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+			pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+			pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+		}
+
+		// 頂点データをアンロックする
+		D3DVtxBuff->Unlock();
+	}
+
+	return S_OK;
+}
+
+//=============================================================================
+// テクスチャ座標の設定
+//=============================================================================
+void ObjectChip::SetTexture()
+{
+	{//頂点バッファの中身を埋める
+		Vertex3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		// テクスチャ座標の設定
+		if (texnum < 0)
+		{
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[3].tex = D3DXVECTOR2(0.0f, 0.0f);
+		}
+		else
+		{
 			int x = texnum % CHIP_DIVIDE_X;
 			int y = texnum / CHIP_DIVIDE_X;
 			float sizeX = 1.0f / CHIP_DIVIDE_X;
@@ -171,12 +229,41 @@ HRESULT ObjectChip::MakeVertex(int texnum)
 			pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 			pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
 		}
-
 		// 頂点データをアンロックする
 		D3DVtxBuff->Unlock();
 	}
 
-	return S_OK;
+}
+
+//=============================================================================
+// テクスチャを反転させる
+//=============================================================================
+void ObjectChip::ReverseTexture()
+{
+	switch (texnum)
+	{
+	case OBJ_NUM_SPDUP:
+		texnum = OBJ_NUM_SPDDOWN;
+		break;
+
+	case OBJ_NUM_SPDDOWN:
+		texnum = OBJ_NUM_SPDUP;
+		break;
+
+	case OBJ_NUM_DRAIN:
+		texnum = OBJ_NUM_HEAL;
+		break;
+
+	case OBJ_NUM_HEAL:
+		texnum = OBJ_NUM_DRAIN;
+		break;
+
+	default:
+		break;
+	}
+
+	// テクスチャ座標の設定
+	SetTexture();
 }
 
 //=============================================================================

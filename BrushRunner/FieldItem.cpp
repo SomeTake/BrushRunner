@@ -60,6 +60,8 @@ void FieldItem::Update()
 	if (use)
 	{
 		pos += move;
+
+		OnCamera();
 	}
 }
 
@@ -215,4 +217,31 @@ void FieldItem::SetColor()
 
 	// 頂点データをアンロックする
 	D3DVtxBuff->Unlock();
+}
+
+//=============================================================================
+// 画面内判定
+//=============================================================================
+void FieldItem::OnCamera()
+{
+	CAMERA *camera = GetCamera();
+
+	// 画面内判定
+	// 縦
+	if ((pos.x > camera->at.x - DRAW_RANGE.x) && (pos.x < camera->at.x + DRAW_RANGE.x))
+	{
+		// 横
+		if ((pos.y > camera->at.y - DRAW_RANGE.y) && (pos.y < camera->at.y + DRAW_RANGE.y))
+		{
+			use = true;
+		}
+		else
+		{
+			use = false;
+		}
+	}
+	else
+	{
+		use = false;
+	}
 }

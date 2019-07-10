@@ -27,10 +27,10 @@
 //*****************************************************************************
 // プレイヤー初期位置
 D3DXVECTOR3 firstpos[PLAYER_MAX] = {
-	D3DXVECTOR3(45.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(30.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(15.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(145.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(130.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(115.0f, 0.0f, 0.0f),
+	D3DXVECTOR3(100.0f, 0.0f, 0.0f),
 };
 
 static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
@@ -329,13 +329,13 @@ void SceneGame::Collision()
 		pPlayer[i]->ObjectCollider(pMap);
 	}
 
-	// プレイヤーとペイントシステムの当たり判定
+	// プレイヤーとペイントマネージャの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPlayer[i]->PaintCollider(pPManager[i]);
 	}
 
-	// ペイントシステム同士の当たり判定
+	// ペイントマネージャ同士の当たり判定
 	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
 	{
 		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
@@ -356,6 +356,17 @@ void SceneGame::Collision()
 			}
 		}
 	}
+
+	// フィールドオブジェクトとペイントマネージャの当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
+		{
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			//pMap->PaintCollider(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
 
 	// 四分木を更新する
 	Quadtree->Update();

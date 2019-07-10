@@ -41,6 +41,7 @@ public:
 	void Draw();
 
 	D3DXVECTOR3 GetPos() { return pos; };
+	bool GetUse() { return use; };
 
 };
 

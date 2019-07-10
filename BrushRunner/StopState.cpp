@@ -36,6 +36,7 @@ void StopState::Update(int AnimCurtID)
 
 	if (cnt == ACTIVE_TIME)
 	{
+		cnt = 0;
 		owner_->ChangeAnim(Running);
 		owner_->ChangeState(new RunningState(owner_));
 		return;

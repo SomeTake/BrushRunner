@@ -10,15 +10,17 @@
 #include "Chip.h"
 #include "ObjectChip.h"
 
+class QUADTREE;
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_FILE		("data/MAP/map.csv")				// 読み込むマップデータ
-#define OBJECT_FILE		("data/MAP/obj.csv")
+#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
+#define OBJECT_FILE		("data/MAP/map_object.csv")
 #define MAP_SIZE_X		(500)								// マップの横の枚数
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
 #define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
-#define GOAL_POS		D3DXVECTOR3(1000.0f, 0.0f, 0.0f)	// ゴール地点
+#define GOAL_POS		D3DXVECTOR3(9500.0f, 0.0f, 0.0f)	// ゴール地点
 
 //*****************************************************************************
 // クラス定義
@@ -40,6 +42,8 @@ public:
 
 	void Update();
 	void Draw();
+
+	void PaintCollider(QUADTREE *Quadtree, int NodeID);
 
 	int GetMapTbl(int _MapX, int _MapY) { return maptbl[-_MapY][_MapX]; };
 	int GetObjTbl(int _ObjX, int _ObjY) { return objtbl[_ObjY][_ObjX]; };

@@ -22,6 +22,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <functional>
 
 #define DIRECTINPUT_VERSION (0x0800)	// Œx‘Îô
 #include "dinput.h"
