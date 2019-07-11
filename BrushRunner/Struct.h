@@ -1,9 +1,11 @@
+//=============================================================================
+//
+// 構造体定義用 [Struct.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
+//
+//=============================================================================
 #ifndef _STRUCT_H_
 #define _STRUCT_H_
-
-class Player;
-class _2dobj;
-class Billboard;
 
 // 上記２Ｄポリゴン頂点フォーマットに合わせた構造体を定義
 struct Vertex2D
@@ -61,34 +63,6 @@ struct Float2D
 	{
 		this->x = x;
 		this->y = y;
-	}
-};
-
-struct Texture
-{
-	LPDIRECT3DTEXTURE9 texture;
-	const char* path;
-	Int2D size;
-	Texture() {};
-	Texture(const char* path, int x, int y)
-	{
-		this->texture = NULL;
-		this->path = path;
-		this->size = Int2D(x, y);
-	}
-};
-
-struct Slice
-{
-	int tileID;
-	Int2D pos;
-	Int2D size;
-	Slice() {};
-	Slice(int tileID, int x, int y, int w, int h)
-	{
-		this->tileID = tileID;
-		this->pos = Int2D(x, y);
-		this->size = Int2D(w, h);
 	}
 };
 

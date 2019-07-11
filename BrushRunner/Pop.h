@@ -28,6 +28,7 @@ public:
 	Pop(int PlayerNo);
 	~Pop();
 
+	void Update() {};
 	void Update(D3DXVECTOR3 PlayerPos);
 	void Draw();
 };

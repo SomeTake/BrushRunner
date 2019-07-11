@@ -9,11 +9,16 @@
 
 #include "Chip.h"
 
+class QUADTREE;
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)
 #define MAP_SIZE_X		(500)								// マップの横の枚数
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
+#define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
+#define GOAL_POS		D3DXVECTOR3(9500.0f, 0.0f, 0.0f)	// ゴール地点
 
 // マップチップ座標を取得の種類
 enum e_ChipPosType
@@ -24,6 +29,17 @@ enum e_ChipPosType
 	eCenterUp,	// マップチップの中央の上の座標
 };
 
+// フィールドオブジェクトの種類
+enum e_ChipType
+{
+	eObjSpdup,		// スピードアップ
+	eObjSpddown,	// スピードダウン
+	eObjNuma,		// 沼（スピードダウン＆ジャンプ力ダウン）
+	eObjJump,		// 強制ジャンプ
+	eObjDrain,		// インクゲージ減少
+	eObjHeal,		// インクゲージ増加
+	eObjItem,		// アイテム取得
+};
 
 //*****************************************************************************
 // クラス定義
@@ -57,6 +73,11 @@ public:
 	static int GetObjTbl(int ObjX, int ObjY);
 	static void GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY);
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
+
+	void PaintCollider(QUADTREE *Quadtree, int NodeID);
+
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
+
 };
 
 //D3DXVECTOR3 GetMapCenterPos();					// 表示されているマップの中心座標

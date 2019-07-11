@@ -32,10 +32,7 @@ public:
 
 	// 仮想関数
 	virtual void Update() {};						// 更新
-	virtual void Draw() {};							// 描画
-	virtual HRESULT MakeVertex() { return S_OK; };	// 頂点の作成
-	virtual void SetTexture(int cntPattern) {};		// テクスチャ座標の設定
-	virtual void SetVertex() {};					// 頂点座標の設定
+	virtual void Draw() = 0;						// 描画
 
 };
 

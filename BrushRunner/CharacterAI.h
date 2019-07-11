@@ -7,7 +7,7 @@
 #ifndef _CharacterAI_H_
 #define _CharacterAI_H_
 
-#include "PaintSystem.h"
+#include "PaintManager.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`

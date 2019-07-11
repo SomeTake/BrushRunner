@@ -8,24 +8,24 @@
 #include "SceneCharacterSelect.h"
 
 //=============================================================================
-// 初期化
+// コンストラクタ
 //=============================================================================
-HRESULT InitSceneCharacterSelect()
+SceneCharacterSelect::SceneCharacterSelect()
 {
-	return S_OK;
+	
 }
 
 //=============================================================================
-// 終了
+// デストラクタ
 //=============================================================================
-void UninitSceneCharacterSelect()
+SceneCharacterSelect::~SceneCharacterSelect()
 {
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void UpdateSceneCharacterSelect()
+void SceneCharacterSelect::Update()
 {
 
 }
@@ -33,7 +33,7 @@ void UpdateSceneCharacterSelect()
 //=============================================================================
 // 描画
 //=============================================================================
-void DrawSceneCharacterSelect()
+void SceneCharacterSelect::Draw()
 {
 
 }
