@@ -94,6 +94,7 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	this->AI = new CharacterAI(true);
 	this->PaintSystem = new PaintManager(_CtrlNum, true);
 	this->PopUp = new Pop(ctrlNum);
+	this->miniPlayer = new MiniPlayer(ctrlNum);
 	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
@@ -130,6 +131,7 @@ Player::~Player()
 	SAFE_DELETE(this->PopUp);
 	SAFE_DELETE(this->state);
 	SAFE_DELETE(this->itemManager);
+	SAFE_DELETE(this->miniPlayer);
 }
 
 //=====================================================================================================
@@ -151,6 +153,9 @@ void Player::Update()
 		// ポップアップの更新処理
 		PopUp->Update(this->pos);
 
+		// ミニプレイヤーの更新処理
+		miniPlayer->Update(this->pos);
+
 		// アニメーションを更新
 		this->UpdateAnim(TIME_PER_FRAME * animSpd);
 
@@ -162,7 +167,7 @@ void Player::Update()
 
 		// フィールド上に生成したアイテムの更新
 		itemManager->Update();
-		
+
 		// フィールド上に生成したアイテムのチェック
 		itemManager->Check();
 	}
@@ -214,9 +219,13 @@ void Player::Draw()
 	itemManager->Draw();
 
 	// ペイントの描画
-	this->PaintSystem->Draw();
+	PaintSystem->Draw();
 
-	this->PopUp->Draw();
+	// ポップアップの描画
+	PopUp->Draw();
+
+	// ミニプレイヤーの描画
+	miniPlayer->Draw();
 
 #if _DEBUG
 	this->AI->Draw();
@@ -248,7 +257,7 @@ void Player::Move()
 	// オート移動
 	if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
 	{
-		pos.x += MOVE_SPEED * runSpd;
+		//pos.x += MOVE_SPEED * runSpd;
 	}
 
 	// 空中判定
@@ -257,11 +266,43 @@ void Player::Move()
 #if _DEBUG
 	if (GetKeyboardPress(DIK_RIGHT))
 	{
-		pos.x += MOVE_SPEED;
+		switch (ctrlNum)
+		{
+		case 0:
+			pos.x += MOVE_SPEED;
+			break;
+		case 1:
+			pos.x += MOVE_SPEED * 0.8f;
+			break;
+		case 2:
+			pos.x += MOVE_SPEED * 0.5f;
+			break;
+		case 3:
+			pos.x += MOVE_SPEED * 0.2f;
+			break;
+		default:
+			break;
+		}
 	}
 	if (GetKeyboardPress(DIK_LEFT))
 	{
-		pos.x -= MOVE_SPEED;
+		switch (ctrlNum)
+		{
+		case 0:
+			pos.x -= MOVE_SPEED;
+			break;
+		case 1:
+			pos.x -= MOVE_SPEED * 0.8f;
+			break;
+		case 2:
+			pos.x -= MOVE_SPEED * 0.5f;
+			break;
+		case 3:
+			pos.x -= MOVE_SPEED * 0.2f;
+			break;
+		default:
+			break;
+		}
 	}
 #endif
 }
@@ -484,7 +525,7 @@ void Player::HorizonCollider()
 	//}
 
 	// テーブルを調べて0以上ならヒット
-	if (Map::GetMapTbl(x,y) >= 0)
+	if (Map::GetMapTbl(x, y) >= 0)
 	{
 		hitHorizon = true;
 		return;

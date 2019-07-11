@@ -13,8 +13,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CURSOR_TEXTURE	_T("data/TEXTURE/brush.png")				// テクスチャ
-#define CURSOR_SIZE D3DXVECTOR3(75.0f, 75.0f, 0.0f)					// サイズ
+#define CURSOR_TEXTURE	_T("data/TEXTURE/brush.png")			// テクスチャ
+#define CURSOR_SIZE D3DXVECTOR3(75.0f, 75.0f, 0.0f)				// サイズ
 #define CURSOR_DIVIDE_X	(4)										// 横分割
 #define CURSOR_DIVIDE_Y	(2)										// 縦分割
 #define CURSOR_PATTERN	(CURSOR_DIVIDE_X * CURSOR_DIVIDE_Y)		// 分割数

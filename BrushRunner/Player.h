@@ -14,13 +14,14 @@
 #include "PlayerState.h"
 #include "FieldItemManager.h"
 #include "PaintManager.h"
+#include "MiniPlayer.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define PLAYER_MAX				(4)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
-#define JUMP_SPEED			(12.0f)										// ジャンプの初速
+#define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -50,6 +51,7 @@ private:
 	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
 	Pop					*PopUp;				// ポップアップ
+	MiniPlayer			*miniPlayer;		// ミニプレイヤー表示
 
 	// メンバ関数
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);

@@ -56,6 +56,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MiniPlayer.h" />
     <ClInclude Include="MyLibrary.h" />
     <ClInclude Include="ObjectChip.h" />
     <ClInclude Include="Paint.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MiniPlayer.cpp" />
     <ClCompile Include="MyLibrary.cpp" />
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="PaintManager.cpp" />
