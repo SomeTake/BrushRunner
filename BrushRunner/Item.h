@@ -9,6 +9,7 @@
 
 #include "_2dobj.h"
 #include "Player.h"
+#include "Effect.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -24,18 +25,18 @@ static D3DXVECTOR3 ItemPos[PLAYER_MAX] = {
 	D3DXVECTOR3(245.0f, 30.0f, 0.0f),
 	D3DXVECTOR3(565.0f, 30.0f, 0.0f),
 	D3DXVECTOR3(885.0f, 30.0f, 0.0f),
-	D3DXVECTOR3(1200.0f, 30.0f, 0.0f),
+	D3DXVECTOR3(1205.0f, 30.0f, 0.0f),
 };
 
 enum ItemNum
 {
-	NumJet,
-	NumSpike,
-	NumPowerUp,
-	NumKawa,
-	NumBlind,
-	NumSpInk,
-	NumGun,
+	NumJet,		// ジェットパック
+	NumSpike,	// スパイクブーツ
+	NumPowerUp,	// パワーアップバナナ
+	NumKawa,	// バナナの皮
+	NumBlind,	// ブラインド
+	NumSpInk,	// スペシャルインク
+	NumGun,		// トリモチガン
 
 	NumItemMax,
 };
@@ -48,6 +49,7 @@ class Item :
 	public _2dobj
 {
 private:
+	Effect * pEffect;						// エフェクト
 	ItemState * state[NumItemMax];			// ステータス抽象クラス
 	Player * pPlayer;						// 参照するプレイヤークラスのポインタ
 	int rouletteCnt;						// ルーレットのカウンタ
@@ -60,6 +62,7 @@ private:
 
 	void Start();
 	void ActiveState(int ItemID);
+	void Debug();
 
 public:
 	Item(D3DXVECTOR3 _pos, Player* ptr);
@@ -69,12 +72,11 @@ public:
 	void Draw();
 
 	void ChangeState(int ItemID);
+	void Reset();
 
 	bool GetUse() { return use; };
 	Player *GetPlayer() { return pPlayer; };
 
-	void SetUse(bool _use) { use = _use; };
-	void SetActive(bool _active) { active = _active; };
 	void SetPatternAnim(int Anim) { PatternAnim = Anim; };
 };
 

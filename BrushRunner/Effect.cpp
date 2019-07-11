@@ -10,7 +10,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Effect::Effect(EffectData data) {
+Effect::Effect(EffectData data, D3DXVECTOR3 _pos) {
 	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -28,7 +28,7 @@ Effect::Effect(EffectData data) {
 	CountAnim = 0;
 	PatternAnim = 0;
 	size = data.size;
-	pos = data.pos;
+	pos = _pos;
 	xPattern = data.pattern.x;
 	yPattern = data.pattern.y;
 	TexAnimNum = xPattern * yPattern;

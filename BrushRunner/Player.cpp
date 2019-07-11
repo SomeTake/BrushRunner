@@ -28,12 +28,13 @@
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define MOVE_SPEED			(2.0f)										// 動くスピード
-#define DefaultPosition		D3DXVECTOR3(45.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+#define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(10)				// オブジェクトにヒットしたとき有効になるまでのフレーム数
-#define MOVE_SPEED			(2.0f)				// 動くスピード
-#define FALL_VELOCITY_MAX	(20.0f)				// 最大の落下速度
-#define STANDARD_GRAVITY	(0.98f)				// 重力加速度
+#define OBJECT_HIT_COUNTER	(10)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define MOVE_SPEED			(2.0f)										// 動くスピード
+#define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
+#define STANDARD_GRAVITY	(0.98f)										// 重力加速度
+#define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
 
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
@@ -69,7 +70,7 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
+Player::Player(int _CtrlNum) : state(nullptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -103,9 +104,8 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	jumpValue = 1.0f;
 
 	spike = false;
-	gun = false;
+	//gun = false;
 	blind = false;
-	spink = false;
 
 	// 待機状態からスタートする
 	state = new IdleState(this);
@@ -242,7 +242,7 @@ void Player::Move()
 	if (onCamera)
 	{
 		// オート移動
-		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
+		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip && GetAnimCurtID() != Stop)
 		{
 			pos.x += MOVE_SPEED * runSpd;
 		}
@@ -486,18 +486,46 @@ void Player::HorizonCollider()
 }
 
 //=====================================================================================================
-// フィールドオブジェクトとの当たり判定
+// フィールドオブジェクト（足元）との当たり判定
 //=====================================================================================================
 void Player::ObjectCollider()
 {
 	// キャラクターの座標からマップ配列の場所を調べる
-	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+	int x, y;
+	Map::GetMapChipXY(pos, &x, &y);
 
-	int objType = Map::GetObjTbl(x, -y);
+	int objType = Map::GetObjTbl(x, y);
 
 	HitObjectInfluence(objType);
 
+}
+
+//=====================================================================================================
+// フィールドオブジェクト（アイテム）との当たり判定
+//=====================================================================================================
+void Player::ObjectItemCollider(Map *pMap)
+{
+	// アイテムを取得している状態なら判定しない
+	if (hitItem)
+		return;
+
+	D3DXVECTOR3 colliderpos = pos;
+	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
+
+	for (auto &Obj : pMap->GetObjectChip())
+	{
+		if (Obj->GetTextureNum() != eObjItem)
+			continue;
+
+		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
+		{
+			hitItem = true;
+			return;
+		}
+	}
+
+	hitItem = false;
+	return;
 }
 
 //=====================================================================================================
@@ -587,15 +615,18 @@ void Player::HitObjectInfluence(int type)
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
-		//if (!spike)
-		//{
-		//	hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-		//	if (hitObjCnt == 0)
-		//	{
-		//		inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
-		//		inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
-		//	}
-		//}
+		// 時間経過でインク減少
+		if (!spike)
+		{
+			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+			if (hitObjCnt == 0)
+			{
+				int ink = PaintSystem->GetInkValue(BlackInk);
+				PaintSystem->SetInkValue(max(--ink, 0), BlackInk);
+				ink = PaintSystem->GetInkValue(ColorInk);
+				PaintSystem->SetInkValue(max(--ink, 0), ColorInk);
+			}
+		}
 
 		// 他のステータスはリセット
 		runSpd = 1.0f;
@@ -603,15 +634,18 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjHeal:
-		//if (!spike)
-		//{
-		//	hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-		//	if (hitObjCnt == 0)
-		//	{
-		//		inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
-		//		inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
-		//	}
-		//}
+		// 時間経過でインク増加
+		if (!spike)
+		{
+			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+			if (hitObjCnt == 0)
+			{
+				int ink = PaintSystem->GetInkValue(BlackInk);
+				PaintSystem->SetInkValue(min(++ink, INK_MAX), BlackInk);
+				ink = PaintSystem->GetInkValue(ColorInk);
+				PaintSystem->SetInkValue(min(++ink, INK_MAX), ColorInk);
+			}
+		}
 
 		// 他のステータスはリセット
 		runSpd = 1.0f;
@@ -619,8 +653,6 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjItem:
-		hitItem = true;
-
 		// 他のステータスはリセット
 		hitObjCnt = 0;
 		runSpd = 1.0f;

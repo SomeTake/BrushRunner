@@ -15,6 +15,7 @@
 #include "PowerUpBananaState.h"
 #include "SpikeState.h"
 #include "SpInkState.h"
+#include "DebugWindow.h"
 
 //=============================================================================
 // コンストラクタ
@@ -50,6 +51,9 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	state[NumBlind] = new BlindState(this);
 	state[NumSpInk] = new SpInkState(this);
 	state[NumGun] = new GunState(this);
+
+	// エフェクト
+	pEffect = new Effect(EffectDataWk[Item1Effect], pos);
 }
 
 //=============================================================================
@@ -68,6 +72,8 @@ Item::~Item()
 	{
 		delete state[i];
 	}
+
+	delete pEffect;
 }
 
 //=============================================================================
@@ -92,7 +98,6 @@ void Item::Update()
 		{
 			use = false;
 			active = true;
-			pPlayer->SetHitItem(false);
 			state[PatternAnim]->Start();
 		}
 
@@ -104,7 +109,11 @@ void Item::Update()
 	if (active)
 	{
 		ActiveState(PatternAnim);
+
+		pEffect->Update();
 	}
+
+	Debug();
 }
 
 //=============================================================================
@@ -112,6 +121,11 @@ void Item::Update()
 //=============================================================================
 void Item::Draw()
 {
+	if (active)
+	{
+		pEffect->Draw();
+	}
+
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
@@ -208,7 +222,6 @@ void Item::Start()
 				use = true;
 				rouletteCnt = 0;
 				useCnt = 0;
-				active = true;
 
 				// ランダムでアイテムの種類をセット
 				PatternAnim = rand() % NumItemMax;
@@ -218,7 +231,7 @@ void Item::Start()
 }
 
 //=============================================================================
-// アイテムを使用したときの効果
+// アイテムを使用中の効果
 //=============================================================================
 void Item::ActiveState(int ItemID)
 {
@@ -231,4 +244,41 @@ void Item::ActiveState(int ItemID)
 void Item::ChangeState(int ItemID)
 {
 	state[ItemID]->Start();
+}
+
+//=============================================================================
+// アイテムの効果が終了したときに呼び出す
+//=============================================================================
+void Item::Reset()
+{
+	pPlayer->SetHitItem(false);
+	use = false;
+	active = false;
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void Item::Debug()
+{
+#ifndef _DEBUG_
+
+	BeginDebugWindow("Item");
+
+	ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+	if (ImGui::TreeNode((void*)(intptr_t)pPlayer->GetCtrlNum(), "Player %d", pPlayer->GetCtrlNum()))
+	{
+		DebugText("ItemNum:%d", PatternAnim);
+
+		if (ImGui::TreeNode("Flag"))
+		{
+			DebugText("Use:%d Active:%d, PlayerHit:%d", use, active, pPlayer->GetHitItem());
+			ImGui::TreePop();
+		}
+		ImGui::TreePop();
+	}
+
+	EndDebugWindow("Item");
+
+#endif
 }

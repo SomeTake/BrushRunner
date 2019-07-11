@@ -19,7 +19,7 @@
 // マクロ定義
 //*****************************************************************************
 #define PLAYER_MAX				(4)										// 操作するプレイヤーの数
-#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
+#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED			(12.0f)										// ジャンプの初速
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
@@ -80,13 +80,11 @@ private:
 
 	// アイテム関連のステータス
 	bool				spike;				// スパイクブーツ装備中
-	bool				gun;				// トリモチガン装備中
 	bool				blind;				// ブラインド中
-	bool				spink;				// SPインク
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum, D3DXVECTOR3 firstpos);
+	Player(int _CtrlNum);
 	~Player();
 	void Update();
 	void Draw();
@@ -98,9 +96,10 @@ public:
 	// 当たり判定
 	void GroundCollider();
 	void HorizonCollider();
-	void ObjectCollider();
+	void ObjectCollider();		// フィールドオブジェクト
+	void ObjectItemCollider(Map *pMap);	// フィールドオブジェクト（アイテム）
 	void PaintCollider();
-	void FieldItemCollider(FieldItemManager *pFIManager);
+	void FieldItemCollider(FieldItemManager *pFIManager);	// フィールド内に設置されたアイテム
 
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
@@ -118,9 +117,7 @@ public:
 	bool GetHitItem() { return hitItem; };
 
 	bool GetSpike() { return spike; };
-	bool GetGun() { return gun; };
 	bool GetBlind() { return blind; };
-	bool GetSpInk() { return spink; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
@@ -129,11 +126,9 @@ public:
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
 
 	void SetSpike(bool _spike) { spike = _spike; };
-	void SetGun(bool _gun) { gun = _gun; };
 	void SetBlind(bool _blind){ blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
 	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
-	void SetSpInk(bool _spink) { spink = spink; };
 };
 
 #endif

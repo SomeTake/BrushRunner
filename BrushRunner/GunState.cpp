@@ -46,5 +46,5 @@ void GunState::Start()
 	D3DXVECTOR3 setpos = owner_->GetPlayer()->GetPos();
 	setpos.y += FIRE_POS_PLUS;
 	owner_->GetPlayer()->GetFieldItemManager()->Set(NumGun, setpos, D3DXVECTOR3(MOVE_SPEED, 0.0f, 0.0f));
-	owner_->GetPlayer()->SetHitItem(false);
+	owner_->Reset();
 }

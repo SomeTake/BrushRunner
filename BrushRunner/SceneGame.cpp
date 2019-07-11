@@ -32,14 +32,6 @@ static Effect	*pEffect[EffectMax];			// エフェクト用のポインタ
 static Player	*pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
 static QUADTREE *Quadtree = nullptr;
 
-// プレイヤー初期位置
-D3DXVECTOR3 firstpos[PLAYER_MAX] = {
-	D3DXVECTOR3(245.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(230.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(215.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(200.0f, 0.0f, 0.0f),
-};
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -48,7 +40,7 @@ SceneGame::SceneGame()
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo, firstpos[PlayerNo]);
+		pPlayer[PlayerNo] = new Player(PlayerNo);
 	}
 
 	// マップの初期化
@@ -272,6 +264,7 @@ void SceneGame::Collision()
 		pPlayer[i]->GroundCollider();
 		pPlayer[i]->HorizonCollider();
 		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
 	}
 
 	// プレイヤーとペイントマネージャの当たり判定

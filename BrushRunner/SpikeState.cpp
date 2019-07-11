@@ -38,9 +38,8 @@ void SpikeState::Update()
 	// —LŒøŠÔ‚ªI—¹
 	if (cnt == ACTIVE_TIME)
 	{
-		owner_->SetActive(false);
 		owner_->GetPlayer()->SetSpike(false);
-		owner_->GetPlayer()->SetHitItem(false);
+		owner_->Reset();
 	}
 }
 
