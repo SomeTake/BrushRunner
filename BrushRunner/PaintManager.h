@@ -32,6 +32,7 @@ private:
 	int						Owner;
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
+	bool					SpInk;					// trueのときインクが減らない
 
 	static QUADTREE			*Quadtree;
 #if _DEBUG
@@ -51,11 +52,15 @@ public:
 	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
 
 	// ゲッター
+	bool GetSpInk() { return SpInk; };
 	int GetOwner(void) { return this->Owner; };
 	std::vector<Paint*> GetBlackPaint(void) { return this->BlackPaint; };
 	std::vector<Paint*> GetColorPaint(void) { return this->ColorPaint; };
 	// 四分木から衝突可能なオブジェクトを探す
 	std::vector<Paint*> GetCollisionList(int NodeID);
+
+	// セッター
+	void SetSpInk(bool _SpInk) { SpInk = _SpInk; };
 };
 
 #endif

@@ -33,6 +33,8 @@ PaintManager::PaintManager(int PlayerNo)
 	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
 	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
 
+	SpInk = false;
+
 	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
 	ColorPaint.reserve(INK_MAX);
@@ -118,12 +120,10 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			InkValue[InkType]--;
-
-			//if (!pPlayer->GetSpInk())
-			//{
-			//	InkValue[InkType]--;
-			//}
+			if (!SpInk)
+			{
+				InkValue[InkType]--;
+			}
 		}
 	}
 #if _DEBUG
@@ -135,12 +135,10 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			InkValue[InkType]--;
-
-			//if (!pPlayer->GetSpInk())
-			//{
-			//	InkValue[InkType]--;
-			//}
+			if (!SpInk)
+			{
+				InkValue[InkType]--;
+			}
 		}
 	}
 #endif

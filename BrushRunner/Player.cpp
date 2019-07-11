@@ -94,7 +94,6 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	this->AI = new CharacterAI(true);
 	this->PaintSystem = new PaintManager(_CtrlNum);
 	this->PopUp = new Pop(ctrlNum);
-	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
@@ -107,11 +106,6 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	gun = false;
 	blind = false;
 	spink = false;
-
-	for (int i = 0; i < InkNum; i++)
-	{
-		inkValue[i] = INK_MAX;
-	}
 
 	// 待機状態からスタートする
 	state = new IdleState(this);
@@ -245,14 +239,17 @@ void Player::ChangeState(PlayerState *NewState)
 //=====================================================================================================
 void Player::Move()
 {
-	// オート移動
-	if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
+	if (onCamera)
 	{
-		pos.x += MOVE_SPEED * runSpd;
-	}
+		// オート移動
+		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
+		{
+			pos.x += MOVE_SPEED * runSpd;
+		}
 
-	// 空中判定
-	JumpMove();
+		// 空中判定
+		JumpMove();
+	}
 
 #if _DEBUG
 	if (GetKeyboardPress(DIK_RIGHT))
@@ -375,17 +372,9 @@ void Player::CheckOnCamera()
 	CAMERA *camera = GetCamera();
 
 	// 縦
-	if ((pos.x > camera->at.x - DRAW_RANGE.x) && (pos.x < camera->at.x + DRAW_RANGE.x))
+	if (pos.x > camera->at.x - DRAW_RANGE.x)
 	{
-		// 横
-		if ((pos.y > camera->at.y - DRAW_RANGE.y) && (pos.y < camera->at.y + DRAW_RANGE.y))
-		{
-			onCamera = true;
-		}
-		else
-		{
-			onCamera = false;
-		}
+		onCamera = true;
 	}
 	else
 	{
@@ -598,15 +587,15 @@ void Player::HitObjectInfluence(int type)
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
-		if (!spike)
-		{
-			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-			if (hitObjCnt == 0)
-			{
-				inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
-				inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
-			}
-		}
+		//if (!spike)
+		//{
+		//	hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+		//	if (hitObjCnt == 0)
+		//	{
+		//		inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
+		//		inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+		//	}
+		//}
 
 		// 他のステータスはリセット
 		runSpd = 1.0f;
@@ -614,15 +603,15 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjHeal:
-		if (!spike)
-		{
-			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
-			if (hitObjCnt == 0)
-			{
-				inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
-				inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
-			}
-		}
+		//if (!spike)
+		//{
+		//	hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
+		//	if (hitObjCnt == 0)
+		//	{
+		//		inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
+		//		inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
+		//	}
+		//}
 
 		// 他のステータスはリセット
 		runSpd = 1.0f;

@@ -68,8 +68,6 @@ private:
 	float				runSpd;				// ダッシュ速度(0.0-1.0-2.0)
 	float				jumpSpd;			// ジャンプ速度
 	float				jumpValue;			// ジャンプ速度に掛けて使う(0.0-1.0-2.0)
-	int					inkValue[InkNum];	// インクの残量
-	int					inkType;			// 使用中のインクの種類(enum ColorInk=カラー, BlackInk=黒)
 
 	// 当たり判定関係のフラグ
 	bool				hitGround;			// 地上判定(↓と合わせて両方falseだと空中状態)
