@@ -53,7 +53,7 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	state[NumGun] = new GunState(this);
 
 	// エフェクト
-	pEffect = new Effect(EffectDataWk[Item1Effect], pos);
+	pEffect = new Effect(EffectDataWk[ChargeEffect], pos);
 }
 
 //=============================================================================
@@ -244,6 +244,9 @@ void Item::ActiveState(int ItemID)
 void Item::ChangeState(int ItemID)
 {
 	state[ItemID]->Start();
+	SetTexture();
+	active = false;
+	use = true;
 }
 
 //=============================================================================
