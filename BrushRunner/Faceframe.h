@@ -10,34 +10,25 @@
 #include "_2dobj.h"
 
 //*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-#define TEXTURE_FACEFRAME	_T("data/texture/faceframe.png")			// フレーム用画像
-#define FACEFRAME_SIZE		D3DXVECTOR3(200.0f, 88.0f, 0.0f)		// テクスチャサイズ
-
-#define FACEFRAME_POS01     D3DXVECTOR3(10.0f, 10.0f, 0.0f)
-#define FACEFRAME_POS02		D3DXVECTOR3(328.0f, 10.0f, 0.0f)
-#define FACEFRAME_POS03		D3DXVECTOR3(646.0f, 10.0f, 0.0f)
-#define FACEFRAME_POS04		D3DXVECTOR3(964.0f, 10.0f, 0.0f)
-//*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class FaceFrame :
-	public _2dobj {
+class FaceFrame : public _2dobj 
+{
 private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
+	HRESULT MakeVertex(void);
+	void SetVertex(void);
+
 public:
-	FaceFrame(D3DXVECTOR3 _pos);
+	FaceFrame(int PlayerNo);
 	~FaceFrame();
+	static void ReleaseTexture(void);
 
 	// オーバーライド関数
 	void Update();
 	void Draw();
-	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex();
-
+	void SetPlayerDeadTexture(void);
 };
 
 #endif

@@ -14,7 +14,6 @@
 
 //2d obj
 #include "Frame01.h"
-#include "Faceframe.h"
 #include "CountDown.h"
 #include "Item.h"
 
@@ -32,14 +31,6 @@ static Effect	*pEffect[EffectMax];			// エフェクト用のポインタ
 static Player	*pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
 static QUADTREE *Quadtree = nullptr;
 
-// プレイヤー初期位置
-D3DXVECTOR3 firstpos[PLAYER_MAX] = {
-	D3DXVECTOR3(245.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(230.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(215.0f, 0.0f, 0.0f),
-	D3DXVECTOR3(200.0f, 0.0f, 0.0f),
-};
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -48,7 +39,7 @@ SceneGame::SceneGame()
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo, firstpos[PlayerNo]);
+		pPlayer[PlayerNo] = new Player(PlayerNo);
 	}
 
 	// マップの初期化
@@ -62,12 +53,6 @@ SceneGame::SceneGame()
 	// フレーム
 	UIObject.push_back(new Frame());
 
-	// 顔を表示するフレームの初期化
-	UIObject.push_back(new FaceFrame(FACEFRAME_POS01));
-	UIObject.push_back(new FaceFrame(FACEFRAME_POS02));
-	UIObject.push_back(new FaceFrame(FACEFRAME_POS03));
-	UIObject.push_back(new FaceFrame(FACEFRAME_POS04));
-
 	// カウントダウンの初期化
 	UIObject.push_back(new CountDown());
 
@@ -76,56 +61,6 @@ SceneGame::SceneGame()
 	{
 		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
 	}
-
-#if 0
-	// ポップアップの初期化
-	//for (int i = 0; i < PLAYER_MAX; i++)
-	//{
-	//	pPop[i] = new Pop(pPlayer[i]);
-	//}
-
-	// 黒インクの初期化
-	//p2dobj[NumInkblack00] = new Ink(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
-	//p2dobj[NumInkblack01] = new Ink(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
-	//p2dobj[NumInkblack02] = new Ink(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
-	//p2dobj[NumInkblack03] = new Ink(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
-
-	// 黒インク用フレームの初期化
-	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS01));
-	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS02));
-	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS03));
-	//UIObject.push_back(new InkFrameBlack(BLACKINKFRAME_POS04));
-
-	//p2dobj[NumBlackFrame00] = new InkFrameBlack(BLACKINKFRAME_POS01);
-	//p2dobj[NumBlackFrame01] = new InkFrameBlack(BLACKINKFRAME_POS02);
-	//p2dobj[NumBlackFrame02] = new InkFrameBlack(BLACKINKFRAME_POS03);
-	//p2dobj[NumBlackFrame03] = new InkFrameBlack(BLACKINKFRAME_POS04);
-
-	// カラーインクの初期化
-	//p2dobj[NumInkblue] = new Ink(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
-	//p2dobj[NumInkred] = new Ink(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
-	//p2dobj[NumInkyellow] = new Ink(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
-	//p2dobj[NumInkgreen] = new Ink(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
-
-	// カラーインク用フレームの初期化
-	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS01));
-	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS02));
-	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS03));
-	//UIObject.push_back(new InkFrameColor(COLORINKFRAME_POS04));
-	//p2dobj[NumColorFrame00] = new InkFrameColor(COLORINKFRAME_POS01);
-	//p2dobj[NumColorFrame01] = new InkFrameColor(COLORINKFRAME_POS02);
-	//p2dobj[NumColorFrame02] = new InkFrameColor(COLORINKFRAME_POS03);
-	//p2dobj[NumColorFrame03] = new InkFrameColor(COLORINKFRAME_POS04);
-
-
-	//p2dobj[NumFaceframe00] = new FaceFrame(FACEFRAME_POS01);
-	//p2dobj[NumFaceframe01] = new FaceFrame(FACEFRAME_POS02);
-	//p2dobj[NumFaceframe02] = new FaceFrame(FACEFRAME_POS03);
-	//p2dobj[NumFaceframe03] = new FaceFrame(FACEFRAME_POS04);
-
-
-#endif
-
 }
 
 //=============================================================================
@@ -161,12 +96,6 @@ SceneGame::~SceneGame()
 	}
 	UIObject.clear();
 	ReleaseVector(UIObject);
-
-	// ポップアップ削除
-	//for (int i = 0; i < PLAYER_MAX; i++)
-	//{
-	//	SAFE_DELETE(pPop[i]);
-	//}
 }
 
 //=============================================================================
@@ -226,7 +155,6 @@ void SceneGame::Update()
 
 	// 当たり判定の更新
 	Collision();
-
 }
 
 //=============================================================================
@@ -258,14 +186,11 @@ void SceneGame::Draw()
 #endif
 }
 
-#if 1
-
 //=============================================================================
 // 当たり判定の更新
 //=============================================================================
 void SceneGame::Collision()
 {
-
 	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -312,10 +237,7 @@ void SceneGame::Collision()
 		}
 	}
 
-
 	// 四分木を更新する
 	Quadtree->Update();
 
 }
-
-#endif

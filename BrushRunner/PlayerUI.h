@@ -1,33 +1,34 @@
 //=============================================================================
 //
-// ポップアップ表示処理 [Pop.h]
+// プレイヤーUI処理 [PlayerUI.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _POP_H_
-#define _POP_H_
+#ifndef _PLAYERUI_H_
+#define _PLAYERUI_H_
 
-#include "Billboard.h"
+#include "Pop.h"
+#include "MiniPlayer.h"
+#include "Faceframe.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Pop : public Billboard
+class PlayerUI
 {
 private:
-	int PlayerNo;
-
-	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
-
-	HRESULT MakeVertex();
+	Pop			*PopUp;
+	MiniPlayer	*miniPlayer;
+	FaceFrame	*faceFrame;
 
 public:
-	Pop(int PlayerNo);
-	~Pop();
+	PlayerUI(int PlayerNo);
+	~PlayerUI();
 
-	void Update() {};
 	void Update(D3DXVECTOR3 PlayerPos);
-	void Draw();
+	void Draw(bool OnCamera);
+	void SetPlayerDeadTexture(void) { this->faceFrame->SetPlayerDeadTexture(); };
 };
 
 #endif
+

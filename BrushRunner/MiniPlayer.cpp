@@ -1,91 +1,89 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Faceframe.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ミニプレイヤー処理 [MiniPlayer.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Faceframe.h"
+#include "MiniPlayer.h"
+#include "Map.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_FACEFRAME	_T("data/texture/faceframe.png")		// フレーム用画像
-#define FACEFRAME_SIZE		D3DXVECTOR3(100.0f, 88.0f, 0.0f)		// テクスチャサイズ
-#define FACEFRAME_POS		D3DXVECTOR3(10.0f, 10.0f, 0.0f)
-#define FACEFRAME_INTERVAL	(318.0f)
+#define MiniPlayer_Texture		_T("data/TEXTURE/MiniPlayer.png")	// テクスチャ
+#define MiniPlayer_Divide_X		(4)									// 横分割
+#define MiniPlayer_Size_X		(15)
+#define MiniPlayer_Size_Y		(30)
+#define MiniPlayer_Pos_X		(10)
+#define MiniPlayer_Pos_Y		(80)
+#define Distance_Screen			(1200.0f)
+#define Distance_World			(GOAL_POS.x - START_POS.x)
 
-LPDIRECT3DTEXTURE9	FaceFrame::D3DTexture = NULL;	// テクスチャのポインタ
+LPDIRECT3DTEXTURE9 MiniPlayer::D3DTexture = nullptr;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-FaceFrame::FaceFrame(int PlayerNo)
+MiniPlayer::MiniPlayer(int PlayerNo)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-	pos = FACEFRAME_POS + D3DXVECTOR3(FACEFRAME_INTERVAL * PlayerNo, 0.0f, 0.0f);
-
-	// 頂点情報の作成
-	MakeVertex();
+	pos = D3DXVECTOR3(MiniPlayer_Pos_X, MiniPlayer_Pos_Y, 0.0f);
 
 	// テクスチャの読み込み
-	if (D3DTexture == NULL)
+	if (MiniPlayer::D3DTexture == NULL)
 	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			TEXTURE_FACEFRAME,				// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
+		D3DXCreateTextureFromFile(Device,		// デバイスのポインタ
+			MiniPlayer_Texture,					// ファイルの名前
+			&MiniPlayer::D3DTexture);			// 読み込むメモリのポインタ
 	}
-}
 
+	// 頂点情報の作成
+	MakeVertex(PlayerNo);
+}
 //=============================================================================
 // デストラクタ
 //=============================================================================
-FaceFrame::~FaceFrame()
+MiniPlayer::~MiniPlayer()
 {
 
 }
 
-void FaceFrame::ReleaseTexture(void)
+//=============================================================================
+// 更新
+//=============================================================================
+void MiniPlayer::Update(D3DXVECTOR3 PlayerPos)
 {
-	SAFE_RELEASE(FaceFrame::D3DTexture);
-}
-
-//=============================================================================
-// 更新処理
-//=============================================================================
-void FaceFrame::Update()
-{
-}
-
-//=============================================================================
-// 描画処理
-//=============================================================================
-void FaceFrame::Draw()
-{
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-
-	// 頂点フォーマットの設定
-	Device->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定
-	Device->SetTexture(0, D3DTexture);
-
-	// ポリゴンの描画
-	Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
-}
-
-//=============================================================================
-// 頂点の作成
-//=============================================================================
-HRESULT FaceFrame::MakeVertex(void)
-{
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	pos.x = MiniPlayer_Pos_X + Distance_Screen * (PlayerPos.x / Distance_World);
 
 	// 頂点座標の設定
 	SetVertex();
+}
 
-	// rhwの設定
+//=============================================================================
+// 描画
+//=============================================================================
+void MiniPlayer::Draw()
+{
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	Device->SetFVF(FVF_VERTEX_2D);
+
+	Device->SetTexture(0, D3DTexture);
+
+	Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+
+}
+//=============================================================================
+// 頂点情報の作成
+//=============================================================================
+HRESULT MiniPlayer::MakeVertex(int PlayerNo)
+{
+	// 頂点座標の設定
+	SetVertex();
+
+	// テクスチャのパースペクティブコレクト用
 	vertexWk[0].rhw = 1.0f;
 	vertexWk[1].rhw = 1.0f;
 	vertexWk[2].rhw = 1.0f;
@@ -98,32 +96,33 @@ HRESULT FaceFrame::MakeVertex(void)
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.5f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.5f, 1.0f);
+	SetTexture(PlayerNo);
 
 	return S_OK;
-}
 
+}
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void FaceFrame::SetPlayerDeadTexture(void)
+void MiniPlayer::SetTexture(int PlayerNo)
 {
-	vertexWk[0].tex = D3DXVECTOR2(0.5f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.5f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	float SizeX = 1.0f / MiniPlayer_Divide_X;
+
+	// テクスチャ座標の設定
+	vertexWk[0].tex = D3DXVECTOR2((float)PlayerNo* SizeX, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2((float)PlayerNo* SizeX + SizeX, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2((float)PlayerNo* SizeX, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2((float)PlayerNo* SizeX + SizeX, 1.0f);
 }
 
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void FaceFrame::SetVertex(void)
+void MiniPlayer::SetVertex(void)
 {
+	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, 0.0f);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + FACEFRAME_SIZE.x, pos.y, 0.0f);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + FACEFRAME_SIZE.y, 0.0f);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + FACEFRAME_SIZE.x, pos.y + FACEFRAME_SIZE.y, 0.0f);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + MiniPlayer_Size_X, pos.y, 0.0f);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + MiniPlayer_Size_Y, 0.0f);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + MiniPlayer_Size_X, pos.y + MiniPlayer_Size_Y, 0.0f);
 }

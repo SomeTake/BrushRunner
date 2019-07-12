@@ -11,7 +11,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_POP		"data/TEXTURE/pointer.png"	// 読み込むテクスチャファイル名
+#define	TEXTURE_POP		"data/TEXTURE/pointer.png"		// 読み込むテクスチャファイル名
 #define	POP_WIDTH		(64.0f)							// 半径高さ
 #define	POP_HEIGHT		(32.0f)							// 半径幅
 #define POP_POS			D3DXVECTOR3(0.0f, 90.0f, -1.0f)	// 表示場所
@@ -30,7 +30,6 @@ Pop::Pop(int PlayerNo)
 
 	this->PlayerNo = PlayerNo;
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	width = POP_WIDTH;
 	height = POP_HEIGHT;
 
@@ -72,52 +71,13 @@ void Pop::Update(D3DXVECTOR3 PlayerPos)
 void Pop::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
-	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
-	CAMERA *cameraWk = GetCamera();
-
-	// αテストを有効に
-	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-
-	// ラインティングを無効にする
-	Device->SetRenderState(D3DRS_LIGHTING, FALSE);
+	D3DXMATRIX WorldMtx, TransMtx;
 
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&WorldMtx);
 
-	// ビューマトリックスを取得
-	ViewMtx = cameraWk->mtxView;
-
-	// ポリゴンを正面に向ける
-#if 1
-	// 逆行列をもとめる
-	D3DXMatrixInverse(&WorldMtx, NULL, &ViewMtx);
-	WorldMtx._41 = 0.0f;
-	WorldMtx._42 = 0.0f;
-	WorldMtx._43 = 0.0f;
-#else
-	WorldMtx._11 = mtxView._11;
-	WorldMtx._12 = mtxView._21;
-	WorldMtx._13 = mtxView._31;
-	WorldMtx._21 = mtxView._12;
-	WorldMtx._22 = mtxView._22;
-	WorldMtx._23 = mtxView._32;
-	WorldMtx._31 = mtxView._13;
-	WorldMtx._32 = mtxView._23;
-	WorldMtx._33 = mtxView._33;
-#endif
-
-	// スケールを反映
-	D3DXMatrixScaling(&SclMtx, scl.x,
-		scl.y,
-		scl.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
-
 	// 移動を反映
-	D3DXMatrixTranslation(&TransMtx, pos.x,
-		pos.y,
-		pos.z);
+	D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
 	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
 	// ワールドマトリックスの設定
@@ -134,13 +94,6 @@ void Pop::Draw()
 
 	// ポリゴンの描画
 	Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
-
-	// ラインティングを有効にする
-	Device->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	// αテストを無効に
-	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
 }
 
 //=============================================================================
@@ -172,6 +125,12 @@ HRESULT Pop::MakeVertex()
 	pVtx[1].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, POP_HEIGHT / 2.0f, 0.0f);
 	pVtx[2].vtx = D3DXVECTOR3(-POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
 	pVtx[3].vtx = D3DXVECTOR3(POP_WIDTH / 2.0f, -POP_HEIGHT / 2.0f, 0.0f);
+
+	// 法線ベクトルの設定
+	pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
 	// 反射光の設定
 	pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);

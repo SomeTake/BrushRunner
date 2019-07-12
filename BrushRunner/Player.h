@@ -9,8 +9,7 @@
 
 #include "D3DXAnimation.h"
 #include "CharacterAI.h"
-#include "Pop.h"
-#include "Map.h"
+#include "PlayerUI.h"
 #include "PlayerState.h"
 #include "FieldItemManager.h"
 #include "PaintManager.h"
@@ -20,7 +19,7 @@
 //*****************************************************************************
 #define PLAYER_MAX				(4)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
-#define JUMP_SPEED			(12.0f)										// ジャンプの初速
+#define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -49,7 +48,7 @@ private:
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
 	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
-	Pop					*PopUp;				// ポップアップ
+	PlayerUI			*playerUI;
 
 	// メンバ関数
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
@@ -86,7 +85,7 @@ private:
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum, D3DXVECTOR3 firstpos);
+	Player(int _CtrlNum);
 	~Player();
 	void Update();
 	void Draw();

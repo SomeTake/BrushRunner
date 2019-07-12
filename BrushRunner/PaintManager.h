@@ -17,8 +17,6 @@
 //*****************************************************************************
 #define INK_MAX	(50)	// インクの最大量
 
-class Player;
-
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -33,21 +31,22 @@ private:
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool					SpInk;					// trueのときインクが減らない
+	bool					AIFlag;
 
 	static QUADTREE			*Quadtree;
 #if _DEBUG
 	static bool				PressMode;
 #endif
 
+	void SetPaint(int InkType);
 	void CheckPaintUse(void);
 
 public:
-	PaintManager(int PlayerNo);
+	PaintManager(int PlayerNo, bool AIFlag);
 	~PaintManager();
 
 	void Update();
 	void Draw();
-	void SetPaint(int InkType);
 	void CursorMove(D3DXVECTOR3 DestPos);
 	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
 

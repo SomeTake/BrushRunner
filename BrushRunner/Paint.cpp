@@ -107,9 +107,7 @@ void Paint::Draw()
 	CAMERA *cameraWk = GetCamera();
 	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
 
-	// ラインティングを無効にする
-	Device->SetRenderState(D3DRS_LIGHTING, FALSE);
-
+#if 0
 	// 減算合成 レンダリングステートの変更→黒っぽくなる（加算合成は白っぽくなる（255に近づけていくと））
 	//Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);	// 結果 = 転送先(DEST) - 転送元(SRC)
 	//Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
@@ -117,18 +115,19 @@ void Paint::Draw()
 	// Zテスト
 	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 
-#if 0
 	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
 	Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
 	Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 #endif
+
 	// Zテスト
 	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
 	// αテストを有効に
-	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	//Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	//Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	//Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	if (Use)
 	{
@@ -160,19 +159,18 @@ void Paint::Draw()
 		Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 	}
 
-	// ラインティングを有効にする
-	Device->SetRenderState(D3DRS_LIGHTING, TRUE);
-
 	// αテストを無効に
-	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	//Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	// Z比較あり
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 #if 0
 	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
 	Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
 	Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 #endif
-	// Z比較あり
-	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 }
 
 //=============================================================================

@@ -38,11 +38,8 @@ Chip::Chip(int x, int y, int _texnum, int ChipType)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 位置・回転・スケールの初期設定
-	pos.x = x * CHIP_SIZE;
-	pos.y = -(y * CHIP_SIZE);
-	pos.z = 0.0f;
-	//rot = MAP_ROT;	// 縦に向ける
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	pos = D3DXVECTOR3(x * CHIP_SIZE, -(y * CHIP_SIZE), 0.0f);
+	//scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
 	this->ChipType = ChipType;
 	texnum = _texnum;
@@ -114,12 +111,12 @@ void Chip::Draw()
 		D3DXMatrixIdentity(&mtxWorld);
 
 		// スケールを反映
-		D3DXMatrixScaling(&mtxScl, scl.x, scl.y, scl.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
+		//D3DXMatrixScaling(&mtxScl, scl.x, scl.y, scl.z);
+		//D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
 
 		// 回転を反映
-		D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+		//D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
+		//D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
 
 		// 移動を反映
 		D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
