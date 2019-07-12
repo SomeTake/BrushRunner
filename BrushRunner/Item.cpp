@@ -96,7 +96,7 @@ void Item::Update()
 		{
 			// エフェクトを発生させる
 			std::vector<Effect*> *EffectVector = GetEffectVector();
-			effect = new Effect(ChargeEffect, pos);
+			effect = new Effect(ChargeEffect, pos, INFINITY_LOOP);
 			effect->SetUse(true);
 			EffectVector->push_back(effect);
 
@@ -246,7 +246,10 @@ void Item::ChangeState(int ItemID)
 	use = true;
 
 	// エフェクトも終了
-	effect->SetUse(false);
+	if (effect != nullptr)
+	{
+		effect->SetUse(false);
+	}
 }
 
 //=============================================================================

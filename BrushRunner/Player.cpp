@@ -95,7 +95,6 @@ Player::Player(int _CtrlNum) : state(nullptr)
 	this->AI = new CharacterAI(true);
 	this->PaintSystem = new PaintManager(ctrlNum, true);
 	this->playerUI = new PlayerUI(ctrlNum);
-	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
@@ -256,7 +255,6 @@ void Player::Move()
 	}
 		// ‹ó’†”»’è
 		JumpMove();
-	}
 
 #if _DEBUG
 	if (GetKeyboardPress(DIK_RIGHT))

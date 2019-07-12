@@ -13,6 +13,7 @@
 #include "PlayerState.h"
 #include "FieldItemManager.h"
 #include "PaintManager.h"
+#include "Map.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`

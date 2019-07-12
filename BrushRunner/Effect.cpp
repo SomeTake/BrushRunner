@@ -39,9 +39,9 @@ static EffectData EffectDataWk[EffectMax] =
 LPDIRECT3DTEXTURE9 Effect::D3DTexture[EffectMax] = { NULL };
 
 //=============================================================================
-// コンストラクタ
+// コンストラクタ(無限ループさせる場合は-1を渡す)
 //=============================================================================
-Effect::Effect(int EffectNum, D3DXVECTOR3 _pos)
+Effect::Effect(int EffectNum, D3DXVECTOR3 _pos, int _LoopNum)
 {
 	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
@@ -68,6 +68,8 @@ Effect::Effect(int EffectNum, D3DXVECTOR3 _pos)
 	yPattern = EffectDataWk[TexNo].pattern.y;
 	TexAnimNum = xPattern * yPattern;
 	AnimationCnt = EffectDataWk[TexNo].count;
+	loopnum = _LoopNum;
+	loopcnt = 0;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -104,19 +106,20 @@ void Effect::ReleaseTexture()
 //=============================================================================
 // 更新
 //=============================================================================
-void Effect::Update() {
-
-
+void Effect::Update()
+{
 	if (use == true)
 	{
 		// アニメーション
 		CountAnim++;
 
-		if ( ( CountAnim % AnimationCnt) == 0)
+		if ((CountAnim % AnimationCnt) == 0)
 		{
-
 			// パターンの切り替え
 			PatternAnim = (PatternAnim + 1) % TexAnimNum;
+
+			// ループ処理
+			Loop();
 
 			//テクスチャ座標をセット
 			SetTexture(PatternAnim);
@@ -129,6 +132,7 @@ void Effect::Update() {
 	SetVertex();
 
 }
+
 //=============================================================================
 // 描画
 //=============================================================================
@@ -150,6 +154,31 @@ void Effect::Draw() {
 	}
 
 }
+
+//=============================================================================
+// エフェクトのループ処理
+//=============================================================================
+void Effect::Loop()
+{
+
+	// 無限ループのとき以外
+	if (loopnum != INFINITY_LOOP)
+	{
+		if (PatternAnim == 0)
+		{
+			loopcnt++;
+
+			// 指定のループ回数に達したらエフェクトを終了
+			if (loopcnt == loopnum)
+			{
+				use = false;
+				loopcnt = 0;
+			}
+		}
+	}
+
+}
+
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
@@ -179,6 +208,7 @@ HRESULT Effect::MakeVertex(void) {
 	return S_OK;
 
 }
+
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
@@ -196,6 +226,7 @@ void Effect::SetTexture(int cntPattern) {
 	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 
 }
+
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
