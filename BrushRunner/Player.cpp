@@ -69,7 +69,7 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
+Player::Player(int _CtrlNum) : state(nullptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -92,9 +92,8 @@ Player::Player(int _CtrlNum, D3DXVECTOR3 firstpos) : state(nullptr)
 	jumpSpd = 0.0f;
 	ctrlNum = _CtrlNum;
 	this->AI = new CharacterAI(true);
-	this->PaintSystem = new PaintManager(_CtrlNum, true);
-	this->PopUp = new Pop(ctrlNum);
-	this->miniPlayer = new MiniPlayer(ctrlNum);
+	this->PaintSystem = new PaintManager(ctrlNum, true);
+	this->playerUI = new PlayerUI(ctrlNum);
 	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
@@ -128,10 +127,9 @@ Player::~Player()
 {
 	SAFE_DELETE(this->AI);
 	SAFE_DELETE(this->PaintSystem);
-	SAFE_DELETE(this->PopUp);
 	SAFE_DELETE(this->state);
 	SAFE_DELETE(this->itemManager);
-	SAFE_DELETE(this->miniPlayer);
+	SAFE_DELETE(this->playerUI);
 }
 
 //=====================================================================================================
@@ -150,14 +148,11 @@ void Player::Update()
 		// ペイントシステムの更新処理
 		PaintSystem->Update();
 
-		// ポップアップの更新処理
-		PopUp->Update(this->pos);
-
-		// ミニプレイヤーの更新処理
-		miniPlayer->Update(this->pos);
+		// プレイヤーUIの更新処理
+		playerUI->Update(this->pos);
 
 		// アニメーションを更新
-		this->UpdateAnim(TIME_PER_FRAME * animSpd);
+		UpdateAnim(TIME_PER_FRAME * animSpd);
 
 		// 状態抽象インターフェースの更新
 		UpdateState(this->GetAnimCurtID());
@@ -181,51 +176,56 @@ void Player::Update()
 //=====================================================================================================
 void Player::Draw()
 {
-	if (onCamera && !blind)
+	if (onCamera)
 	{
-		LPDIRECT3DDEVICE9 pDevice = GetDevice();
-		D3DMATERIAL9 matDef;
-		D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
+		if (!blind)
+		{
+			LPDIRECT3DDEVICE9 pDevice = GetDevice();
+			D3DMATERIAL9 matDef;
+			D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
 
-		// ワールドマトリックスの初期化
-		D3DXMatrixIdentity(&WorldMtx);
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&WorldMtx);
 
-		// スケールを反映
-		D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
-		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+			// スケールを反映
+			D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
 
-		// 回転を反映
-		D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
-		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+			// 回転を反映
+			D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
 
-		// 移動を反映
-		D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
-		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+			// 移動を反映
+			D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
-		// ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
 
-		// 現在のマテリアルを取得
-		pDevice->GetMaterial(&matDef);
+			// 現在のマテリアルを取得
+			pDevice->GetMaterial(&matDef);
 
-		// レンダリング
-		this->DrawAnim(&WorldMtx);
+			// レンダリング
+			this->DrawAnim(&WorldMtx);
 
-		// マテリアルをデフォルトに戻す
-		pDevice->SetMaterial(&matDef);
+			// マテリアルをデフォルトに戻す
+			pDevice->SetMaterial(&matDef);
+		}
+
+		// プレイヤーUIの描画
+		playerUI->Draw(onCamera);
+
+		// ペイントの描画
+		PaintSystem->Draw();
+	}
+	else
+	{
+		// プレイヤーUIの描画(プレイヤー死亡のUI)
+		playerUI->Draw(onCamera);
 	}
 
 	// フィールド上に生成したアイテムの描画
 	itemManager->Draw();
-
-	// ペイントの描画
-	PaintSystem->Draw();
-
-	// ポップアップの描画
-	PopUp->Draw();
-
-	// ミニプレイヤーの描画
-	miniPlayer->Draw();
 
 #if _DEBUG
 	this->AI->Draw();
@@ -426,11 +426,13 @@ void Player::CheckOnCamera()
 		else
 		{
 			onCamera = false;
+			playerUI->SetPlayerDeadTexture();
 		}
 	}
 	else
 	{
 		onCamera = false;
+		playerUI->SetPlayerDeadTexture();
 	}
 }
 

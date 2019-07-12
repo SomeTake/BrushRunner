@@ -63,6 +63,7 @@
     <ClInclude Include="PaintManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerState.h" />
+    <ClInclude Include="PlayerUI.h" />
     <ClInclude Include="Pop.h" />
     <ClInclude Include="PowerUpBananaState.h" />
     <ClInclude Include="Quadtree.h" />
@@ -123,6 +124,7 @@
     <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerState.cpp" />
+    <ClCompile Include="PlayerUI.cpp" />
     <ClCompile Include="Pop.cpp" />
     <ClCompile Include="PowerUpBananaState.cpp" />
     <ClCompile Include="Quadtree.cpp" />

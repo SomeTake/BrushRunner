@@ -75,6 +75,14 @@ void Cursor::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
+	// Zテスト
+	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
+	// αテストを有効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
 	// 頂点フォーマットの設定
 	Device->SetFVF(FVF_VERTEX_2D);
 
@@ -87,6 +95,12 @@ void Cursor::Draw()
 		// ポリゴンの描画
 		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
+
+	// αテストを無効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	// Z比較あり
+	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 }
 
 //=============================================================================
@@ -151,15 +165,15 @@ void Cursor::SetVertex()
 //=============================================================================
 void Cursor::Move()
 {
-	if (!AIFlag)
-	{
+	//if (!AIFlag)
+	//{
 		KeyMove();	// キーボード操作
 		PadMove();	// コントローラ操作
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		AIMove();
-	}
+	//}
 }
 
 //=============================================================================

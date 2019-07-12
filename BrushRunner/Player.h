@@ -9,12 +9,10 @@
 
 #include "D3DXAnimation.h"
 #include "CharacterAI.h"
-#include "Pop.h"
-#include "Map.h"
+#include "PlayerUI.h"
 #include "PlayerState.h"
 #include "FieldItemManager.h"
 #include "PaintManager.h"
-#include "MiniPlayer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -50,8 +48,7 @@ private:
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
 	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
-	Pop					*PopUp;				// ポップアップ
-	MiniPlayer			*miniPlayer;		// ミニプレイヤー表示
+	PlayerUI			*playerUI;
 
 	// メンバ関数
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
@@ -90,7 +87,7 @@ private:
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum, D3DXVECTOR3 firstpos);
+	Player(int _CtrlNum);
 	~Player();
 	void Update();
 	void Draw();

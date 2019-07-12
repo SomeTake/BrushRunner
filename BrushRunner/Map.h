@@ -8,8 +8,7 @@
 #define _MAP_H_
 
 #include "Chip.h"
-
-class QUADTREE;
+#include "Quadtree.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -49,17 +48,9 @@ class Map
 private:
 	static std::vector<std::vector<int>>	maptbl;
 	std::vector<Chip*>						MapChipVector;
-	//int maptbl[MAP_SIZE_Y][MAP_SIZE_X];		// マップ用の配列
-	//int	*pMaptbl[MAP_SIZE_Y];				// 配列のポインタ
-	//Chip *pChip[MAP_SIZE_Y][MAP_SIZE_X];	// チップのポインタ
-	//std::vector<Chip*>				NoEmptyMapChip;
 
 	static std::vector<std::vector<int>>	objtbl;
 	std::vector<Chip*>						ObjectChipVector;
-	//int objtbl[MAP_SIZE_Y][MAP_SIZE_X];		// フィールドオブジェクト用の配列
-	//int *pObjtbl[MAP_SIZE_Y];
-	//ObjectChip *pObjChip[MAP_SIZE_Y][MAP_SIZE_X];
-	//std::vector<ObjectChip *> NoEmptyObjectChip;
 
 public:
 	Map();
@@ -68,6 +59,8 @@ public:
 	void Update();
 	void Draw();
 
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
+
 	static int GetMapTbl(int MapX, int MapY);
 	static int GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection);
 	static int GetObjTbl(int ObjX, int ObjY);
@@ -75,11 +68,6 @@ public:
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
 
 	void PaintCollider(QUADTREE *Quadtree, int NodeID);
-
-	static void SetObjTbl(int ObjX, int ObjY, int texnum);
-
 };
-
-//D3DXVECTOR3 GetMapCenterPos();					// 表示されているマップの中心座標
 
 #endif

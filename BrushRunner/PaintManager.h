@@ -17,8 +17,6 @@
 //*****************************************************************************
 #define INK_MAX	(50)	// インクの最大量
 
-class Player;
-
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -39,6 +37,7 @@ private:
 	static bool				PressMode;
 #endif
 
+	void SetPaint(int InkType);
 	void CheckPaintUse(void);
 
 public:
@@ -47,7 +46,6 @@ public:
 
 	void Update();
 	void Draw();
-	void SetPaint(int InkType);
 	void CursorMove(D3DXVECTOR3 DestPos);
 	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
 

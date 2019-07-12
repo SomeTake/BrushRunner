@@ -221,9 +221,6 @@ void PaintManager::Update()
 //=============================================================================
 void PaintManager::Draw()
 {
-	// カーソルを描画
-	this->pCursor->Draw();
-
 	// 使用しているペイントを描画
 	for (auto &Black : this->BlackPaint)
 	{
@@ -233,6 +230,9 @@ void PaintManager::Draw()
 	{
 		Color->Draw();
 	}
+
+	// カーソルを描画
+	this->pCursor->Draw();
 
 	// インクゲージを描画
 	// 現在使用しているインクはカラー、カラーインクゲージは前
