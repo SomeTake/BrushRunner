@@ -97,7 +97,6 @@ void Item::Update()
 			// エフェクトを発生させる
 			std::vector<Effect*> *EffectVector = GetEffectVector();
 			effect = new Effect(ChargeEffect, pos, INFINITY_LOOP);
-			effect->SetUse(true);
 			EffectVector->push_back(effect);
 
 			use = false;

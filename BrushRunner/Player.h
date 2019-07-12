@@ -81,6 +81,7 @@ private:
 	// アイテム関連のステータス
 	bool				spike;				// スパイクブーツ装備中
 	bool				blind;				// ブラインド中
+	bool				jet;				// ジェットパック装備中
 
 public:
 	// メンバ関数
@@ -107,6 +108,7 @@ public:
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
 	D3DXVECTOR3	GetPos() { return pos; };
 	float GetJumpSpeed() { return jumpSpd; };
+	float GetJumpValue() { return jumpValue; };
 	PaintManager* GetPaintManager(void) { return this->PaintSystem; };
 
 	int GetCtrlNum() { return ctrlNum; };
@@ -124,7 +126,7 @@ public:
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
-
+	void SetJet(bool _jet) { jet = _jet; };
 	void SetSpike(bool _spike) { spike = _spike; };
 	void SetBlind(bool _blind){ blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };

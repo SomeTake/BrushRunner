@@ -7,14 +7,12 @@
 #ifndef _EFFECT_H_
 #define _EFFECT_H_
 
-#include "_2dobj.h"
-
 // エフェクトの種類
 enum EffectNum{
 	HitEffect,
-	Hit1Effect,
+	DeadEffect,
 	RunEffect,
-	ExpEffect,
+	ExplosionEffect,
 	ItemEffect,
 	Item1Effect,
 	ChargeEffect,
@@ -28,8 +26,8 @@ enum EffectNum{
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Effect {
-	//public _2dobj {
+class Effect
+{
 private:
 	static LPDIRECT3DTEXTURE9	D3DTexture[EffectMax];	// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9		D3DVtxBuff;				// 頂点バッファへのポインタ
@@ -48,6 +46,10 @@ private:
 	int							loopnum;				// ループさせる回数(無限ループは-1)
 	int							loopcnt;				// 現在のループ回数
 
+	HRESULT MakeVertex();						// 頂点情報の作成
+	void SetTexture(int cntPattern);			// テクスチャ座標の設定
+	void SetVertex();							// 頂点座標の設定
+
 	void Loop();								// エフェクトのループ処理
 
 public:
@@ -56,10 +58,6 @@ public:
 
 	void Update();
 	void Draw();
-
-	HRESULT MakeVertex();						// 頂点情報の作成
-	void SetTexture(int cntPattern);			// テクスチャ座標の設定
-	void SetVertex();							// 頂点座標の設定
 
 	bool GetUse() { return use; };
 	void SetUse(bool _use) { use = _use; };

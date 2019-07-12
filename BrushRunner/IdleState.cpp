@@ -45,7 +45,8 @@ void IdleState::Update(int AnimCurtID)
 			// 上キーを押してジャンプ
 			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B))
 			{
-				owner_->SetJumpSpeed(JUMP_SPEED);
+				float value = owner_->GetJumpValue();
+				owner_->SetJumpSpeed(JUMP_SPEED * value);
 				owner_->ChangeAnim(Jump);
 				owner_->ChangeState(new JumpState(owner_));
 				return;

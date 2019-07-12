@@ -1,0 +1,374 @@
+//=============================================================================
+//
+// 3Dビルボードエフェクト処理 [Effect3D.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
+//
+//=============================================================================
+#include "Main.h"
+#include "Effect3D.h"
+#include "MyLibrary.h"
+#include "Camera.h"
+
+//*****************************************************************************
+// 構造体定義
+//*****************************************************************************
+// エフェクトデータ構造体
+struct EffectData3D
+{
+	const char *texture;	// テクスチャファイル
+	D3DXVECTOR3 size;		// サイズ
+	int count;				// 更新フレーム
+	Int2D pattern;			// テクスチャ分割数(x,y)
+};
+
+//*****************************************************************************
+// グローバル変数
+//*****************************************************************************
+static EffectData3D EffectData3DWk[EffectMax] =
+{
+	{ "data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(5, 1) },
+{ "data/EFFECT/anmef001.png", D3DXVECTOR3(500.0f, 100.0f, 0.0f), 7, Int2D(1, 5) },
+{ "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(2, 2) },
+{ "data/EFFECT/explo000.png", D3DXVECTOR3(1000.0f, 1000.0f, 0.0f), 3, Int2D(5, 3) },
+{ "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 10, Int2D(5, 2) },
+{ "data/EFFECT/ief000.png", D3DXVECTOR3(70.0f, 70.0f, 0.0f), 4, Int2D(3, 1) },
+{ "data/EFFECT/Charge.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 10 ,Int2D(2, 7) },
+};
+
+//*****************************************************************************
+// クラスのメンバ初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9 Effect3D::D3DTexture[EffectMax] = { NULL };
+
+//=============================================================================
+// コンストラクタ(無限ループさせる場合はINFINITY_LOOPを渡す)
+//=============================================================================
+Effect3D::Effect3D(int Effect3DNum, D3DXVECTOR3 _pos, int _LoopNum)
+{
+
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	D3DVtxBuff = NULL;
+
+	TexNo = Effect3DNum;
+
+	// テクスチャの読み込み
+	if (D3DTexture[TexNo] == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			EffectData3DWk[TexNo].texture,	// ファイルの名前
+			&D3DTexture[TexNo]);			// 読み込むメモリのポインタ
+	}
+
+	use = true;
+	CountAnim = 0;
+	PatternAnim = 0;
+	size = EffectData3DWk[TexNo].size;
+	pos = _pos;
+	xPattern = EffectData3DWk[TexNo].pattern.x;
+	yPattern = EffectData3DWk[TexNo].pattern.y;
+	TexAnimNum = xPattern * yPattern;
+	AnimationCnt = EffectData3DWk[TexNo].count;
+	loopnum = _LoopNum;
+	loopcnt = 0;
+
+	// 頂点情報の作成
+	MakeVertex();
+
+}
+
+//=============================================================================
+// デストラクタ
+//=============================================================================
+Effect3D::~Effect3D()
+{
+	if (D3DVtxBuff != NULL)
+	{
+		D3DVtxBuff->Release();
+		D3DVtxBuff = NULL;
+	}
+}
+
+//=============================================================================
+// テクスチャの開放
+//=============================================================================
+void Effect3D::ReleaseTexture()
+{
+	for (int i = 0; i < EffectMax3D; i++)
+	{
+		if (D3DTexture[i] != NULL)
+		{	// テクスチャの開放
+			D3DTexture[i]->Release();
+			D3DTexture[i] = NULL;
+		}
+	}
+}
+
+//=============================================================================
+// 更新
+//=============================================================================
+void Effect3D::Update()
+{
+	if (use == true)
+	{
+		// アニメーション
+		CountAnim++;
+
+		if ((CountAnim % AnimationCnt) == 0)
+		{
+			// パターンの切り替え
+			PatternAnim = LoopCountUp(PatternAnim, 0, TexAnimNum);
+
+			// ループ処理
+			Loop();
+
+			//テクスチャ座標をセット
+			SetTexture();
+
+		}
+
+	}
+}
+
+//=============================================================================
+// 描画
+//=============================================================================
+void Effect3D::Draw()
+{
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	CAMERA *cameraWk = GetCamera();
+	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
+
+	// ラインティングを無効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	// 減算合成 レンダリングステートの変更→黒っぽくなる（加算合成は白っぽくなる（255に近づけていくと））
+	//pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);	// 結果 = 転送先(DEST) - 転送元(SRC)
+	//pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	// Zテスト
+	//pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	// Zテスト
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
+	// αテストを有効に
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
+	if (use)
+	{
+		// ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&WorldMtx);
+
+		// ビューマトリックスを取得
+		ViewMtx = cameraWk->mtxView;
+
+		// ポリゴンを正面に向ける
+		WorldMtx._11 = ViewMtx._11;
+		WorldMtx._12 = ViewMtx._21;
+		WorldMtx._13 = ViewMtx._31;
+		WorldMtx._21 = ViewMtx._12;
+		WorldMtx._22 = ViewMtx._22;
+		WorldMtx._23 = ViewMtx._32;
+		WorldMtx._31 = ViewMtx._13;
+		WorldMtx._32 = ViewMtx._23;
+		WorldMtx._33 = ViewMtx._33;
+
+#if 1
+		// 逆行列をもとめる
+		D3DXMatrixInverse(&WorldMtx, NULL, &ViewMtx);
+		WorldMtx._41 = 0.0f;
+		WorldMtx._42 = 0.0f;
+		WorldMtx._43 = 0.0f;
+#else
+		WorldMtx._11 = mtxView._11;
+		WorldMtx._12 = mtxView._21;
+		WorldMtx._13 = mtxView._31;
+		WorldMtx._21 = mtxView._12;
+		WorldMtx._22 = mtxView._22;
+		WorldMtx._23 = mtxView._32;
+		WorldMtx._31 = mtxView._13;
+		WorldMtx._32 = mtxView._23;
+		WorldMtx._33 = mtxView._33;
+#endif
+
+		// スケールを反映
+		D3DXMatrixScaling(&SclMtx, scl.x,
+			scl.y,
+			scl.z);
+		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+
+		// 移動を反映
+		D3DXMatrixTranslation(&TransMtx, pos.x,
+			pos.y,
+			pos.z);
+		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+
+		// ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+
+		// 頂点バッファをデバイスのデータストリームにバインド
+		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
+
+		// 頂点フォーマットの設定
+		pDevice->SetFVF(FVF_VERTEX_3D);
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, D3DTexture[TexNo]);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	}
+
+	// ラインティングを有効にする
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
+	// αテストを無効に
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
+	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
+	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	// Z比較あり
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+}
+
+//=============================================================================
+// エフェクトのループ処理
+//=============================================================================
+void Effect3D::Loop()
+{
+
+	// 無限ループのとき以外
+	if (loopnum != INFINITY_LOOP)
+	{
+		if (PatternAnim == 0)
+		{
+			loopcnt++;
+
+			// 指定のループ回数に達したらエフェクトを終了
+			if (loopcnt == loopnum)
+			{
+				use = false;
+				loopcnt = 0;
+			}
+		}
+	}
+
+}
+
+//=============================================================================
+// 頂点情報の作成
+//=============================================================================
+HRESULT Effect3D::MakeVertex()
+{
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	// オブジェクトの頂点バッファを生成
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+		D3DUSAGE_WRITEONLY,													// 頂点バッファの使用法　
+		FVF_VERTEX_3D,														// 使用する頂点フォーマット
+		D3DPOOL_MANAGED,													// リソースのバッファを保持するメモリクラスを指定
+		&D3DVtxBuff,														// 頂点バッファインターフェースへのポインタ
+		NULL)))																// NULLに設定
+	{
+		return E_FAIL;
+	}
+
+	{//頂点バッファの中身を埋める
+		Vertex3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		// 頂点座標の設定
+		pVtx[0].vtx = D3DXVECTOR3(-size.x / 2.0f, size.y / 2.0f, 0.0f);
+		pVtx[1].vtx = D3DXVECTOR3(size.x / 2.0f, size.y / 2.0f, 0.0f);
+		pVtx[2].vtx = D3DXVECTOR3(-size.x / 2.0f, -size.y / 2.0f, 0.0f);
+		pVtx[3].vtx = D3DXVECTOR3(size.x / 2.0f, -size.y / 2.0f, 0.0f);
+
+		// 法線ベクトルの設定
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+
+		// 反射光の設定
+		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// テクスチャ座標の設定
+		int x = PatternAnim % xPattern;
+		int y = PatternAnim / xPattern;
+		float sizeX = 1.0f / xPattern;
+		float sizeY = 1.0f / yPattern;
+
+		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+
+		// 頂点データをアンロックする
+		D3DVtxBuff->Unlock();
+	}
+
+
+	return S_OK;
+}
+
+//=============================================================================
+// テクスチャ座標の設定
+//=============================================================================
+void Effect3D::SetTexture()
+{
+	{//頂点バッファの中身を埋める
+		Vertex3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		// テクスチャ座標の設定
+		int x = PatternAnim % xPattern;
+		int y = PatternAnim / xPattern;
+		float sizeX = 1.0f / xPattern;
+		float sizeY = 1.0f / yPattern;
+
+		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+
+		// 頂点データをアンロックする
+		D3DVtxBuff->Unlock();
+	}
+
+}
+
+//=============================================================================
+// テクスチャの読み込み
+//=============================================================================
+void Effect3D::LoadTexture()
+{
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	for (int effectNo = 0; effectNo < EffectMax3D; effectNo++)
+	{
+		if (D3DTexture[effectNo] == NULL)
+		{
+			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+				EffectData3DWk[effectNo].texture,		// ファイルの名前
+				&D3DTexture[effectNo]);				// 読み込むメモリのポインタ
+
+		}
+	}
+}

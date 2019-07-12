@@ -35,6 +35,7 @@
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
 #define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
+#define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
 
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
@@ -305,11 +306,17 @@ void Player::Move()
 //=====================================================================================================
 void Player::JumpMove()
 {
-	pos.y += jumpSpd * jumpValue;
+	pos.y += jumpSpd;
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
 	if (jumpSpd > -FALL_VELOCITY_MAX)
 	{
 		jumpSpd -= STANDARD_GRAVITY;
+	}
+
+	// ジェットパック装備中はジャンプ力アップ
+	if (jet)
+	{
+		jumpValue = JETPACK_VALUE;
 	}
 }
 
@@ -417,6 +424,13 @@ void Player::CheckOnCamera()
 	{
 		onCamera = false;
 		playerUI->SetPlayerDeadTexture();
+
+		// エフェクト発生
+		D3DXVECTOR3 setpos = pos;
+		setpos.z -= 1.0f;
+		std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
+		Effect3D *effect = new Effect3D(ExplosionEffect3D, setpos, 3);
+		Effect3DVector->push_back(effect);
 	}
 }
 
@@ -648,7 +662,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjJump:
-		jumpSpd = JUMP_SPEED;
+		jumpSpd = JUMP_SPEED * jumpValue;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 

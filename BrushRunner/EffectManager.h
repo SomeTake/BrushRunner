@@ -8,6 +8,7 @@
 #define _EFFECTMANAGER_H_
 
 #include "Effect.h"
+#include "Effect3D.h"
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -27,5 +28,6 @@ public:
 };
 
 std::vector<Effect*> *GetEffectVector();
+std::vector<Effect3D*> *GetEffect3DVector();
 
 #endif

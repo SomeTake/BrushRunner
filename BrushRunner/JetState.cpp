@@ -37,7 +37,7 @@ void JetState::Update()
 
 	if (cnt == ACTIVE_TIME)
 	{
-		owner_->GetPlayer()->SetJumpValue(1.0f);
+		owner_->GetPlayer()->SetJet(false);
 		// アイテムの効果終了
 		owner_->Reset();
 	}
@@ -49,5 +49,5 @@ void JetState::Update()
 void JetState::Start()
 {
 	cnt = 0;
-	owner_->GetPlayer()->SetJumpValue(2.0f);
+	owner_->GetPlayer()->SetJet(true);
 }

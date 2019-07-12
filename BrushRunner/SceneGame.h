@@ -14,60 +14,12 @@
 #include "Player.h"
 #include "PaintManager.h"
 #include "EffectManager.h"
+#include "Sky.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define START_FRAME (240)	// スタートするまでのタイマー
-
-// 2dobjの個数(描画順先→後)
-enum Num2dobj
-{
-	// 一番外のフレーム
-	NumFrame,
-
-	// 黒インク
-	NumInkblack00,
-	NumInkblack01,
-	NumInkblack02,
-	NumInkblack03,
-
-	// 黒インクのフレーム
-	NumBlackFrame00,
-	NumBlackFrame01,
-	NumBlackFrame02,
-	NumBlackFrame03,
-
-	// カラーインク
-	NumInkblue,
-	NumInkred,
-	NumInkyellow,
-	NumInkgreen,
-
-	// カラーインクのフレーム
-	NumColorFrame00,
-	NumColorFrame01,
-	NumColorFrame02,
-	NumColorFrame03,
-
-	// 顔のフレーム
-	NumFaceframe00,
-	NumFaceframe01,
-	NumFaceframe02,
-	NumFaceframe03,
-
-	// カウントダウン
-	NumCountDown,
-
-	// アイテム表示
-	NumItem00,
-	NumItem01,
-	NumItem02,
-	NumItem03,
-
-	// ----- 最大数 -----
-	_2dMax,
-};
 
 //*****************************************************************************
 // クラス定義
@@ -80,6 +32,7 @@ private:
 	Player	*pPlayer[PLAYER_MAX];			// プレイヤー
 	QUADTREE *Quadtree = nullptr;			// 四分木
 	EffectManager *pEffectManager;			// 2Dエフェクト管理
+	Sky		*pSky;							// 空
 
 	void Collision();
 
