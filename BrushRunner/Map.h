@@ -59,7 +59,7 @@ public:
 	void Update();
 	void Draw();
 
-	static void SetObjTbl(int ObjX, int ObjY, int texnum);
+	void PaintCollider(QUADTREE *Quadtree, int NodeID);
 
 	static int GetMapTbl(int MapX, int MapY);
 	static int GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection);
@@ -67,7 +67,9 @@ public:
 	static void GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY);
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
 
-	void PaintCollider(QUADTREE *Quadtree, int NodeID);
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
+	std::vector<Chip*> GetObjectChip() { return ObjectChipVector; };
+
 };
 
 #endif

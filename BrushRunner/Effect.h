@@ -16,34 +16,11 @@ enum EffectNum{
 	RunEffect,
 	ExpEffect,
 	ItemEffect,
+	Item1Effect,
+	ChargeEffect,
 
 	// エフェクトの個数
 	EffectMax,
-};
-
-//*****************************************************************************
-// 構造体定義
-//*****************************************************************************
-// エフェクトデータ構造体
-struct EffectData
-{
-	const char *texture;	// テクスチャファイル
-	D3DXVECTOR3 size;		// サイズ
-	D3DXVECTOR3 pos;		// 場所
-	int count;				// 更新フレーム
-	Int2D pattern;			// テクスチャ分割数(x,y)
-};
-
-//*****************************************************************************
-// グローバル変数
-//*****************************************************************************
-static EffectData EffectDataWk[EffectMax] =
-{
-	{"data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 7, Int2D(5, 1) },
-{ "data/EFFECT/anmef001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(200.0f, 0.0f, 0.0f), 7, Int2D(1, 5) },
-{ "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(400.0f, 0.0f, 0.0f), 7, Int2D(2, 2) },
-{ "data/EFFECT/explo000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(600.0f, 0.0f, 0.0f), 3, Int2D(5, 3) },
-{ "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), D3DXVECTOR3(800.0f, 0.0f, 0.0f), 10, Int2D(5, 2) }
 };
 
 //*****************************************************************************
@@ -60,15 +37,16 @@ private:
 	int				CountAnim;
 	int				PatternAnim;					// アニメーションパターン
 	int				AnimationCnt;
+	int				TexNo;
 
-	LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
+	static LPDIRECT3DTEXTURE9		D3DTexture[EffectMax];		// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff;		// 頂点バッファへのポインタ
 	int				TexAnimNum;						// アニメーションの分割数
 	int				xPattern, yPattern;				// 分割数
 	D3DXVECTOR3		size;
 
 public:
-	Effect(EffectData data);
+	Effect(int EffectNum, D3DXVECTOR3 _pos);
 	~Effect();
 
 	void Update();
@@ -77,6 +55,12 @@ public:
 	HRESULT MakeVertex();						// 頂点情報の作成
 	void SetTexture(int cntPattern);			// テクスチャ座標の設定
 	void SetVertex();							// 頂点座標の設定
+
+	bool GetUse() { return use; };
+	void SetUse(bool _use) { use = _use; };
+
+	static void LoadTexture();
+	static void ReleaseTexture();
 };
 
 #endif

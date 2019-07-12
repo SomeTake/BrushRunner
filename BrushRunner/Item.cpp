@@ -15,6 +15,8 @@
 #include "PowerUpBananaState.h"
 #include "SpikeState.h"
 #include "SpInkState.h"
+#include "DebugWindow.h"
+#include "EffectManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -50,6 +52,7 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	state[NumBlind] = new BlindState(this);
 	state[NumSpInk] = new SpInkState(this);
 	state[NumGun] = new GunState(this);
+
 }
 
 //=============================================================================
@@ -68,6 +71,7 @@ Item::~Item()
 	{
 		delete state[i];
 	}
+
 }
 
 //=============================================================================
@@ -90,9 +94,14 @@ void Item::Update()
 		// アイテムを使用する
 		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
 		{
+			// エフェクトを発生させる
+			std::vector<Effect*> *EffectVector = GetEffectVector();
+			effect = new Effect(ChargeEffect, pos);
+			effect->SetUse(true);
+			EffectVector->push_back(effect);
+
 			use = false;
 			active = true;
-			pPlayer->SetHitItem(false);
 			state[PatternAnim]->Start();
 		}
 
@@ -105,6 +114,8 @@ void Item::Update()
 	{
 		ActiveState(PatternAnim);
 	}
+	
+	Debug();
 }
 
 //=============================================================================
@@ -208,7 +219,6 @@ void Item::Start()
 				use = true;
 				rouletteCnt = 0;
 				useCnt = 0;
-				active = true;
 
 				// ランダムでアイテムの種類をセット
 				PatternAnim = rand() % NumItemMax;
@@ -218,7 +228,7 @@ void Item::Start()
 }
 
 //=============================================================================
-// アイテムを使用したときの効果
+// アイテムを使用中の効果
 //=============================================================================
 void Item::ActiveState(int ItemID)
 {
@@ -231,4 +241,53 @@ void Item::ActiveState(int ItemID)
 void Item::ChangeState(int ItemID)
 {
 	state[ItemID]->Start();
+	SetTexture();
+	active = false;
+	use = true;
+
+	// エフェクトも終了
+	effect->SetUse(false);
+}
+
+//=============================================================================
+// アイテムの効果が終了したときに呼び出す
+//=============================================================================
+void Item::Reset()
+{
+	pPlayer->SetHitItem(false);
+	use = false;
+	active = false;
+
+	// エフェクトも終了
+	if (effect != nullptr)
+	{
+		effect->SetUse(false);
+	}
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void Item::Debug()
+{
+#ifndef _DEBUG_
+
+	BeginDebugWindow("Item");
+
+	ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+	if (ImGui::TreeNode((void*)(intptr_t)pPlayer->GetCtrlNum(), "Player %d", pPlayer->GetCtrlNum()))
+	{
+		DebugText("ItemNum:%d", PatternAnim);
+
+		if (ImGui::TreeNode("Flag"))
+		{
+			DebugText("Use:%d Active:%d, PlayerHit:%d", use, active, pPlayer->GetHitItem());
+			ImGui::TreePop();
+		}
+		ImGui::TreePop();
+	}
+
+	EndDebugWindow("Item");
+
+#endif
 }

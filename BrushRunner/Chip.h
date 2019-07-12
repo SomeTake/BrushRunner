@@ -55,6 +55,7 @@ public:
 	D3DXVECTOR3 GetPos() { return pos; };
 	bool GetUse() { return use; };
 	bool GetReverse() { return reverse; };
+	int GetTextureNum() { return texnum; };
 
 	void SetReverse(bool _reverse) { reverse = _reverse; };
 	void SetCnt(int num) { cnt = num; };

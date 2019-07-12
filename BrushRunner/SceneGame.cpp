@@ -25,11 +25,6 @@
 //*****************************************************************************
 // オブジェクトのポインタ
 //*****************************************************************************
-static std::vector<_2dobj*> UIObject;
-static Map		*pMap;							// マップ用のポインタ
-static Effect	*pEffect[EffectMax];			// エフェクト用のポインタ
-static Player	*pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-static QUADTREE *Quadtree = nullptr;
 
 //=============================================================================
 // コンストラクタ
@@ -56,11 +51,14 @@ SceneGame::SceneGame()
 	// カウントダウンの初期化
 	UIObject.push_back(new CountDown());
 
-	// アイテムの初期化
+	// アイテム表示の初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
 	}
+
+	// エフェクトマネージャ
+	pEffectManager = new EffectManager();
 }
 
 //=============================================================================
@@ -77,12 +75,6 @@ SceneGame::~SceneGame()
 	// ペイントテクスチャの削除
 	Paint::ReleaseTexture();
 
-	// エフェクトの削除
-	for (int i = 0; i < EffectMax; i++)
-	{
-		SAFE_DELETE(pEffect[i]);
-	}
-
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -96,6 +88,9 @@ SceneGame::~SceneGame()
 	}
 	UIObject.clear();
 	ReleaseVector(UIObject);
+
+	// エフェクトマネージャの削除
+	delete pEffectManager;
 }
 
 //=============================================================================
@@ -130,22 +125,8 @@ void SceneGame::Update()
 	// カメラの更新
 	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
 
-	// 2Dオブジェクトの更新
-	for (auto &Object : UIObject)
-	{
-		Object->Update();
-	}
-
 	// マップの更新
 	pMap->Update();
-
-	// エフェクトの更新
-#if 0
-	for (int i = 0; i < EffectMax; i++)
-	{
-		pEffect[i]->Update();
-	}
-#endif
 
 	// プレイヤーの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -155,6 +136,15 @@ void SceneGame::Update()
 
 	// 当たり判定の更新
 	Collision();
+
+	// 2Dオブジェクトの更新
+	for (auto &Object : UIObject)
+	{
+		Object->Update();
+	}
+
+	// エフェクトマネージャの更新
+	pEffectManager->Update();
 }
 
 //=============================================================================
@@ -177,13 +167,8 @@ void SceneGame::Draw()
 		pPlayer[i]->Draw();
 	}
 
-#if 0
-	// エフェクトの描画
-	for (int i = 0; i < EffectMax; i++)
-	{
-		pEffect[i]->Draw();
-	}
-#endif
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
 }
 
 //=============================================================================
@@ -197,6 +182,7 @@ void SceneGame::Collision()
 		pPlayer[i]->GroundCollider();
 		pPlayer[i]->HorizonCollider();
 		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
 	}
 
 	// プレイヤーとペイントマネージャの当たり判定

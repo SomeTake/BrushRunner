@@ -52,6 +52,7 @@ public:
 
 	// ゲッター
 	bool GetSpInk() { return SpInk; };
+	int GetInkValue(int type) { return InkValue[type]; };
 	int GetOwner(void) { return this->Owner; };
 	std::vector<Paint*> GetBlackPaint(void) { return this->BlackPaint; };
 	std::vector<Paint*> GetColorPaint(void) { return this->ColorPaint; };
@@ -60,6 +61,7 @@ public:
 
 	// セッター
 	void SetSpInk(bool _SpInk) { SpInk = _SpInk; };
+	void SetInkValue(int value, int type) { InkValue[type] = value; };
 };
 
 #endif

@@ -33,7 +33,7 @@ void BanananoKawaState::Update()
 		D3DXVECTOR3 setpos = owner_->GetPlayer()->GetPos();
 		owner_->GetPlayer()->GetFieldItemManager()->Set(NumKawa, setpos, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 		// アイテムを使用
-		owner_->SetActive(false);
+		owner_->Reset();
 	}
 }
 
