@@ -1,75 +1,84 @@
+//=============================================================================
+//
+// エフェクト管理マネージャ [EffectManager.cpp]
+// Author : HAL東京 GP11B341 17 染谷武志
+//
+//=============================================================================
 #include "Main.h"
-#include "FieldItemManager.h"
+#include "EffectManager.h"
+
+static std::vector<Effect*> EffectVector;
 
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-FieldItemManager::FieldItemManager()
+EffectManager::EffectManager()
 {
+	Effect::LoadTexture();
 }
 
 //=====================================================================================================
 // デストラクタ
 //=====================================================================================================
-FieldItemManager::~FieldItemManager()
+EffectManager::~EffectManager()
 {
-	for (auto &i : this->Item)
+	for (auto &effect : EffectVector)
 	{
-		SAFE_DELETE(i);
+		SAFE_DELETE(effect);
 	}
-	this->Item.clear();
-	ReleaseVector(Item);
+	EffectVector.clear();
+	ReleaseVector(EffectVector);
+
+	Effect::ReleaseTexture();
 }
 
 //=====================================================================================================
-// 使用しているアイテムの更新
+// 更新
 //=====================================================================================================
-void FieldItemManager::Update()
+void EffectManager::Update()
 {
 	Check();
 
-	for (auto &i : this->Item)
+	for (auto &effect : EffectVector)
 	{
-		i->Update();
+		effect->Update();
 	}
 }
 
 //=====================================================================================================
-// 使用しているアイテムの描画
+// 描画
 //=====================================================================================================
-void FieldItemManager::Draw()
+void EffectManager::Draw()
 {
-	for (auto &i : this->Item)
+	for (auto &effect : EffectVector)
 	{
-		i->Draw();
+		effect->Draw();
 	}
 }
 
 //=====================================================================================================
-// 使用していないアイテムをチェックしてvectorから削除
+// 使用確認
 //=====================================================================================================
-void FieldItemManager::Check()
+void EffectManager::Check()
 {
-	for (auto i = this->Item.begin(); i != this->Item.end();)
+	for (auto effect = EffectVector.begin(); effect != EffectVector.end();)
 	{
-		if ((*i)->GetUse() == false)
+		if ((*effect)->GetUse() == false)
 		{
-			SAFE_DELETE((*i));
-			i = this->Item.erase(i);
+			SAFE_DELETE((*effect));
+			effect = EffectVector.erase(effect);
 		}
 		else
 		{
-			i++;
+			effect++;
 		}
 	}
 }
 
 //=====================================================================================================
-// フィールド上にアイテムを生成
+// ゲッター
 //=====================================================================================================
-void FieldItemManager::Set(int ItemID, D3DXVECTOR3 _pos, D3DXVECTOR3 _move)
-{
-	FieldItem *object = new FieldItem(ItemID, _pos, _move);
-	object->SetUse(true);
-	this->Item.push_back(object);
+std::vector<Effect*> *GetEffectVector()
+{ 
+	return &EffectVector; 
 }

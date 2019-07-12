@@ -33,6 +33,7 @@
     <ClInclude Include="D3DXAnimation.h" />
     <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="EffectManager.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="FieldItem.h" />
     <ClInclude Include="FieldItemManager.h" />
@@ -95,6 +96,7 @@
     <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="Faceframe.cpp" />
     <ClCompile Include="FieldItem.cpp" />
     <ClCompile Include="FieldItemManager.cpp" />

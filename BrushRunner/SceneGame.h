@@ -10,11 +10,10 @@
 // ポインタとして取得する必要のあるクラス
 #include "Map.h"
 #include "_2dobj.h"
-#include "Effect.h"
 #include "Quadtree.h"
 #include "Player.h"
 #include "PaintManager.h"
-#include "Pop.h"
+#include "EffectManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -76,14 +75,11 @@ enum Num2dobj
 class SceneGame
 {
 private:
-	_2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
-	Map *pMap;							// マップ用のポインタ
-	Effect *pEffect[EffectMax];			// エフェクト用のポインタ
-	Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-	Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-	PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
-	Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
-	QUADTREE *Quadtree = nullptr;
+	std::vector<_2dobj*> UIObject;			// UI
+	Map		*pMap;							// マップ
+	Player	*pPlayer[PLAYER_MAX];			// プレイヤー
+	QUADTREE *Quadtree = nullptr;			// 四分木
+	EffectManager *pEffectManager;			// 2Dエフェクト管理
 
 	void Collision();
 
@@ -94,8 +90,5 @@ public:
 	void Draw();
 
 };
-
-void ChangeDrawOrder(int NumA, int NumB);			// 描画順を入れ替える
-
 
 #endif

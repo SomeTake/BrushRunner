@@ -157,8 +157,6 @@ void Player::Update()
 		// フィールド上に生成したアイテムの更新
 		itemManager->Update();
 		
-		// フィールド上に生成したアイテムのチェック
-		itemManager->Check();
 	}
 
 	// デバッグ表示＆操作

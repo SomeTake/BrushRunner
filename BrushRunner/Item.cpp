@@ -16,6 +16,7 @@
 #include "SpikeState.h"
 #include "SpInkState.h"
 #include "DebugWindow.h"
+#include "EffectManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -52,8 +53,6 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	state[NumSpInk] = new SpInkState(this);
 	state[NumGun] = new GunState(this);
 
-	// エフェクト
-	pEffect = new Effect(EffectDataWk[ChargeEffect], pos);
 }
 
 //=============================================================================
@@ -73,7 +72,6 @@ Item::~Item()
 		delete state[i];
 	}
 
-	delete pEffect;
 }
 
 //=============================================================================
@@ -96,6 +94,12 @@ void Item::Update()
 		// アイテムを使用する
 		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
 		{
+			// エフェクトを発生させる
+			std::vector<Effect*> *EffectVector = GetEffectVector();
+			effect = new Effect(ChargeEffect, pos);
+			effect->SetUse(true);
+			EffectVector->push_back(effect);
+
 			use = false;
 			active = true;
 			state[PatternAnim]->Start();
@@ -109,10 +113,8 @@ void Item::Update()
 	if (active)
 	{
 		ActiveState(PatternAnim);
-
-		pEffect->Update();
 	}
-
+	
 	Debug();
 }
 
@@ -121,11 +123,6 @@ void Item::Update()
 //=============================================================================
 void Item::Draw()
 {
-	if (active)
-	{
-		pEffect->Draw();
-	}
-
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
@@ -247,6 +244,9 @@ void Item::ChangeState(int ItemID)
 	SetTexture();
 	active = false;
 	use = true;
+
+	// エフェクトも終了
+	effect->SetUse(false);
 }
 
 //=============================================================================
@@ -257,6 +257,12 @@ void Item::Reset()
 	pPlayer->SetHitItem(false);
 	use = false;
 	active = false;
+
+	// エフェクトも終了
+	if (effect != nullptr)
+	{
+		effect->SetUse(false);
+	}
 }
 
 //=============================================================================

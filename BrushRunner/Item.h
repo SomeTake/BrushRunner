@@ -9,7 +9,6 @@
 
 #include "_2dobj.h"
 #include "Player.h"
-#include "Effect.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -42,6 +41,7 @@ enum ItemNum
 };
 
 class ItemState;
+class Effect;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -49,7 +49,7 @@ class Item :
 	public _2dobj
 {
 private:
-	Effect * pEffect;						// エフェクト
+	Effect * effect;
 	ItemState * state[NumItemMax];			// ステータス抽象クラス
 	Player * pPlayer;						// 参照するプレイヤークラスのポインタ
 	int rouletteCnt;						// ルーレットのカウンタ
@@ -76,6 +76,7 @@ public:
 
 	bool GetUse() { return use; };
 	Player *GetPlayer() { return pPlayer; };
+	Effect *GetEffect() { return effect; };
 
 	void SetPatternAnim(int Anim) { PatternAnim = Anim; };
 };
