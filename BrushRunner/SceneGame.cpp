@@ -158,6 +158,9 @@ void SceneGame::Draw()
 	// マップの描画
 	pMap->Draw();
 
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
+
 	// 2Dオブジェクトの描画
 	for (auto &Object : UIObject)
 	{
@@ -170,8 +173,6 @@ void SceneGame::Draw()
 		pPlayer[i]->Draw();
 	}
 
-	// エフェクトマネージャの描画
-	pEffectManager->Draw();
 }
 
 //=============================================================================

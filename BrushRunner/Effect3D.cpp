@@ -27,7 +27,7 @@ struct EffectData3D
 static EffectData3D EffectData3DWk[EffectMax] =
 {
 	{ "data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(5, 1) },
-{ "data/EFFECT/anmef001.png", D3DXVECTOR3(500.0f, 100.0f, 0.0f), 7, Int2D(1, 5) },
+{ "data/EFFECT/anmef001.png", D3DXVECTOR3(300.0f, 300.0f, 0.0f), 7, Int2D(1, 5) },
 { "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(2, 2) },
 { "data/EFFECT/explo000.png", D3DXVECTOR3(1000.0f, 1000.0f, 0.0f), 3, Int2D(5, 3) },
 { "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 10, Int2D(5, 2) },
@@ -136,108 +136,29 @@ void Effect3D::Update()
 void Effect3D::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	CAMERA *cameraWk = GetCamera();
-	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
+	D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
 
-	// ラインティングを無効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&mtxWorld);
 
-	// 減算合成 レンダリングステートの変更→黒っぽくなる（加算合成は白っぽくなる（255に近づけていくと））
-	//pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);	// 結果 = 転送先(DEST) - 転送元(SRC)
-	//pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	// Zテスト
-	//pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-	// Zテスト
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	// 移動を反映
+	D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
 
-	// αテストを有効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
-	if (use)
-	{
-		// ワールドマトリックスの初期化
-		D3DXMatrixIdentity(&WorldMtx);
+	// 頂点バッファをデバイスのデータストリームにバインド
+	pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
-		// ビューマトリックスを取得
-		ViewMtx = cameraWk->mtxView;
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_3D);
 
-		// ポリゴンを正面に向ける
-		WorldMtx._11 = ViewMtx._11;
-		WorldMtx._12 = ViewMtx._21;
-		WorldMtx._13 = ViewMtx._31;
-		WorldMtx._21 = ViewMtx._12;
-		WorldMtx._22 = ViewMtx._22;
-		WorldMtx._23 = ViewMtx._32;
-		WorldMtx._31 = ViewMtx._13;
-		WorldMtx._32 = ViewMtx._23;
-		WorldMtx._33 = ViewMtx._33;
+	// テクスチャのセット
+	pDevice->SetTexture(0, D3DTexture[TexNo]);
 
-#if 1
-		// 逆行列をもとめる
-		D3DXMatrixInverse(&WorldMtx, NULL, &ViewMtx);
-		WorldMtx._41 = 0.0f;
-		WorldMtx._42 = 0.0f;
-		WorldMtx._43 = 0.0f;
-#else
-		WorldMtx._11 = mtxView._11;
-		WorldMtx._12 = mtxView._21;
-		WorldMtx._13 = mtxView._31;
-		WorldMtx._21 = mtxView._12;
-		WorldMtx._22 = mtxView._22;
-		WorldMtx._23 = mtxView._32;
-		WorldMtx._31 = mtxView._13;
-		WorldMtx._32 = mtxView._23;
-		WorldMtx._33 = mtxView._33;
-#endif
-
-		// スケールを反映
-		D3DXMatrixScaling(&SclMtx, scl.x,
-			scl.y,
-			scl.z);
-		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
-
-		// 移動を反映
-		D3DXMatrixTranslation(&TransMtx, pos.x,
-			pos.y,
-			pos.z);
-		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-
-		// ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
-
-		// 頂点バッファをデバイスのデータストリームにバインド
-		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
-
-		// 頂点フォーマットの設定
-		pDevice->SetFVF(FVF_VERTEX_3D);
-
-		// テクスチャの設定
-		pDevice->SetTexture(0, D3DTexture[TexNo]);
-
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
-	}
-
-	// ラインティングを有効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	// αテストを無効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-	// Z比較あり
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	// ポリゴンの描画
+	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 
 }
 
@@ -296,10 +217,10 @@ HRESULT Effect3D::MakeVertex()
 		pVtx[3].vtx = D3DXVECTOR3(size.x / 2.0f, -size.y / 2.0f, 0.0f);
 
 		// 法線ベクトルの設定
-		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+		pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+		pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
 		// 反射光の設定
 		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);

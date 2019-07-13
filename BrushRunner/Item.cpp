@@ -96,7 +96,7 @@ void Item::Update()
 		{
 			// エフェクトを発生させる
 			std::vector<Effect*> *EffectVector = GetEffectVector();
-			effect = new Effect(ChargeEffect, pos, INFINITY_LOOP);
+			effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
 			EffectVector->push_back(effect);
 
 			use = false;
@@ -273,6 +273,7 @@ void Item::Reset()
 void Item::Debug()
 {
 #ifndef _DEBUG_
+	ImGui::SetNextWindowPos(ImVec2(5, 145), ImGuiSetCond_Once);
 
 	BeginDebugWindow("Item");
 

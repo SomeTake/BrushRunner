@@ -28,7 +28,7 @@ static EffectData EffectDataWk[EffectMax] =
 	{ "data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(5, 1) },
 { "data/EFFECT/anmef001.png", D3DXVECTOR3(500.0f, 100.0f, 0.0f), 7, Int2D(1, 5) },
 { "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(2, 2) },
-{ "data/EFFECT/explo000.png", D3DXVECTOR3(500.0f, 500.0f, 0.0f), 3, Int2D(5, 3) },
+{ "data/EFFECT/explo000.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 3, Int2D(5, 3) },
 { "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 10, Int2D(5, 2) },
 { "data/EFFECT/ief000.png", D3DXVECTOR3(70.0f, 70.0f, 0.0f), 4, Int2D(3, 1) },
 { "data/EFFECT/Charge.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 10 ,Int2D(2, 7) },

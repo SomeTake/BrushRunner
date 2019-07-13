@@ -428,8 +428,9 @@ void Player::CheckOnCamera()
 		// エフェクト発生
 		D3DXVECTOR3 setpos = pos;
 		setpos.z -= 1.0f;
+		setpos.x += 150.0f;
 		std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
-		Effect3D *effect = new Effect3D(ExplosionEffect3D, setpos, 3);
+		Effect3D *effect = new Effect3D(DeadEffect3D, setpos, 1);
 		Effect3DVector->push_back(effect);
 	}
 }
