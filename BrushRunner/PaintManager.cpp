@@ -40,7 +40,7 @@ PaintManager::PaintManager(int PlayerNo, bool AIFlag)
 	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
 	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
 
-	SpInk = false;
+	this->SpInk = false;
 
 	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
@@ -122,9 +122,9 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			if (!SpInk)
+			if (!this->SpInk)
 			{
-				InkValue[InkType]--;
+				this->InkValue[InkType]--;
 			}
 		}
 	}
@@ -137,9 +137,9 @@ void PaintManager::Update()
 			// ペイントを設置する
 			SetPaint(InkType);
 			// インクを減らす
-			if (!SpInk)
+			if (!this->SpInk)
 			{
-				InkValue[InkType]--;
+				this->InkValue[InkType]--;
 			}
 		}
 	}
@@ -153,18 +153,12 @@ void PaintManager::Update()
 	// インクの残量を調整
 	if (GetKeyboardPress(DIK_LEFT) || GetKeyboardPress(DIK_Z))
 	{
-		if (InkValue[InkType] > 0)
-		{
-			InkValue[InkType]--;
-		}
+		InkValue[InkType] = max(--InkValue[InkType], 0);
 	}
 
 	if (GetKeyboardPress(DIK_RIGHT) || GetKeyboardPress(DIK_X))
 	{
-		if (InkValue[InkType] < INK_MAX)
-		{
-			InkValue[InkType]++;
-		}
+		InkValue[InkType] = min(++InkValue[InkType], INK_MAX);
 	}
 
 	if (GetKeyboardTrigger(DIK_L))

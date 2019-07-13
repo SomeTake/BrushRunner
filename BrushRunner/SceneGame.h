@@ -33,7 +33,9 @@ private:
 	QUADTREE *Quadtree = nullptr;			// 四分木
 	EffectManager *pEffectManager;			// 2Dエフェクト管理
 	Sky		*pSky;							// 空
+	int		startframe;						// 開始カウントダウン
 
+	void Start();
 	void Collision();
 
 public:

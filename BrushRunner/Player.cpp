@@ -449,13 +449,6 @@ void Player::GroundCollider()
 
 		D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
 
-		//// マップ外判定
-		//if (x < 0 || y > 0)
-		//{
-		//	hitGround = false;
-		//	return;
-		//}
-
 		// 現在座標があるところになにかオブジェクトがあればヒットしている
 		if (Map::GetMapTbl(x, y) >= 0)
 		{
@@ -482,27 +475,34 @@ void Player::GroundCollider()
 //=====================================================================================================
 void Player::PaintCollider()
 {
-	for (auto &Paint : PaintSystem->GetColorPaint())
+	// 上昇中は判定しない
+	if (jumpSpd <= 0)
 	{
-		if (!Paint->GetUse())
-			continue;
+		for (auto &Paint : PaintSystem->GetColorPaint())
+		{
+			if (!Paint->GetUse())
+				continue;
 
-		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-		if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
-		{
-			// 当たった場合、プレイヤーの座標を修正
-			pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
-			jumpSpd = 0.0f;
-			animSpd = 1.0f;
-			hitPaint = true;
-			return;
-		}
-		else
-		{
-			hitPaint = false;
+			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
+			if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
+			{
+				// 当たった場合、プレイヤーの座標を修正
+				pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
+				jumpSpd = 0.0f;
+				animSpd = 1.0f;
+				hitPaint = true;
+				return;
+			}
+			else
+			{
+				hitPaint = false;
+			}
 		}
 	}
-
+	else
+	{
+		hitPaint = false;
+	}
 }
 
 //=====================================================================================================
@@ -517,13 +517,6 @@ void Player::HorizonCollider()
 	// 足元から見て右上なので
 	x++;
 	y--;
-
-	// マップ外
-	//if (x < 0 || y > 0)
-	//{
-	//	hitHorizon = false;
-	//	return;
-	//}
 
 	// テーブルを調べて0以上ならヒット
 	if (Map::GetMapTbl(x, y) >= 0)

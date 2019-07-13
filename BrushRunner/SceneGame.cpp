@@ -22,6 +22,8 @@
 //=============================================================================
 SceneGame::SceneGame()
 {
+	startframe = 0;
+
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
@@ -39,14 +41,14 @@ SceneGame::SceneGame()
 	// フレーム
 	UIObject.push_back(new Frame());
 
-	// カウントダウンの初期化
-	UIObject.push_back(new CountDown());
-
 	// アイテム表示の初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
 	}
+
+	// カウントダウンの初期化
+	UIObject.push_back(new CountDown());
 
 	// エフェクトマネージャ
 	pEffectManager = new EffectManager();
@@ -95,19 +97,9 @@ SceneGame::~SceneGame()
 //=============================================================================
 void SceneGame::Update()
 {
-	static int startframe = 0;
-
-	// スタートタイマー更新
 	if (startframe < START_FRAME)
 	{
-		startframe++;
-	}
-	if (startframe == START_FRAME)
-	{
-		for (int i = 0; i < PLAYER_MAX; i++)
-		{
-			pPlayer[i]->SetPlayable(true);
-		}
+		Start();
 	}
 
 	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
@@ -161,16 +153,16 @@ void SceneGame::Draw()
 	// エフェクトマネージャの描画
 	pEffectManager->Draw();
 
-	// 2Dオブジェクトの描画
-	for (auto &Object : UIObject)
-	{
-		Object->Draw();
-	}
-
 	// プレイヤーの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPlayer[i]->Draw();
+	}
+
+	// 2Dオブジェクトの描画
+	for (auto &Object : UIObject)
+	{
+		Object->Draw();
 	}
 
 }
@@ -230,4 +222,21 @@ void SceneGame::Collision()
 	// 四分木を更新する
 	Quadtree->Update();
 
+}
+
+//=============================================================================
+// 開始処理
+//=============================================================================
+void SceneGame::Start()
+{
+	// スタートタイマー更新
+	startframe++;
+	
+	if (startframe == START_FRAME)
+	{
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->SetPlayable(true);
+		}
+	}
 }

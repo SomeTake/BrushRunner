@@ -135,31 +135,33 @@ void Effect3D::Update()
 //=============================================================================
 void Effect3D::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
+	if (use)
+	{
+		LPDIRECT3DDEVICE9 pDevice = GetDevice();
+		D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
 
-	// ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&mtxWorld);
+		// ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&mtxWorld);
 
-	// 移動を反映
-	D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
+		// 移動を反映
+		D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
+		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
 
-	// ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+		// ワールドマトリックスの設定
+		pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
-	// 頂点バッファをデバイスのデータストリームにバインド
-	pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
+		// 頂点バッファをデバイスのデータストリームにバインド
+		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_3D);
+		// 頂点フォーマットの設定
+		pDevice->SetFVF(FVF_VERTEX_3D);
 
-	// テクスチャのセット
-	pDevice->SetTexture(0, D3DTexture[TexNo]);
+		// テクスチャのセット
+		pDevice->SetTexture(0, D3DTexture[TexNo]);
 
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
-
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	}
 }
 
 //=============================================================================
