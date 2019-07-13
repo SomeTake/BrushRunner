@@ -26,7 +26,7 @@ public:
 	~PlayerUI();
 
 	void Update(D3DXVECTOR3 PlayerPos);
-	void Draw(bool OnCamera);
+	void Draw(bool OnCamera, bool blind);
 	void SetPlayerDeadTexture(void) { this->faceFrame->SetPlayerDeadTexture(); };
 };
 

@@ -205,7 +205,7 @@ void Player::Draw()
 		}
 
 		// プレイヤーUIの描画
-		playerUI->Draw(onCamera);
+		playerUI->Draw(onCamera,blind);
 
 		// ペイントの描画
 		PaintSystem->Draw();
@@ -213,7 +213,7 @@ void Player::Draw()
 	else
 	{
 		// プレイヤーUIの描画(プレイヤー死亡のUI)
-		playerUI->Draw(onCamera);
+		playerUI->Draw(onCamera, blind);
 	}
 
 	// フィールド上に生成したアイテムの描画
@@ -601,6 +601,11 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 				break;
 			}
 			item->SetUse(false);
+
+			// エフェクトを発生
+			std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
+			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
+			Effect3DVector->push_back(effect);
 		}
 	}
 }

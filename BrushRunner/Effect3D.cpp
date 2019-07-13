@@ -29,7 +29,7 @@ static EffectData3D EffectData3DWk[EffectMax] =
 	{ "data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(5, 1) },
 { "data/EFFECT/anmef001.png", D3DXVECTOR3(300.0f, 300.0f, 0.0f), 7, Int2D(1, 5) },
 { "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(2, 2) },
-{ "data/EFFECT/explo000.png", D3DXVECTOR3(1000.0f, 1000.0f, 0.0f), 3, Int2D(5, 3) },
+{ "data/EFFECT/explo000.png", D3DXVECTOR3(300.0f, 300.0f, 0.0f), 3, Int2D(5, 3) },
 { "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 10, Int2D(5, 2) },
 { "data/EFFECT/ief000.png", D3DXVECTOR3(70.0f, 70.0f, 0.0f), 4, Int2D(3, 1) },
 { "data/EFFECT/Charge.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 10 ,Int2D(2, 7) },
@@ -140,6 +140,14 @@ void Effect3D::Draw()
 		LPDIRECT3DDEVICE9 pDevice = GetDevice();
 		D3DXMATRIX mtxWorld, mtxScl, mtxRot, mtxTranslate;
 
+		// Zテストを有効に
+		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
+		// αテストを有効に
+		pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+		pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
+		pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
 		// ワールドマトリックスの初期化
 		D3DXMatrixIdentity(&mtxWorld);
 
@@ -161,6 +169,13 @@ void Effect3D::Draw()
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+		// αテストを無効に
+		pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+		// Z比較を無効に
+		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 	}
 }
 

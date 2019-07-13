@@ -45,11 +45,14 @@ void PlayerUI::Update(D3DXVECTOR3 PlayerPos)
 //=============================================================================
 // •`‰æ
 //=============================================================================
-void PlayerUI::Draw(bool OnCamera)
+void PlayerUI::Draw(bool OnCamera, bool blind)
 {
 	if (OnCamera)
 	{
-		PopUp->Draw();
+		if (!blind)
+		{
+			PopUp->Draw();
+		}
 		miniPlayer->Draw();
 	}
 	faceFrame->Draw();
