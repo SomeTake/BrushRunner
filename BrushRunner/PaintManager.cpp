@@ -14,6 +14,9 @@
 #include "DebugWindow.h"
 #include "SceneGame.h"
 #include "Player.h"
+#include "MyLibrary.h"
+
+#define HEAL_FRAME		(30)	// 何フレームごとに自動回復を行うか
 
 QUADTREE *PaintManager::Quadtree = nullptr;
 bool PaintManager::PressMode = true;
@@ -41,6 +44,7 @@ PaintManager::PaintManager(int PlayerNo, bool AIFlag)
 	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
 
 	this->SpInk = false;
+	this->HealCnt = 0;
 
 	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
@@ -82,6 +86,9 @@ PaintManager::~PaintManager()
 //=============================================================================
 void PaintManager::Update()
 {
+	// インクの自動回復
+	AutoHeal();
+
 	// カーソルの更新
 	this->pCursor->Update();
 
@@ -391,4 +398,17 @@ std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
 void PaintManager::CursorMove(D3DXVECTOR3 DestPos)
 {
 
+}
+
+//=============================================================================
+// 自動回復処理
+//=============================================================================
+void PaintManager::AutoHeal()
+{
+	HealCnt = LoopCountUp(++HealCnt, 0, HEAL_FRAME);
+	if (HealCnt == 0)
+	{
+		InkValue[ColorInk] = min(++InkValue[ColorInk], INK_MAX);
+		InkValue[BlackInk] = min(++InkValue[BlackInk], INK_MAX);
+	}
 }

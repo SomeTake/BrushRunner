@@ -32,6 +32,7 @@ private:
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool					SpInk;					// trueのときインクが減らない
 	bool					AIFlag;
+	int						HealCnt;				// 自動回復カウント
 
 	static QUADTREE			*Quadtree;
 #if _DEBUG
@@ -40,6 +41,7 @@ private:
 
 	void SetPaint(int InkType);
 	void CheckPaintUse(void);
+	void AutoHeal();
 
 public:
 	PaintManager(int PlayerNo, bool AIFlag);
