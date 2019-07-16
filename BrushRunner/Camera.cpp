@@ -13,6 +13,7 @@
 //*****************************************************************************
 #define VIEW_DIST			(4)		// 最低限のキャラクターとカメラの距離
 #define VIEW_DIST_RATE		(0.3f)
+#define CAMERA_SPD			(0.05f)	// 古いカメラ注視点と新しいカメラ注視点に差がある場合にカメラ位置を更新するスピード
 
 //*****************************************************************************
 // グローバル変数
@@ -40,135 +41,17 @@ void InitCamera(void)
 //=============================================================================
 void UpdateCamera(D3DXVECTOR3 _at)
 {
-	// 参照する座標に対して平行移動する
-	cameraWk.at = _at;
-	cameraWk.pos = _at + CAMERA_POS;
+	// 一番前にいるキャラクタの座標を新しい注視点とする
+	D3DXVECTOR3 newAt = _at;
 
-#ifndef _DEBUG_
-	//PrintDebugProc("CamerAt X:%f Y:%f Z:%f\n", cameraWk.at.x, cameraWk.at.y, cameraWk.at.z);
-	//PrintDebugProc("CamerPos X:%f Y:%f Z:%f\n", cameraWk.pos.x, cameraWk.pos.y, cameraWk.pos.z);
-#endif
+	// 更新前の注視点と新しい注視点の差をベクトルにする
+	D3DXVECTOR3 DistVec = newAt - cameraWk.at;
 
-	//if (GetKeyboardPress(DIK_A))
-	//{
-	//	if (GetKeyboardPress(DIK_W))
-	//	{// 左前移動
-	//		cameraWk.pos.x -= cosf(cameraWk.rot.y + D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z += sinf(cameraWk.rot.y + D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//	}
-	//	else if (GetKeyboardPress(DIK_S))
-	//	{// 左後移動
-	//		cameraWk.pos.x -= cosf(cameraWk.rot.y - D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z += sinf(cameraWk.rot.y - D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//	}
-	//	else
-	//	{// 左移動
-	//		cameraWk.pos.x -= cosf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z += sinf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//	}
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//else if (GetKeyboardPress(DIK_D))
-	//{
-	//	if (GetKeyboardPress(DIK_W))
-	//	{// 右前移動
-	//		cameraWk.pos.x += cosf(cameraWk.rot.y - D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z -= sinf(cameraWk.rot.y - D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//	}
-	//	else if (GetKeyboardPress(DIK_S))
-	//	{// 右後移動
-	//		cameraWk.pos.x += cosf(cameraWk.rot.y + D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z -= sinf(cameraWk.rot.y + D3DX_PI * 0.25f) * VALUE_MOVE_CAMERA;
-	//	}
-	//	else
-	//	{// 右移動
-	//		cameraWk.pos.x += cosf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//		cameraWk.pos.z -= sinf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//	}
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//else if (GetKeyboardPress(DIK_W))
-	//{// 前移動
-	//	cameraWk.pos.x += sinf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//	cameraWk.pos.z += cosf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//else if (GetKeyboardPress(DIK_S))
-	//{// 後移動
-	//	cameraWk.pos.x -= sinf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-	//	cameraWk.pos.z -= cosf(cameraWk.rot.y) * VALUE_MOVE_CAMERA;
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-
-	//if (GetKeyboardPress(DIK_Z))
-	//{// 視点旋回「左」
-	//	cameraWk.rot.y += VALUE_ROTATE_CAMERA;
-	//	if (cameraWk.rot.y > D3DX_PI)
-	//	{
-	//		cameraWk.rot.y -= D3DX_PI * 2.0f;
-	//	}
-
-	//	cameraWk.pos.x = cameraWk.at.x - sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.pos.z = cameraWk.at.z - cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//if (GetKeyboardPress(DIK_C))
-	//{// 視点旋回「右」
-	//	cameraWk.rot.y -= VALUE_ROTATE_CAMERA;
-	//	if (cameraWk.rot.y < -D3DX_PI)
-	//	{
-	//		cameraWk.rot.y += D3DX_PI * 2.0f;
-	//	}
-
-	//	cameraWk.pos.x = cameraWk.at.x - sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.pos.z = cameraWk.at.z - cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//if (GetKeyboardPress(DIK_Y))
-	//{// 視点移動「上」
-	//	cameraWk.pos.y += VALUE_MOVE_CAMERA;
-	//}
-	//if (GetKeyboardPress(DIK_N))
-	//{// 視点移動「下」
-	//	cameraWk.pos.y -= VALUE_MOVE_CAMERA;
-	//}
-
-	//if (GetKeyboardPress(DIK_Q))
-	//{// 注視点旋回「左」
-	//	cameraWk.rot.y -= VALUE_ROTATE_CAMERA;
-	//	if (cameraWk.rot.y < -D3DX_PI)
-	//	{
-	//		cameraWk.rot.y += D3DX_PI * 2.0f;
-	//	}
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//if (GetKeyboardPress(DIK_E))
-	//{// 注視点旋回「右」
-	//	cameraWk.rot.y += VALUE_ROTATE_CAMERA;
-	//	if (cameraWk.rot.y > D3DX_PI)
-	//	{
-	//		cameraWk.rot.y -= D3DX_PI * 2.0f;
-	//	}
-
-	//	cameraWk.at.x = cameraWk.pos.x + sinf(cameraWk.rot.y) * cameraWk.distance;
-	//	cameraWk.at.z = cameraWk.pos.z + cosf(cameraWk.rot.y) * cameraWk.distance;
-	//}
-	//if (GetKeyboardPress(DIK_T))
-	//{// 注視点移動「上」
-	//	cameraWk.at.y += VALUE_MOVE_CAMERA;
-	//}
-	//if (GetKeyboardPress(DIK_B))
-	//{// 注視点移動「下」
-	//	cameraWk.at.y -= VALUE_MOVE_CAMERA;
-	//}
+	// 徐々に新しい注視点に近づける
+	cameraWk.at += DistVec * CAMERA_SPD;
+	
+	// 座標は注視点に対して平行移動する
+	cameraWk.pos = cameraWk.at + CAMERA_POS;
 
 }
 
