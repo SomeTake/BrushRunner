@@ -44,7 +44,7 @@ static LPD3DXFONT	g_pD3DXFont = NULL;				// フォントへのポインタ
 int					g_nCountFPS;					// FPSカウンタ
 #endif
 
-int eScene = SceneGame;								// ゲームの開始位置&シーン遷移
+int eScene = SceneTitle;								// ゲームの開始位置&シーン遷移
 
 HWND hWnd;										// ウインドウハンドル
 
