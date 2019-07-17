@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "DebugWindow.h"
 #include "SceneManager.h"
+#include "SceneTitle.h"
 
 //=============================================================================
 // グローバル変数
@@ -50,22 +51,23 @@ SceneResult::~SceneResult()
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneResult::Update()
+void SceneResult::Update(int SceneID)
 {
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
+		{
+			SetScene(new SceneTitle(), nSceneTitle);
+			return;
+		}
+	}
+
 	for (int i = 0; i < UIMax; i++)
 	{
 		p2dObj[i]->Update();
 
 	}
 	Debug();
-
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
-		{
-			SetScene(nSceneTitle);
-		}
-	}
 }
 
 //=============================================================================
@@ -77,7 +79,6 @@ void SceneResult::Draw()
 	{
 		p2dObj[i]->Draw();
 	}
-
 }
 
 //=============================================================================

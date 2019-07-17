@@ -12,13 +12,11 @@
 #include "Collision.h"
 #include "Input.h"
 #include "DebugWindow.h"
+#include "SceneResult.h"
 
 //2d obj
 #include "Frame01.h"
 #include "Face.h"
-#include "Face2.h"
-#include "Face3.h"
-#include "Face4.h"
 #include "CountDown.h"
 #include "Item.h"
 
@@ -107,7 +105,7 @@ SceneGame::~SceneGame()
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneGame::Update()
+void SceneGame::Update(int SceneID)
 {
 	if (startframe < START_FRAME)
 	{
@@ -270,11 +268,11 @@ void SceneGame::CheckResult()
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
-				SetScene(nSceneResult);
+				SetScene(new SceneResult(), nSceneResult);
+				InitCamera();
+				return;
 			}
 		}
-
-		return;
 	}
 
 	// 全員がゴールorゲームオーバーになったか確認

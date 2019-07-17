@@ -7,15 +7,12 @@
 #ifndef _SCENEMANAGER_H_
 #define _SCENEMANAGER_H_
 
-#include "SceneTitle.h"
-#include "SceneCharacterSelect.h"
-#include "SceneGame.h"
-#include "SceneResult.h"
+#include "Scene.h"
 
-//シーン遷移
+//シーン遷移番号
 enum SceneNum
 {
-	nSceneTitle,				// タイトル
+	nSceneTitle,			// タイトル
 	nSceneCharacterSelect,	// キャラクターセレクト
 	nSceneGame,				// ゲーム
 	nSceneResult,			// リザルト
@@ -27,12 +24,6 @@ enum SceneNum
 //*****************************************************************************
 class SceneManager
 {
-private:
-	SceneTitle * title;
-	SceneCharacterSelect * charaselect;
-	SceneGame * game;
-	SceneResult * result;
-
 public:
 	SceneManager(HINSTANCE hInstance, HWND hWnd);
 	~SceneManager();
@@ -41,8 +32,7 @@ public:
 	void Draw();
 };
 
-int GetScene();					// 現在のゲームシーンを取得する
-void SetScene(int _scene);		// ゲームシーンを変更する
-
+int GetScene();									// 現在のゲームシーンを取得する
+void SetScene(Scene *NewScene, int _scene);		// ゲームシーンを変更する
 
 #endif

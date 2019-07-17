@@ -1,31 +1,23 @@
 //=============================================================================
 //
-// リザルト画面処理 [SceneGame.h]
+// シーン基底クラス [Scene.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENERESULT_H_
-#define _SCENERESULT_H_
-
-#include "Scene.h"
+#ifndef _SCENE_H_
+#define _SCENE_H_
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneResult :
-	public Scene
+class Scene
 {
-private:
-	int *ResultRank;	// ゲームシーンの順位を取得するポインタ
-
-	void Debug();
-
 public:
-	SceneResult();
-	~SceneResult();
+	Scene();
+	virtual ~Scene();
 
-	void Update(int SceneID);
-	void Draw();
+	virtual void Update(int SceneID) = 0;
+	virtual void Draw() = 0;
 };
 
 #endif

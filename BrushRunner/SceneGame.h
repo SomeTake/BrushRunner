@@ -7,6 +7,8 @@
 #ifndef _SCENEGAME_H_
 #define _SCENEGAME_H_
 
+#include "Scene.h"
+
 // ポインタとして取得する必要のあるクラス
 #include "Map.h"
 #include "_2dobj.h"
@@ -24,7 +26,8 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneGame
+class SceneGame :
+	public Scene
 {
 private:
 	std::vector<_2dobj*> UIObject;			// UI
@@ -46,7 +49,7 @@ private:
 public:
 	SceneGame();
 	~SceneGame();
-	void Update();
+	void Update(int SceneID);
 	void Draw();
 
 };
