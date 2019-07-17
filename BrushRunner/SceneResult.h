@@ -12,6 +12,11 @@
 //*****************************************************************************
 class SceneResult
 {
+private:
+	int *ResultRank;	// ゲームシーンの順位を取得するポインタ
+
+	void Debug();
+
 public:
 	SceneResult();
 	~SceneResult();

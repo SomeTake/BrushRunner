@@ -6,14 +6,18 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneResult.h"
-
+#include "SceneGame.h"
+#include "Player.h"
+#include "DebugWindow.h"
+#include "Input.h"
+#include "SceneManager.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneResult::SceneResult()
 {
-
+	ResultRank = GetResultRank(0);
 }
 
 //=============================================================================
@@ -21,6 +25,7 @@ SceneResult::SceneResult()
 //=============================================================================
 SceneResult::~SceneResult()
 {
+
 }
 
 //=============================================================================
@@ -28,7 +33,15 @@ SceneResult::~SceneResult()
 //=============================================================================
 void SceneResult::Update()
 {
+	Debug();
 
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
+		{
+			SetScene(nSceneTitle);
+		}
+	}
 }
 
 //=============================================================================
@@ -37,4 +50,19 @@ void SceneResult::Update()
 void SceneResult::Draw()
 {
 
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void SceneResult::Debug()
+{
+#ifndef _DEBUG_
+	BeginDebugWindow("Result");
+
+	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+
+	EndDebugWindow("Result");
+
+#endif
 }

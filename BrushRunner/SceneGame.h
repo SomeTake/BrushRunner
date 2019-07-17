@@ -51,4 +51,6 @@ public:
 
 };
 
+int *GetResultRank(int no);					// ‡ˆÊŒ‹‰Ê‚ğæ“¾
+
 #endif

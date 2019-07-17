@@ -26,7 +26,10 @@ static int ResultRank[PLAYER_MAX];
 SceneGame::SceneGame()
 {
 	startframe = 0;
-	ResultRank[PLAYER_MAX] = { NULL };
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		ResultRank[i] = -1;
+	}
 	result = false;
 
 	// プレイヤーの初期化
@@ -273,7 +276,7 @@ void SceneGame::CheckResult()
 	// 全員がゴールorゲームオーバーになったか確認
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (ResultRank[i] != NULL)
+		if (ResultRank[i] != -1)
 		{
 			result = true;
 		}
@@ -284,7 +287,7 @@ void SceneGame::CheckResult()
 		}
 	}
 
-	for (int pNo = 1; pNo < PLAYER_MAX + 1; pNo++)
+	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
 	{
 		bool hit = false;
 		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
@@ -304,7 +307,7 @@ void SceneGame::CheckResult()
 		if (!hit)
 		{
 			// まだ順位が登録されていない場合
-			InsertResult(pNo - 1);
+			InsertResult(pNo);
 		}
 	}
 }
@@ -320,9 +323,9 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の後ろから入れていく
 		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
 		{
-			if (ResultRank[rNo] == NULL)
+			if (ResultRank[rNo] == -1)
 			{
-				ResultRank[rNo] = pNo + 1;
+				ResultRank[rNo] = pNo;
 				break;
 			}
 		}
@@ -334,9 +337,9 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (ResultRank[rNo] == NULL)
+			if (ResultRank[rNo] == -1)
 			{
-				ResultRank[rNo] = pNo + 1;
+				ResultRank[rNo] = pNo;
 				break;
 			}
 		}
@@ -357,4 +360,12 @@ void SceneGame::Debug()
 	EndDebugWindow("Result");
 
 #endif
+}
+
+//=============================================================================
+// 順位結果のゲッター
+//=============================================================================
+int *GetResultRank(int no)
+{
+	return &ResultRank[no];
 }
