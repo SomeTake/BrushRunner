@@ -11,6 +11,7 @@
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
 #define	NUM_KEY_MAX		(256)		// ƒL[Å‘å”
+#define REPEAT_FRAME	(26)		// ƒQ[ƒ€ƒpƒbƒh‚Ì‚èƒs[‚Æ‚ª—LŒø‚É‚È‚é‚Ü‚Å‚ÌƒtƒŒ[ƒ€”
 
 //*****************************************************************************
 // ƒvƒƒgƒ^ƒCƒvéŒ¾
@@ -19,9 +20,15 @@ HRESULT InitKeyboard(HINSTANCE hInst, HWND hWnd);
 void UninitKeyboard(void);
 HRESULT UpdateKeyboard(void);
 
+HRESULT InitPad();	// ƒpƒbƒh‰Šú‰»
+					// BOOL CALLBACK SearchPadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID);	// ƒpƒbƒhŒŸ¸ƒR[ƒ‹ƒoƒbƒN
+void UninitPad();	// I—¹
+void UpdatePad();	// XV
+
 //*****************************************************************************
 // ƒOƒ[ƒoƒ‹•Ï”
 //*****************************************************************************
+// ----- ƒL[ƒ{[ƒhŠÖ˜A -------------------------------------------------------
 LPDIRECTINPUT8			g_pDInput = NULL;					// IDirectInput8ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
 LPDIRECTINPUTDEVICE8	g_pDIDevKeyboard = NULL;			// IDirectInputDevice8ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^(ƒL[ƒ{[ƒh)
 BYTE					g_aKeyState[NUM_KEY_MAX];			// ƒL[ƒ{[ƒh‚Ì‰Ÿ‰ºó‘Ô‚ğ•Û‚·‚éƒ[ƒN
@@ -29,6 +36,18 @@ BYTE					g_aKeyStateTrigger[NUM_KEY_MAX];	// ƒL[ƒ{[ƒh‚ÌƒgƒŠƒK[ó‘Ô‚ğ•Û‚·‚éƒ
 BYTE					g_aKeyStateRelease[NUM_KEY_MAX];	// ƒL[ƒ{[ƒh‚ÌƒŠƒŠ[ƒXó‘Ô‚ğ•Û‚·‚éƒ[ƒN
 BYTE					g_aKeyStateRepeat[NUM_KEY_MAX];		// ƒL[ƒ{[ƒh‚ÌƒŠƒs[ƒgó‘Ô‚ğ•Û‚·‚éƒ[ƒN
 int						g_aKeyStateRepeatCnt[NUM_KEY_MAX];	// ƒL[ƒ{[ƒh‚ÌƒŠƒs[ƒgƒJƒEƒ“ƒ^
+
+// ----- ƒQ[ƒ€ƒpƒbƒhŠÖ˜A -----------------------------------------------------
+static LPDIRECTINPUTDEVICE8 pGamePad[GAMEPAD_MAX] = { NULL,NULL };	// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
+static DWORD PadState[GAMEPAD_MAX];			// ƒpƒbƒhó‘Ô‚ğ•Û‘¶
+static DWORD PadTrigger[GAMEPAD_MAX];
+static DWORD PadRepeat[GAMEPAD_MAX];
+static DWORD PadRelease[GAMEPAD_MAX];
+int PadRepeatCnt[GAMEPAD_MAX];				// ƒQ[ƒ€ƒpƒbƒh‚ÌƒŠƒs[ƒgƒJƒEƒ“ƒ^
+static int PadCount = 0;					// ŒŸo‚µ‚½ƒQ[ƒ€ƒpƒbƒh‚Ì”
+static float JoyStickAngle[GAMEPAD_MAX];	// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌŠp“x‚ğ•Û‘¶
+static float JoyStickVec[GAMEPAD_MAX];		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌƒxƒNƒgƒ‹‚ğ•Û‘¶
+static DIJOYSTATE2 dijs[GAMEPAD_MAX];		// ƒRƒ“ƒgƒ[ƒ‰‚Ìó‘Ô‚ğ•Û‘¶
 
 //=============================================================================
 // “ü—Íˆ—‚Ì‰Šú‰»
@@ -47,6 +66,9 @@ HRESULT InitInput(HINSTANCE hInst, HWND hWnd)
 	// ƒL[ƒ{[ƒh‚Ì‰Šú‰»
 	InitKeyboard(hInst, hWnd);
 
+	// ƒQ[ƒ€ƒpƒbƒh‚Ì‰Šú‰»
+	InitPad();
+
 	return S_OK;
 }
 
@@ -57,6 +79,9 @@ void UninitInput(void)
 {
 	// ƒL[ƒ{[ƒh‚ÌI—¹ˆ—
 	UninitKeyboard();
+
+	// ƒQ[ƒ€ƒpƒbƒh‚ÌI—¹ˆ—
+	UninitPad();
 
 	if(g_pDInput)
 	{// DirectInputƒIƒuƒWƒFƒNƒg‚ÌŠJ•ú
@@ -72,6 +97,9 @@ void UpdateInput(void)
 {
 	// ƒL[ƒ{[ƒh‚ÌXV
 	UpdateKeyboard();
+
+	// ƒQ[ƒ€ƒpƒbƒh‚ÌXV
+	UpdatePad();
 }
 
 //=============================================================================
@@ -199,3 +227,272 @@ bool GetKeyboardRelease(int nKey)
 	return (g_aKeyStateRelease[nKey] & 0x80) ? true: false;
 }
 
+// ----- ƒQ[ƒ€ƒpƒbƒhŠÖ˜A -----------------------------------------------------
+//=============================================================================
+// ƒQ[ƒ€ƒpƒbƒh‚ğŒŸo‚·‚éƒR[ƒ‹ƒoƒbƒNŠÖ”
+//=============================================================================
+bool CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE ipddi, LPVOID)
+{
+	HRESULT result;
+
+	result = g_pDInput->CreateDevice(ipddi->guidInstance, &pGamePad[PadCount++], NULL);	// ŒŸo”‚¾‚¯PadCount‚ª‘‚¦‚é
+	return DIENUM_CONTINUE;		// ƒfƒoƒCƒX‚ğ—ñ‹“
+}
+
+//=============================================================================
+// ‰Šú‰»
+//=============================================================================
+HRESULT InitPad()
+{
+	HRESULT result;
+
+	PadCount = 0;
+	// ƒpƒbƒh‚ğ’T‚·
+	g_pDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)SearchGamePadCallback, NULL, DIEDFL_ATTACHEDONLY);
+
+	for (int i = 0; i < PadCount; i++)
+	{
+		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN—p‚Ìƒf[ƒ^AƒtƒH[ƒ}ƒbƒg‚ğİ’è
+		result = pGamePad[i]->SetDataFormat(&c_dfDIJoystick);
+		if (FAILED(result)) return false;	// ƒf[ƒ^ƒtƒH[ƒ}ƒbƒg‚Ìİ’è‚É¸”s
+											// ƒ‚[ƒh‚ğİ’èiƒtƒHƒAƒOƒ‰ƒEƒ“ƒh•”ñ”r‘¼ƒ‚[ƒhj
+											//		result = pGamePad[i]->SetCooperativeLevel(hWindow, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+											//		if ( FAILED(result) )
+											//			return false; // ƒ‚[ƒh‚Ìİ’è‚É¸”s
+
+											// ²‚Ì’l‚Ì”ÍˆÍ‚ğİ’è
+											// X²AY²‚Ì‚»‚ê‚¼‚ê‚É‚Â‚¢‚ÄAƒIƒuƒWƒFƒNƒg‚ª•ñ‰Â”\‚È’l‚Ì”ÍˆÍ‚ğƒZƒbƒg‚·‚éB
+											// (max-min)‚ÍAÅ‘å10,000(?)B(max-min)/2‚ª’†‰›’l‚É‚È‚éB
+											// ·‚ğ‘å‚«‚­‚·‚ê‚ÎAƒAƒiƒƒO’l‚Ì×‚©‚È“®‚«‚ğ•ß‚ç‚¦‚ç‚ê‚éB(ƒpƒbƒh‚Ì«”\‚É‚æ‚é)
+
+		DIPROPRANGE diprg;								// ƒfƒoƒCƒX“à‚ÌƒIƒuƒWƒFƒNƒg‚Ì”ÍˆÍ‚ÉŠÖ‚·‚éî•ñ‚ğİ’è‚·‚é
+		ZeroMemory(&diprg, sizeof(diprg));
+		diprg.diph.dwSize = sizeof(diprg);				// diprg\‘¢‘Ì‚ÌƒTƒCƒY‚ğİ’è
+		diprg.diph.dwHeaderSize = sizeof(diprg.diph);	// diprg.diph\‘¢‘Ì‚ÌƒTƒCƒY‚ğİ’è
+		diprg.diph.dwHow = DIPH_BYOFFSET;				// ƒƒ“ƒo‚Ì‰ğß•û–@‚ğw’èiƒvƒƒpƒeƒB‚ªƒAƒNƒZƒX‚³‚ê‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ÌŒ»İ‚Ìƒf[ƒ^Œ`®‚Ö‚ÌƒIƒtƒZƒbƒg‚Æ‚·‚éj
+		diprg.lMin = RANGE_MIN;							// ƒIƒuƒWƒFƒNƒg‚ÌÅ¬’l
+		diprg.lMax = RANGE_MAX;							// ƒIƒuƒWƒFƒNƒg‚ÌÅ‘å’l
+		// X²‚Ì”ÍˆÍ‚ğİ’è
+		diprg.diph.dwObj = DIJOFS_X;
+		pGamePad[i]->SetProperty(DIPROP_RANGE, &diprg.diph);
+		// Y²‚Ì”ÍˆÍ‚ğİ’è
+		diprg.diph.dwObj = DIJOFS_Y;
+		pGamePad[i]->SetProperty(DIPROP_RANGE, &diprg.diph);
+
+		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚Ì–³Œøƒ][ƒ“‚ğİ’è‚·‚é
+		// w’è‚·‚é’l‚Í10000‚É‘Î‚·‚é‘Š‘Î’l
+		DIPROPDWORD dipdw;
+		dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+		dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
+		dipdw.diph.dwHow = DIPH_BYOFFSET;
+		dipdw.dwData = DEADZONE;
+		//X²‚Ì–³Œøƒ][ƒ“‚ğİ’è
+		dipdw.diph.dwObj = DIJOFS_X;
+		pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
+		//Y²‚Ì–³Œøƒ][ƒ“‚ğİ’è
+		dipdw.diph.dwObj = DIJOFS_Y;
+		pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
+
+		//ƒWƒ‡ƒCƒXƒeƒBƒbƒN“ü—Í§ŒäŠJn
+		pGamePad[i]->Acquire();
+	}
+
+	return true;
+}
+
+//=============================================================================
+// I—¹
+//=============================================================================
+void UninitPad()
+{
+	for (int i = 0; i < GAMEPAD_MAX; i++)
+	{
+		if (pGamePad[i])
+		{
+			pGamePad[i]->Unacquire();
+			pGamePad[i]->Release();
+		}
+	}
+}
+
+//=============================================================================
+// XV
+//=============================================================================
+void UpdatePad()
+{
+	HRESULT result;
+
+	for (int i = 0; i < PadCount; i++)
+	{
+		DWORD lastPadState[GAMEPAD_MAX];
+		lastPadState[i] = PadState[i];		// ‘OƒtƒŒ[ƒ€‚É“ü—Í‚³‚ê‚½‚à‚Ì‚ğ•Û‘¶
+		PadState[i] = 0x00000000l;			// ‰Šú‰»
+
+		result = pGamePad[i]->Poll();		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚Éƒ|[ƒ‹‚ğ‚©‚¯‚é
+		// g—p‰Â”\‚©Šm”F
+		if (FAILED(result))
+		{
+			result = pGamePad[i]->Acquire();
+			while (result == DIERR_INPUTLOST)
+			{
+				result = pGamePad[i]->Acquire();
+			}
+		}
+
+		result = pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs);
+		if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED)
+		{
+			result = pGamePad[i]->Acquire();
+			while (result == DIERR_INPUTLOST)
+			{
+				result = pGamePad[i]->Acquire();
+			}
+		}
+
+		// ƒRƒ“ƒgƒ[ƒ‰‚ÌŠeƒ{ƒ^ƒ“‚Ì“ü—ÍŠm”F
+		// ----- ƒWƒ‡ƒCƒXƒeƒBƒbƒN ----------------------------------
+		// ã
+		if (dijs[i].lY < 0)		PadState[i] |= STICK_UP;
+		// ‰º
+		if (dijs[i].lY > 0)		PadState[i] |= STICK_DOWN;
+		// ¶
+		if (dijs[i].lX < 0)		PadState[i] |= STICK_LEFT;
+		// ‰E
+		if (dijs[i].lX > 0)		PadState[i] |= STICK_RIGHT;
+
+		// ----- ƒ{ƒ^ƒ“ --------------------------------------------
+		// A(PS4 )
+		if (dijs[i].rgbButtons[0] & 0x80)	PadState[i] |= BUTTON_A;
+		// B(PS4~)
+		if (dijs[i].rgbButtons[1] & 0x80)	PadState[i] |= BUTTON_B;
+		// C(PS4›)
+		if (dijs[i].rgbButtons[2] & 0x80)	PadState[i] |= BUTTON_C;
+		// D(PS4¢)
+		if (dijs[i].rgbButtons[3] & 0x80)	PadState[i] |= BUTTON_D;
+
+		// L1(PS4L1)
+		if (dijs[i].rgbButtons[4] & 0x80)	PadState[i] |= BUTTON_L1;
+		// R1(PS4R1)
+		if (dijs[i].rgbButtons[5] & 0x80)	PadState[i] |= BUTTON_R1;
+		// L2(PS4L2)
+		if (dijs[i].rgbButtons[6] & 0x80)	PadState[i] |= BUTTON_L2;
+		// R2(PS4R2)
+		if (dijs[i].rgbButtons[7] & 0x80)	PadState[i] |= BUTTON_R2;
+
+		// SHARE(PS4SHARE)
+		if (dijs[i].rgbButtons[8] & 0x80)	PadState[i] |= BUTTON_SHARE;
+		// START(PS4OPTION)
+		if (dijs[i].rgbButtons[9] & 0x80)	PadState[i] |= BUTTON_START;
+
+		// Triggerİ’è
+		PadTrigger[i] = (lastPadState[i] ^ PadState[i]) & PadState[i];	// ‘OƒtƒŒ[ƒ€‚Æˆá‚Á‚Ä‚¢‚ÄAŒ»İON‚Ìƒ{ƒ^ƒ“‚ğŒŸo
+
+		// ƒŠƒŠ[ƒXİ’è
+		PadRelease[i] = (lastPadState[i] ^ PadState[i]) & ~PadState[i];
+
+		// ƒŠƒs[ƒgİ’è
+		PadRepeat[i] = PadTrigger[i];
+
+		// ƒŠƒs[ƒg‚ğ—LŒø‚É‚·‚é‚½‚ß‚ÌŠm”F
+		if (PadState[i])
+		{
+			PadRepeatCnt[i]++;
+			if (PadRepeatCnt[i] >= REPEAT_FRAME)
+			{
+				PadRepeat[i] = PadState[i];
+			}
+			else
+			{
+				PadRepeatCnt[i] = 0;
+				PadRepeat[i] = 0;
+			}
+		}
+
+		// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌŠp“xAƒxƒNƒgƒ‹‚ğ•Û‘¶
+		JoyStickAngle[i] = atan2f((float)dijs[i].lY, (float)dijs[i].lX);
+		D3DXVECTOR2 temp = D3DXVECTOR2((float)dijs[i].lX, (float)dijs[i].lY);
+		JoyStickVec[i] = D3DXVec2Length(&temp);
+
+#ifndef _DEBUG_
+		//// ŒŸo‚³‚ê‚½ƒRƒ“ƒgƒ[ƒ‰‚Ì‚İƒfƒoƒbƒO‚ğ•\¦‚·‚é
+		//if (i < PadCount)
+		//{
+		//	PrintDebugProc("JoyStick[%d] X:%d Y:%d\n", i, dijs[i].lX, dijs[i].lY);
+		//	PrintDebugProc("JoyStickAngle[%d] %f\n", i, JoyStickAngle[i]);
+		//	PrintDebugProc("JoyStickVec[%d] %f\n", i, JoyStickVec[i]);
+		//}
+#endif
+	}
+}
+
+//=============================================================================
+// ƒQ[ƒ€ƒpƒbƒh‚ÌƒvƒŒƒXó‘Ô‚ğŒŸo‚·‚é
+//=============================================================================
+bool IsButtonPressed(int padNo, DWORD button)
+{
+	return (button & PadState[padNo]);
+}
+
+//=============================================================================
+// ƒQ[ƒ€ƒpƒbƒh‚ÌƒgƒŠƒK[ó‘Ô‚ğŒŸo‚·‚é
+//=============================================================================
+bool IsButtonTriggered(int padNo, DWORD button)
+{
+	return (button & PadTrigger[padNo]);
+}
+
+//=============================================================================
+// ƒQ[ƒ€ƒpƒbƒh‚ÌƒŠƒs[ƒgó‘Ô‚ğŒŸo‚·‚é
+//=============================================================================
+bool IsButtonRepeated(int padNo, DWORD button)
+{
+	return (button & PadRepeat[padNo]);
+}
+
+//=============================================================================
+// ƒQ[ƒ€ƒpƒbƒh‚ÌƒŠƒŠ[ƒXó‘Ô‚ğŒŸo‚·‚é
+//=============================================================================
+bool IsButtonReleased(int padNo, DWORD button)
+{
+	return (button & PadRelease[padNo]);
+}
+
+//=============================================================================
+// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌŠp“x‚ğæ“¾‚·‚é
+//=============================================================================
+float GetJoyStickAngle(int padNo)
+{
+	return JoyStickAngle[padNo];
+}
+
+//=============================================================================
+// ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌƒxƒNƒgƒ‹‚ğæ“¾‚·‚é
+//=============================================================================
+float GetJoyStickVec(int padNo)
+{
+	return JoyStickVec[padNo];
+}
+
+//=============================================================================
+// Ú‘±‚³‚ê‚Ä‚¢‚éƒRƒ“ƒgƒ[ƒ‰‚Ì”‚ğæ“¾
+//=============================================================================
+int GetPadCount(void)
+{
+	return PadCount;
+}
+
+//=============================================================================
+// ¶ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌX’l
+//=============================================================================
+int GetJoyStickLeftX(int padNo)
+{
+	return (int)dijs[padNo].lX;
+}
+
+//=============================================================================
+// ¶ƒWƒ‡ƒCƒXƒeƒBƒbƒN‚ÌY’l
+//=============================================================================
+int GetJoyStickLeftY(int padNo)
+{
+	return (int)dijs[padNo].lY;
+}

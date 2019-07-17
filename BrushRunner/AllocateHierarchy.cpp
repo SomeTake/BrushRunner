@@ -222,7 +222,7 @@ HRESULT AllocateHierarchy::CreateMeshContainer(
 			{
 				char TextureName[256];
 				ZeroMemory(TextureName, sizeof(TextureName));
-				sprintf_s(TextureName, "data/Model/%s", pMeshContainer->pMaterials[iMaterial].pTextureFilename);
+				sprintf_s(TextureName, "data/MODEL/%s", pMeshContainer->pMaterials[iMaterial].pTextureFilename);
 
 				if (FAILED(D3DXCreateTextureFromFile(pd3dDevice, TextureName,
 					&pMeshContainer->ppTextures[iMaterial])))

@@ -1,63 +1,75 @@
 //=============================================================================
 //
-// マップ処理 [Map.cpp]
+// マップ処理 [Map.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #ifndef _MAP_H_
 #define _MAP_H_
 
-#include <iostream>
-#include <string>
-#include <fstream>
+#include "Chip.h"
+#include "Quadtree.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_TEXTURE0	("data/TEXTURE/map0.jpg")
-#define MAP_TEXTURE1	("data/TEXTURE/map1.jpg")
-#define MAP_TEXTURE2	("data/TEXTURE/map2.jpg")
-#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)	// 表示場所
-#define MAP_FILE		("data/MAP/data.csv")			// 読み込むマップデータ
-#define MAP_SIZE_X		(3)							// マップの横の枚数
-#define MAP_SIZE_Y		(3)								// マップの縦の枚数
-#define CHIP_SIZE		(40.0f)							// マップチップ一枚のサイズ
+#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)
+#define MAP_SIZE_X		(500)								// マップの横の枚数
+#define MAP_SIZE_Y		(50)								// マップの縦の枚数
+#define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
+#define GOAL_POS		D3DXVECTOR3(9500.0f, 0.0f, 0.0f)	// ゴール地点
 
-// マップチップの種類
-enum {
-	MapField,
-	MapTrap,
-	MapItem,
+// マップチップ座標を取得の種類
+enum e_ChipPosType
+{
+	eLeftUp,	// マップチップの左上の座標 
+	eRightUp,	// マップチップの右上の座標 
+	eCenter,	// マップチップの中心の座標 
+	eCenterUp,	// マップチップの中央の上の座標
+};
 
-	// マップチップの種類数
-	MapChipMax
+// フィールドオブジェクトの種類
+enum e_ChipType
+{
+	eObjSpdup,		// スピードアップ
+	eObjSpddown,	// スピードダウン
+	eObjNuma,		// 沼（スピードダウン＆ジャンプ力ダウン）
+	eObjJump,		// 強制ジャンプ
+	eObjDrain,		// インクゲージ減少
+	eObjHeal,		// インクゲージ増加
+	eObjItem,		// アイテム取得
 };
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class MAP
+class Map
 {
 private:
-	string					line;								// 文字列を一時的に保存
-	int						maptbl[MAP_SIZE_Y][MAP_SIZE_X];		// マップ用の配列
-	const string			delim = ",";						// データ区切り用の文字
-	D3DXVECTOR3				pos;
-	D3DXVECTOR3				rot;
-	D3DXVECTOR3				scl;
-	LPDIRECT3DTEXTURE9		D3DTexture[MapChipMax] = { NULL };	// テクスチャへのポインタ
-	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff = NULL;					// 頂点バッファへのポインタ
+	static std::vector<std::vector<int>>	maptbl;
+	std::vector<Chip*>						MapChipVector;
 
+	static std::vector<std::vector<int>>	objtbl;
+	std::vector<Chip*>						ObjectChipVector;
 
 public:
-	MAP();
-	~MAP();
+	Map();
+	~Map();
 
 	void Update();
 	void Draw();
 
-	void ReadCsv(const char *data);		// CSVファイルの読み込み
-	HRESULT MakeVertex();				// 頂点情報の作成
+	void PaintCollider(QUADTREE *Quadtree, int NodeID);
+
+	static int GetMapTbl(int MapX, int MapY);
+	static int GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection);
+	static int GetObjTbl(int ObjX, int ObjY);
+	static void GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY);
+	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
+
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
+	std::vector<Chip*> GetObjectChip() { return ObjectChipVector; };
+
 };
 
 #endif

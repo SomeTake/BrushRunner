@@ -11,7 +11,7 @@
 // マクロ定義
 //*****************************************************************************
 #define	CAMERA_POS		D3DXVECTOR3(0.0f, 10.0f, -500.0f)				// カメラの初期位置
-#define CAMERA_AT		D3DXVECTOR3(0.0f, 50.0f, 0.0f)					// カメラの注視点
+#define CAMERA_AT		D3DXVECTOR3(0.0f, 0.0f, 0.0f)					// カメラの注視点
 
 #define	VALUE_MOVE_CAMERA	(2.0f)										// カメラの移動量
 #define	VALUE_ROTATE_CAMERA	(D3DX_PI * 0.01f)							// カメラの回転量
@@ -19,6 +19,8 @@
 #define	INTERVAL_CAMERA_R	(12.5f)										// モデルの視線の先までの距離
 #define	RATE_CHASE_CAMERA_P	(0.35f)										// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)										// カメラの注視点への補正係数
+
+#define DRAW_RANGE	D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.3f, 0.0f)	// カメラで撮影される範囲（大体）
 
 //*****************************************************************************
 // グローバル変数
@@ -38,7 +40,7 @@ typedef struct {
 // プロトタイプ宣言
 //*****************************************************************************
 void InitCamera();
-void UpdateCamera();
+void UpdateCamera(D3DXVECTOR3 _at);
 CAMERA *GetCamera();
 void SetCamera();
 

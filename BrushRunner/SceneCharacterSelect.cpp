@@ -14,6 +14,8 @@
 #include "carsl_obj2.h"
 #include "carsl_obj3.h"
 #include "carsl_obj4.h"
+#include "SceneManager.h"
+
 enum
 {
 	logo,
@@ -49,9 +51,9 @@ enum
 static _2dobj *c2dobj[_2dMx];			// 2Dオブジェクト用のポインタ
 float a, b, c;
 //=============================================================================
-// 初期化
+// コンストラクタ
 //=============================================================================
-HRESULT InitSceneCharacterSelect()
+SceneCharacterSelect::SceneCharacterSelect()
 {
 	c2dobj[logo] = new Carsl_logo();
 	c2dobj[obj1p01] = new Carsl_obj(CARSL_OBJ_POS01, TEXTURE_CARSL_OBJ);
@@ -70,13 +72,12 @@ HRESULT InitSceneCharacterSelect()
 	c2dobj[obj4p02] = new Carsl_obj4(CARSL_OBJ4_POS02, TEXTURE_CARSL_OBJ2);
 	c2dobj[obj4p03] = new Carsl_obj4(CARSL_OBJ4_POS03, TEXTURE_CARSL_OBJ3);
 	c2dobj[obj4p04] = new Carsl_obj4(CARSL_OBJ4_POS04, TEXTURE_CARSL_OBJ4);
-	return S_OK;
 }
 
 //=============================================================================
-// 終了
+// デストラクタ
 //=============================================================================
-void UninitSceneCharacterSelect()
+SceneCharacterSelect::~SceneCharacterSelect()
 {
 	// 2Dオブジェクトの削除
 	for (int i = 0; i < _2dMx; i++)
@@ -88,11 +89,11 @@ void UninitSceneCharacterSelect()
 //=============================================================================
 // 更新
 //=============================================================================
-void UpdateSceneCharacterSelect()
+void SceneCharacterSelect::Update()
 {
 	if (GetKeyboardTrigger(DIK_SPACE))
 	{
-		SetScene(SceneGame);
+		SetScene(nSceneGame);
 	}
 
 	// 2Dオブジェクトの更新
@@ -105,7 +106,7 @@ void UpdateSceneCharacterSelect()
 //=============================================================================
 // 描画
 //=============================================================================
-void DrawSceneCharacterSelect()
+void SceneCharacterSelect::Draw()
 {
 	// 2Dオブジェクトの描画
 	for (int i = 0; i < _2dMx; i++)

@@ -6,159 +6,370 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
+#include "SceneManager.h"
 #include "Map.h"
 #include "Camera.h"
-#include "Player.h"
+#include "Collision.h"
+#include "Input.h"
+#include "DebugWindow.h"
 
-//2d obje
-#include "_2dobj.h"
+//2d obj
 #include "Frame01.h"
 #include "Face.h"
 #include "Face2.h"
 #include "Face3.h"
 #include "Face4.h"
-#include "Faceframe.h"
-#include "blackinkline.h"
-#include "colorinkline.h"
-enum
-{
-	NumFrame01,
+#include "CountDown.h"
+#include "Item.h"
 
-	NumFace01,
-	NumFace02,
-	NumFace03,
-	NumFace04,
-
-	NumFaceframe01,
-	NumFaceframe02,
-	NumFaceframe03,
-	NumFaceframe04,
-
-	NumInklineblack01,
-	NumInklineblack02,
-	NumInklineblack03,
-	NumInklineblack04,
-
-	NumInklineblackframe01,
-	NumInklineblackframe02,
-	NumInklineblackframe03,
-	NumInklineblackframe04,
-
-	NumInklineblue,
-	NumInklinered,
-	NumInklineyellow,
-	NumInklinegreen,
-
-	NumColorinkline01,
-	NumColorinkline02,
-	NumColorinkline03,
-	NumColorinkline04,
-
-
-	// 最大数
-	_2dMax,
-};
-
-
-static _2dobj *p2dobj[_2dMax];			// 2Dオブジェクト用のポインタ
-// オブジェクトのポインタ
-MAP *pMap;
-PLAYER *pPlayer;
+static int ResultRank[PLAYER_MAX];
 
 //=============================================================================
-// 初期化
+// コンストラクタ
 //=============================================================================
-HRESULT InitSceneGame()
+SceneGame::SceneGame()
 {
+	startframe = 0;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		ResultRank[i] = -1;
+	}
+	result = false;
 
-	pMap = new MAP();
-	p2dobj[NumFrame01] = new Frame01();
+	// プレイヤーの初期化
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo);
+	}
 
+	// マップの初期化
+	pMap = new Map();
 
-	p2dobj[NumInklineblue] = new Colorinkline(INKLINEBLUE_POS, TEXTURE_INKLINEBLUE);
-	p2dobj[NumInklinered] = new Colorinkline(INKLINERED_POS, TEXTURE_INKLINERED);
-	p2dobj[NumInklineyellow] = new Colorinkline(INKLINEYELLOW_POS, TEXTURE_INKLINEYELLOW);
-	p2dobj[NumInklinegreen] = new Colorinkline(INKLINEGREEN_POS, TEXTURE_INKLINEGREEN);
+	// 四分木の初期化
+	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	PaintManager::SetQuadtreePtr(Quadtree);
 
-	p2dobj[NumColorinkline01] = new Colorinkline(COLORINKFRAME_POS01, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorinkline02] = new Colorinkline(COLORINKFRAME_POS02, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorinkline03] = new Colorinkline(COLORINKFRAME_POS03, TEXTURE_COLORINKFRAME);
-	p2dobj[NumColorinkline04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_COLORINKFRAME);
+	// 2DUIの初期化
+	// フレーム
+	UIObject.push_back(new Frame());
 
-	p2dobj[NumFace01] = new Face(FACE_POS01, TEXTURE_FACE1);
-	p2dobj[NumFace02] = new Face2(FACE_POS02, TEXTURE_FACE2);
-	p2dobj[NumFace03] = new Face3(FACE_POS03, TEXTURE_FACE3);
-	p2dobj[NumFace04] = new Face4(FACE_POS04, TEXTURE_FACE4);
+	// アイテム表示の初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
+	}
 
-	p2dobj[NumFaceframe01] = new Faceframe(FACEFRAME_POS01,TEXTURE_FACEFRAME);
-	p2dobj[NumFaceframe02] = new Faceframe(FACEFRAME_POS02,TEXTURE_FACEFRAME);
-	p2dobj[NumFaceframe03] = new Faceframe(FACEFRAME_POS03,TEXTURE_FACEFRAME);
-	p2dobj[NumFaceframe04] = new Faceframe(FACEFRAME_POS04,TEXTURE_FACEFRAME);
+	// カウントダウンの初期化
+	UIObject.push_back(new CountDown());
 
-	p2dobj[NumInklineblack01] = new Colorinkline(INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK);
-	p2dobj[NumInklineblack02] = new Colorinkline(INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK);
-	p2dobj[NumInklineblack03] = new Colorinkline(INKLINEBLACK_POS03, TEXTURE_INKLINEBLACK);
-	p2dobj[NumInklineblack04] = new Colorinkline(INKLINEBLACK_POS04, TEXTURE_INKLINEBLACK);
-	
-	p2dobj[NumInklineblackframe01] = new Colorinkline(COLORINKFRAME_POS01, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumInklineblackframe02] = new Colorinkline(COLORINKFRAME_POS02, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumInklineblackframe03] = new Colorinkline(COLORINKFRAME_POS03, TEXTURE_BLACKINKFRAME);
-	p2dobj[NumInklineblackframe04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_BLACKINKFRAME);
+	// エフェクトマネージャ
+	pEffectManager = new EffectManager();
 
-	
-	pMap = new MAP();
-
-	pPlayer = new PLAYER();
-
-	return S_OK;
+	// 空
+	pSky = new Sky();
 }
 
 //=============================================================================
-// 終了
+// デストラクタ
 //=============================================================================
-void UninitSceneGame()
+SceneGame::~SceneGame()
 {
-	delete pMap;
+	// マップの削除
+	SAFE_DELETE(pMap);
 
-	// 2Dオブジェクトの削除
-	for (int i = 0; i < _2dMax; i++)
+	// 四分木の削除
+	SAFE_DELETE(Quadtree);
+
+	// ペイントテクスチャの削除
+	Paint::ReleaseTexture();
+
+	// プレイヤーの削除
+	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete p2dobj[i];
+		SAFE_DELETE(pPlayer[i]);
 	}
 
-	delete pPlayer;
+	// 2Dオブジェクトの削除
+	for (auto &Object : UIObject)
+	{
+		SAFE_DELETE(Object);
+	}
+	UIObject.clear();
+	ReleaseVector(UIObject);
+
+	// エフェクトマネージャの削除
+	delete pEffectManager;
+
+	// 空の削除
+	delete pSky;
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void UpdateSceneGame()
+void SceneGame::Update()
 {
-
-	// 2Dオブジェクトの更新
-	for (int i = 0; i < _2dMax; i++)
+	if (startframe < START_FRAME)
 	{
-		p2dobj[i]->Update();
+		Start();
 	}
-	UpdateCamera();
 
+	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+	std::vector<float> vec(PLAYER_MAX);
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		vec.at(i) = pPlayer[i]->GetPos().x;
+	}
+	auto max = std::max_element(vec.begin(), vec.end());
+	size_t maxIdx = std::distance(vec.begin(), max);
+
+	// カメラの更新
+	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
+
+	// マップの更新
 	pMap->Update();
 
-	pPlayer->Update();
+	// プレイヤーの更新
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Update();
+	}
+
+	// 当たり判定の更新
+	Collision();
+
+	// 2Dオブジェクトの更新
+	for (auto &Object : UIObject)
+	{
+		Object->Update();
+	}
+
+	// エフェクトマネージャの更新
+	pEffectManager->Update();
+
+	// 空の更新
+	pSky->Update();
+
+	// リザルト画面へ遷移していいか確認
+	CheckResult();
+
+	Debug();
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void DrawSceneGame()
+void SceneGame::Draw()
 {
+	// 空の描画
+	pSky->Draw();
 
-	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMax; i++)
-	{
-			p2dobj[i]->Draw();
-	}
+	// マップの描画
 	pMap->Draw();
 
-	pPlayer->Draw();
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
+
+	// プレイヤーの描画
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->Draw();
+	}
+
+	// 2Dオブジェクトの描画
+	for (auto &Object : UIObject)
+	{
+		Object->Draw();
+	}
+
+}
+
+//=============================================================================
+// 当たり判定の更新
+//=============================================================================
+void SceneGame::Collision()
+{
+	// プレイヤーとマップの当たり判定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->GroundCollider();
+		pPlayer[i]->HorizonCollider();
+		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
+	}
+
+	// プレイヤーとペイントマネージャの当たり判定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->PaintCollider();
+	}
+
+	// ペイントマネージャ同士の当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
+		{
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
+	// フィールド上に発生したアイテムとの当たり判定
+	for (int nPlayer = 0; nPlayer < PLAYER_MAX; nPlayer++)
+	{
+		for (int nItem = 0; nItem < PLAYER_MAX; nItem++)
+		{
+			if (nPlayer != nItem)
+			{
+				pPlayer[nPlayer]->FieldItemCollider(pPlayer[nItem]->GetFieldItemManager());
+			}
+		}
+	}
+
+	// フィールドオブジェクトとペイントマネージャの当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
+		{
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			pMap->PaintCollider(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
+	// 四分木を更新する
+	Quadtree->Update();
+
+}
+
+//=============================================================================
+// 開始処理
+//=============================================================================
+void SceneGame::Start()
+{
+	// スタートタイマー更新
+	startframe++;
+	
+	if (startframe == START_FRAME)
+	{
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->SetPlayable(true);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト画面へ遷移していいか確認
+//=============================================================================
+void SceneGame::CheckResult()
+{
+	// 全員ゴールorゲームオーバーならシーン遷移可能
+	if (result)
+	{
+		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+		{
+			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
+			{
+				SetScene(nSceneResult);
+			}
+		}
+
+		return;
+	}
+
+	// 全員がゴールorゲームオーバーになったか確認
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (ResultRank[i] != -1)
+		{
+			result = true;
+		}
+		else
+		{
+			result = false;
+			break;
+		}
+	}
+
+	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+	{
+		bool hit = false;
+		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (ResultRank[rNo] != pNo)
+			{
+				hit = false;
+			}
+			else
+			{
+				hit = true;
+				break;
+			}
+		}
+
+		if (!hit)
+		{
+			// まだ順位が登録されていない場合
+			InsertResult(pNo);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト順位配列にデータの挿入
+//=============================================================================
+void SceneGame::InsertResult(int pNo)
+{
+	// ゲームオーバー確認
+	if (!pPlayer[pNo]->GetOnCamera())
+	{
+		// リザルト順位配列の後ろから入れていく
+		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
+		{
+			if (ResultRank[rNo] == -1)
+			{
+				ResultRank[rNo] = pNo;
+				break;
+			}
+		}
+	}
+
+	// ゴール確認
+	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
+	{
+		// リザルト順位配列の前から入れていく
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (ResultRank[rNo] == -1)
+			{
+				ResultRank[rNo] = pNo;
+				break;
+			}
+		}
+	}
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void SceneGame::Debug()
+{
+#ifndef _DEBUG_
+	BeginDebugWindow("Result");
+
+	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
+	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+
+	EndDebugWindow("Result");
+
+#endif
+}
+
+//=============================================================================
+// 順位結果のゲッター
+//=============================================================================
+int *GetResultRank(int no)
+{
+	return &ResultRank[no];
 }

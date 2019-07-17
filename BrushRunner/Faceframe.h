@@ -32,21 +32,25 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Faceframe :
-	public _2dobj {
+class FaceFrame : public _2dobj 
+{
+private:
+	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+
+	HRESULT MakeVertex(void);
+	void SetVertex(void);
+
 public:
-	Faceframe(D3DXVECTOR3 _pos, const char *texno);
-	~Faceframe();
+	FaceFrame(int PlayerNo);
+	~FaceFrame();
+	static void ReleaseTexture(void);
 
 	int fc;
 
 	// オーバーライド関数
 	void Update();
 	void Draw();
-	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex();
-
+	void SetPlayerDeadTexture(void);
 };
 
 #endif

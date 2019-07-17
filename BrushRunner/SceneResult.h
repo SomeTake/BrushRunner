@@ -8,11 +8,21 @@
 #define _SCENERESULT_H_
 
 //*****************************************************************************
-// プロトタイプ宣言
+// クラス定義
 //*****************************************************************************
-HRESULT InitSceneResult();
-void UninitSceneResult();
-void UpdateSceneResult();
-void DrawSceneResult();
+class SceneResult
+{
+private:
+	int *ResultRank;	// ゲームシーンの順位を取得するポインタ
+
+	void Debug();
+
+public:
+	SceneResult();
+	~SceneResult();
+
+	void Update();
+	void Draw();
+};
 
 #endif
