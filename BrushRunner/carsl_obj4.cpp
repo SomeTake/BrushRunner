@@ -8,6 +8,8 @@
 #include "carslobj.h"
 #include "carsl_obj4.h"
 #include "Input.h"
+#include "SceneManager.h"
+
 bool ao4, aka4, midori4, ki4;
 //=============================================================================
 // コンストラクタ
@@ -81,7 +83,7 @@ void Carsl_obj4::Update()
 	}
 	if (Getpnum() == 4)
 	{
-		SetScene(SceneGame);
+		SetScene(nSceneGame);
 	}
 	if (Getpnum() == 3)
 	{
@@ -184,7 +186,7 @@ void Carsl_obj4::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -266,5 +268,9 @@ int Getchar4num()
 	else if (ki4 == true)
 	{
 		return KI;
+	}
+	else
+	{
+		return 0;
 	}
 }

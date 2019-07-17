@@ -108,7 +108,7 @@ void Face::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
