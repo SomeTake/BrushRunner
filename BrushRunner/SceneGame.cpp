@@ -6,16 +6,19 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
+#include "SceneManager.h"
 #include "Map.h"
 #include "Camera.h"
 #include "Collision.h"
 #include "Input.h"
-#include "MyLibrary.h"
+#include "DebugWindow.h"
 
 //2d obj
 #include "Frame01.h"
 #include "CountDown.h"
 #include "Item.h"
+
+static int ResultRank[PLAYER_MAX];
 
 //=============================================================================
 // コンストラクタ
@@ -23,6 +26,8 @@
 SceneGame::SceneGame()
 {
 	startframe = 0;
+	ResultRank[PLAYER_MAX] = { NULL };
+	result = false;
 
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
@@ -137,6 +142,11 @@ void SceneGame::Update()
 
 	// 空の更新
 	pSky->Update();
+
+	// リザルト画面へ遷移していいか確認
+	CheckResult();
+
+	Debug();
 }
 
 //=============================================================================
@@ -239,4 +249,112 @@ void SceneGame::Start()
 			pPlayer[i]->SetPlayable(true);
 		}
 	}
+}
+
+//=============================================================================
+// リザルト画面へ遷移していいか確認
+//=============================================================================
+void SceneGame::CheckResult()
+{
+	// 全員ゴールorゲームオーバーならシーン遷移可能
+	if (result)
+	{
+		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+		{
+			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
+			{
+				SetScene(nSceneResult);
+			}
+		}
+
+		return;
+	}
+
+	// 全員がゴールorゲームオーバーになったか確認
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (ResultRank[i] != NULL)
+		{
+			result = true;
+		}
+		else
+		{
+			result = false;
+			break;
+		}
+	}
+
+	for (int pNo = 1; pNo < PLAYER_MAX + 1; pNo++)
+	{
+		bool hit = false;
+		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (ResultRank[rNo] != pNo)
+			{
+				hit = false;
+			}
+			else
+			{
+				hit = true;
+				break;
+			}
+		}
+
+		if (!hit)
+		{
+			// まだ順位が登録されていない場合
+			InsertResult(pNo - 1);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト順位配列にデータの挿入
+//=============================================================================
+void SceneGame::InsertResult(int pNo)
+{
+	// ゲームオーバー確認
+	if (!pPlayer[pNo]->GetOnCamera())
+	{
+		// リザルト順位配列の後ろから入れていく
+		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
+		{
+			if (ResultRank[rNo] == NULL)
+			{
+				ResultRank[rNo] = pNo + 1;
+				break;
+			}
+		}
+	}
+
+	// ゴール確認
+	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
+	{
+		// リザルト順位配列の前から入れていく
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (ResultRank[rNo] == NULL)
+			{
+				ResultRank[rNo] = pNo + 1;
+				break;
+			}
+		}
+	}
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void SceneGame::Debug()
+{
+#ifndef _DEBUG_
+	BeginDebugWindow("Result");
+
+	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
+	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+
+	EndDebugWindow("Result");
+
+#endif
 }

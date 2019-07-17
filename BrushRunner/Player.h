@@ -110,7 +110,7 @@ public:
 	float GetJumpSpeed() { return jumpSpd; };
 	float GetJumpValue() { return jumpValue; };
 	PaintManager* GetPaintManager(void) { return this->PaintSystem; };
-
+	bool GetOnCamera() { return onCamera; };
 	int GetCtrlNum() { return ctrlNum; };
 	bool GetPlayable() { return playable; };
 	bool GetHitGround() { return hitGround; };

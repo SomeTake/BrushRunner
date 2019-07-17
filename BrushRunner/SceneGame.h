@@ -34,9 +34,14 @@ private:
 	EffectManager *pEffectManager;			// 2Dエフェクト管理
 	Sky		*pSky;							// 空
 	int		startframe;						// 開始カウントダウン
+	bool	result;							// 終了フラグ
 
 	void Start();
 	void Collision();
+	void CheckResult();
+	void InsertResult(int pNo);
+
+	void Debug();
 
 public:
 	SceneGame();
