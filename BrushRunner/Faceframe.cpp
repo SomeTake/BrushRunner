@@ -26,6 +26,8 @@ FaceFrame::FaceFrame(int PlayerNo)
 
 	pos = FACEFRAME_POS + D3DXVECTOR3(FACEFRAME_INTERVAL * PlayerNo, 0.0f, 0.0f);
 
+	PatternAnim = 1;
+
 	// 頂点情報の作成
 	MakeVertex();
 
@@ -67,7 +69,7 @@ void FaceFrame::Draw()
 
 	// 頂点フォーマットの設定
 	Device->SetFVF(FVF_VERTEX_2D);
-
+		
 	// テクスチャの設定
 	Device->SetTexture(0, D3DTexture);
 

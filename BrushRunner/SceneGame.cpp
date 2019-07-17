@@ -15,6 +15,10 @@
 
 //2d obj
 #include "Frame01.h"
+#include "Face.h"
+#include "Face2.h"
+#include "Face3.h"
+#include "Face4.h"
 #include "CountDown.h"
 #include "Item.h"
 
