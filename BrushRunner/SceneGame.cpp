@@ -6,309 +6,165 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
-#include "Debugproc.h"
+#include "SceneManager.h"
 #include "Map.h"
 #include "Camera.h"
-#include "_2dobj.h"
-#include "Effect.h"
-
-#include "Player.h"
 #include "Collision.h"
-#include "Gravity.h"
 #include "Input.h"
-#include "MyLibrary.h"
+#include "DebugWindow.h"
 
 //2d obj
-#include "_2dobj.h"
 #include "Frame01.h"
-#include "Faceframe.h"
-#include "InkFrameColor.h"
-#include "InkFrameBlack.h"
-#include "Ink.h"
-#include "Cursor.h"
 #include "CountDown.h"
+#include "Item.h"
 
-#include "PaintSystem.h"
-#include "Pop.h"
-
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-// エフェクトの種類
-enum {
-	HitEffect,
-	Hit1Effect,
-	RunEffect,
-	ExpEffect,
-	ItemEffect,
-
-	// エフェクトの個数
-	EffectMax,
-};
-
-//*****************************************************************************
-// オブジェクトのポインタ
-//*****************************************************************************
-static _2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
-static MAP *pMap;							// マップ用のポインタ
-static EFFECT *pEffect[EffectMax];			// エフェクト用のポインタ
-static PLAYER *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-static CURSOR *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-static PAINTSYSTEM *pPSystem[PLAYER_MAX];	// ペイントシステム用のポインタ
-static POP *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
-
-static int Draw2dobjBuff[_2dMax];			// UIの描画順を変更するための配列
+static int ResultRank[PLAYER_MAX];
 
 //=============================================================================
-// 初期化
+// コンストラクタ
 //=============================================================================
-HRESULT InitSceneGame()
+SceneGame::SceneGame()
 {
-	// プレイヤーの初期化
+	startframe = 0;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i] = new PLAYER(i);
+		ResultRank[i] = -1;
+	}
+	result = false;
+
+	// プレイヤーの初期化
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo);
 	}
 
 	// マップの初期化
-	pMap = new MAP();
+	pMap = new Map();
+
+	// 四分木の初期化
+	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+	PaintManager::SetQuadtreePtr(Quadtree);
 
 	// 2DUIの初期化
 	// フレーム
-	p2dobj[NumFrame] = new FRAME();
+	UIObject.push_back(new Frame());
 
-	// 黒インクの初期化
-	p2dobj[NumInkblack00] = new INK(pPlayer[0], INKLINEBLACK_POS01, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack01] = new INK(pPlayer[1], INKLINEBLACK_POS02, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack02] = new INK(pPlayer[2], INKLINEBLACK_POS03, TEXTURE_INKGAUGEBLACK, BlackInk);
-	p2dobj[NumInkblack03] = new INK(pPlayer[3], INKLINEBLACK_POS04, TEXTURE_INKGAUGEBLACK, BlackInk);
+	// アイテム表示の初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
+	}
 
-	// 黒インク用フレームの初期化
-	p2dobj[NumBlackFrame00] = new INKFRAMEBLACK(BLACKINKFRAME_POS01);
-	p2dobj[NumBlackFrame01] = new INKFRAMEBLACK(BLACKINKFRAME_POS02);
-	p2dobj[NumBlackFrame02] = new INKFRAMEBLACK(BLACKINKFRAME_POS03);
-	p2dobj[NumBlackFrame03] = new INKFRAMEBLACK(BLACKINKFRAME_POS04);
-
-	// カラーインクの初期化
-	p2dobj[NumInkblue] = new INK(pPlayer[0], INKLINEBLUE_POS, TEXTURE_INKGAUGERED, ColorInk);
-	p2dobj[NumInkred] = new INK(pPlayer[1], INKLINERED_POS, TEXTURE_INKGAUGEBLUE, ColorInk);
-	p2dobj[NumInkyellow] = new INK(pPlayer[2], INKLINEYELLOW_POS, TEXTURE_INKGAUGEYELLOW, ColorInk);
-	p2dobj[NumInkgreen] = new INK(pPlayer[3], INKLINEGREEN_POS, TEXTURE_INKGAUGEGREEN, ColorInk);
-
-	// カラーインク用フレームの初期化
-	p2dobj[NumColorFrame00] = new INKFRAMECOLOR(COLORINKFRAME_POS01);
-	p2dobj[NumColorFrame01] = new INKFRAMECOLOR(COLORINKFRAME_POS02);
-	p2dobj[NumColorFrame02] = new INKFRAMECOLOR(COLORINKFRAME_POS03);
-	p2dobj[NumColorFrame03] = new INKFRAMECOLOR(COLORINKFRAME_POS04);
-
-	// 顔を表示するフレームの初期化
-	p2dobj[NumFaceframe00] = new FACEFRAME(FACEFRAME_POS01);
-	p2dobj[NumFaceframe01] = new FACEFRAME(FACEFRAME_POS02);
-	p2dobj[NumFaceframe02] = new FACEFRAME(FACEFRAME_POS03);
-	p2dobj[NumFaceframe03] = new FACEFRAME(FACEFRAME_POS04);
-	
 	// カウントダウンの初期化
-	p2dobj[NumCountDown] = new COUNTDOWN();
+	UIObject.push_back(new CountDown());
 
-	// カーソルの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i] = new CURSOR(i, pPlayer[i]);
-	}
+	// エフェクトマネージャ
+	pEffectManager = new EffectManager();
 
-	// ペイントシステムの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPSystem[i] = new PAINTSYSTEM(pCursor[i], pPlayer[i]);
-	}
-
-	// ポップアップの初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i] = new POP(pPlayer[i]);
-	}
-
-	// エフェクトの初期化
-	pEffect[HitEffect] = new EFFECT(EFFECT_TEXTURE0, EFFECT0_SIZE, EFFET0_POS, TIME_ANIMATION_EFFECT0, EFFECT_PATTERN_X, EFFECT_PATTERN_Y);
-	pEffect[Hit1Effect] = new EFFECT(EFFECT_TEXTURE1, EFFECT1_SIZE, EFFET1_POS, TIME_ANIMATION_EFFECT1, EFFECT1_PATTERN_X, EFFECT1_PATTERN_Y);
-	pEffect[RunEffect] = new EFFECT(EFFECT_TEXTURE2, EFFECT2_SIZE, EFFET2_POS, TIME_ANIMATION_EFFECT2, EFFECT2_PATTERN_X, EFFECT2_PATTERN_Y);
-	pEffect[ExpEffect] = new EFFECT(EFFECT_TEXTURE3, EFFECT3_SIZE, EFFET3_POS, TIME_ANIMATION_EFFECT3, EFFECT3_PATTERN_X, EFFECT3_PATTERN_Y);
-	pEffect[ItemEffect] = new EFFECT(EFFECT_TEXTURE4, EFFECT4_SIZE, EFFET4_POS, TIME_ANIMATION_EFFECT4, EFFECT4_PATTERN_X, EFFECT4_PATTERN_Y);
-
-	// 描画順の初期化
-	for (int i = 0; i < _2dMax; i++)
-	{
-		Draw2dobjBuff[i] = i;
-	}
-
-	return S_OK;
+	// 空
+	pSky = new Sky();
 }
 
 //=============================================================================
-// 終了
+// デストラクタ
 //=============================================================================
-void UninitSceneGame()
+SceneGame::~SceneGame()
 {
 	// マップの削除
-	delete pMap;
+	SAFE_DELETE(pMap);
 
-	// エフェクトの削除
-	for (int i = 0; i < EffectMax; i++)
-	{
-		delete pEffect[i];
-	}
+	// 四分木の削除
+	SAFE_DELETE(Quadtree);
+
+	// ペイントテクスチャの削除
+	Paint::ReleaseTexture();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		delete pPlayer[i];
+		SAFE_DELETE(pPlayer[i]);
 	}
 
 	// 2Dオブジェクトの削除
-	for (int i = 0; i < _2dMax; i++)
+	for (auto &Object : UIObject)
 	{
-		delete p2dobj[i];
+		SAFE_DELETE(Object);
 	}
+	UIObject.clear();
+	ReleaseVector(UIObject);
 
-	// カーソルの削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		delete pCursor[i];
-	}
+	// エフェクトマネージャの削除
+	delete pEffectManager;
 
-	// ペイントシステムの削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		delete pPSystem[i];
-	}
-
-	// ポップアップ削除
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		delete pPop[i];
-	}
+	// 空の削除
+	delete pSky;
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void UpdateSceneGame()
+void SceneGame::Update()
 {
-	static int startframe = 0;
-
-	// スタートタイマー更新
 	if (startframe < START_FRAME)
 	{
-		startframe++;
-	}
-	if (startframe == START_FRAME)
-	{
-		for (int i = 0; i < PLAYER_MAX; i++)
-		{
-			pPlayer[i]->SetPlayable(true);
-		}
+		Start();
 	}
 
+	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+	std::vector<float> vec(PLAYER_MAX);
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		vec.at(i) = pPlayer[i]->GetPos().x;
+	}
+	auto max = std::max_element(vec.begin(), vec.end());
+	size_t maxIdx = std::distance(vec.begin(), max);
 
 	// カメラの更新
-	UpdateCamera(CompareXPos());
-
-	// 2Dオブジェクトの更新
-	for (int i = 0; i < _2dMax; i++)
-	{
-		p2dobj[i]->Update();
-	}
-
-	// カーソルの更新
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i]->Update();
-	}
-
-	// ペイントシステムの更新
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPSystem[i]->Update();
-	}
+	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
 
 	// マップの更新
 	pMap->Update();
-
-	// エフェクトの更新
-	for (int i = 0; i < EffectMax; i++)
-	{
-		pEffect[i]->Update();
-	}
 
 	// プレイヤーの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		pPlayer[i]->Update();
-
-		bool gravflag = false;
-
-		// 地面に接しているか確認
-		if (HitCheckPToM(pPlayer[i], pMap))
-		{
-			pPlayer[i]->SetJumpFlag(false);
-			gravflag = false;
-		}
-		else
-		{
-			gravflag = true;
-		}
-		// ペイントシステムとの当たり判定
-		if (pPlayer[i]->GetJumpSpeed() >= 0.0f)
-		{
-			if (HitCheckPToS(pPlayer[i], pPSystem[i]))
-			{
-				pPlayer[i]->SetJumpFlag(false);
-				gravflag = false;
-			}
-			else
-			{
-				gravflag = true;
-			}
-		}
-
-		// 重力が有効
-		if (gravflag)
-		{
-			GravityFall(pPlayer[i]);
-		}
 	}
 
-	// ペイントシステム同士の当たり判定
-	for (int nBlack = 0; nBlack < PLAYER_MAX; nBlack++)
+	// 当たり判定の更新
+	Collision();
+
+	// 2Dオブジェクトの更新
+	for (auto &Object : UIObject)
 	{
-		for (int nColor = 0; nColor < PLAYER_MAX; nColor++)
-		{
-			// 自分が使用しているカラー以外との判定を行う
-			if (nBlack != nColor)
-			{
-				//HitCheckSToS(pPSystem[nBlack], pPSystem[nColor]);
-			}
-		}
+		Object->Update();
 	}
 
-	// ポップアップの更新
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i]->Update();
-	}
+	// エフェクトマネージャの更新
+	pEffectManager->Update();
 
-#ifndef _DEBUG_
+	// 空の更新
+	pSky->Update();
 
-#endif
+	// リザルト画面へ遷移していいか確認
+	CheckResult();
+
+	Debug();
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void DrawSceneGame()
+void SceneGame::Draw()
 {
+	// 空の描画
+	pSky->Draw();
+
 	// マップの描画
 	pMap->Draw();
+
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
 
 	// プレイヤーの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -316,104 +172,200 @@ void DrawSceneGame()
 		pPlayer[i]->Draw();
 	}
 
-	// カーソルの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pCursor[i]->Draw();
-	}
-
 	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMax; i++)
+	for (auto &Object : UIObject)
 	{
-		p2dobj[Draw2dobjBuff[i]]->Draw();
+		Object->Draw();
 	}
-
-	// ペイントシステムの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPSystem[i]->Draw();
-	}
-
-	// ポップアップの描画
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPop[i]->Draw();
-	}
-
-	// エフェクトの描画
-	for (int i = 0; i < EffectMax; i++)
-	{
-		pEffect[i]->Draw();
-	}
-}
-
-//=============================================================================
-// 2Dオブジェクトの描画順を取得
-//=============================================================================
-int GetDraw2dobjBuff(int _num)
-{
-	return Draw2dobjBuff[_num];
-}
-
-//=============================================================================
-// 2Dオブジェクトの描画順をセット
-//=============================================================================
-void SetDraw2dobjBuff(int _BuffNum, int _DrawNum)
-{
-	Draw2dobjBuff[_BuffNum] = _DrawNum;
-}
-
-//=============================================================================
-// 描画順を入れ替える
-//=============================================================================
-void ChangeDrawOrder(int _NumA, int _NumB)
-{
-	int change = GetDraw2dobjBuff(_NumA);
-	SetDraw2dobjBuff(_NumA, GetDraw2dobjBuff(_NumB));
-	SetDraw2dobjBuff(_NumB, change);
 
 }
 
 //=============================================================================
-// X座標を比較して、大きい2つの中心座標を返す
+// 当たり判定の更新
 //=============================================================================
-D3DXVECTOR3 CompareXPos()
+void SceneGame::Collision()
 {
-	float CmpPos[PLAYER_MAX];
-
-	// プレイヤーの座標を格納
+	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		CmpPos[i] = pPlayer[i]->GetPos().x;
+		pPlayer[i]->GroundCollider();
+		pPlayer[i]->HorizonCollider();
+		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
 	}
 
-	// QuickSort関数 引数1 比較する配列の先頭要素
-	//				 引数2 配列の要素数
-	//				 引数3 型のサイズ
-	//				 引数4 比較用の関数
-	qsort(CmpPos, PLAYER_MAX, sizeof(float), CmpDescendf);
-
-	float CmpY[2];
-
-	// 1つめの要素確定
+	// プレイヤーとペイントマネージャの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (CmpPos[0] == pPlayer[i]->GetPos().x)
+		pPlayer[i]->PaintCollider();
+	}
+
+	// ペイントマネージャ同士の当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
 		{
-			CmpY[0] = pPlayer[i]->GetPos().y;
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
+	// フィールド上に発生したアイテムとの当たり判定
+	for (int nPlayer = 0; nPlayer < PLAYER_MAX; nPlayer++)
+	{
+		for (int nItem = 0; nItem < PLAYER_MAX; nItem++)
+		{
+			if (nPlayer != nItem)
+			{
+				pPlayer[nPlayer]->FieldItemCollider(pPlayer[nItem]->GetFieldItemManager());
+			}
+		}
+	}
+
+	// フィールドオブジェクトとペイントマネージャの当たり判定
+	for (int TenDigit = 1; TenDigit <= 4; TenDigit++)
+	{
+		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
+		{
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			pMap->PaintCollider(Quadtree, (TenDigit * 10 + OneDigit));
+		}
+	}
+
+	// 四分木を更新する
+	Quadtree->Update();
+
+}
+
+//=============================================================================
+// 開始処理
+//=============================================================================
+void SceneGame::Start()
+{
+	// スタートタイマー更新
+	startframe++;
+	
+	if (startframe == START_FRAME)
+	{
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->SetPlayable(true);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト画面へ遷移していいか確認
+//=============================================================================
+void SceneGame::CheckResult()
+{
+	// 全員ゴールorゲームオーバーならシーン遷移可能
+	if (result)
+	{
+		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+		{
+			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
+			{
+				SetScene(nSceneResult);
+			}
+		}
+
+		return;
+	}
+
+	// 全員がゴールorゲームオーバーになったか確認
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (ResultRank[i] != -1)
+		{
+			result = true;
+		}
+		else
+		{
+			result = false;
 			break;
 		}
 	}
 
-	// 2つめの要素確定
-	for (int i = 0; i < PLAYER_MAX; i++)
+	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
 	{
-		if (CmpPos[1] == pPlayer[i]->GetPos().x)
+		bool hit = false;
+		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			CmpY[1] = pPlayer[i]->GetPos().y;
-			break;
+			if (ResultRank[rNo] != pNo)
+			{
+				hit = false;
+			}
+			else
+			{
+				hit = true;
+				break;
+			}
+		}
+
+		if (!hit)
+		{
+			// まだ順位が登録されていない場合
+			InsertResult(pNo);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト順位配列にデータの挿入
+//=============================================================================
+void SceneGame::InsertResult(int pNo)
+{
+	// ゲームオーバー確認
+	if (!pPlayer[pNo]->GetOnCamera())
+	{
+		// リザルト順位配列の後ろから入れていく
+		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
+		{
+			if (ResultRank[rNo] == -1)
+			{
+				ResultRank[rNo] = pNo;
+				break;
+			}
 		}
 	}
 
-	return D3DXVECTOR3((CmpPos[0] + CmpPos[1]) * 0.5f, (CmpY[0] + CmpY[1]) * 0.5f, 0.0f);
+	// ゴール確認
+	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
+	{
+		// リザルト順位配列の前から入れていく
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (ResultRank[rNo] == -1)
+			{
+				ResultRank[rNo] = pNo;
+				break;
+			}
+		}
+	}
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void SceneGame::Debug()
+{
+#ifndef _DEBUG_
+	BeginDebugWindow("Result");
+
+	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
+	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+
+	EndDebugWindow("Result");
+
+#endif
+}
+
+//=============================================================================
+// 順位結果のゲッター
+//=============================================================================
+int *GetResultRank(int no)
+{
+	return &ResultRank[no];
 }

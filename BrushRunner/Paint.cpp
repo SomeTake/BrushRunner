@@ -7,31 +7,22 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
-#include "Debugproc.h"
+
+#define DecAlpha (0.1f)
 
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	PAINT::D3DTexture = NULL;		// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9	Paint::D3DTexture = NULL;		// テクスチャへのポインタ
+float Paint::HalfSize = PAINT_WIDTH / 2;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PAINT::PAINT()
+Paint::Paint(int Owner, int PaintColor)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-	// 頂点情報の作成
-	MakeVertex();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-			TEXTURE_PAINT,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
-	
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
@@ -39,37 +30,45 @@ PAINT::PAINT()
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	width = PAINT_WIDTH;
 	height = PAINT_HEIGHT;
-	use = false;
 	time = 0;
-	patternAnim = 0;
-	DecAlpha = 0.1f;
+	this->Use = false;
+	this->InScreen = true;
+	this->NodeID = 0;
+	this->Owner = Owner;
+	this->PaintColor = PaintColor;
+
+	// テクスチャの読み込み
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
+			TEXTURE_PAINT,					// ファイルの名前
+			&D3DTexture);					// 読み込むメモリー
+	}
+
+	MakeVertex();
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-PAINT::~PAINT()
+Paint::~Paint()
 {
-	if (D3DTexture != NULL)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// 頂点バッファの開放
+	SAFE_RELEASE(this->D3DVtxBuff);
+}
 
-	if (D3DVtxBuff != NULL)
-	{// 頂点バッファの開放
-		D3DVtxBuff->Release();
-		D3DVtxBuff = NULL;
-	}
+void Paint::ReleaseTexture(void)
+{
+	SAFE_RELEASE(Paint::D3DTexture);
 }
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void PAINT::Update()
+void Paint::Update()
 {
 	// 使用しているもののみ更新
-	if (use)
+	if (Use)
 	{
 		// 表示時間の更新
 		if (time > 0)
@@ -82,254 +81,206 @@ void PAINT::Update()
 			// 透明度を減衰値に合わせて追加
 			col.a -= DecAlpha;
 
-			// 色の設定
-			SetColor();
-
 			if (col.a <= 0.0f)
 			{
 				// 透明になったら使用をやめる
 				col.a = 0.0f;
-				use = false;
+				Use = false;
 				col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			}
 
+			// 色の設定
+			SetColor();
 		}
 
-		SetTexture();
-
-		PrintDebugProc("ペイント座標 X:%f Y:%f Z:%f\n", pos.x, pos.y ,pos.z);
+#if _DEBUG
+#endif
 	}
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void PAINT::Draw()
+void Paint::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 	CAMERA *cameraWk = GetCamera();
 	D3DXMATRIX WorldMtx, ViewMtx, SclMtx, TransMtx;
 
-	// ラインティングを無効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-
+#if 0
 	// 減算合成 レンダリングステートの変更→黒っぽくなる（加算合成は白っぽくなる（255に近づけていくと））
-	//pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);	// 結果 = 転送先(DEST) - 転送元(SRC)
-	//pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	//Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);	// 結果 = 転送先(DEST) - 転送元(SRC)
+	//Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	// Zテスト
-	//pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
 	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
+	Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+#endif
+
 	// Zテスト
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 
 	// αテストを有効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	//Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	//Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	//Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
-	if (use)
+	if (Use)
 	{
 		// ワールドマトリックスの初期化
 		D3DXMatrixIdentity(&WorldMtx);
 
-		// ビューマトリックスを取得
-		ViewMtx = cameraWk->mtxView;
-
-		// ポリゴンを正面に向ける
-		WorldMtx._11 = ViewMtx._11;
-		WorldMtx._12 = ViewMtx._21;
-		WorldMtx._13 = ViewMtx._31;
-		WorldMtx._21 = ViewMtx._12;
-		WorldMtx._22 = ViewMtx._22;
-		WorldMtx._23 = ViewMtx._32;
-		WorldMtx._31 = ViewMtx._13;
-		WorldMtx._32 = ViewMtx._23;
-		WorldMtx._33 = ViewMtx._33;
-
-#if 1
-		// 逆行列をもとめる
-		D3DXMatrixInverse(&WorldMtx, NULL, &ViewMtx);
-		WorldMtx._41 = 0.0f;
-		WorldMtx._42 = 0.0f;
-		WorldMtx._43 = 0.0f;
-#else
-		WorldMtx._11 = mtxView._11;
-		WorldMtx._12 = mtxView._21;
-		WorldMtx._13 = mtxView._31;
-		WorldMtx._21 = mtxView._12;
-		WorldMtx._22 = mtxView._22;
-		WorldMtx._23 = mtxView._32;
-		WorldMtx._31 = mtxView._13;
-		WorldMtx._32 = mtxView._23;
-		WorldMtx._33 = mtxView._33;
-#endif
-
 		// スケールを反映
-		D3DXMatrixScaling(&SclMtx, scl.x,
-			scl.y,
-			scl.z);
+		D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
 		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
 
 		// 移動を反映
-		D3DXMatrixTranslation(&TransMtx, pos.x,
-			pos.y,
-			pos.z);
+		D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
 		D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
 		// ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+		Device->SetTransform(D3DTS_WORLD, &WorldMtx);
+		this->ScreenPos = WorldToScreenPos(WorldMtx);
 
 		// 頂点バッファをデバイスのデータストリームにバインド
-		pDevice->SetStreamSource(0, D3DVtxBuff, 0, sizeof(VERTEX_3D));
+		Device->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
 
 		// 頂点フォーマットの設定
-		pDevice->SetFVF(FVF_VERTEX_3D);
+		Device->SetFVF(FVF_VERTEX_3D);
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, D3DTexture);
+		Device->SetTexture(0, Paint::D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+		Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 	}
 
-	// ラインティングを有効にする
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
 	// αテストを無効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	//Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Z比較あり
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+#if 0
+	// 通常ブレンド レンダリングステートをもとに戻す（戻さないと減算合成のままになる）
+	Device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);			// 結果 = 転送元(SRC) + 転送先(DEST)
+	Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+#endif
 }
 
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT PAINT::MakeVertex()
+HRESULT Paint::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+	if (FAILED(Device->CreateVertexBuffer(sizeof(Vertex3D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
 		D3DUSAGE_WRITEONLY,						// 頂点バッファの使用法　
 		FVF_VERTEX_3D,							// 使用する頂点フォーマット
 		D3DPOOL_MANAGED,						// リソースのバッファを保持するメモリクラスを指定
-		&D3DVtxBuff,						// 頂点バッファインターフェースへのポインタ
+		&D3DVtxBuff,							// 頂点バッファインターフェースへのポインタ
 		NULL)))									// NULLに設定
 	{
 		return E_FAIL;
 	}
 
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
 
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-PAINT_WIDTH / 2.0f, 0.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(-PAINT_WIDTH / 2.0f, PAINT_HEIGHT, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(PAINT_WIDTH / 2.0f, 0.0f, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(PAINT_WIDTH / 2.0f, PAINT_HEIGHT, 0.0f);
+	// 頂点座標の設定
+	pVtx[0].vtx = D3DXVECTOR3(-PAINT_WIDTH / 2, PAINT_HEIGHT / 2, 0.0f);
+	pVtx[1].vtx = D3DXVECTOR3(PAINT_WIDTH / 2, PAINT_HEIGHT / 2, 0.0f);
+	pVtx[2].vtx = D3DXVECTOR3(-PAINT_WIDTH / 2, -PAINT_HEIGHT / 2, 0.0f);
+	pVtx[3].vtx = D3DXVECTOR3(PAINT_WIDTH / 2, -PAINT_HEIGHT / 2, 0.0f);
 
-		// 反射光の設定
-		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	// 法線ベクトルの設定
+	pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[1].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[2].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+	pVtx[3].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[1].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(1.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 0.0f);
+	// 反射光の設定
+	pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
-	}
+	// テクスチャ座標の設定
+	int x = this->PaintColor % PAINT_DIVIDE_X;
+	float sizeX = 1.0f / PAINT_DIVIDE_X;
+
+	pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
+
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
 
 	return S_OK;
-
 }
 
 //=============================================================================
-// 頂点座標の設定
+// 頂点カラーの設定
 //=============================================================================
-void PAINT::SetVertex()
+void Paint::SetColor()
 {
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
 
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-width / 2.0f, 0.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(-width / 2.0f, height, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(width / 2.0f, 0.0f, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(width / 2.0f, height, 0.0f);
+	// 頂点座標の設定
+	pVtx[0].diffuse = col;
+	pVtx[1].diffuse = col;
+	pVtx[2].diffuse = col;
+	pVtx[3].diffuse = col;
 
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
-	}
-
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
 }
 
 //=============================================================================
-// 頂点カラーの設定 引数(nIdxParticle = 番号, col = 色)
+// ワールド座標からスクリーン座標に変換する
 //=============================================================================
-void PAINT::SetColor()
+D3DXVECTOR2 Paint::WorldToScreenPos(D3DXMATRIX WorldMatrix)
 {
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
+	D3DXMATRIX ViewMatrix, ProjMatrix;
+	D3DXMATRIX WVP;
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	Device->GetTransform(D3DTS_VIEW, &ViewMatrix);
+	Device->GetTransform(D3DTS_PROJECTION, &ProjMatrix);
+	WVP = WorldMatrix * ViewMatrix * ProjMatrix;
 
-		// 頂点座標の設定
-		pVtx[0].diffuse = col;
-		pVtx[1].diffuse = col;
-		pVtx[2].diffuse = col;
-		pVtx[3].diffuse = col;
+	D3DXVECTOR3 ScreenCoord = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVec3TransformCoord(&ScreenCoord, &ScreenCoord, &WVP);
 
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
+	ScreenCoord.x = ((ScreenCoord.x + 1.0f) / 2.0f) * SCREEN_WIDTH;
+	ScreenCoord.y = ((-ScreenCoord.y + 1.0f) / 2.0f) * SCREEN_HEIGHT;
+
+	if (ScreenCoord.x < 0 ||
+		ScreenCoord.x > SCREEN_WIDTH ||
+		ScreenCoord.y < 0 ||
+		ScreenCoord.y > SCREEN_HEIGHT)
+	{
+		this->InScreen = false;
 	}
-}
-
-//=============================================================================
-// テクスチャ座標の設定
-//=============================================================================
-void PAINT::SetTexture()
-{
-	int x = patternAnim % PAINT_DIVIDE_X;
-	int y = patternAnim / PAINT_DIVIDE_X;
-	float sizeX = 1.0f / PAINT_DIVIDE_X;
-	float sizeY = 1.0f / PAINT_DIVIDE_Y;
-
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-		pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-		pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
-		pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-
-		// 頂点データをアンロックする
-		D3DVtxBuff->Unlock();
+	else
+	{
+		this->InScreen = true;
 	}
 
+	return (D3DXVECTOR2)ScreenCoord;
 }

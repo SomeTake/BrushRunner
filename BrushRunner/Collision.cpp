@@ -6,8 +6,8 @@
 //=============================================================================
 #include "Main.h"
 #include "Collision.h"
-#include "Debugproc.h"
-#include "Gravity.h"
+#include "Input.h"
+#include "Player.h"
 
 //=============================================================================
 // 矩形の当たり判定
@@ -31,147 +31,66 @@ bool HitCheckBB(D3DXVECTOR3 posA, D3DXVECTOR3 posB, D3DXVECTOR2 sizeA, D3DXVECTO
 //=============================================================================
 // 球の当たり判定
 //=============================================================================
-bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Range1, float Range2)
+bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Radius1, float Radius2)
 {
 	// 当たり判定の中心の距離を測る
-	D3DXVECTOR3 unit = Pos1 - Pos2;
-	float dist = D3DXVec3Length(&unit);
+	float dist = D3DXVec3LengthSq(&D3DXVECTOR3(Pos1 - Pos2));
 
 	// 当たり判定の範囲を足した距離を出す（球なのでXYZどれとっても同じ）
-	float hitrange = Range1 + Range2;
+	float hitrange = powf((Radius1 + Radius2), 2);
 
 	// 当たり判定の中心の距離よりも範囲を足した距離の方が長ければ当たる
-	if (dist <= hitrange)
-	{
-		return true;
-	}
-	// 外れ
-	else
-	{
-
-	}
-	return false;
-}
-
-//=============================================================================
-// プレイヤーと足元のマップの当たり判定
-//=============================================================================
-bool HitCheckPToM(PLAYER *pP, MAP *pM)
-{
-	// キャラクターの座標からマップ配列の場所を調べる
-	int x = (int)((pP->GetPos().x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pP->GetPos().y - CHIP_SIZE / 2) / CHIP_SIZE);
-
-	// 当たり判定を確認するマップチップの場所
-	D3DXVECTOR3 mappos;
-	mappos.x = MAP_POS.x + CHIP_SIZE * x;
-	mappos.y = MAP_POS.y + CHIP_SIZE * y;
-	mappos.z = 0.0f;
-
-	// プレイヤーの足元のマップチップから右上のマップチップの番号
-	int frontx = x + 1;
-	int fronty = y + 1;
-
-	// 前方のオブジェクトに引っかかるかチェック(ジャンプ中はチェックしない)
-	if (!pP->GetJumpFlag())
-	{
-		if (pM->GetMapTbl(-fronty, frontx) >= 0)
-		{
-			pP->SetMoveFlag(false);
-		}
-		else
-		{
-			pP->SetMoveFlag(true);
-		}
-	}
-
-	// マップ外判定
-	if (!HitCheckBB(pP->GetPos(), GetMapCenterPos(), PLAYER_COLLISION_SIZE, D3DXVECTOR2(MAP_SIZE_X * CHIP_SIZE, MAP_SIZE_Y * CHIP_SIZE)))
-	{
-		pP->SetMoveFlag(true);
-
-		return false;
-	}
-	
-#ifndef _DEBUG_
-	PrintDebugProc("現在プレイヤーがいるMapTbl[%d][%d]\n", -y, x);
-	PrintDebugProc("プレイヤーの前のMapTbl[%d][%d]\n", -fronty, frontx);
-	PrintDebugProc("MapTblの中身:%d\n", pM->GetMapTbl(-y, x));
-#endif
-
-	// 現在座標があるところになにかオブジェクトがあればヒットしている
-	if (pM->GetMapTbl(-y, x) >= 0)
-	{
-		// めり込みを修正
-		PosModification(pP, mappos);
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-//=============================================================================
-// プレイヤーとペイントシステムの当たり判定
-//=============================================================================
-bool HitCheckPToS(PLAYER *pP, PAINTSYSTEM *pS)
-{
-	bool returnflag = false;
-
-	for (int i = 0; i < PAINT_MAX; i++)
-	{
-		// 使用しているかつ、プレイヤーカラーのインクを使用している場合当たり判定を行う
-		if (pS->GetPaint(i)->GetUse() && (pS->GetPaint(i)->GetPatternAnim() == pP->GetCtrlNum()))
-		{
-			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-			if (HitSphere(pP->GetPos(), pS->GetPaint(i)->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
-			{
-				// 当たった場合、プレイヤーの座標を修正
-				D3DXVECTOR3 setpos = pP->GetPos();
-				setpos.y = pS->GetPaint(i)->GetPos().y + PAINT_WIDTH * 0.1f;
-
-				pP->SetPos(setpos);
-
-				returnflag = true;
-			}
-		}
-	}
-
-	if (returnflag)
-	{
-		return true;
-	}
-	return false;
+	return dist <= hitrange ? true : false;
 }
 
 //=============================================================================
 // ペイントシステム同士の当たり判定
 // pSysBlack : 黒インク用ペイントシステムのポインタ
-// pSysColor : カラーインク用ペイントシステムのポインタ
 //=============================================================================
-void HitCheckSToS(PAINTSYSTEM *pSysBlack, PAINTSYSTEM *pSysColor)
+void HitCheckSToS(QUADTREE *Quadtree, int NodeID)
 {
-	for (int nBlack = 0; nBlack < PAINT_MAX; nBlack++)
+	std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt(NodeID);
+
+	// 現在のノードはオブジェクトがない
+	if (CollisionList.empty())
 	{
-		// 使用しているかつ黒の場合判定を行う
-		if (pSysBlack->GetPaint(nBlack)->GetUse() && pSysBlack->GetPaint(nBlack)->GetPatternAnim() == BlackInkColor) continue;
-		
-		for (int nColor = 0; nColor < PAINT_MAX; nColor++)
+		return;
+	}
+
+	// プレイヤー
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		std::vector<Paint*> BlackList;
+		std::vector<Paint*> ColorList;
+
+		for (auto &BlackPaint : CollisionList)
 		{
-			// 使用しているかつカラーの場合判定を行う
-			if (pSysColor->GetPaint(nColor)->GetUse() && pSysColor->GetPaint(nColor)->GetPatternAnim() != BlackInkColor) continue;
-			
-			if (HitSphere(pSysBlack->GetPaint(nBlack)->GetPos(), pSysColor->GetPaint(nColor)->GetPos(), PAINT_WIDTH, PAINT_WIDTH))
+			// 使用している、カラーが黒、所有者が現在のプレイヤーを探す
+			if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor ||
+				BlackPaint->GetOwner() != PlayerNo)
 			{
-				// ヒットした場合そのペイントを消す
-				pSysColor->GetPaint(nColor)->SetTime(0);
+				continue;
 			}
 
+			for (auto &ColorPaint : CollisionList)
+			{
+				if (!ColorPaint->GetUse() || ColorPaint->GetPaintColor() == BlackInkColor ||
+					ColorPaint->GetOwner() == PlayerNo)
+				{
+					continue;
+				}
+
+				// 二つのペイントを判定する
+				if (HitSphere(BlackPaint->GetPos(), ColorPaint->GetPos(), Paint::GetPaintRadius(), Paint::GetPaintRadius()))
+				{
+					// ヒットした場合そのペイントを消す
+					BlackPaint->SetUse(false);
+					ColorPaint->SetUse(false);
+					break;
+				}
+			}
 		}
 	}
-	
 }
 
 //=============================================================================
@@ -209,17 +128,17 @@ void crossProduct(D3DXVECTOR3 *ret, D3DXVECTOR3 *vl, D3DXVECTOR3 *vr)
 // pos0   :始点（移動前）
 // pos1   :終点（移動後）
 //=============================================================================
-int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_WK tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
+int hitCheck(D3DXVECTOR3 *OutPos, TriangleStr tri, D3DXVECTOR3 pos0, D3DXVECTOR3 pos1)
 {
 	D3DXVECTOR3		nor;		// ポリゴンの法線
 
-	{	// ポリゴンの外積をとって法線を求める。そして正規化しておく。
-		D3DXVECTOR3		vec01 = tri.pos1 - tri.pos0;
-		D3DXVECTOR3		vec02 = tri.pos2 - tri.pos0;
-		crossProduct(&nor, &vec01, &vec02);
-	}
+	// ポリゴンの外積をとって法線を求める。そして正規化しておく。
+	D3DXVECTOR3		vec01 = tri.pos1 - tri.pos0;
+	D3DXVECTOR3		vec02 = tri.pos2 - tri.pos0;
+	crossProduct(&nor, &vec01, &vec02);
 
-	{	// 平面と線分の内積とって衝突している可能性を調べる
+	{
+		// 平面と線分の内積とって衝突している可能性を調べる
 		// 求めた法線とベクトル２つ（線分の両端とポリゴン上の任意の点）の内積とって衝突している可能性を調べる
 		D3DXVECTOR3		vec1 = pos0 - tri.pos0;
 		D3DXVECTOR3		vec2 = pos1 - tri.pos0;
@@ -234,7 +153,8 @@ int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_WK tri, D3DXVECTOR3 pos0, D3DXVECTOR3
 	}
 
 
-	{	// ポリゴンと線分の交点を求める
+	{
+		// ポリゴンと線分の交点を求める
 		D3DXVECTOR3		vec1 = pos0 - tri.pos0;
 		D3DXVECTOR3		vec2 = pos1 - tri.pos0;
 		float			d1 = (float)fabs(dotProduct(&nor, &vec1));			// 内分比を求める為の点とポリゴンとの距離
@@ -265,12 +185,10 @@ int hitCheck(D3DXVECTOR3 *OutPos, TRIANGLE_WK tri, D3DXVECTOR3 pos0, D3DXVECTOR3
 			if (dotProduct(&n1, &nor) < 0) return(0);
 			if (dotProduct(&n2, &nor) < 0) return(0);
 			if (dotProduct(&n3, &nor) < 0) return(0);
-
 		}
 
 		// 出力用の座標をセット
 		*OutPos = p3;
-
 	}
 
 	return(1);

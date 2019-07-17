@@ -10,7 +10,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-FRAME::FRAME()
+Frame::Frame()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -34,7 +34,7 @@ FRAME::FRAME()
 //=============================================================================
 // デストラクタ
 //=============================================================================
-FRAME::~FRAME()
+Frame::~Frame()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -46,7 +46,7 @@ FRAME::~FRAME()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void FRAME::Update()
+void Frame::Update()
 {
 	if (use == true)
 	{
@@ -61,7 +61,7 @@ void FRAME::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void FRAME::Draw()
+void Frame::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -75,7 +75,7 @@ void FRAME::Draw()
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -83,7 +83,7 @@ void FRAME::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT FRAME::MakeVertex(void)
+HRESULT Frame::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -114,7 +114,7 @@ HRESULT FRAME::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void FRAME::SetTexture(int cntPattern)
+void Frame::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -131,7 +131,7 @@ void FRAME::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void FRAME::SetVertex(void)
+void Frame::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

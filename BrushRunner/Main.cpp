@@ -5,14 +5,8 @@
 //
 //=============================================================================
 #include "Main.h"
-#include "SceneTitle.h"
-#include "SceneCharacterSelect.h"
-#include "SceneGame.h"
-#include "SceneResult.h"
-#include "Camera.h"
-#include "Light.h"
-#include "Input.h"
-#include "Debugproc.h"
+#include "SceneManager.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -28,25 +22,21 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
 void Update(void);
 void Draw(void);
-#ifdef _DEBUG
-void DrawFPS(void);
-#endif
 bool SetWindowCenter(HWND hWnd);
 
 //*****************************************************************************
 // グローバル変数:
 //*****************************************************************************
+HWND hWnd;											// ウインドウハンドル
 LPDIRECT3D9			g_pD3D = NULL;					// Direct3D オブジェクト
 LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;			// Deviceオブジェクト(描画に必要)
 
 #ifdef _DEBUG
-static LPD3DXFONT	g_pD3DXFont = NULL;				// フォントへのポインタ
-int					g_nCountFPS;					// FPSカウンタ
+int					FPSCount;						// FPSカウンタ
+bool ShowAnotherWindow = false;						// imGui用別ウインドウのフラグ
 #endif
 
-int eScene = SceneTitle;								// ゲームの開始位置&シーン遷移
-
-HWND hWnd;										// ウインドウハンドル
+SceneManager *pSceneManager;						// シーン管理
 
 //=============================================================================
 // メイン関数
@@ -125,8 +115,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// --------------------------------------  メッセージループ---------------------------------------------
 	while (1)
 	{
+		int scene = GetScene();
 		// ゲーム終了処理
-		if (eScene == SceneExit)
+		if (scene == nSceneExit)
 		{
 			break;
 		}
@@ -151,7 +142,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			if ((dwCurrentTime - dwFPSLastTime) >= 500)	// 0.5秒ごとに実行
 			{
 #ifdef _DEBUG
-				g_nCountFPS = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
+				FPSCount = dwFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);
 #endif
 				dwFPSLastTime = dwCurrentTime;
 				dwFrameCount = 0;
@@ -211,6 +202,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
+
+	// デバッグウィンドウ
+	DebugWindPrcHandler(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
@@ -298,13 +292,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);		// αソースカラーの指定
 	g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// αデスティネーションカラーの指定
 
-																			// サンプラーステートパラメータの設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(U値)を設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(V値)を設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);	// テクスチャ縮小フィルタモードを設定
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);	// テクスチャ拡大フィルタモードを設定
 
-																			// テクスチャステージステートの設定
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);	// アルファブレンディング処理
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);	// 最初のアルファ引数
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);	// ２番目のアルファ引数
@@ -313,22 +305,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 #ifdef _DEBUG
-	// 情報表示用フォントを設定
-	D3DXCreateFont(g_pD3DDevice, 18, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "Terminal", &g_pD3DXFont);
-
-	InitDebugProc();
-
+	InitDebugWindow(hWnd, g_pD3DDevice);
 #endif
-	InitInput(hInstance,hWnd);
-
-	InitCamera();
-	InitLight();
-
-	InitSceneTitle();
-	InitSceneCharacterSelect();
-	InitSceneGame();
-	InitSceneResult();
+	pSceneManager = new SceneManager(hInstance, hWnd);
 
 	return S_OK;
 }
@@ -339,31 +318,16 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 void Uninit(void)
 {
 #ifdef _DEBUG
-	if (g_pD3DXFont != NULL)
-	{// 情報表示用フォントの開放
-		g_pD3DXFont->Release();
-		g_pD3DXFont = NULL;
-	}
-
-	UninitDebugProc();
+	UninitDebugWindow(0);
 #endif
-	if (g_pD3DDevice != NULL)
-	{// デバイスの開放
-		g_pD3DDevice->Release();
-		g_pD3DDevice = NULL;
-	}
 
-	if (g_pD3D != NULL)
-	{// Direct3Dオブジェクトの開放
-		g_pD3D->Release();
-		g_pD3D = NULL;
-	}
-	UninitInput();
+	delete pSceneManager;
 
-	UninitSceneTitle();
-	UninitSceneCharacterSelect();
-	UninitSceneGame();
-	UninitSceneResult();
+	// デバイスの開放
+	SAFE_RELEASE(g_pD3DDevice);
+
+	// Direct3Dオブジェクトの開放
+	SAFE_RELEASE(g_pD3D);
 
 }
 
@@ -373,27 +337,24 @@ void Uninit(void)
 void Update(void)
 {
 #ifdef _DEBUG
+	// 処理開始の時間を記録
+	BeginTimerCount();
 
+	UpdateDebugWindow();
 #endif
-	UpdateInput();
 
-	switch (eScene)
-	{
-	case SceneTitle:
-		UpdateSceneTitle();
-		break;
-	case SceneCharacterSelect:
-		UpdateSceneCharacterSelect();
-		break;
-	case SceneGame:
-		UpdateSceneGame();
-		break;
-	case SceneResult:
-		UpdateSceneResult();
-		break;
-	default:
-		break;
-	}
+	pSceneManager->Update();
+
+#ifdef _DEBUG
+	// 処理終了の時間を表示
+	BeginDebugWindow("Information");
+
+	ImGui::SetNextWindowPos(ImVec2(5, 600), ImGuiSetCond_Once);
+
+	DebugText("UpdateTime = %.3f ms", GetProgressTimerCount());
+
+	EndDebugWindow("Information");
+#endif
 
 }
 
@@ -403,38 +364,27 @@ void Update(void)
 void Draw(void)
 {
 	// バックバッファ＆Ｚバッファのクリア
-	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(255, 255, 255, 255), 1.0f, 0);
+
+#ifdef _DEBUG
+	// 処理開始の時間を記録
+	BeginTimerCount();
+#endif
 
 	// Direct3Dによる描画の開始
 	if (SUCCEEDED(g_pD3DDevice->BeginScene()))
 	{
-		SetCamera();
-
-		switch (eScene)
-		{
-		case SceneTitle:
-			DrawSceneTitle();
-			break;
-		case SceneCharacterSelect:
-			DrawSceneCharacterSelect();
-			break;
-		case SceneGame:
-			DrawSceneGame();
-			break;
-		case SceneResult:
-			DrawSceneResult();
-			break;
-		default:
-			break;
-		}
-
+		pSceneManager->Draw();
 
 #ifdef _DEBUG
-		// FPS表示
-		DrawFPS();
+		// 処理終了の時間を表示
+		BeginDebugWindow("Information");
 
-		DrawDebugProc();
+		DebugText("DrawTime = %.3f ms\nFPS = %d\n", GetProgressTimerCount(), FPSCount);
 
+		EndDebugWindow("Information");
+
+		DrawDebugWindow();
 #endif
 
 		// Direct3Dによる描画の終了
@@ -451,32 +401,6 @@ void Draw(void)
 LPDIRECT3DDEVICE9 GetDevice(void)
 {
 	return g_pD3DDevice;
-}
-
-#ifdef _DEBUG
-//=============================================================================
-// FPS表示
-//=============================================================================
-void DrawFPS(void)
-{
-	PrintDebugProc("FPS:%d\n", g_nCountFPS);
-}
-#endif
-
-//=====================================================================================================
-// シーン遷移
-//=====================================================================================================
-void SetScene(int _scene)
-{
-	eScene = _scene;
-}
-
-//=====================================================================================================
-// シーンのゲッター
-//=====================================================================================================
-int GetScene()
-{
-	return eScene;
 }
 
 //=====================================================================================================
@@ -516,9 +440,4 @@ bool SetWindowCenter(HWND hWnd)
 							(SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER)	//	ウィンドウ位置のオプション：ウィンドウのサイズや、位置の変更に関するフラグを指定
 						);
 
-}
-
-HWND GetWindowHandle()
-{
-	return hWnd;
 }

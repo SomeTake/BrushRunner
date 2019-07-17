@@ -7,32 +7,32 @@
 #include "Main.h"
 #include "Cursor.h"
 #include "Input.h"
-#include "Debugproc.h"
+#include "MyLibrary.h"
 
-LPDIRECT3DTEXTURE9	CURSOR::D3DTexture = NULL;	// テクスチャのポインタ
+LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
+Cursor::Cursor(int PlayerNo, bool AIFlag)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	use = true;
+	this->AIFlag = AIFlag;
+	pos = CURSOR_FIRST_POS;
+	PatternAnim = ctrlNum = PlayerNo;
+	vec = 0.0f;
+	moveX = 0.0f;
+	moveY = 0.0f;
 
 	// テクスチャの読み込み
 	if (D3DTexture == NULL)
 	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
+		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
 			CURSOR_TEXTURE,					// ファイルの名前
 			&D3DTexture);					// 読み込むメモリのポインタ
 	}
-
-	use = true;
-	pos = CURSOR_FIRST_POS;
-	PatternAnim = ctrlNum = _ctrlNum;
-	pPlayer = pP;
-	vec = 0.0f;
-	moveX = 0.0f;
-	moveY = 0.0f;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -41,78 +41,83 @@ CURSOR::CURSOR(int _ctrlNum, PLAYER *pP)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-CURSOR::~CURSOR()
+Cursor::~Cursor()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// テクスチャの開放
+	SAFE_RELEASE(Cursor::D3DTexture)
 }
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void CURSOR::Update()
+void Cursor::Update()
 {
 	if (use == true)
 	{
 		// 操作
 		Move();
 
-		// テクスチャの切り替え
-		Change();
+		if (GetKeyboardTrigger(DIK_P))
+		{
+			// テクスチャの切り替え
+			Change();
+		}
 
-		//テクスチャ座標をセット
-		SetTexture(PatternAnim);
-
+		// 頂点座標の設定
+		SetVertex();
 	}
-	SetVertex();
-
-#ifndef _DEBUG_
-	PrintDebugProc("CursorPos X:%f Y:%f\n", pos.x, pos.y);
-	//PrintDebugProc("CursorMove X:%f Y:%f\n", moveX, moveY);
-	//PrintDebugProc("CursorVec %f\n", vec);
-#endif
-
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void CURSOR::Draw()
+void Cursor::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	// Zテスト
+	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
+	// αテストを有効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
+	Device->SetFVF(FVF_VERTEX_2D);
 
 	if (use == true)
 	{
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
-		pDevice->SetTexture(0, D3DTexture);
+		Device->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
+
+	// αテストを無効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	// Z比較あり
+	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT CURSOR::MakeVertex()
+HRESULT Cursor::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// 頂点座標の設定
 	SetVertex();
 
 	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// 反射光の設定
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
@@ -121,10 +126,7 @@ HRESULT CURSOR::MakeVertex()
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture();
 
 	return S_OK;
 }
@@ -132,10 +134,10 @@ HRESULT CURSOR::MakeVertex()
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void CURSOR::SetTexture(int cntPattern)
+void Cursor::SetTexture()
 {
-	int x = cntPattern % CURSOR_DIVIDE_X;
-	int y = cntPattern / CURSOR_DIVIDE_X;
+	int x = PatternAnim % CURSOR_DIVIDE_X;
+	int y = PatternAnim / CURSOR_DIVIDE_X;
 	float sizeX = 1.0f / CURSOR_DIVIDE_X;
 	float sizeY = 1.0f / CURSOR_DIVIDE_Y;
 
@@ -149,7 +151,7 @@ void CURSOR::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void CURSOR::SetVertex()
+void Cursor::SetVertex()
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
@@ -161,97 +163,105 @@ void CURSOR::SetVertex()
 //=============================================================================
 // 操作
 //=============================================================================
-void CURSOR::Move()
+void Cursor::Move()
 {
-	KeyMove();	// キーボード操作
-	PadMove();	// コントローラ操作
+	//if (!AIFlag)
+	//{
+		KeyMove();	// キーボード操作
+		PadMove();	// コントローラ操作
+	//}
+	//else
+	//{
+		AIMove();
+	//}
 }
 
 //=============================================================================
 // カーソルの切り替え
 //=============================================================================
-void CURSOR::Change()
+void Cursor::Change()
 {
-	if (GetKeyboardTrigger(DIK_P))
+	// テクスチャとプレイヤーのインクの切り替え
+	// カラー→黒
+	if (PatternAnim == ctrlNum)
 	{
-		// テクスチャとプレイヤーのインクの切り替え
-		// カラー→黒
-		if (PatternAnim == ctrlNum)
-		{
-			PatternAnim = ctrlNum + CURSOR_DIVIDE_X;
-		}
-		// 黒→カラー
-		else
-		{
-			PatternAnim = ctrlNum;
-		}
-
+		PatternAnim = ctrlNum + CURSOR_DIVIDE_X;
 	}
+	// 黒→カラー
+	else
+	{
+		PatternAnim = ctrlNum;
+	}
+
+	//テクスチャ座標をセット
+	SetTexture();
 }
 
 //=============================================================================
 // キーボード操作
 //=============================================================================
-void CURSOR::KeyMove()
+void Cursor::KeyMove()
 {
 	// 上下
 	if (GetKeyboardPress(DIK_W))
 	{
+		pos.y -= CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.y > 0)
-		{
-			pos.y -= CURSOR_SPEED;
-		}
+		pos.y = max(pos.y, 0.0f);
 	}
 	else if (GetKeyboardPress(DIK_S))
 	{
+		pos.y += CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.y < SCREEN_HEIGHT - CURSOR_SIZE.y)
-		{
-			pos.y += CURSOR_SPEED;
-		}
+		pos.y = min(pos.y, SCREEN_HEIGHT - CURSOR_SIZE.y);
+
 	}
 
 	// 左右
 	if (GetKeyboardPress(DIK_D))
 	{
+		pos.x += CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.x < SCREEN_WIDTH - CURSOR_SIZE.x)
-		{
-			pos.x += CURSOR_SPEED;
-		}
+		pos.x = min(pos.x, SCREEN_WIDTH - CURSOR_SIZE.x);
 	}
 	else if (GetKeyboardPress(DIK_A))
 	{
+		pos.x -= CURSOR_SPEED;
+
 		// 画面外判定
-		if (pos.x > 0)
-		{
-			pos.x -= CURSOR_SPEED;
-		}
+		pos.x = max(pos.x, 0.0f);
 	}
 }
 
 //=============================================================================
 // コントローラ操作
 //=============================================================================
-void CURSOR::PadMove()
+void Cursor::PadMove()
 {
 	vec = GetJoyStickVec(ctrlNum) / 1000.f;
 	moveX = (float)GetJoyStickLeftX(ctrlNum) / 1000.0f;
 	moveY = (float)GetJoyStickLeftY(ctrlNum) / 1000.0f;
 
-	oldPos = pos;
-
 	pos.x += vec * moveX * CURSOR_SPEED;
 	pos.y += vec * moveY * CURSOR_SPEED;
 
 	// 画面外に出た場合、古い座標に戻す
-	if (pos.y < 0 || pos.y > SCREEN_HEIGHT - CURSOR_SIZE.y)
-	{
-		pos.y = oldPos.y;
-	}
-	if (pos.x > SCREEN_WIDTH - CURSOR_SIZE.x || pos.x < 0)
-	{
-		pos.x = oldPos.x;
-	}
+	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
+	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
+}
+
+//=============================================================================
+// カーソルの筆先の座標を取得
+//=============================================================================
+D3DXVECTOR3 Cursor::GetPenPoint()
+{
+	return D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, 0.0f);
+}
+
+void Cursor::AIMove()
+{
+
 }

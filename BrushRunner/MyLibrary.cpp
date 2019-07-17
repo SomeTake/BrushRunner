@@ -18,55 +18,22 @@ D3DXVECTOR3* CalcScreenToWorld(
 	int Screen_w,
 	int Screen_h,
 	D3DXMATRIX* View,
-	D3DXMATRIX* Prj
-) {
+	D3DXMATRIX* Proj)
+{
 	// 各行列の逆行列を算出
 	D3DXMATRIX InvView, InvPrj, VP, InvViewport;
 	D3DXMatrixInverse(&InvView, NULL, View);
-	D3DXMatrixInverse(&InvPrj, NULL, Prj);
+	D3DXMatrixInverse(&InvPrj, NULL, Proj);
 	D3DXMatrixIdentity(&VP);
-	VP._11 = Screen_w / 2.0f; VP._22 = -Screen_h / 2.0f;
-	VP._41 = Screen_w / 2.0f; VP._42 = Screen_h / 2.0f;
+	VP._11 = Screen_w / 2.0f;
+	VP._22 = -Screen_h / 2.0f;
+	VP._41 = Screen_w / 2.0f;
+	VP._42 = Screen_h / 2.0f;
 	D3DXMatrixInverse(&InvViewport, NULL, &VP);
 
 	// 逆変換
 	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;
 	D3DXVec3TransformCoord(pout, &D3DXVECTOR3((float)Sx, (float)Sy, (float)fZ), &tmp);
-
-	return pout;
-}
-
-//=============================================================================
-// XZ平面とスクリーン座標の交点算出関数
-//=============================================================================
-D3DXVECTOR3* CalcScreenToXZ(
-	D3DXVECTOR3* pout,
-	int Sx,
-	int Sy,
-	int Screen_w,
-	int Screen_h,
-	D3DXMATRIX* View,
-	D3DXMATRIX* Prj
-) {
-	D3DXVECTOR3 nearpos;
-	D3DXVECTOR3 farpos;
-	D3DXVECTOR3 ray;
-	CalcScreenToWorld(&nearpos, Sx, Sy, 0.0f, Screen_w, Screen_h, View, Prj);
-	CalcScreenToWorld(&farpos, Sx, Sy, 1.0f, Screen_w, Screen_h, View, Prj);
-	ray = farpos - nearpos;
-	D3DXVec3Normalize(&ray, &ray);
-
-	// 床との交差が起きている場合は交点を
-	// 起きていない場合は遠くの壁との交点を出力
-	if (ray.y <= 0) {
-		// 床交点
-		float Lray = D3DXVec3Dot(&ray, &D3DXVECTOR3(0, 1, 0));
-		float LP0 = D3DXVec3Dot(&(-nearpos), &D3DXVECTOR3(0, 1, 0));
-		*pout = nearpos + (LP0 / Lray)*ray;
-	}
-	else {
-		*pout = farpos;
-	}
 
 	return pout;
 }
@@ -121,4 +88,41 @@ int CmpDescend(const void *p, const void *q)
 int CmpAscend(const void *p, const void *q)
 {
 	return *(int*)p - *(int*)q;
+}
+
+//=============================================================================
+// CSVファイルの読み込み
+// 引数：data = define定義したcsvデータ
+// 引数：MapVector = ベクター
+//=============================================================================
+void ReadCsv(const char *data, vector<vector<int>> *MapVector)
+{
+	ifstream stream(data);		// マップの読み込み先
+	string line;				// 文字列を一時的に保存
+	const string delim = ",";	// データ区切り用の文字
+
+	int row = 0;
+	int col;
+	while (getline(stream, line))
+	{
+		col = 0;
+		// delimを区切り文字として切り分け、intに変換してmaptbl[][]に格納する
+		for (string::size_type spos, epos = 0;
+			(spos = line.find_first_not_of(delim, epos)) != string::npos;)
+		{
+			string token = line.substr(spos, (epos = line.find_first_of(delim, spos)) - spos);
+			MapVector->at(row).push_back(stoi(token));
+		}
+		++row;
+	}
+}
+
+//=============================================================================
+// カウントアップ関数
+//=============================================================================
+int LoopCountUp(int counter, int low, int high)
+{
+	counter++;
+	const int n = (counter - low) % (high - low);
+	return (n >= 0) ? (n + low) : (n + high);
 }

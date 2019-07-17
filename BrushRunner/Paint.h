@@ -8,8 +8,6 @@
 #define _PAINT_H_
 
 #include "Billboard.h"
-#include "Player.h"
-#include "Cursor.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -20,7 +18,6 @@
 #define PAINT_DIVIDE_X		(5)
 #define PAINT_DIVIDE_Y		(1)
 #define PAINT_DIVIDE		(PAINT_DIVIDE_X * PAINT_DIVIDE_Y)
-#define PAINT_MAX			(INK_MAX * 2)				// カラーインク＆黒インク
 #define DRAW_FRAME_COLOR	(300)						// 表示しておくフレーム数
 #define DRAW_FRAME_BLACK	(60)						// 表示しておくフレーム数
 
@@ -36,45 +33,49 @@ enum InkColor
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class PAINT :
-	public BILLBOARD
+class Paint : public Billboard
 {
 private:
-	bool					use;			// 使用しているかどうか
-	float					DecAlpha;		// 減衰値
+	bool					Use;			// 使用しているかどうか
+	bool					InScreen;		// 画面内フラグ
 	int						time;			// 表示する時間
-	int						patternAnim;	// テクスチャパターン
+	int						NodeID;			// 四分木用ノードID
+	int						Owner;			// 所有者
+	int						PaintColor;		// ペイントカラー
+	D3DXVECTOR2				ScreenPos;		// スクリーン座標
+
 	static LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
+	static float			HalfSize;		// ペイントサイズの半分
+
+	void SetColor();
+	HRESULT MakeVertex();
+	// ワールド座標からスクリーン座標に変換する
+	D3DXVECTOR2 WorldToScreenPos(D3DXMATRIX WorldMatrix);
 
 public:
-	PAINT();
-	~PAINT();
+	Paint(int Owner, int PaintColor);
+	~Paint();
 
 	void Update();
 	void Draw();
-	HRESULT MakeVertex();
-	void SetVertex();
-	void SetColor();
-	void SetTexture();
+	static void ReleaseTexture(void);
 
 	// ゲッター
-	bool GetUse() { return use; };
-	int GetTime() { return time; };
+	bool GetUse() { return this->Use; };
+	bool GetInScreen() { return this->InScreen; };
 	D3DXVECTOR3 GetPos() { return pos; };
-	int GetPatternAnim() { return patternAnim; };
+	int GetNodeID(void) { return this->NodeID; };
+	int GetOwner(void) { return this->Owner; };
+	int GetPaintColor(void) { return this->PaintColor; };
+	D3DXVECTOR2 GetScreenPos(void) { return this->ScreenPos; };
+	static float GetPaintRadius(void) { return Paint::HalfSize; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
-	void SetRot(D3DXVECTOR3 _rot) { rot = _rot; };
-	void SetScl(D3DXVECTOR3 _scl) { scl = _scl; };
-	void SetCol(D3DXCOLOR _col) { col = _col; };
-	void SetMove(D3DXVECTOR3 _move) { move = _move; };
-	void SetWidth(float _width) { width = _width; };
-	void SetHeight(float _height) { height = _height; };
-	void SetUse(bool _use) { use = _use; };
-	void SetDecAlpha(float _DecAlpha) { DecAlpha = _DecAlpha; };
+	void SetUse(bool Flag) { this->Use = Flag; };
 	void SetTime(int _time) { time = _time; };
-	void SetPatternAnim(int num) { patternAnim = num; };
+	void SetNodeID(int NodeID) { this->NodeID = NodeID; };
+	void SetScreenPos(D3DXVECTOR2 ScreenPos) { this->ScreenPos = ScreenPos; };
 };
 
 #endif
