@@ -13,6 +13,10 @@
 //2d obje
 #include "_2dobj.h"
 #include "Frame01.h"
+#include "Face.h"
+#include "Face2.h"
+#include "Face3.h"
+#include "Face4.h"
 #include "Faceframe.h"
 #include "blackinkline.h"
 #include "colorinkline.h"
@@ -20,11 +24,15 @@ enum
 {
 	NumFrame01,
 
+	NumFace01,
+	NumFace02,
+	NumFace03,
+	NumFace04,
+
 	NumFaceframe01,
 	NumFaceframe02,
 	NumFaceframe03,
 	NumFaceframe04,
-
 
 	NumInklineblack01,
 	NumInklineblack02,
@@ -77,12 +85,15 @@ HRESULT InitSceneGame()
 	p2dobj[NumColorinkline03] = new Colorinkline(COLORINKFRAME_POS03, TEXTURE_COLORINKFRAME);
 	p2dobj[NumColorinkline04] = new Colorinkline(COLORINKFRAME_POS04, TEXTURE_COLORINKFRAME);
 
+	p2dobj[NumFace01] = new Face(FACE_POS01, TEXTURE_FACE1);
+	p2dobj[NumFace02] = new Face2(FACE_POS02, TEXTURE_FACE2);
+	p2dobj[NumFace03] = new Face3(FACE_POS03, TEXTURE_FACE3);
+	p2dobj[NumFace04] = new Face4(FACE_POS04, TEXTURE_FACE4);
 
-	p2dobj[NumFaceframe01] = new Faceframe(FACEFRAME_POS01);
-	p2dobj[NumFaceframe02] = new Faceframe(FACEFRAME_POS02);
-	p2dobj[NumFaceframe03] = new Faceframe(FACEFRAME_POS03);
-	p2dobj[NumFaceframe04] = new Faceframe(FACEFRAME_POS04);
-
+	p2dobj[NumFaceframe01] = new Faceframe(FACEFRAME_POS01,TEXTURE_FACEFRAME);
+	p2dobj[NumFaceframe02] = new Faceframe(FACEFRAME_POS02,TEXTURE_FACEFRAME);
+	p2dobj[NumFaceframe03] = new Faceframe(FACEFRAME_POS03,TEXTURE_FACEFRAME);
+	p2dobj[NumFaceframe04] = new Faceframe(FACEFRAME_POS04,TEXTURE_FACEFRAME);
 
 	p2dobj[NumInklineblack01] = new Colorinkline(INKLINEBLACK_POS01, TEXTURE_INKLINEBLACK);
 	p2dobj[NumInklineblack02] = new Colorinkline(INKLINEBLACK_POS02, TEXTURE_INKLINEBLACK);
@@ -145,9 +156,8 @@ void DrawSceneGame()
 	// 2Dオブジェクトの描画
 	for (int i = 0; i < _2dMax; i++)
 	{
-		p2dobj[i]->Draw();
+			p2dobj[i]->Draw();
 	}
-
 	pMap->Draw();
 
 	pPlayer->Draw();

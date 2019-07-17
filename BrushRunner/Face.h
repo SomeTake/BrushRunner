@@ -1,34 +1,39 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Carsl_obj.h]
+// バトル画面フレーム表示処理 [Face.h]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
-#ifndef _CARSL_OBJ_H_
-#define _CARSL_OBJ_H_
+#ifndef _FACE_H_
+#define _FACE_H_
 
 #include "_2dobj.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_CARSL_OBJ	_T("data/texture/charasl_obj.png")			// フレーム用画像
-#define CARSL_OBJ_SIZE		D3DXVECTOR3(114.0f, 114.0f, 0.0f)		// テクスチャサイズ
 
-#define CARSL_OBJ_POS01		D3DXVECTOR3(400.0f, 150.0f, 0.0f)
-#define CARSL_OBJ_POS02		D3DXVECTOR3(550.0f, 150.0f, 0.0f)
-#define CARSL_OBJ_POS03		D3DXVECTOR3(700.0f, 150.0f, 0.0f)
-#define CARSL_OBJ_POS04		D3DXVECTOR3(850.0f, 150.0f, 0.0f)
+#define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
+
+#define FACE_POS01     D3DXVECTOR3(22.0f, 22.0f, 0.0f)
+#define FACE_POS02		D3DXVECTOR3(340.0f, 22.0f, 0.0f)
+#define FACE_POS03		D3DXVECTOR3(657.0f, 22.0f, 0.0f)
+#define FACE_POS04		D3DXVECTOR3(975.0f, 22.0f, 0.0f)
+
+#define FACE1_POS			D3DXVECTOR3(50.0f, 50.0f, 0.0f)
+#define FACE2_POS			D3DXVECTOR3(318.0f, 0.0f, 0.0f)
+#define FACE3_POS			D3DXVECTOR3(636.0f, 0.0f, 0.0f)
+#define FACE4_POS			D3DXVECTOR3(954.0f, 0.0f, 0.0f)
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Carsl_obj :
+class Face :
 	public _2dobj {
 public:
-	Carsl_obj(D3DXVECTOR3 _pos, const char *texno);
-	~Carsl_obj();
+	Face(D3DXVECTOR3 _pos, const char *texno);
+	~Face();
 
-	int char1;
+	int fc;
 
 	// オーバーライド関数
 	void Update();
@@ -36,7 +41,7 @@ public:
 	HRESULT MakeVertex();
 	void SetTexture(int cntPattern);
 	void SetVertex();
+
 };
-int Getchar1num(void);
 
 #endif

@@ -1,21 +1,18 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Carsl_obj.cpp]
+// バトル画面フレーム表示処理 [Carsl_obj4.cpp]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "carsl_obj.h"
-#include "carsl_obj2.h"
-#include "Input.h"
 #include "carslobj.h"
-int char01;
-bool ao,aka,midori,ki;
-
+#include "carsl_obj4.h"
+#include "Input.h"
+bool ao4, aka4, midori4, ki4;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Carsl_obj::Carsl_obj(D3DXVECTOR3 _pos, const char *texno)
+Carsl_obj4::Carsl_obj4(D3DXVECTOR3 _pos, const char *texno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -23,44 +20,43 @@ Carsl_obj::Carsl_obj(D3DXVECTOR3 _pos, const char *texno)
 	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
 		texno,				// ファイルの名前
 		&D3DTexture);				// 読み込むメモリのポインタ
+
 									///////////////////////////////////////////////////////////////////////////////////////
 									// フレームの初期化
 	use = true;
 	pos = _pos;
-	ao = false;
-	aka = false;
-	midori = false;
-	ki = false;
+	char4 = AO;
+	PatternAnim = 1;
+	ao4 = false;
+	aka4 = false;
+	midori4 = false;
+	ki4 = false;
 	if (texno == TEXTURE_CARSLOBJ)
 	{
-		char1 = AO;
-		char01 = char1;
+		char4 = AO;
 	}
 	else if (texno == TEXTURE_CARSLOBJ2)
 	{
-		char1 = AKA;
-		char01 = char1;
+		char4 = AKA;
 	}
 	else if (texno == TEXTURE_CARSLOBJ3)
 	{
-		char1 = MIDORI;
-		char01 = char1;
+		char4 = MIDORI;
 	}
 	else if (texno == TEXTURE_CARSLOBJ4)
 	{
-		char1 = KI;
-		char01 = char1;
+		char4 = KI;
 	}
-	PatternAnim = 1;
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Carsl_obj::~Carsl_obj()
+Carsl_obj4::~Carsl_obj4()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -72,101 +68,109 @@ Carsl_obj::~Carsl_obj()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Carsl_obj::Update()
+void Carsl_obj4::Update()
 {
 	if (use == true)
-	{		
+	{
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 	}
-	if (Getpnum() == 0)
+	if (GetKeyboardRelease(DIK_RETURN) && Getch() == true)
 	{
-		if (pos == CARSL_OBJ_POS01)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS02;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS04;
-			}
-			if (char1 == AO)
-			{
-				ao = true;
-				aka = false;
-				midori = false;
-				ki = false;
-			}
-			else if (char1 == AKA)
-			{
-				aka = true;
-
-				ao = false;
-				midori = false;
-				ki = false;
-			}
-			else if (char1 == MIDORI)
-			{
-				midori = true;
-				aka = false;
-				ao = false;
-				ki = false;
-			}
-			else if (char1 == KI)
-			{
-				ki = true;
-				ao = false;
-				aka = false;
-				midori = false;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS02)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS03;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS01;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS03)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS04;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS02;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS04)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS01;
-			}	
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS03;
-			}
-
-		}
-			if (GetKeyboardRelease(DIK_RETURN))
-			{
-				Setpnum(1);
-			}
+		Setpnum(3);
 	}
-	SetVertex();
+	if (Getpnum() == 4)
+	{
+		SetScene(SceneGame);
+	}
+	if (Getpnum() == 3)
+	{
+		if (pos == CARSL_OBJ4_POS01)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				Setch(true);
+				pos = CARSL_OBJ4_POS02;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				Setch(true);
+				pos = CARSL_OBJ4_POS04;
+			}
+			if (char4 == AO)
+			{
+				ao4 = true;
+				aka4 = false;
+				midori4 = false;
+				ki4 = false;
+			}
+			else if (char4 == AKA)
+			{
+				aka4 = true;
+				ao4 = false;
+				midori4 = false;
+				ki4 = false;
+			}
+			else if (char4 == MIDORI)
+			{
+				midori4 = true;
+				aka4 = false;
+				ao4 = false;
+				ki4 = false;
+			}
+			else if (char4 == KI)
+			{
+				ki4 = true;
+				ao4 = false;
+				aka4 = false;
+				midori4 = false;
+			}
+		}
+		else if (pos == CARSL_OBJ4_POS02)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ4_POS03;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ4_POS01;
+			}
+		}
+		else if (pos == CARSL_OBJ4_POS03)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ4_POS04;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ4_POS02;
+			}
+		}
+		else if (pos == CARSL_OBJ4_POS04)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ4_POS01;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ4_POS03;
+			}
+		}
+		if (GetKeyboardTrigger(DIK_RETURN))
+		{
+			Setpnum(4);
+		}
+		SetVertex();
+	}
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Carsl_obj::Draw()
+void Carsl_obj4::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -182,12 +186,13 @@ void Carsl_obj::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
 	}
+
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Carsl_obj::MakeVertex(void)
+HRESULT Carsl_obj4::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -218,7 +223,7 @@ HRESULT Carsl_obj::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Carsl_obj::SetTexture(int cntPattern)
+void Carsl_obj4::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -235,29 +240,30 @@ void Carsl_obj::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Carsl_obj::SetVertex(void)
+void Carsl_obj4::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CARSL_OBJ_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ_SIZE.x, pos.y + CARSL_OBJ_SIZE.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ4_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CARSL_OBJ4_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ4_SIZE.x, pos.y + CARSL_OBJ4_SIZE.y, pos.z);
 }
-int Getchar1num(void)
+
+int Getchar4num()
 {
-	if (ao == true)
+	if (ao4 == true)
 	{
 		return AO;
 	}
-	else if (aka == true)
+	else if (aka4 == true)
 	{
 		return AKA;
 	}
-	else if (midori == true)
+	else if (midori4 == true)
 	{
 		return MIDORI;
 	}
-	else if (ki == true)
+	else if (ki4 == true)
 	{
 		return KI;
 	}

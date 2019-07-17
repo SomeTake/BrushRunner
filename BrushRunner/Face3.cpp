@@ -1,66 +1,60 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Carsl_obj.cpp]
+// バトル画面フレーム表示処理 [Face3.cpp]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
 #include "Main.h"
+#include "Face3.h"
+#include "Faceframe.h"
 #include "carsl_obj.h"
 #include "carsl_obj2.h"
-#include "Input.h"
+#include "carsl_obj3.h"
+#include "carsl_obj4.h"
 #include "carslobj.h"
-int char01;
-bool ao,aka,midori,ki;
-
+int fc3;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Carsl_obj::Carsl_obj(D3DXVECTOR3 _pos, const char *texno)
+Face3::Face3(D3DXVECTOR3 _pos, const char *texno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
 		texno,				// ファイルの名前
 		&D3DTexture);				// 読み込むメモリのポインタ
+
 									///////////////////////////////////////////////////////////////////////////////////////
 									// フレームの初期化
 	use = true;
 	pos = _pos;
-	ao = false;
-	aka = false;
-	midori = false;
-	ki = false;
-	if (texno == TEXTURE_CARSLOBJ)
-	{
-		char1 = AO;
-		char01 = char1;
-	}
-	else if (texno == TEXTURE_CARSLOBJ2)
-	{
-		char1 = AKA;
-		char01 = char1;
-	}
-	else if (texno == TEXTURE_CARSLOBJ3)
-	{
-		char1 = MIDORI;
-		char01 = char1;
-	}
-	else if (texno == TEXTURE_CARSLOBJ4)
-	{
-		char1 = KI;
-		char01 = char1;
-	}
 	PatternAnim = 1;
+	if (texno == TEXTURE_FACE1)
+	{
+		fc = 0;
+	}
+	else if (texno == TEXTURE_FACE2)
+	{
+		fc = 1;
+	}
+	else if (texno == TEXTURE_FACE3)
+	{
+		fc = 2;
+	}
+	else if (texno == TEXTURE_FACE4)
+	{
+		fc = 3;
+	}
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Carsl_obj::~Carsl_obj()
+Face3::~Face3()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -72,93 +66,15 @@ Carsl_obj::~Carsl_obj()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Carsl_obj::Update()
+void Face3::Update()
 {
 	if (use == true)
-	{		
-		//テクスチャ座標をセット
-		SetTexture(PatternAnim);
-	}
-	if (Getpnum() == 0)
 	{
-		if (pos == CARSL_OBJ_POS01)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS02;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS04;
-			}
-			if (char1 == AO)
-			{
-				ao = true;
-				aka = false;
-				midori = false;
-				ki = false;
-			}
-			else if (char1 == AKA)
-			{
-				aka = true;
+			fc3 = Getchar3num();
 
-				ao = false;
-				midori = false;
-				ki = false;
-			}
-			else if (char1 == MIDORI)
-			{
-				midori = true;
-				aka = false;
-				ao = false;
-				ki = false;
-			}
-			else if (char1 == KI)
-			{
-				ki = true;
-				ao = false;
-				aka = false;
-				midori = false;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS02)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS03;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS01;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS03)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS04;
-			}
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS02;
-			}
-		}
-		else if (pos == CARSL_OBJ_POS04)
-		{
-			if (GetKeyboardTrigger(DIK_RIGHT))
-			{
-				pos = CARSL_OBJ_POS01;
-			}	
-			else if (GetKeyboardTrigger(DIK_LEFT))
-			{
-				pos = CARSL_OBJ_POS03;
-			}
+			//テクスチャ座標をセット
+		SetTexture(PatternAnim);
 
-		}
-			if (GetKeyboardRelease(DIK_RETURN))
-			{
-				Setpnum(1);
-			}
 	}
 	SetVertex();
 }
@@ -166,7 +82,7 @@ void Carsl_obj::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Carsl_obj::Draw()
+void Face3::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -175,6 +91,34 @@ void Carsl_obj::Draw()
 
 	if (use == true)
 	{
+			switch (fc3)
+			{
+			case AO:
+				// テクスチャの読み込み
+				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+					TEXTURE_FACE1,				// ファイルの名前
+					&D3DTexture);				// 読み込むメモリのポインタ
+				break;
+			case AKA:
+				// テクスチャの読み込み
+				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+					TEXTURE_FACE2,				// ファイルの名前
+					&D3DTexture);				// 読み込むメモリのポインタ
+				break;
+			case MIDORI:
+				// テクスチャの読み込み
+				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+					TEXTURE_FACE3,				// ファイルの名前
+					&D3DTexture);				// 読み込むメモリのポインタ
+				break;
+			case KI:
+				// テクスチャの読み込み
+				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+					TEXTURE_FACE4,				// ファイルの名前
+					&D3DTexture);				// 読み込むメモリのポインタ
+				break;
+			}
+
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);
@@ -182,12 +126,13 @@ void Carsl_obj::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
 	}
+
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Carsl_obj::MakeVertex(void)
+HRESULT Face3::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -218,7 +163,7 @@ HRESULT Carsl_obj::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Carsl_obj::SetTexture(int cntPattern)
+void Face3::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -235,30 +180,11 @@ void Carsl_obj::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Carsl_obj::SetVertex(void)
+void Face3::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CARSL_OBJ_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ_SIZE.x, pos.y + CARSL_OBJ_SIZE.y, pos.z);
-}
-int Getchar1num(void)
-{
-	if (ao == true)
-	{
-		return AO;
-	}
-	else if (aka == true)
-	{
-		return AKA;
-	}
-	else if (midori == true)
-	{
-		return MIDORI;
-	}
-	else if (ki == true)
-	{
-		return KI;
-	}
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + FACE3_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + FACE3_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + FACE3_SIZE.x, pos.y + FACE3_SIZE.y, pos.z);
 }

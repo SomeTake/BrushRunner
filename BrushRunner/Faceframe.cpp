@@ -6,25 +6,27 @@
 //=============================================================================
 #include "Main.h"
 #include "Faceframe.h"
-
+#include "carsl_obj.h"
+#include "carsl_obj2.h"
+#include "carsl_obj3.h"
+#include "carsl_obj4.h"
+#include "carslobj.h"
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Faceframe::Faceframe(D3DXVECTOR3 _pos)
+Faceframe::Faceframe(D3DXVECTOR3 _pos, const char *texno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			texno,				// ファイルの名前
+			&D3DTexture);				// 読み込むメモリのポインタ
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		TEXTURE_FACEFRAME,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
-
-									///////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
 									// フレームの初期化
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
-
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +52,6 @@ void Faceframe::Update()
 {
 	if (use == true)
 	{
-
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
@@ -70,6 +71,8 @@ void Faceframe::Draw()
 
 	if (use == true)
 	{
+
+		
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);

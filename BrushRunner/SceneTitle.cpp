@@ -28,7 +28,7 @@ void UninitSceneTitle()
 //=============================================================================
 void UpdateSceneTitle()
 {
-	if (GetKeyboardTrigger(DIK_RETURN))
+	if (GetKeyboardRelease(DIK_RETURN))
 	{
 		SetScene(SceneCharacterSelect);
 	}

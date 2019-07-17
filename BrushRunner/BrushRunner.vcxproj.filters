@@ -123,6 +123,24 @@
     <ClCompile Include="carsl_obj3.cpp">
       <Filter>ソース ファイル\2d\characterselect</Filter>
     </ClCompile>
+    <ClCompile Include="carslobj.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
+    <ClCompile Include="carsl_obj4.cpp">
+      <Filter>ソース ファイル\2d\characterselect</Filter>
+    </ClCompile>
+    <ClCompile Include="Face.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Face2.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Face3.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Face4.cpp">
+      <Filter>ソース ファイル\2d\game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -190,6 +208,24 @@
     </ClInclude>
     <ClInclude Include="carsl_obj3.h">
       <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="carslobj.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="carsl_obj4.h">
+      <Filter>ヘッダー ファイル\2d\characterselect</Filter>
+    </ClInclude>
+    <ClInclude Include="Face.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Face4.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Face3.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Face2.h">
+      <Filter>ヘッダー ファイル\2d\game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

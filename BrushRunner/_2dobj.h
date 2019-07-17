@@ -30,6 +30,7 @@ public:
 	// メンバ関数
 	_2dobj();
 	~_2dobj();
+		
 
 	// 仮想関数
 	virtual void Update() {};						// 更新

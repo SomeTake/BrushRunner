@@ -13,12 +13,29 @@
 #include "carsl_obj.h"
 #include "carsl_obj2.h"
 #include "carsl_obj3.h"
+#include "carsl_obj4.h"
 enum
 {
 	logo,
-	obj01,
-	obj02,
-	obj03,
+	obj1p01,
+	obj1p02,
+	obj1p03,
+	obj1p04,
+	obj2p01,
+	obj2p02,
+	obj2p03,
+	obj2p04,
+	obj3p01,
+	obj3p02,
+	obj3p03,
+	obj3p04,
+	obj4p01,
+	obj4p02,
+	obj4p03,
+	obj4p04,
+	//obj4p01,
+	//obj4p02,
+	//obj4p03,
 	//NumColorinkline02,
 	//NumColorinkline03,
 	//NumColorinkline04,
@@ -37,9 +54,22 @@ float a, b, c;
 HRESULT InitSceneCharacterSelect()
 {
 	c2dobj[logo] = new Carsl_logo();
-	c2dobj[obj01] = new Carsl_obj(CARSL_OBJ_POS01, TEXTURE_CARSL_OBJ);
-	c2dobj[obj02] = new Carsl_obj2(CARSL_OBJ_POS02,TEXTURE_CARSL_OBJ2);
-	c2dobj[obj03] = new Carsl_obj3(CARSL_OBJ_POS03,TEXTURE_CARSL_OBJ3);
+	c2dobj[obj1p01] = new Carsl_obj(CARSL_OBJ_POS01, TEXTURE_CARSL_OBJ);
+	c2dobj[obj1p02] = new Carsl_obj(CARSL_OBJ_POS02,TEXTURE_CARSL_OBJ2);
+	c2dobj[obj1p03] = new Carsl_obj(CARSL_OBJ_POS03,TEXTURE_CARSL_OBJ3);
+	c2dobj[obj1p04] = new Carsl_obj(CARSL_OBJ_POS04, TEXTURE_CARSL_OBJ4);
+	c2dobj[obj2p01] = new Carsl_obj2(CARSL_OBJ2_POS01, TEXTURE_CARSL_OBJ);
+	c2dobj[obj2p02] = new Carsl_obj2(CARSL_OBJ2_POS02, TEXTURE_CARSL_OBJ2);
+	c2dobj[obj2p03] = new Carsl_obj2(CARSL_OBJ2_POS03, TEXTURE_CARSL_OBJ3);
+	c2dobj[obj2p04] = new Carsl_obj2(CARSL_OBJ2_POS04, TEXTURE_CARSL_OBJ4);
+	c2dobj[obj3p01] = new Carsl_obj3(CARSL_OBJ3_POS01, TEXTURE_CARSL_OBJ);
+	c2dobj[obj3p02] = new Carsl_obj3(CARSL_OBJ3_POS02, TEXTURE_CARSL_OBJ2);
+	c2dobj[obj3p03] = new Carsl_obj3(CARSL_OBJ3_POS03, TEXTURE_CARSL_OBJ3);
+	c2dobj[obj3p04] = new Carsl_obj3(CARSL_OBJ3_POS04, TEXTURE_CARSL_OBJ4);
+	c2dobj[obj4p01] = new Carsl_obj4(CARSL_OBJ4_POS01, TEXTURE_CARSL_OBJ);
+	c2dobj[obj4p02] = new Carsl_obj4(CARSL_OBJ4_POS02, TEXTURE_CARSL_OBJ2);
+	c2dobj[obj4p03] = new Carsl_obj4(CARSL_OBJ4_POS03, TEXTURE_CARSL_OBJ3);
+	c2dobj[obj4p04] = new Carsl_obj4(CARSL_OBJ4_POS04, TEXTURE_CARSL_OBJ4);
 	return S_OK;
 }
 

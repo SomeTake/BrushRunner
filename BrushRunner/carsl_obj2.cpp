@@ -5,8 +5,11 @@
 //
 //=============================================================================
 #include "Main.h"
+#include "carslobj.h"
 #include "carsl_obj2.h"
 #include "Input.h"
+int char02;
+bool ao2, aka2, midori2, ki2;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -24,6 +27,31 @@ Carsl_obj2::Carsl_obj2(D3DXVECTOR3 _pos, const char *texno)
 	use = true;
 	pos = _pos;
 	PatternAnim = 1;
+	ao2 = false;
+	aka2 = false;
+	midori2 = false;
+	ki2 = false;
+	if (texno == TEXTURE_CARSLOBJ)
+	{
+		char2 = AO;
+		char02 = char2;
+	}
+	else if (texno == TEXTURE_CARSLOBJ2)
+	{
+		char2 = AKA;
+		char02 = char2;
+	}
+	else if (texno == TEXTURE_CARSLOBJ3)
+	{
+		char2 = MIDORI;
+		char02 = char2;
+	}
+	else if (texno == TEXTURE_CARSLOBJ4)
+	{
+		char2 = KI;
+		char02 = char2;
+	}
+
 	// 頂点情報の作成
 	MakeVertex();
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -49,39 +77,87 @@ void Carsl_obj2::Update()
 {
 	if (use == true)
 	{
-
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
-
 	}
-	if (GetKeyboardTrigger(DIK_RIGHT))
+	if (Getpnum() == 1)
 	{
-		if (pos == CARSL_OBJ2_POS01)
+		if (GetKeyboardTrigger(DIK_RETURN))
 		{
-			pos = CARSL_OBJ2_POS02;
-		}
-		else if (pos == CARSL_OBJ2_POS02)
-		{
-			pos = CARSL_OBJ2_POS03;
-		}
-		else if (pos == CARSL_OBJ2_POS03)
-		{
-			pos = CARSL_OBJ2_POS01;
-		}
-	}
-	if (GetKeyboardTrigger(DIK_LEFT))
-	{
-		if (pos == CARSL_OBJ2_POS03)
-		{
-			pos = CARSL_OBJ2_POS02;
-		}
-		else if (pos == CARSL_OBJ2_POS02)
-		{
-			pos = CARSL_OBJ2_POS01;
+			Setpnum(2);
 		}
 		else if (pos == CARSL_OBJ2_POS01)
 		{
-			pos = CARSL_OBJ2_POS03;
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ2_POS02;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ2_POS04;
+			}
+			if (char2 == AO)
+			{
+				ao2 = true;
+				aka2 = false;
+				midori2 = false;
+				ki2 = false;
+			}
+			else if (char2 == AKA)
+			{
+				aka2 = true;
+				ao2 = false;
+				midori2 = false;
+				ki2 = false;
+			}
+			else if (char2 == MIDORI)
+			{
+				midori2 = true;
+				aka2 = false;
+				ao2 = false;
+				ki2 = false;
+			}
+			else if (char2 == KI)
+			{
+				ki2 = true;
+				ao2 = false;
+				aka2 = false;
+				midori2 = false;
+			}
+		}
+		else if (pos == CARSL_OBJ2_POS02)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ2_POS03;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ2_POS01;
+			}
+		}
+		else if (pos == CARSL_OBJ2_POS03)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ2_POS04;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ2_POS02;
+			}
+		}
+		else if (pos == CARSL_OBJ2_POS04)
+		{
+			if (GetKeyboardTrigger(DIK_RIGHT))
+			{
+				pos = CARSL_OBJ2_POS01;
+			}
+			else if (GetKeyboardTrigger(DIK_LEFT))
+			{
+				pos = CARSL_OBJ2_POS03;
+			}
+
 		}
 	}
 	SetVertex();
@@ -169,3 +245,22 @@ void Carsl_obj2::SetVertex(void)
 	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CARSL_OBJ2_SIZE.x, pos.y + CARSL_OBJ2_SIZE.y, pos.z);
 }
 
+int Getchar2num()
+{
+	if (ao2 == true)
+	{
+		return AO;
+	}
+	else if (aka2 == true)
+	{
+		return AKA;
+	}
+	else if (midori2 == true)
+	{
+		return MIDORI;
+	}
+	else if (ki2 == true)
+	{
+		return KI;
+	}
+}

@@ -15,18 +15,20 @@
 #define TEXTURE_CARSL_OBJ3	_T("data/texture/charasl_obj3.png")			// フレーム用画像
 #define CARSL_OBJ3_SIZE		D3DXVECTOR3(114.0f, 114.0f, 0.0f)		// テクスチャサイズ
 
-#define CARSL_OBJ3_POS01		D3DXVECTOR3(400.0f, 350.0f, 0.0f)
-#define CARSL_OBJ3_POS02		D3DXVECTOR3(550.0f, 350.0f, 0.0f)
-#define CARSL_OBJ3_POS03		D3DXVECTOR3(700.0f, 350.0f, 0.0f)
-
+#define CARSL_OBJ3_POS01		D3DXVECTOR3(400.0f, 410.0f, 0.0f)
+#define CARSL_OBJ3_POS02		D3DXVECTOR3(550.0f, 410.0f, 0.0f)
+#define CARSL_OBJ3_POS03		D3DXVECTOR3(700.0f, 410.0f, 0.0f)
+#define CARSL_OBJ3_POS04		D3DXVECTOR3(850.0f, 410.0f, 0.0f)
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class Carsl_obj3 :
 	public _2dobj {
 public:
+	bool  player = false;
 	Carsl_obj3(D3DXVECTOR3 _pos, const char *texno);
 	~Carsl_obj3();
+	int char3;
 
 	// オーバーライド関数
 	void Update();
@@ -34,6 +36,6 @@ public:
 	HRESULT MakeVertex();
 	void SetTexture(int cntPattern);
 	void SetVertex();
-	float getobjpos();
 };
+int Getchar3num();
 #endif
