@@ -60,6 +60,8 @@ void CountDown::Update()
 			startsecond = starttimer / SECOND_PER_FRAME;
 
 			SetTexture();
+
+			// PlaySound(カウントダウン)
 		}
 		// カウントダウン終了
 		else

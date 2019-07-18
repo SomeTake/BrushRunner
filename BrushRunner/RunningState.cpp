@@ -45,6 +45,8 @@ void RunningState::Update(int AnimCurtID)
 		owner_->SetJumpSpeed(JUMP_SPEED * value);
 		owner_->ChangeAnim(Jump);
 		owner_->ChangeState(new JumpState(owner_));
+
+		// PlaySound(ジャンプ音)
 		return;
 	}
 	// 前方オブジェクトにヒットしているので待機状態へ
