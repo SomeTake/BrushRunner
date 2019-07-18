@@ -39,7 +39,7 @@ SceneGame::SceneGame()
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo);
+		pPlayer[PlayerNo] = new Player(PlayerNo, true);
 	}
 
 	// マップの初期化

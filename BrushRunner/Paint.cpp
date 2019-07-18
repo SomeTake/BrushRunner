@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
+#include "MyLibrary.h"
 
 #define DecAlpha (0.1f)
 
@@ -144,7 +145,9 @@ void Paint::Draw()
 
 		// ワールドマトリックスの設定
 		Device->SetTransform(D3DTS_WORLD, &WorldMtx);
-		this->ScreenPos = WorldToScreenPos(WorldMtx);
+
+		// 現在のオブジェクトが画面内を確認
+		CheckInScreen(WorldMtx);
 
 		// 頂点バッファをデバイスのデータストリームにバインド
 		Device->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
@@ -254,26 +257,14 @@ void Paint::SetColor()
 //=============================================================================
 // ワールド座標からスクリーン座標に変換する
 //=============================================================================
-D3DXVECTOR2 Paint::WorldToScreenPos(D3DXMATRIX WorldMatrix)
+void Paint::CheckInScreen(D3DXMATRIX WorldMatrix)
 {
-	D3DXMATRIX ViewMatrix, ProjMatrix;
-	D3DXMATRIX WVP;
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ScreenPos = WorldToScreenPos(WorldMatrix);
 
-	Device->GetTransform(D3DTS_VIEW, &ViewMatrix);
-	Device->GetTransform(D3DTS_PROJECTION, &ProjMatrix);
-	WVP = WorldMatrix * ViewMatrix * ProjMatrix;
-
-	D3DXVECTOR3 ScreenCoord = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVec3TransformCoord(&ScreenCoord, &ScreenCoord, &WVP);
-
-	ScreenCoord.x = ((ScreenCoord.x + 1.0f) / 2.0f) * SCREEN_WIDTH;
-	ScreenCoord.y = ((-ScreenCoord.y + 1.0f) / 2.0f) * SCREEN_HEIGHT;
-
-	if (ScreenCoord.x < 0 ||
-		ScreenCoord.x > SCREEN_WIDTH ||
-		ScreenCoord.y < 0 ||
-		ScreenCoord.y > SCREEN_HEIGHT)
+	if (ScreenPos.x < 0 ||
+		ScreenPos.x > SCREEN_WIDTH ||
+		ScreenPos.y < 0 ||
+		ScreenPos.y > SCREEN_HEIGHT)
 	{
 		this->InScreen = false;
 	}
@@ -281,6 +272,4 @@ D3DXVECTOR2 Paint::WorldToScreenPos(D3DXMATRIX WorldMatrix)
 	{
 		this->InScreen = true;
 	}
-
-	return (D3DXVECTOR2)ScreenCoord;
 }

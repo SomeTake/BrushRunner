@@ -50,7 +50,7 @@ private:
 	void SetColor();
 	HRESULT MakeVertex();
 	// ワールド座標からスクリーン座標に変換する
-	D3DXVECTOR2 WorldToScreenPos(D3DXMATRIX WorldMatrix);
+	void CheckInScreen(D3DXMATRIX WorldMatrix);
 
 public:
 	Paint(int Owner, int PaintColor);

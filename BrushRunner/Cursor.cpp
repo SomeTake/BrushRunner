@@ -6,25 +6,35 @@
 //=============================================================================
 #include "Main.h"
 #include "Cursor.h"
+#include "Camera.h"
 #include "Input.h"
+#include "Collision.h"
 #include "MyLibrary.h"
+#include "DebugWindow.h"
+#include "CharacterAI.h"
 
 LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Cursor::Cursor(int PlayerNo, bool AIFlag)
+Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	use = true;
-	this->AIFlag = AIFlag;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
-	vec = 0.0f;
-	moveX = 0.0f;
-	moveY = 0.0f;
+	if (AIUse)
+	{
+		this->AIUse = true;
+		this->AIptr = AIptr;
+	}
+	else
+	{
+		this->AIUse = false;
+		this->AIptr = nullptr;
+	}
 
 	// テクスチャの読み込み
 	if (D3DTexture == NULL)
@@ -43,8 +53,6 @@ Cursor::Cursor(int PlayerNo, bool AIFlag)
 //=============================================================================
 Cursor::~Cursor()
 {
-	// テクスチャの開放
-	SAFE_RELEASE(Cursor::D3DTexture)
 }
 
 //=============================================================================
@@ -52,10 +60,13 @@ Cursor::~Cursor()
 //=============================================================================
 void Cursor::Update()
 {
-	if (use == true)
+	if (use)
 	{
 		// 操作
 		Move();
+
+		// スクリーン座標からワールド座標に変換
+		CalWorldPos();
 
 		if (GetKeyboardTrigger(DIK_P))
 		{
@@ -66,6 +77,54 @@ void Cursor::Update()
 		// 頂点座標の設定
 		SetVertex();
 	}
+
+#if _DEBUG
+	ImGui::SetNextWindowPos(ImVec2(5, 300), ImGuiSetCond_Once);
+
+	BeginDebugWindow("Cursor");
+
+	ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+	if (ImGui::TreeNode("Cursor Postion"))
+	{
+		if (ImGui::TreeNode("ScreenPos"))
+		{
+			DebugText("Pos X:%.2f\nPos Y:%.2f\n", pos.x, pos.y);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("WorldPos"))
+		{
+			DebugText("X:%.2f\nY:%.2f\nZ:%.2f\n", WorldPos.x, WorldPos.y, WorldPos.z);
+			ImGui::TreePop();
+		}
+		//if (ImGui::TreeNode("DestWorldPos"))
+		//{
+		//	DebugText("X:%.2f\nY:%.2f\nZ:%.2f\n", PaintStartPos_World.x, PaintStartPos_World.y, PaintStartPos_World.z);
+		//	ImGui::TreePop();
+		//}
+		//if (ImGui::TreeNode("DestScreenPos"))
+		//{
+		//	D3DXMATRIX WorldMtx, TransMtx;
+		//	D3DXVECTOR2 DestPos_Screen;
+
+		//	// ワールドマトリックスの初期化
+		//	D3DXMatrixIdentity(&WorldMtx);
+
+		//	// 移動を反映
+		//	D3DXMatrixTranslation(&TransMtx, PaintStartPos_World.x, PaintStartPos_World.y, PaintStartPos_World.z);
+		//	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+
+		//	DestPos_Screen = WorldToScreenPos(WorldMtx);
+
+		//	DebugText("X:%.2f\nY:%.2f\n", DestPos_Screen.x, DestPos_Screen.y);
+		//	ImGui::TreePop();
+		//}
+
+		ImGui::TreePop();
+	}
+
+	EndDebugWindow("Cursor");
+
+#endif
 }
 
 //=============================================================================
@@ -154,10 +213,10 @@ void Cursor::SetTexture()
 void Cursor::SetVertex()
 {
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y + CURSOR_SIZE.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y - CURSOR_SIZE.y, 0.0f);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y - CURSOR_SIZE.y, 0.0f);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y, 0.0f);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y, 0.0f);
 }
 
 //=============================================================================
@@ -165,15 +224,19 @@ void Cursor::SetVertex()
 //=============================================================================
 void Cursor::Move()
 {
-	//if (!AIFlag)
-	//{
+	if (!AIUse)
+	{
 		KeyMove();	// キーボード操作
 		PadMove();	// コントローラ操作
-	//}
-	//else
-	//{
-		AIMove();
-	//}
+	}
+	else
+	{
+		KeyMove();	// キーボード操作
+		if (AIptr->GetAIState() == eCursorMove)
+		{
+			AIMove();
+		}
+	}
 }
 
 //=============================================================================
@@ -208,14 +271,14 @@ void Cursor::KeyMove()
 		pos.y -= CURSOR_SPEED;
 
 		// 画面外判定
-		pos.y = max(pos.y, 0.0f);
+		pos.y = max(pos.y, 0.0f + CURSOR_SIZE.y);
 	}
 	else if (GetKeyboardPress(DIK_S))
 	{
 		pos.y += CURSOR_SPEED;
 
 		// 画面外判定
-		pos.y = min(pos.y, SCREEN_HEIGHT - CURSOR_SIZE.y);
+		pos.y = min(pos.y, SCREEN_HEIGHT);
 
 	}
 
@@ -253,15 +316,83 @@ void Cursor::PadMove()
 	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 }
 
-//=============================================================================
-// カーソルの筆先の座標を取得
-//=============================================================================
-D3DXVECTOR3 Cursor::GetPenPoint()
+void Cursor::CalWorldPos()
 {
-	return D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, 0.0f);
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+	CAMERA *camerawk = GetCamera();
+	D3DXMATRIX ViewMtx, ProjMtx;
+
+	Device->GetTransform(D3DTS_VIEW, &ViewMtx);
+	Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
+
+	// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+	// スクリーン座標とXZ平面のワールド座標交点算出
+	D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+	CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+	CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+	// 判定用三角形ポリゴン
+	TriangleStr triPos1, triPos2;
+	triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+		camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+		camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+	triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+		camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+		camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+	// 2点を使って当たった場所をセットする場所とする
+	if (!hitCheck(&this->WorldPos, triPos1, OutPos1, OutPos2))
+	{
+		hitCheck(&this->WorldPos, triPos2, OutPos1, OutPos2);
+	}
 }
 
 void Cursor::AIMove()
 {
+	float Distance = 0.0f;
+	int AIState = AIptr->GetAIState();
+	D3DXMATRIX WorldMtx, TransMtx;
+	D3DXVECTOR3 DestPos_World;
+	D3DXVECTOR2 DestPos_Screen;
 
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&WorldMtx);
+
+	// 移動を反映
+	if (AIptr->GetAIPaint())
+	{
+		DestPos_World = AIptr->GetPaintEndPos();
+	}
+	else
+	{
+		DestPos_World = AIptr->GetPaintStartPos();
+	}
+	D3DXMatrixTranslation(&TransMtx, DestPos_World.x, DestPos_World.y, DestPos_World.z);
+	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+
+	DestPos_Screen = WorldToScreenPos(WorldMtx);
+
+	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
+	Distance = D3DXVec2LengthSq(&Vec);
+
+	if (Distance > pow(20.0f, 2))
+	{
+		float Angle = atan2f(Vec.y, Vec.x);
+		pos.x += cosf(Angle) * CURSOR_SPEED;
+		pos.y += sinf(Angle) * CURSOR_SPEED;
+	}
+	else
+	{
+		(D3DXVECTOR2)pos = DestPos_Screen;
+		if (!AIptr->GetAIPaint())
+		{
+			AIptr->SetAIPaint(true);
+		}
+		else
+		{
+			AIptr->SetAIPaint(false);
+			AIptr->SetAIState(eNoEvent);
+		}
+	}
 }

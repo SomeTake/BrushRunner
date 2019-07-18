@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "CharacterAI.h"
 #include "Map.h"
+#include "PaintManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -26,19 +27,20 @@ enum e_ChipNo
 	ePlatformEdge = -4
 };
 
+#if _DEBUG
 // 3D空間で直線描画用構造体を定義
 typedef struct
 {
 	D3DXVECTOR3 Point;
 	D3DCOLOR	Color;
 } VERTEX_3DLINE;
+#endif
 
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-CharacterAI::CharacterAI(bool AIFlag)
+CharacterAI::CharacterAI()
 {
-	this->AIFlag = AIFlag;
 }
 
 //=====================================================================================================
@@ -49,22 +51,17 @@ CharacterAI::~CharacterAI()
 
 }
 
-void CharacterAI::Update(D3DXVECTOR3 Pos, PaintManager *ManagerPtr)
+void CharacterAI::Update(D3DXVECTOR3 Pos)
 {
 	int MapChipNo = Map::GetMapTbl(Pos, eCenterUp);
-	this->Action = NoAction;
+	this->Action = eNoAction;
 	this->DrawLineFlag = false;
-
-	if (this->AIFlag == false)
-	{
-		return;
-	}
 
 	switch (MapChipNo)
 	{
 	case eJumpChip:
 
-		this->Action = ActJump;
+		this->Action = eActJump;
 		break;
 
 	case eDetermineChip:
@@ -92,10 +89,13 @@ void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 			if (k == ePlatformEdge)
 			{
 				// 探したプラットフォームの座標
-				this->PlatformEdgePos = Map::GetMapChipPos(i, j + 1, eLeftUp);
+				this->PaintEndPos = Map::GetMapChipPos(i, j + 1, eLeftUp);
 				// キャラクター下のチップの座標
-				this->PaintStartPos = Map::GetMapChipPos(PlayerChip_X, PlayerChip_Y, eRightUp);
+				this->PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
+				this->State = eCursorMove;
+#if _DEBUG
 				this->DrawLineFlag = true;
+#endif
 			}
 		}
 	}
@@ -109,7 +109,7 @@ void CharacterAI::Draw(void)
 {
 	if (this->DrawLineFlag)
 	{
-		DrawLine3D(this->PaintStartPos, this->PlatformEdgePos);
+		DrawLine3D(this->PaintStartPos, this->PaintEndPos);
 	}
 }
 

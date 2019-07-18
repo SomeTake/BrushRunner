@@ -69,7 +69,7 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum) : state(nullptr)
+Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -91,8 +91,16 @@ Player::Player(int _CtrlNum) : state(nullptr)
 	runSpd = 1.0f;
 	jumpSpd = 0.0f;
 	ctrlNum = _CtrlNum;
-	this->AI = new CharacterAI(true);
-	this->PaintSystem = new PaintManager(ctrlNum, true);
+	if (AIUse)
+	{
+		this->AI = new CharacterAI();
+		this->PaintSystem = new PaintManager(ctrlNum, true, this->AI);
+	}
+	else
+	{
+		this->AI = nullptr;
+		this->PaintSystem = new PaintManager(ctrlNum, false, nullptr);
+	}
 	this->playerUI = new PlayerUI(ctrlNum);
 	inkType = ColorInk;
 	hitHorizon = false;
@@ -143,7 +151,10 @@ void Player::Update()
 		Move();
 
 		// AIの更新処理
-		AI->Update(this->pos, this->PaintSystem);
+		if (this->AI != nullptr)
+		{
+			AI->Update(this->pos);
+		}
 
 		// ペイントシステムの更新処理
 		PaintSystem->Update();
@@ -228,7 +239,10 @@ void Player::Draw()
 	itemManager->Draw();
 
 #if _DEBUG
-	this->AI->Draw();
+	if (this->AI != nullptr)
+	{
+		AI->Draw();
+	}
 #endif
 }
 
@@ -263,48 +277,6 @@ void Player::Move()
 	// 空中判定
 	JumpMove();
 
-#if _DEBUG
-	if (GetKeyboardPress(DIK_RIGHT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x += MOVE_SPEED;
-			break;
-		case 1:
-			pos.x += MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x += MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x += MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-	if (GetKeyboardPress(DIK_LEFT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x -= MOVE_SPEED;
-			break;
-		case 1:
-			pos.x -= MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x -= MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x -= MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-#endif
 }
 
 //=====================================================================================================
@@ -691,7 +663,48 @@ void Player::HitObjectInfluence(int type)
 //=====================================================================================================
 void Player::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG
+
+	if (GetKeyboardPress(DIK_RIGHT))
+	{
+		switch (ctrlNum)
+		{
+		case 0:
+			pos.x += MOVE_SPEED;
+			break;
+		case 1:
+			pos.x += MOVE_SPEED * 0.8f;
+			break;
+		case 2:
+			pos.x += MOVE_SPEED * 0.5f;
+			break;
+		case 3:
+			pos.x += MOVE_SPEED * 0.2f;
+			break;
+		default:
+			break;
+		}
+	}
+	if (GetKeyboardPress(DIK_LEFT))
+	{
+		switch (ctrlNum)
+		{
+		case 0:
+			pos.x -= MOVE_SPEED;
+			break;
+		case 1:
+			pos.x -= MOVE_SPEED * 0.8f;
+			break;
+		case 2:
+			pos.x -= MOVE_SPEED * 0.5f;
+			break;
+		case 3:
+			pos.x -= MOVE_SPEED * 0.2f;
+			break;
+		default:
+			break;
+		}
+	}
 
 	ImGui::SetNextWindowPos(ImVec2(5, 120), ImGuiSetCond_Once);
 

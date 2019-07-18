@@ -11,6 +11,7 @@
 #include "Cursor.h"
 #include "Quadtree.h"
 #include "InkGauge.h"
+#include "CharacterAI.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,7 +31,8 @@ private:
 	int						Owner;
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
-	bool					AIFlag;
+	bool					AIUse;
+	CharacterAI				*AIptr;
 
 	static QUADTREE			*Quadtree;
 #if _DEBUG
@@ -41,12 +43,11 @@ private:
 	void CheckPaintUse(void);
 
 public:
-	PaintManager(int PlayerNo, bool AIFlag);
+	PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr);
 	~PaintManager();
 
 	void Update();
 	void Draw();
-	void CursorMove(D3DXVECTOR3 DestPos);
 	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
 
 	// ゲッター

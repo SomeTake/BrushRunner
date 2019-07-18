@@ -17,7 +17,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define PLAYER_MAX				(4)										// 操作するプレイヤーの数
+#define PLAYER_MAX				(1)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
@@ -87,7 +87,7 @@ private:
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum);
+	Player(int _CtrlNum,bool AIUse);
 	~Player();
 	void Update();
 	void Draw();

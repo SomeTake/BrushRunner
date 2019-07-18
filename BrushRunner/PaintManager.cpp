@@ -21,20 +21,30 @@ bool PaintManager::PressMode = true;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-PaintManager::PaintManager(int PlayerNo, bool AIFlag)
+PaintManager::PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 {
 	this->Owner = PlayerNo;
 	this->InkType = ColorInk;
-	this->AIFlag = AIFlag;
+	if (AIUse)
+	{
+		this->AIUse = true;
+		this->AIptr = AIptr;
+		// カーソルオブジェクト作成
+		this->pCursor = new Cursor(this->Owner, true, AIptr);
+	}
+	else
+	{
+		this->AIUse = false;
+		this->AIptr = nullptr;
+		// カーソルオブジェクト作成
+		this->pCursor = new Cursor(this->Owner, false, nullptr);
+	}
 
 	// インク残量が最大値にする
 	for (int i = 0; i < InkNum; i++)
 	{
 		this->InkValue[i] = INK_MAX;
 	}
-
-	// カーソルオブジェクト作成
-	this->pCursor = new Cursor(this->Owner, AIFlag);
 
 	// インクゲージUIオブジェクト作成
 	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
@@ -112,7 +122,8 @@ void PaintManager::Update()
 	}
 
 	// インクを使う
-	if ((GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && PressMode)
+	if (((GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && PressMode) ||
+		AIptr->GetAIPaint() == true)
 	{
 		// 使用するインクの残量チェック
 		if (this->InkValue[InkType] > 0)
@@ -121,11 +132,6 @@ void PaintManager::Update()
 			SetPaint(InkType);
 			// インクを減らす
 			InkValue[InkType]--;
-
-			//if (!pPlayer->GetSpInk())
-			//{
-			//	InkValue[InkType]--;
-			//}
 		}
 	}
 #if _DEBUG
@@ -138,11 +144,6 @@ void PaintManager::Update()
 			SetPaint(InkType);
 			// インクを減らす
 			InkValue[InkType]--;
-
-			//if (!pPlayer->GetSpInk())
-			//{
-			//	InkValue[InkType]--;
-			//}
 		}
 	}
 #endif
@@ -153,7 +154,7 @@ void PaintManager::Update()
 
 #if _DEBUG
 	// インクの残量を調整
-	if (GetKeyboardPress(DIK_LEFT) || GetKeyboardPress(DIK_Z))
+	if (GetKeyboardPress(DIK_Z))
 	{
 		if (InkValue[InkType] > 0)
 		{
@@ -161,12 +162,18 @@ void PaintManager::Update()
 		}
 	}
 
-	if (GetKeyboardPress(DIK_RIGHT) || GetKeyboardPress(DIK_X))
+	if (GetKeyboardPress(DIK_X))
 	{
 		if (InkValue[InkType] < INK_MAX)
 		{
 			InkValue[InkType]++;
 		}
+	}
+
+	if (GetKeyboardPress(DIK_C))
+	{
+		InkValue[ColorInk] = INK_MAX;
+		InkValue[BlackInk] = INK_MAX;
 	}
 
 	if (GetKeyboardTrigger(DIK_L))
@@ -254,13 +261,14 @@ void PaintManager::Draw()
 //=============================================================================
 void PaintManager::SetPaint(int InkType)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-	CAMERA *camerawk = GetCamera();
-	D3DXMATRIX ViewMtx, ProjMtx;
-	D3DXVECTOR3 CursorPos = pCursor->GetPenPoint();
+	//LPDIRECT3DDEVICE9 Device = GetDevice();
+	//CAMERA *camerawk = GetCamera();
+	//D3DXMATRIX ViewMtx, ProjMtx;
+	D3DXVECTOR3 CursorScreenPos = pCursor->GetPos();
+	D3DXVECTOR3 CursorWorldPos = pCursor->GetWorldPos();
 
-	Device->GetTransform(D3DTS_VIEW, &ViewMtx);
-	Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
+	//Device->GetTransform(D3DTS_VIEW, &ViewMtx);
+	//Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
 
 	// 黒インクの場合
 	if (InkType == BlackInk)
@@ -272,6 +280,7 @@ void PaintManager::SetPaint(int InkType)
 
 		Paint *Object = new Paint(this->Owner, BlackInkColor);
 
+#if 0
 		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
 		// スクリーン座標とXZ平面のワールド座標交点算出
 		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
@@ -295,10 +304,12 @@ void PaintManager::SetPaint(int InkType)
 		}
 
 		Object->SetPos(SetPos);
+#endif
+		Object->SetPos(CursorWorldPos);
 		Object->SetUse(true);
 
 		// スクリーン座標を保存する
-		Object->SetScreenPos((D3DXVECTOR2)CursorPos);
+		Object->SetScreenPos((D3DXVECTOR2)CursorScreenPos);
 		// 四分木に入れる
 		PaintManager::Quadtree->InsertObject(Object);
 
@@ -318,6 +329,7 @@ void PaintManager::SetPaint(int InkType)
 
 		Paint *Object = new Paint(this->Owner, this->Owner);
 
+#if 0
 		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
 		// スクリーン座標とXZ平面のワールド座標交点算出
 		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
@@ -341,10 +353,12 @@ void PaintManager::SetPaint(int InkType)
 		}
 
 		Object->SetPos(SetPos);
+#endif
+		Object->SetPos(CursorWorldPos);
 		Object->SetUse(true);
 
 		// スクリーン座標を保存する
-		Object->SetScreenPos((D3DXVECTOR2)CursorPos);
+		Object->SetScreenPos((D3DXVECTOR2)CursorScreenPos);
 		// 四分木に入れる
 		PaintManager::Quadtree->InsertObject(Object);
 
@@ -394,9 +408,4 @@ void PaintManager::CheckPaintUse(void)
 std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
 {
 	return PaintManager::Quadtree->GetObjectsAt(NodeID);
-}
-
-void PaintManager::CursorMove(D3DXVECTOR3 DestPos)
-{
-
 }
