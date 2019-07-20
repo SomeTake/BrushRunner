@@ -1,32 +1,40 @@
 //=============================================================================
 //
-// シーン基底クラス [Scene.h]
-// Author : HAL東京 GP12B332-19 80277 染谷武志
+// プレイヤー順位 [ResultRank.h]
+// Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
-#ifndef _SCENE_H_
-#define _SCENE_H_
+#ifndef _RESULTRANK_H_
+#define _RESULTRANK_H_
+
+#include "_2dobj.h"
 
 //*****************************************************************************
-// 構造体定義
+// マクロ定義
 //*****************************************************************************
-// ゲーム結果
-typedef struct {
-	int rank;	// 順位
-	DWORD time;	// 時間
-}ResultData;
+#define RESULTRANK_TEXTURE	("data/TEXTURE/ResultPlayer.png")
+#define RESULTRANK_DIVIDE_X	(1)
+#define RESULTRANK_DIVIDE_Y	(4)
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Scene
+class ResultRank :
+	public _2dobj
 {
-public:
-	Scene();
-	virtual ~Scene();
+private:
+	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+	int rank;	// 順位
 
-	virtual void Update(int SceneID) = 0;
-	virtual void Draw() = 0;
+	HRESULT MakeVertex();
+
+public:
+	ResultRank(int rank);
+	~ResultRank();
+
+	void Update();
+	void Draw();
+
 };
 
 #endif

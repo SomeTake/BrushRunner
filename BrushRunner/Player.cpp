@@ -20,6 +20,7 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Timer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,7 +31,7 @@
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(10)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
@@ -703,7 +704,7 @@ void Player::HitObjectInfluence(int type)
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(min(++ink, INK_MAX), ColorInk);
 
-				// インクが回復する音
+				// PlaySound(インクが回復する音)
 			}
 		}
 

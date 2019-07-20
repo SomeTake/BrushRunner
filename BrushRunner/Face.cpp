@@ -13,7 +13,7 @@
 //*****************************************************************************
 #define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
 #define FACE_POS		D3DXVECTOR3(31.0f, 30.5f, 0.0f)
-#define FACE_SLIDE_SIZE	(318.5f)
+#define FACE_SPACE		(318.5f)							// 表示間隔
 
 //=============================================================================
 // コンストラクタ
@@ -34,7 +34,7 @@ Face::Face(int playerNo, int charNo)
 
 	use = true;
 	pos = FACE_POS;
-	pos.x += this->playerNo * FACE_SLIDE_SIZE;
+	pos.x += this->playerNo * FACE_SPACE;
 
 	// 頂点情報の作成
 	MakeVertex();

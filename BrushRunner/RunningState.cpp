@@ -10,6 +10,7 @@
 #include "VictoryState.h"
 #include "Input.h"
 #include "Map.h"
+#include "Timer.h"
 
 //=============================================================================
 // コンストラクタ

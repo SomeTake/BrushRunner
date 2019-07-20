@@ -1,32 +1,39 @@
 //=============================================================================
 //
-// シーン基底クラス [Scene.h]
+// 桁 [Digit.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENE_H_
-#define _SCENE_H_
+#ifndef _DIGIT_H_
+#define _DIGIT_H_
+
+#include "_2dobj.h"
 
 //*****************************************************************************
-// 構造体定義
+// マクロ定義
 //*****************************************************************************
-// ゲーム結果
-typedef struct {
-	int rank;	// 順位
-	DWORD time;	// 時間
-}ResultData;
+#define DIGIT_MAX		(6)		// 表示桁数
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Scene
+class Digit :
+	public _2dobj
 {
-public:
-	Scene();
-	virtual ~Scene();
+private:
+	static LPDIRECT3DTEXTURE9 D3DTexture;	// テクスチャのポインタ
+	DWORD time;								// その桁に表示する数字（0-9 or 0-5）
 
-	virtual void Update(int SceneID) = 0;
-	virtual void Draw() = 0;
+	HRESULT MakeVertex();
+	void SetTexture();
+
+public:
+	Digit(int digit);
+	~Digit();
+
+	void Update()override {};
+	void Update(DWORD time);
+	void Draw()override;
 };
 
 #endif

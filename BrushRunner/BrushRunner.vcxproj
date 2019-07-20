@@ -26,6 +26,7 @@
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CursorObj.h" />
+    <ClInclude Include="ResultRank.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SelectLogo.h" />
     <ClInclude Include="CharacterAI.h" />
@@ -88,6 +89,8 @@
     <ClInclude Include="SpInkState.h" />
     <ClInclude Include="StopState.h" />
     <ClInclude Include="Struct.h" />
+    <ClInclude Include="Digit.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
@@ -100,6 +103,7 @@
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CursorObj.cpp" />
+    <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SelectLogo.cpp" />
     <ClCompile Include="CharacterAI.cpp" />
@@ -158,6 +162,8 @@
     <ClCompile Include="SpikeState.cpp" />
     <ClCompile Include="SpInkState.cpp" />
     <ClCompile Include="StopState.cpp" />
+    <ClCompile Include="Digit.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />

@@ -15,7 +15,7 @@
 //*****************************************************************************
 #define CURSOROBJ_SIZE		D3DXVECTOR3(114.0f, 114.0f, 0.0f)	// テクスチャサイズ
 #define CURSOROBJ_POS		D3DXVECTOR3(350.0f, 100.0f, 0.0f)
-#define CURSOROBJ_SLIDE_SIZE D3DXVECTOR3(150.0f, 150.0f, 0.0f)
+#define CURSOROBJ_SPACE		D3DXVECTOR3(150.0f, 150.0f, 0.0f)	// 表示間隔
 
 LPDIRECT3DTEXTURE9	CursorObj::D3DTexture = NULL;				// テクスチャのポインタ
 
@@ -38,8 +38,8 @@ CursorObj::CursorObj(int playerNo, int cursorNo)
 	this->cursorNo = cursorNo;
 	this->selectNo = cursorNo;
 	use = true;
-	pos.x = cursorNo * CURSOROBJ_SLIDE_SIZE.x + CURSOROBJ_POS.x;
-	pos.y = playerNo * CURSOROBJ_SLIDE_SIZE.y + CURSOROBJ_POS.y;
+	pos.x = cursorNo * CURSOROBJ_SPACE.x + CURSOROBJ_POS.x;
+	pos.y = playerNo * CURSOROBJ_SPACE.y + CURSOROBJ_POS.y;
 	pos.z = 0.0f;
 	
 	// 頂点情報の作成
