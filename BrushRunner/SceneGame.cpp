@@ -22,6 +22,7 @@
 #include "CountDown.h"
 #include "Item.h"
 
+#include "Sound.h"
 static int ResultRank[PLAYER_MAX];
 
 //=============================================================================
@@ -271,6 +272,7 @@ void SceneGame::CheckResult()
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
 				SetScene(nSceneResult);
+				StopSound(BGM_TRAINING);
 			}
 		}
 

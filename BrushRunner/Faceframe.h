@@ -25,10 +25,10 @@
 #define FACEFRAME_POS03		D3DXVECTOR3(636.0f, 0.0f, 0.0f)
 #define FACEFRAME_POS04		D3DXVECTOR3(954.0f, 0.0f, 0.0f)
 
-#define FACE1_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)
-#define FACE2_POS			D3DXVECTOR3(318.0f, 0.0f, 0.0f)
-#define FACE3_POS			D3DXVECTOR3(636.0f, 0.0f, 0.0f)
-#define FACE4_POS			D3DXVECTOR3(954.0f, 0.0f, 0.0f)
+//#define FACE1_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)
+//#define FACE2_POS			D3DXVECTOR3(318.0f, 0.0f, 0.0f)
+//#define FACE3_POS			D3DXVECTOR3(636.0f, 0.0f, 0.0f)
+//#define FACE4_POS			D3DXVECTOR3(954.0f, 0.0f, 0.0f)
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************************************

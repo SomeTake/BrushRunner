@@ -22,7 +22,6 @@ typedef struct
 //*****************************************************************************
 HRESULT CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD *pChunkDataPosition);
 HRESULT ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset);
-
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
@@ -31,41 +30,41 @@ IXAudio2MasteringVoice *g_pMasteringVoice = NULL;			// マスターボイス
 IXAudio2SourceVoice *g_apSourceVoice[SOUND_LABEL_MAX] = {};	// ソースボイス
 BYTE *g_apDataAudio[SOUND_LABEL_MAX] = {};					// オーディオデータ
 DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
-
 // 各音素材のパラメータ
 PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	// BGM
 	{ "data/BGM/title.wav", true, 0.50f },
 	{ "data/BGM/tutorial.wav", true, 0.50f },
+	{ "data/BGM/Toy`sCarnival.wav", true, 0.50f },
 	{ "data/BGM/training.wav", true, 0.50f },
-	{ "data/BGM/battle.wav", true, 0.50f }
+	//{ "data/BGM/battle.wav", true, 0.50f }
 	//SE
-	//{ "data/SE/Defend0.wav", false, 1.00f },
-	//{ "data/SE/Hit0.wav", false, 1.00f },
-	//{ "data/SE/Hit1.wav", false, 1.00f },
-	//{ "data/SE/Swing0.wav", false, 1.00f },
-	//{ "data/SE/Select0.wav", false, 1.00f },
-	//{ "data/SE/Select1.wav", false, 1.00f },
+	{ "data/BGM/choice.wav", false, 0.50f },
+	{ "data/BGM/select.wav", false, 0.50f },
+	{ "data/BGM/kaifuku.wav", false, 0.50f },
+	{ "data/BGM/fall.wav", false, 0.50f },
+	{ "data/BGM/explosion.wav", false, 0.50f },
+	{ "data/BGM/slime.wav", false, 0.50f },
 	//{ "data/SE/yattaze0.wav", false, 0.20f },
 	//{ "data/SE/KO.wav", false, 0.20f },
 	//{ "data/SE/effect0.wav", false, 1.00f },
 	//{ "data/SE/cutin0.wav", false, 1.00f },
 	//{ "data/SE/countdown0.wav", false, 1.00f },
 };
-
+bool playsound;
 //=============================================================================
 // 初期化
 //=============================================================================
 HRESULT InitSound(HWND hWnd)
 {
 	HRESULT hr;
-
 	// COMライブラリの初期化
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 	// XAudio2オブジェクトの作成
 	hr = XAudio2Create(&g_pXAudio2, 0);
+	playsound = false;
 	if (FAILED(hr))
 	{
 		MessageBox(hWnd, "XAudio2オブジェクトの作成に失敗！", "警告！", MB_ICONWARNING);
@@ -231,12 +230,12 @@ void UninitSound(void)
 //=============================================================================
 // セグメント再生(停止)
 //=============================================================================
-HRESULT PlaySound(SOUND_LABEL label)
+HRESULT Playsound(SOUND_LABEL label)
 {
 	XAUDIO2_VOICE_STATE xa2state;
 	XAUDIO2_BUFFER buffer;
 
-	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
+	memset(&buffer, label, sizeof(XAUDIO2_BUFFER));
 	buffer.AudioBytes = g_aSizeAudio[label];
 	buffer.pAudioData = g_apDataAudio[label];
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
@@ -253,27 +252,34 @@ HRESULT PlaySound(SOUND_LABEL label)
 
 	// 状態取得
 	g_apSourceVoice[label]->GetState(&xa2state);
-	if (xa2state.BuffersQueued != 0)
-	{// 再生中
-	 // 一時停止
-		g_apSourceVoice[label]->Stop(0);
+	if(label>= SE_CHOICE)
+	{
+		if (xa2state.BuffersQueued != 0)
+		{// 再生中
+		 // 一時停止
+			g_apSourceVoice[label]->Stop(0);
 
-		// オーディオバッファの削除
-		g_apSourceVoice[label]->FlushSourceBuffers();
+			// オーディオバッファの削除
+			g_apSourceVoice[label]->FlushSourceBuffers();
+
+			playsound = false;
+		}
 	}
+	if (playsound == false)
+	{
+		// 音量設定
+		g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
 
-	// 音量設定
-	g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
+		// オーディオバッファの登録
+		g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
 
-	// オーディオバッファの登録
-	g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
+		// 再生
+		g_apSourceVoice[label]->Start(0);
 
-	// 再生
-	g_apSourceVoice[label]->Start(0);
-
+		playsound = true;
+	}
 	return S_OK;
 }
-
 //=============================================================================
 // セグメント停止
 //=============================================================================
@@ -283,13 +289,18 @@ void StopSound(SOUND_LABEL label)
 
 	// 状態取得
 	g_apSourceVoice[label]->GetState(&xa2state);
-	if (xa2state.BuffersQueued != 0)
-	{// 再生中
-	 // 一時停止
-		g_apSourceVoice[label]->Stop(0);
+	if (playsound == true)
+	{
+		if (xa2state.BuffersQueued != 0)
+		{// 再生中
+		 // 一時停止
+			g_apSourceVoice[label]->Stop(0);
 
-		// オーディオバッファの削除
-		g_apSourceVoice[label]->FlushSourceBuffers();
+			// オーディオバッファの削除
+			g_apSourceVoice[label]->FlushSourceBuffers();
+
+			playsound = false;
+		}
 	}
 }
 

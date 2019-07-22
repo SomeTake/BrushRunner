@@ -15,15 +15,16 @@ typedef enum
 	// BGM（音楽）
 	BGM_TITLE,
 	BGM_TUTORIAL,
+	BGM_CHARSEL,
 	BGM_TRAINING,
-	BGM_BATTLE,
+	//BGM_BATTLE,
 	// SE（サウンドエフェクト）
-	//SE_DEFEND0,
-	//SE_HIT0,
-	//SE_HIT1,
-	//SE_SWING0,
-	//SE_SELECT0,
-	//SE_SELECT1,
+	SE_CHOICE,
+	SE_SELECT,
+	SE_PICITEM,
+	SE_FALL,
+	SE_USEITEM,
+	SE_PAINT,
 	//SE_WINNER0,
 	//SE_KO,
 	//SE_EFFECT0,
@@ -39,7 +40,7 @@ typedef enum
 //*****************************************************************************
 HRESULT InitSound(HWND hWnd);
 void UninitSound(void);
-HRESULT PlaySound(SOUND_LABEL label);
+HRESULT Playsound(SOUND_LABEL label);
 void StopSound(SOUND_LABEL label);
 void StopSound(void);
 

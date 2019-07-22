@@ -24,6 +24,15 @@
 #define CARSLOBJ_POS01		D3DXVECTOR3(400.0f, 300.0f, 0.0f)
 #define CARSLOBJ_POS02		D3DXVECTOR3(550.0f, 300.0f, 0.0f)
 #define CARSLOBJ_POS03		D3DXVECTOR3(700.0f, 300.0f, 0.0f)
+// 上記頂点フォーマットに合わせた構造体を定義
+typedef struct
+{
+	D3DXVECTOR3 vtx;		// 頂点座標
+	float rhw;				// テクスチャのパースペクティブコレクト用
+	D3DCOLOR diffuse;		// 反射光
+	D3DXVECTOR2 tex;		// テクスチャ座標
+
+} VERTEX_2D;
 
 //*****************************************************************************
 // クラス定義

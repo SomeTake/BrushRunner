@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "carslobj.h"
 #include "Input.h"
+#include "_2dobj.h"
 int pnum=0;
 bool canch = false;
 //=============================================================================

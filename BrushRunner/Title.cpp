@@ -1,6 +1,9 @@
 #include "Main.h"
 #include "Title.h"
-
+#include "carslobj.h"
+#include "Sound.h"
+#include "Input.h"
+#include "SceneManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -48,8 +51,17 @@ void  TITLE::Update()
 
 	if (use == true)
 	{
+			Playsound(BGM_TITLE);
+
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
+
+		if (GetKeyboardTrigger(DIK_SPACE))
+		{
+			SetScene(nSceneCharacterSelect);
+			StopSound(BGM_TITLE);
+			Playsound(BGM_CHARSEL);
+		}
 
 	}
 	 SetVertex();

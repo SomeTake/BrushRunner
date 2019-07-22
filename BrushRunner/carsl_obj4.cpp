@@ -8,6 +8,8 @@
 #include "carslobj.h"
 #include "carsl_obj4.h"
 #include "Input.h"
+#include "SceneManager.h"
+#include "Sound.h"
 bool ao4, aka4, midori4, ki4;
 //=============================================================================
 // コンストラクタ
@@ -81,7 +83,9 @@ void Carsl_obj4::Update()
 	}
 	if (Getpnum() == 4)
 	{
-		SetScene(SceneGame);
+		SetScene(nSceneGame);
+		StopSound(BGM_CHARSEL);
+		Playsound(BGM_TRAINING);
 	}
 	if (Getpnum() == 3)
 	{
@@ -267,4 +271,5 @@ int Getchar4num()
 	{
 		return KI;
 	}
+	return 0;
 }

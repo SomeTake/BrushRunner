@@ -16,6 +16,8 @@
 #include "carsl_obj4.h"
 #include "SceneManager.h"
 
+#include "Sound.h"
+
 enum
 {
 	logo,
@@ -91,10 +93,10 @@ SceneCharacterSelect::~SceneCharacterSelect()
 //=============================================================================
 void SceneCharacterSelect::Update()
 {
-	if (GetKeyboardTrigger(DIK_SPACE))
-	{
-		SetScene(nSceneGame);
-	}
+//	if (GetKeyboardTrigger(DIK_SPACE))
+	//{
+	//	SetScene(nSceneGame);
+	//}
 
 	// 2Dオブジェクトの更新
 	for (int i = 0; i < _2dMx; i++)
