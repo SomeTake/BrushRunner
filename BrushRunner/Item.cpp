@@ -17,7 +17,6 @@
 #include "SpInkState.h"
 #include "DebugWindow.h"
 #include "EffectManager.h"
-#include "Sound.h"
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -205,7 +204,6 @@ void Item::SetVertex()
 //=============================================================================
 void Item::Start()
 {
-	Playsound(SE_PICITEM);
 	// ルーレットを回す
 	rouletteCnt = LoopCountUp(rouletteCnt, 0, ROULETTE_COUNTER);
 	if (rouletteCnt == 0)

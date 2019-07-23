@@ -20,6 +20,7 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Sound.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -552,8 +553,9 @@ void Player::ObjectItemCollider(Map *pMap)
 {
 	// アイテムを取得している状態なら判定しない
 	if (hitItem)
+	{
 		return;
-
+	}
 	D3DXVECTOR3 colliderpos = pos;
 	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
 
@@ -564,6 +566,10 @@ void Player::ObjectItemCollider(Map *pMap)
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
+			if (hitItem == false)
+			{
+				Playsound(SE_PICITEM);
+			}
 			hitItem = true;
 			return;
 		}

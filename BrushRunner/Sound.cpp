@@ -52,7 +52,7 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 	//{ "data/SE/cutin0.wav", false, 1.00f },
 	//{ "data/SE/countdown0.wav", false, 1.00f },
 };
-bool playsound;
+bool playsound,volbuf;
 //=============================================================================
 // 初期化
 //=============================================================================
@@ -65,6 +65,7 @@ HRESULT InitSound(HWND hWnd)
 	// XAudio2オブジェクトの作成
 	hr = XAudio2Create(&g_pXAudio2, 0);
 	playsound = false;
+	volbuf = false;
 	if (FAILED(hr))
 	{
 		MessageBox(hWnd, "XAudio2オブジェクトの作成に失敗！", "警告！", MB_ICONWARNING);
@@ -258,25 +259,33 @@ HRESULT Playsound(SOUND_LABEL label)
 		{// 再生中
 		 // 一時停止
 			g_apSourceVoice[label]->Stop(0);
-
-			// オーディオバッファの削除
-			g_apSourceVoice[label]->FlushSourceBuffers();
-
-			playsound = false;
 		}
-	}
-	if (playsound == false)
-	{
-		// 音量設定
-		g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
-
-		// オーディオバッファの登録
-		g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
-
+		if (volbuf == false)
+		{
+			// 音量設定
+			g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
+		
+			volbuf = true;
+		}
 		// 再生
 		g_apSourceVoice[label]->Start(0);
+		return S_OK;
+	}
+	else
+	{
+		if (playsound == false)
+		{
+			// 音量設定
+			g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
 
-		playsound = true;
+			// オーディオバッファの登録
+			g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
+
+			// 再生
+			g_apSourceVoice[label]->Start(0);
+
+			playsound = true;
+		}
 	}
 	return S_OK;
 }
