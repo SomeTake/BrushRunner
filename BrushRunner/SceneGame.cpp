@@ -292,8 +292,6 @@ void SceneGame::CheckResult()
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
-				SetScene(nSceneResult);
-				StopSound(BGM_TRAINING);
 				SetScene(new SceneResult(), nSceneResult);
 				InitCamera();
 				return;

@@ -569,10 +569,7 @@ void Player::ObjectItemCollider(Map *pMap)
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
-			if (hitItem == false)
-			{
-				Playsound(SE_PICITEM);
-			}
+			Playsound(SE_PICITEM);
 			hitItem = true;
 			// PlaySound(ƒAƒCƒeƒ€Žæ“¾‰¹)
 			return;

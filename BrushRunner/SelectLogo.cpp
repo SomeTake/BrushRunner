@@ -5,7 +5,6 @@
 //
 //=============================================================================
 #include "Main.h"
-#include "carsl_logo.h"
 #include "carslobj.h"
 #include "SelectLogo.h"
 

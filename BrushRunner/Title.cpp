@@ -51,7 +51,6 @@ void  TITLE::Update()
 
 	if (use == true)
 	{
-			Playsound(BGM_TITLE);
 
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);

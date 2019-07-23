@@ -10,10 +10,6 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Sound.h"
-//*****************************************************************************
-// グローバル変数
-//*****************************************************************************
-static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
 #include "SceneTitle.h"
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
@@ -22,8 +18,8 @@ static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int eScene = nSceneGame;	// ゲームの開始位置&シーン遷移
-static Scene *scene;						// ゲームシーンのポインタ
+//static int eScene = nSceneGame;	// ゲームの開始位置&シーン遷移
+//static Scene *scene;						// ゲームシーンのポインタ
 static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
 static Scene *scene;				// ゲームシーンのポインタ
 
@@ -44,15 +40,21 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	switch (eScene)
 	{
 	case nSceneTitle:
+		Playsound(BGM_TITLE);
 		scene = new SceneTitle();
 		break;
 	case nSceneCharacterSelect:
+		StopSound(BGM_TITLE);
+		Playsound(BGM_CHARSEL);
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
+		StopSound(BGM_CHARSEL);
+		Playsound(BGM_TRAINING);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
+		StopSound(BGM_TRAINING);
 		scene = new SceneResult();
 		break;
 	default:
@@ -139,6 +141,25 @@ void SceneManager::Draw()
 void SetScene(Scene *NewScene, int _scene)
 {
 	eScene = _scene;
+	switch (eScene)
+	{
+	case nSceneTitle:
+		Playsound(BGM_TITLE);
+		break;
+	case nSceneCharacterSelect:
+		StopSound(BGM_TITLE);
+		Playsound(BGM_CHARSEL);
+		break;
+	case nSceneGame:
+		StopSound(BGM_CHARSEL);
+		Playsound(BGM_TRAINING);
+		break;
+	case nSceneResult:
+		StopSound(BGM_TRAINING);
+		break;
+	default:
+		break;
+	}
 	delete scene;
 	scene = NewScene;
 }

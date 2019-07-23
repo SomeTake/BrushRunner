@@ -65,8 +65,6 @@ void SceneTitle::Update(int SceneID)
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
 			SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
-			StopSound(BGM_TITLE);
-			Playsound(BGM_CHARSEL);
 			return;
 		}
 	}

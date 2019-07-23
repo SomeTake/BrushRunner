@@ -5,7 +5,7 @@
 //
 //=============================================================================
 #include "Sound.h"
-#include <xaudio2.h> 
+#include <XAudio2.h> 
 
 //*****************************************************************************
 // パラメータ構造体定義
@@ -52,7 +52,7 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 	//{ "data/SE/cutin0.wav", false, 1.00f },
 	//{ "data/SE/countdown0.wav", false, 1.00f },
 };
-bool playsound,volbuf;
+//bool playsound,volbuf;
 //=============================================================================
 // 初期化
 //=============================================================================
@@ -64,8 +64,8 @@ HRESULT InitSound(HWND hWnd)
 
 	// XAudio2オブジェクトの作成
 	hr = XAudio2Create(&g_pXAudio2, 0);
-	playsound = false;
-	volbuf = false;
+	//playsound = false;
+	//volbuf = false;
 	if (FAILED(hr))
 	{
 		MessageBox(hWnd, "XAudio2オブジェクトの作成に失敗！", "警告！", MB_ICONWARNING);
@@ -240,7 +240,7 @@ HRESULT Playsound(SOUND_LABEL label)
 	buffer.AudioBytes = g_aSizeAudio[label];
 	buffer.pAudioData = g_apDataAudio[label];
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	
+
 	// ループの可否設定
 	if (g_aParam[label].bLoop == true)
 	{
@@ -253,40 +253,37 @@ HRESULT Playsound(SOUND_LABEL label)
 
 	// 状態取得
 	g_apSourceVoice[label]->GetState(&xa2state);
-	if(label>= SE_CHOICE)
+	if (label >= SE_CHOICE)
 	{
 		if (xa2state.BuffersQueued != 0)
 		{// 再生中
 		 // 一時停止
 			g_apSourceVoice[label]->Stop(0);
+
+			// オーディオバッファの削除
+			g_apSourceVoice[label]->FlushSourceBuffers();
 		}
-		if (volbuf == false)
-		{
-			// 音量設定
-			g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
-		
-			volbuf = true;
-		}
+		// 音量設定
+		g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
+
+		// オーディオバッファの登録
+		g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
 		// 再生
 		g_apSourceVoice[label]->Start(0);
+
+
 		return S_OK;
 	}
-	else
-	{
-		if (playsound == false)
-		{
-			// 音量設定
-			g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
+	// 音量設定
+	g_apSourceVoice[label]->SetVolume(g_aParam[label].volume);
 
-			// オーディオバッファの登録
-			g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
+	// オーディオバッファの登録
+	g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
 
-			// 再生
-			g_apSourceVoice[label]->Start(0);
+	// 再生
+	g_apSourceVoice[label]->Start(0);
 
-			playsound = true;
-		}
-	}
+
 	return S_OK;
 }
 //=============================================================================
@@ -298,18 +295,13 @@ void StopSound(SOUND_LABEL label)
 
 	// 状態取得
 	g_apSourceVoice[label]->GetState(&xa2state);
-	if (playsound == true)
-	{
-		if (xa2state.BuffersQueued != 0)
-		{// 再生中
-		 // 一時停止
-			g_apSourceVoice[label]->Stop(0);
+	if (xa2state.BuffersQueued != 0)
+	{// 再生中
+	 // 一時停止
+		g_apSourceVoice[label]->Stop(0);
 
-			// オーディオバッファの削除
-			g_apSourceVoice[label]->FlushSourceBuffers();
-
-			playsound = false;
-		}
+		// オーディオバッファの削除
+		g_apSourceVoice[label]->FlushSourceBuffers();
 	}
 }
 

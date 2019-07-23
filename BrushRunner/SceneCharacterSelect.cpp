@@ -97,6 +97,9 @@ void SceneCharacterSelect::Update(int SceneID)
 	//{
 	//	SetScene(nSceneGame);
 	//}
+	//SetScene(new SceneGame(), nSceneGame);
+	//StopSound(BGM_TITLE);
+	//Playsound(BGM_CHARSEL);
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
