@@ -10,9 +10,6 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_DIGIT	("data/TEXTURE/Digit.png")
-#define DIGIT_DIVIDE_X	(10)
-#define DIGIT_DIVIDE_Y	(1)
 #define DIGIT_SIZE		D3DXVECTOR3(30.0f, 50.0f, 0.0f)
 #define DIGIT_POS		D3DXVECTOR3(SCREEN_CENTER_X + ((DIGIT_SIZE.x / 2) * DIGIT_MAX), 135.0f, 0.0f)	// 表示場所（1番右、1桁目を基準とする）
 #define DIGIT_SPACE		(40.0f)	// 表示間隔（横）

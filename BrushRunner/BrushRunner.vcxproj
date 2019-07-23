@@ -26,7 +26,9 @@
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CursorObj.h" />
+    <ClInclude Include="ResultDigit.h" />
     <ClInclude Include="ResultRank.h" />
+    <ClInclude Include="ResultTimer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SelectLogo.h" />
     <ClInclude Include="CharacterAI.h" />
@@ -103,7 +105,9 @@
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CursorObj.cpp" />
+    <ClCompile Include="ResultDigit.cpp" />
     <ClCompile Include="ResultRank.cpp" />
+    <ClCompile Include="ResultTimer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SelectLogo.cpp" />
     <ClCompile Include="CharacterAI.cpp" />

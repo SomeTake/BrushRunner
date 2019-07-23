@@ -15,7 +15,6 @@
 #define RESULTRANK_TEXTURE	("data/TEXTURE/ResultPlayer.png")
 #define RESULTRANK_DIVIDE_X	(1)
 #define RESULTRANK_DIVIDE_Y	(4)
-
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************************************

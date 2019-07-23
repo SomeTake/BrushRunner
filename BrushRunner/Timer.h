@@ -7,14 +7,16 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
+#include "_2dobj.h"
 #include "Digit.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Timer
+class Timer :
+	public _2dobj
 {
-private:
+protected:
 	Digit *time[DIGIT_MAX];		// それぞれの桁を表示するオブジェクトのポインタ
 
 	DWORD startTime;			// ゲームの開始時間
@@ -29,7 +31,7 @@ public:
 	Timer();
 	~Timer();
 
-	void Update();
+	virtual void Update();
 	void Draw();
 
 	void Start();			// タイマースタート

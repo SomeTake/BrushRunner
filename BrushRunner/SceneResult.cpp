@@ -14,6 +14,7 @@
 #include "SceneManager.h"
 #include "SceneTitle.h"
 #include "ResultRank.h"
+#include "ResultTimer.h"
 
 //=============================================================================
 // グローバル変数
@@ -30,7 +31,10 @@ SceneResult::SceneResult()
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++, data++)
 	{
 		p2dObj.push_back(new ResultRank(data->rank));
+		p2dObj.push_back(new ResultTimer(data->time, data->rank));
 	}
+
+	
 }
 
 //=============================================================================
@@ -45,6 +49,9 @@ SceneResult::~SceneResult()
 	}
 	p2dObj.clear();
 	ReleaseVector(p2dObj);
+
+	// タイマーの削除
+
 
 }
 
