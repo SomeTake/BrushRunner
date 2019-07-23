@@ -29,6 +29,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	InitInput(hInstance, hWnd);
 	InitCamera();
 	InitLight();
+	InitSound(hWnd);
 
 	//title = new SceneTitle();
 	//scene = new SceneCharacterSelect();
@@ -65,6 +66,7 @@ SceneManager::~SceneManager()
 	//delete result;
 
 	delete scene;
+	UninitSound();
 
 	UninitInput();
 }
