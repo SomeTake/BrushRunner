@@ -12,18 +12,20 @@
 #include "Collision.h"
 #include "Input.h"
 #include "DebugWindow.h"
+#include "SceneResult.h"
 
 //2d obj
 #include "Frame01.h"
 #include "Face.h"
-#include "Face2.h"
-#include "Face3.h"
-#include "Face4.h"
 #include "CountDown.h"
 #include "Item.h"
 
 #include "Sound.h"
 static int ResultRank[PLAYER_MAX];
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
+ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
 
 //=============================================================================
 // コンストラクタ
@@ -33,7 +35,8 @@ SceneGame::SceneGame()
 	startframe = 0;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		ResultRank[i] = -1;
+		data[i].rank = -1;
+		data[i].time = 0;
 	}
 	result = false;
 
@@ -68,6 +71,9 @@ SceneGame::SceneGame()
 
 	// 空
 	pSky = new Sky();
+
+	// タイマー
+	pTimer = new Timer();
 }
 
 //=============================================================================
@@ -103,13 +109,17 @@ SceneGame::~SceneGame()
 
 	// 空の削除
 	delete pSky;
+
+	// タイマーの削除
+	delete pTimer;
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneGame::Update()
+void SceneGame::Update(int SceneID)
 {
+	// 開始処理
 	if (startframe < START_FRAME)
 	{
 		Start();
@@ -151,9 +161,13 @@ void SceneGame::Update()
 	// 空の更新
 	pSky->Update();
 
+	// タイマーの更新
+	pTimer->Update();
+
 	// リザルト画面へ遷移していいか確認
 	CheckResult();
 
+	// デバッグ
 	Debug();
 }
 
@@ -183,6 +197,8 @@ void SceneGame::Draw()
 		Object->Draw();
 	}
 
+	// タイマーの描画
+	pTimer->Draw();
 }
 
 //=============================================================================
@@ -256,6 +272,8 @@ void SceneGame::Start()
 		{
 			pPlayer[i]->SetPlayable(true);
 		}
+
+		pTimer->Start();
 	}
 }
 
@@ -267,22 +285,26 @@ void SceneGame::CheckResult()
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{
+		// タイマーストップ
+		pTimer->Stop();
+
 		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
 				SetScene(nSceneResult);
 				StopSound(BGM_TRAINING);
+				SetScene(new SceneResult(), nSceneResult);
+				InitCamera();
+				return;
 			}
 		}
-
-		return;
 	}
 
 	// 全員がゴールorゲームオーバーになったか確認
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (ResultRank[i] != -1)
+		if (data[i].rank != -1)
 		{
 			result = true;
 		}
@@ -299,7 +321,7 @@ void SceneGame::CheckResult()
 		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (ResultRank[rNo] != pNo)
+			if (data[rNo].rank != pNo)
 			{
 				hit = false;
 			}
@@ -329,9 +351,10 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の後ろから入れていく
 		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
 		{
-			if (ResultRank[rNo] == -1)
+			if (data[rNo].rank == -1)
 			{
-				ResultRank[rNo] = pNo;
+				data[rNo].rank = pNo;
+				data[rNo].time = 359999;
 				break;
 			}
 		}
@@ -343,9 +366,10 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (ResultRank[rNo] == -1)
+			if (data[rNo].rank == -1)
 			{
-				ResultRank[rNo] = pNo;
+				data[rNo].rank = pNo;
+				data[rNo].time = pTimer->Check();
 				break;
 			}
 		}
@@ -361,7 +385,8 @@ void SceneGame::Debug()
 	BeginDebugWindow("Result");
 
 	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
-	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].rank, data[1].rank, data[2].rank, data[3].rank);
+	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
 
 	EndDebugWindow("Result");
 
@@ -369,9 +394,9 @@ void SceneGame::Debug()
 }
 
 //=============================================================================
-// 順位結果のゲッター
+// 結果のゲッター
 //=============================================================================
-int *GetResultRank(int no)
+ResultData *SceneGame::GetResultData(int playerNo)
 {
-	return &ResultRank[no];
+	return &data[playerNo];
 }

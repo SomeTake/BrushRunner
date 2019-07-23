@@ -1,60 +1,40 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Face2.cpp]
+// キャラクターセレクトロゴ [SelectLogo.cpp]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Face2.h"
-#include "Faceframe.h"
-#include "carsl_obj.h"
-#include "carsl_obj2.h"
-#include "carsl_obj3.h"
-#include "carsl_obj4.h"
+#include "carsl_logo.h"
 #include "carslobj.h"
-int fc2;
+#include "SelectLogo.h"
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Face2::Face2(D3DXVECTOR3 _pos, const char *texno)
+SelectLogo::SelectLogo()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		texno,				// ファイルの名前
+		TEXTURE_SELECTLOGO,				// ファイルの名前
 		&D3DTexture);				// 読み込むメモリのポインタ
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
+
 	use = true;
-	pos = _pos;
+	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	PatternAnim = 1;
-	if (texno == TEXTURE_FACE1)
-	{
-		fc = 0;
-	}
-	else if (texno == TEXTURE_FACE2)
-	{
-		fc = 1;
-	}
-	else if (texno == TEXTURE_FACE3)
-	{
-		fc = 2;
-	}
-	else if (texno == TEXTURE_FACE4)
-	{
-		fc = 3;
-	}
 	// 頂点情報の作成
 	MakeVertex();
-	///////////////////////////////////////////////////////////////////////////////////////
+
 
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Face2::~Face2()
+SelectLogo::~SelectLogo()
 {
 	if (D3DTexture != NULL)
 	{	// テクスチャの開放
@@ -66,12 +46,10 @@ Face2::~Face2()
 //=============================================================================
 // 更新処理
 //=============================================================================
-void Face2::Update()
+void SelectLogo::Update()
 {
 	if (use == true)
 	{
-
-		fc2 = Getchar2num();
 
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
@@ -83,7 +61,7 @@ void Face2::Update()
 //=============================================================================
 // 描画処理
 //=============================================================================
-void Face2::Draw()
+void SelectLogo::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -92,42 +70,12 @@ void Face2::Draw()
 
 	if (use == true)
 	{
-		switch (fc2)
-			{
-			case AO:
-				// テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-					TEXTURE_FACE1,				// ファイルの名前
-					&D3DTexture);				// 読み込むメモリのポインタ
-				break;
-			case AKA:
-				// テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-					TEXTURE_FACE2,				// ファイルの名前
-					&D3DTexture);				// 読み込むメモリのポインタ
-				break;
-			case MIDORI:
-				// テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-					TEXTURE_FACE3,				// ファイルの名前
-					&D3DTexture);				// 読み込むメモリのポインタ
-				break;
-			case KI:
-				// テクスチャの読み込み
-				D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-					TEXTURE_FACE4,				// ファイルの名前
-					&D3DTexture);				// 読み込むメモリのポインタ
-				break;
-			}
-
-
-
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -135,7 +83,7 @@ void Face2::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT Face2::MakeVertex(void)
+HRESULT SelectLogo::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -166,7 +114,7 @@ HRESULT Face2::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Face2::SetTexture(int cntPattern)
+void SelectLogo::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -183,11 +131,11 @@ void Face2::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Face2::SetVertex(void)
+void SelectLogo::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + FACE2_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + FACE2_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + FACE2_SIZE.x, pos.y + FACE2_SIZE.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + SELECTLOGO_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + SELECTLOGO_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + SELECTLOGO_SIZE.x, pos.y + SELECTLOGO_SIZE.y, pos.z);
 }

@@ -405,7 +405,7 @@ void PaintManager::CursorMove(D3DXVECTOR3 DestPos)
 //=============================================================================
 void PaintManager::AutoHeal()
 {
-	HealCnt = LoopCountUp(++HealCnt, 0, HEAL_FRAME);
+	HealCnt = LoopCountUp(HealCnt, 0, HEAL_FRAME);
 	if (HealCnt == 0)
 	{
 		InkValue[ColorInk] = min(++InkValue[ColorInk], INK_MAX);

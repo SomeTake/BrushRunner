@@ -9,12 +9,9 @@
 #include "Input.h"
 //2d obje
 #include "_2dobj.h"
-#include "carsl_logo.h"
-#include "carsl_obj.h"
-#include "carsl_obj2.h"
-#include "carsl_obj3.h"
-#include "carsl_obj4.h"
+#include "SelectLogo.h"
 #include "SceneManager.h"
+#include "SceneGame.h"
 
 #include "Sound.h"
 
@@ -48,32 +45,24 @@ enum
 	// 最大数
 	_2dMx,
 };
+static int SelectCharacter[PLAYER_MAX];
 
-
-static _2dobj *c2dobj[_2dMx];			// 2Dオブジェクト用のポインタ
-float a, b, c;
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneCharacterSelect::SceneCharacterSelect()
 {
-	c2dobj[logo] = new Carsl_logo();
-	c2dobj[obj1p01] = new Carsl_obj(CARSL_OBJ_POS01, TEXTURE_CARSL_OBJ);
-	c2dobj[obj1p02] = new Carsl_obj(CARSL_OBJ_POS02,TEXTURE_CARSL_OBJ2);
-	c2dobj[obj1p03] = new Carsl_obj(CARSL_OBJ_POS03,TEXTURE_CARSL_OBJ3);
-	c2dobj[obj1p04] = new Carsl_obj(CARSL_OBJ_POS04, TEXTURE_CARSL_OBJ4);
-	c2dobj[obj2p01] = new Carsl_obj2(CARSL_OBJ2_POS01, TEXTURE_CARSL_OBJ);
-	c2dobj[obj2p02] = new Carsl_obj2(CARSL_OBJ2_POS02, TEXTURE_CARSL_OBJ2);
-	c2dobj[obj2p03] = new Carsl_obj2(CARSL_OBJ2_POS03, TEXTURE_CARSL_OBJ3);
-	c2dobj[obj2p04] = new Carsl_obj2(CARSL_OBJ2_POS04, TEXTURE_CARSL_OBJ4);
-	c2dobj[obj3p01] = new Carsl_obj3(CARSL_OBJ3_POS01, TEXTURE_CARSL_OBJ);
-	c2dobj[obj3p02] = new Carsl_obj3(CARSL_OBJ3_POS02, TEXTURE_CARSL_OBJ2);
-	c2dobj[obj3p03] = new Carsl_obj3(CARSL_OBJ3_POS03, TEXTURE_CARSL_OBJ3);
-	c2dobj[obj3p04] = new Carsl_obj3(CARSL_OBJ3_POS04, TEXTURE_CARSL_OBJ4);
-	c2dobj[obj4p01] = new Carsl_obj4(CARSL_OBJ4_POS01, TEXTURE_CARSL_OBJ);
-	c2dobj[obj4p02] = new Carsl_obj4(CARSL_OBJ4_POS02, TEXTURE_CARSL_OBJ2);
-	c2dobj[obj4p03] = new Carsl_obj4(CARSL_OBJ4_POS03, TEXTURE_CARSL_OBJ3);
-	c2dobj[obj4p04] = new Carsl_obj4(CARSL_OBJ4_POS04, TEXTURE_CARSL_OBJ4);
+	// セレクト画面のロゴ
+	p2dobj.push_back(new SelectLogo());
+
+	// セレクト用のカーソル
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
+		{
+			pCursor[playerNo][cursorNo] = new CursorObj(playerNo, cursorNo);
+		}
+	}
 }
 
 //=============================================================================
@@ -82,26 +71,60 @@ SceneCharacterSelect::SceneCharacterSelect()
 SceneCharacterSelect::~SceneCharacterSelect()
 {
 	// 2Dオブジェクトの削除
-	for (int i = 0; i < _2dMx; i++)
+	for (auto &Object : p2dobj)
 	{
-		delete c2dobj[i];
+		SAFE_DELETE(Object);
+	}
+	p2dobj.clear();
+	ReleaseVector(p2dobj);
+
+	// カーソルの削除
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
+		{
+			delete pCursor[playerNo][cursorNo];
+		}
 	}
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneCharacterSelect::Update()
+void SceneCharacterSelect::Update(int SceneID)
 {
 //	if (GetKeyboardTrigger(DIK_SPACE))
 	//{
 	//	SetScene(nSceneGame);
 	//}
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
+		{
+			SetScene(new SceneGame(), nSceneGame);
+			return;
+		}
+	}
 
 	// 2Dオブジェクトの更新
-	for (int i = 0; i < _2dMx; i++)
+	for (auto & Obj : p2dobj)
 	{
-		c2dobj[i]->Update();
+		Obj->Update();
+	}
+
+	// カーソルの更新
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
+		{
+			pCursor[playerNo][cursorNo]->Update();
+		}
+	}
+
+	// 一番左のカーソルをキャラクターセレクトの番号として使用する
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		SelectCharacter[playerNo] = pCursor[playerNo][0]->GetSelectNo();
 	}
 }
 
@@ -111,9 +134,25 @@ void SceneCharacterSelect::Update()
 void SceneCharacterSelect::Draw()
 {
 	// 2Dオブジェクトの描画
-	for (int i = 0; i < _2dMx; i++)
+	for (auto & Obj : p2dobj)
 	{
-		c2dobj[i]->Draw();
+		Obj->Draw();
+	}
+
+	// カーソルの描画
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
+		{
+			pCursor[playerNo][cursorNo]->Draw();
+		}
 	}
 }
 
+//=============================================================================
+// キャラクターセレクト番号のゲッター
+//=============================================================================
+int *GetSelectCharacter(int no)
+{
+	return &SelectCharacter[no];
+}

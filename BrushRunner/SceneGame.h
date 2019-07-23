@@ -7,6 +7,8 @@
 #ifndef _SCENEGAME_H_
 #define _SCENEGAME_H_
 
+#include "Scene.h"
+
 // ポインタとして取得する必要のあるクラス
 #include "Map.h"
 #include "_2dobj.h"
@@ -15,6 +17,7 @@
 #include "PaintManager.h"
 #include "EffectManager.h"
 #include "Sky.h"
+#include "Timer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -24,17 +27,21 @@
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneGame
+class SceneGame :
+	public Scene
 {
 private:
 	std::vector<_2dobj*> UIObject;			// UI
-	Map		*pMap;							// マップ
-	Player	*pPlayer[PLAYER_MAX];			// プレイヤー
-	QUADTREE *Quadtree = nullptr;			// 四分木
-	EffectManager *pEffectManager;			// 2Dエフェクト管理
-	Sky		*pSky;							// 空
-	int		startframe;						// 開始カウントダウン
-	bool	result;							// 終了フラグ
+	Map				*pMap;					// マップ
+	Player			*pPlayer[PLAYER_MAX];	// プレイヤー
+	QUADTREE		*Quadtree = nullptr;	// 四分木
+	EffectManager	*pEffectManager;		// 2Dエフェクト管理
+	Sky				*pSky;					// 空
+	Timer			*pTimer;				// タイマー
+
+	int				startframe;				// 開始カウントダウン
+	bool			result;					// 終了フラグ
+	static ResultData data[PLAYER_MAX];		// 結果
 
 	void Start();
 	void Collision();
@@ -46,11 +53,10 @@ private:
 public:
 	SceneGame();
 	~SceneGame();
-	void Update();
+	void Update(int SceneID);
 	void Draw();
 
+	static ResultData *GetResultData(int playerNo);
+
 };
-
-int *GetResultRank(int no);					// 順位結果を取得
-
 #endif

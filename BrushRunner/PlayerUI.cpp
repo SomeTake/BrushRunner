@@ -6,11 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "PlayerUI.h"
-
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-
+#include "SceneCharacterSelect.h"
 
 //=============================================================================
 // コンストラクタ
@@ -19,6 +15,7 @@ PlayerUI::PlayerUI(int PlayerNo)
 {
 	this->PopUp = new Pop(PlayerNo);
 	this->miniPlayer = new MiniPlayer(PlayerNo);
+	this->face = new Face(PlayerNo, *GetSelectCharacter(PlayerNo));
 	this->faceFrame = new FaceFrame(PlayerNo);
 }
 
@@ -30,6 +27,7 @@ PlayerUI::~PlayerUI()
 	SAFE_DELETE(this->PopUp);
 	SAFE_DELETE(this->miniPlayer);
 	SAFE_DELETE(this->faceFrame);
+	SAFE_DELETE(this->face);
 }
 
 //=============================================================================
@@ -39,6 +37,7 @@ void PlayerUI::Update(D3DXVECTOR3 PlayerPos)
 {
 	PopUp->Update(PlayerPos);
 	miniPlayer->Update(PlayerPos);
+	face->Update();
 	faceFrame->Update();
 }
 
@@ -55,5 +54,7 @@ void PlayerUI::Draw(bool OnCamera, bool blind)
 		}
 		miniPlayer->Draw();
 	}
+
+	face->Draw();
 	faceFrame->Draw();
 }

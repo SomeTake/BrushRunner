@@ -1,84 +1,75 @@
 //=============================================================================
 //
-// カウントダウン処理 [CountDown.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// 桁 [Digit.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "CountDown.h"
+#include "Digit.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_COUNTDOWN	("data/TEXTURE/countdown.png")
-#define COUNTDOWN_SIZE		D3DXVECTOR2(360.0f, 360.0f)
-#define COUNTDOWN_DIVIDE_Y	(4)
-#define COUNTDOWN_POS		D3DXVECTOR3(SCREEN_WIDTH / 2 - COUNTDOWN_SIZE.x / 2, SCREEN_HEIGHT / 2 - COUNTDOWN_SIZE.y / 2, 0.0f)
-#define START_TIMER			(240)
-#define SECOND_PER_FRAME	(60)
+#define TEXTURE_DIGIT	("data/TEXTURE/Digit.png")
+#define DIGIT_DIVIDE_X	(10)
+#define DIGIT_DIVIDE_Y	(1)
+#define DIGIT_SIZE		D3DXVECTOR3(30.0f, 50.0f, 0.0f)
+#define DIGIT_POS		D3DXVECTOR3(SCREEN_CENTER_X + ((DIGIT_SIZE.x / 2) * DIGIT_MAX), 135.0f, 0.0f)	// 表示場所（1番右、1桁目を基準とする）
+#define DIGIT_SPACE		(40.0f)	// 表示間隔（横）
+
+//*****************************************************************************
+// クラスのメンバ初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9	Digit::D3DTexture = NULL; // テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-CountDown::CountDown()
+Digit::Digit(int digit)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-		TEXTURE_COUNTDOWN,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリのポインタ
-
 	use = true;
-	pos = COUNTDOWN_POS;
-	starttimer = 0;
-	startsecond = 0;
+	time = 0;
+	pos = DIGIT_POS;
+	pos.x -= digit * DIGIT_SPACE;
+	size = DIGIT_SIZE;
 
-	// 頂点情報の作成
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
+			TEXTURE_DIGIT,					// ファイルの名前
+			&D3DTexture);					// 読み込むメモリのポインタ
+	}
+
 	MakeVertex();
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-CountDown::~CountDown()
+Digit::~Digit()
 {
-	// テクスチャの開放
-	SAFE_RELEASE(D3DTexture);
+	SAFE_RELEASE(Digit::D3DTexture);
 }
 
 //=============================================================================
-// 更新処理
+// 更新
 //=============================================================================
-void CountDown::Update()
+void Digit::Update(DWORD time)
 {
-	if (use)
-	{
-		if (starttimer < START_TIMER)
-		{
-			starttimer++;
-			startsecond = starttimer / SECOND_PER_FRAME;
-
-			SetTexture();
-
-			// PlaySound(カウントダウン)
-		}
-		// カウントダウン終了
-		else
-		{
-			use = false;
-		}
-	}
+	this->time = time;
+	SetTexture();
 }
 
 //=============================================================================
-// 描画処理
+// 描画
 //=============================================================================
-void CountDown::Draw()
+void Digit::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-	// Zテストを有効に
+	// Zテスト
 	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 
 	// αテストを有効に
@@ -102,7 +93,7 @@ void CountDown::Draw()
 	// αテストを無効に
 	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	// Z比較を無効に
+	// Z比較あり
 	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
 }
@@ -110,15 +101,15 @@ void CountDown::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT CountDown::MakeVertex()
+HRESULT Digit::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, 1.0f);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + COUNTDOWN_SIZE.x, pos.y, 1.0f);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + COUNTDOWN_SIZE.y, 1.0f);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + COUNTDOWN_SIZE.x, pos.y + COUNTDOWN_SIZE.y, 1.0f);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2.0f, pos.y - size.y / 2.0f, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2.0f, pos.y - size.y / 2.0f, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2.0f, pos.y + size.y / 2.0f, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2.0f, pos.y + size.y / 2.0f, pos.z);
 
 	// rhwの設定
 	vertexWk[0].rhw = 1.0f;
@@ -139,15 +130,18 @@ HRESULT CountDown::MakeVertex()
 }
 
 //=============================================================================
-// テクスチャ座標のセット
+// テクスチャのセット
 //=============================================================================
-void CountDown::SetTexture()
+void Digit::SetTexture()
 {
-	float sizeY = 1.0f / COUNTDOWN_DIVIDE_Y;
+	int x = time % DIGIT_DIVIDE_X;
+	int y = time / DIGIT_DIVIDE_X;
+	float sizeX = 1.0f / DIGIT_DIVIDE_X;
+	float sizeY = 1.0f / DIGIT_DIVIDE_Y;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, (float)(startsecond)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2(1.0f, (float)(startsecond)* sizeY);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, (float)(startsecond)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2(1.0f, (float)(startsecond)* sizeY + sizeY);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
 }

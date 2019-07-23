@@ -14,6 +14,16 @@
 // グローバル変数
 //*****************************************************************************
 static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
+#include "SceneTitle.h"
+#include "SceneCharacterSelect.h"
+#include "SceneGame.h"
+#include "SceneResult.h"
+
+//*****************************************************************************
+// グローバル変数
+//*****************************************************************************
+static int eScene = nSceneGame;	// ゲームの開始位置&シーン遷移
+static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
 // コンストラクタ
@@ -24,10 +34,28 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	InitCamera();
 	InitLight();
 
-	title = new SceneTitle();
-	charaselect = new SceneCharacterSelect();
-	game = new SceneGame();
-	result = new SceneResult();
+	//title = new SceneTitle();
+	//scene = new SceneCharacterSelect();
+	//game = new SceneGame();
+	//result = new SceneResult();
+	switch (eScene)
+	{
+	case nSceneTitle:
+		scene = new SceneTitle();
+		break;
+	case nSceneCharacterSelect:
+		scene = new SceneCharacterSelect();
+		break;
+	case nSceneGame:
+		scene = new SceneGame();
+		break;
+	case nSceneResult:
+		scene = new SceneResult();
+		break;
+	default:
+		break;
+	}
+
 }
 
 //=============================================================================
@@ -35,10 +63,12 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 //=============================================================================
 SceneManager::~SceneManager()
 {
-	delete title;
-	delete charaselect;
-	delete game;
-	delete result;
+	//delete title;
+	//delete charaselect;
+	//delete game;
+	//delete result;
+
+	delete scene;
 
 	UninitInput();
 }
@@ -50,24 +80,25 @@ void SceneManager::Update()
 {
 	UpdateInput();
 
-	switch (eScene)
-	{
-	case nSceneTitle:
-		title->Update();
-		break;
-	case nSceneCharacterSelect:
-		charaselect->Update();
-		break;
-	case nSceneGame:
-		game->Update();
-		break;
-	case nSceneResult:
-		result->Update();
-		break;
-	default:
-		break;
-	}
+	//switch (eScene)
+	//{
+	//case nSceneTitle:
+	//	title->Update();
+	//	break;
+	//case nSceneCharacterSelect:
+	//	charaselect->Update();
+	//	break;
+	//case nSceneGame:
+	//	game->Update();
+	//	break;
+	//case nSceneResult:
+	//	result->Update();
+	//	break;
+	//default:
+	//	break;
+	//}
 
+	scene->Update(eScene);
 }
 
 //=============================================================================
@@ -77,31 +108,35 @@ void SceneManager::Draw()
 {
 	SetCamera();
 
-	switch (eScene)
-	{
-	case nSceneTitle:
-		title->Draw();
-		break;
-	case nSceneCharacterSelect:
-		charaselect->Draw();
-		break;
-	case nSceneGame:
-		game->Draw();
-		break;
-	case nSceneResult:
-		result->Draw();
-		break;
-	default:
-		break;
-	}
+	//switch (eScene)
+	//{
+	//case nSceneTitle:
+	//	title->Draw();
+	//	break;
+	//case nSceneCharacterSelect:
+	//	charaselect->Draw();
+	//	break;
+	//case nSceneGame:
+	//	game->Draw();
+	//	break;
+	//case nSceneResult:
+	//	result->Draw();
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	scene->Draw();
 }
 
 //=====================================================================================================
 // シーン遷移
 //=====================================================================================================
-void SetScene(int _scene)
+void SetScene(Scene *NewScene, int _scene)
 {
 	eScene = _scene;
+	delete scene;
+	scene = NewScene;
 }
 
 //=====================================================================================================
