@@ -20,6 +20,8 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Timer.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -29,7 +31,7 @@
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(10)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
@@ -431,6 +433,8 @@ void Player::CheckOnCamera()
 		std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
 		Effect3D *effect = new Effect3D(DeadEffect3D, setpos, 1);
 		Effect3DVector->push_back(effect);
+
+		// PlaySound(爆発音)
 	}
 }
 
@@ -565,6 +569,7 @@ void Player::ObjectItemCollider(Map *pMap)
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
 			hitItem = true;
+			// PlaySound(アイテム取得音)
 			return;
 		}
 	}
@@ -605,6 +610,8 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 			std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
 			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
 			Effect3DVector->push_back(effect);
+
+			// PlaySound(アイテムヒット音)
 		}
 	}
 }
@@ -675,6 +682,8 @@ void Player::HitObjectInfluence(int type)
 				PaintSystem->SetInkValue(max(--ink, 0), BlackInk);
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(max(--ink, 0), ColorInk);
+
+				// PlaySound(インクが減る音)
 			}
 		}
 
@@ -694,6 +703,8 @@ void Player::HitObjectInfluence(int type)
 				PaintSystem->SetInkValue(min(++ink, INK_MAX), BlackInk);
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(min(++ink, INK_MAX), ColorInk);
+
+				// PlaySound(インクが回復する音)
 			}
 		}
 

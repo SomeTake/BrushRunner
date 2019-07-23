@@ -123,6 +123,14 @@ void ReadCsv(const char *data, vector<vector<int>> *MapVector)
 int LoopCountUp(int counter, int low, int high)
 {
 	counter++;
-	const int n = (counter - low) % (high - low);
-	return (n >= 0) ? (n + low) : (n + high);
+	return (counter > high) ? low : counter;
+}
+
+//=============================================================================
+// カウントダウン関数
+//=============================================================================
+int LoopCountDown(int counter, int low, int high)
+{
+	counter--;
+	return (counter < low) ? high : counter;
 }

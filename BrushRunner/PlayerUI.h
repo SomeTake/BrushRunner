@@ -10,6 +10,7 @@
 #include "Pop.h"
 #include "MiniPlayer.h"
 #include "Faceframe.h"
+#include "Face.h"
 
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
@@ -20,6 +21,7 @@ private:
 	Pop			*PopUp;
 	MiniPlayer	*miniPlayer;
 	FaceFrame	*faceFrame;
+	Face		*face;
 
 public:
 	PlayerUI(int PlayerNo);

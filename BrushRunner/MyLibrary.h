@@ -26,6 +26,7 @@ T clamp(T x, T low, T high)	// 上限、下限のチェック
 
 void ReadCsv(const char *data, vector<vector<int>> *MapVector);
 int LoopCountUp(int counter, int low, int high);	// カウントアップ関数
+int LoopCountDown(int counter, int low, int high);	// カウントダウン関数
 
 #endif
 

@@ -11,6 +11,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "Sound.h"
+#include "SceneCharacterSelect.h"
 
 //=============================================================================
 // グローバル変数
@@ -50,12 +51,20 @@ SceneTitle::~SceneTitle()
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneTitle::Update()
+void SceneTitle::Update(int SceneID)
 {
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
+		{
+			SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+			return;
+		}
+	}
+
 	for (int i = 0; i < UIMax; i++)
 	{
 		p2dObj[i]->Update();
-
 	}
 
 }

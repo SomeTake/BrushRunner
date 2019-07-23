@@ -6,33 +6,31 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneResult.h"
-#include "_2dobj.h"
 #include "Result.h"
 #include "Input.h"
 #include "SceneGame.h"
 #include "Player.h"
 #include "DebugWindow.h"
 #include "SceneManager.h"
+#include "SceneTitle.h"
+#include "ResultRank.h"
 
 //=============================================================================
 // グローバル変数
 //=============================================================================
-enum
-{
-	ResultBG,
-	UIMax,										// UI表示の最大数
-};
-
-static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneResult::SceneResult()
 {
-	ResultRank = GetResultRank(0);
+	data = SceneGame::GetResultData(0);
 
-	p2dObj[ResultBG] = new RESULT(RESULT_POS01, RESULT_SIZE01, TEXTURE_RESULT01);
+	p2dObj.push_back(new RESULT());
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++, data++)
+	{
+		p2dObj.push_back(new ResultRank(data->rank));
+	}
 }
 
 //=============================================================================
@@ -40,32 +38,37 @@ SceneResult::SceneResult()
 //=============================================================================
 SceneResult::~SceneResult()
 {
-	for (int i = 0; i < UIMax; i++)
+	// 2Dオブジェクトの削除
+	for (auto &Obj : p2dObj)
 	{
-		delete p2dObj[i];
+		SAFE_DELETE(Obj);
 	}
+	p2dObj.clear();
+	ReleaseVector(p2dObj);
 
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneResult::Update()
+void SceneResult::Update(int SceneID)
 {
-	for (int i = 0; i < UIMax; i++)
-	{
-		p2dObj[i]->Update();
-
-	}
-	Debug();
-
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
 		{
-			SetScene(nSceneTitle);
+			SetScene(new SceneTitle(), nSceneTitle);
+			return;
 		}
 	}
+
+	// 2Dオブジェクトの更新
+	for (auto &Obj : p2dObj)
+	{
+		Obj->Update();
+	}
+
+	Debug();
 }
 
 //=============================================================================
@@ -73,11 +76,11 @@ void SceneResult::Update()
 //=============================================================================
 void SceneResult::Draw()
 {
-	for (int i = 0; i < UIMax; i++)
+	// 2Dオブジェクトの描画
+	for (auto &Obj : p2dObj)
 	{
-		p2dObj[i]->Draw();
+		Obj->Draw();
 	}
-
 }
 
 //=============================================================================
@@ -88,7 +91,8 @@ void SceneResult::Debug()
 #ifndef _DEBUG_
 	BeginDebugWindow("Result");
 
-	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].rank, data[1].rank, data[2].rank, data[3].rank);
+	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
 
 	EndDebugWindow("Result");
 

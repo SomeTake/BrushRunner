@@ -103,7 +103,7 @@ void Item::Update()
 			active = true;
 			state[PatternAnim]->Start();
 
-
+			// PlaySound(アイテム使用)
 		}
 
 		//テクスチャ座標をセット

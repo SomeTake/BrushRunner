@@ -1,30 +1,32 @@
 //=============================================================================
 //
-// タイトル画面処理 [SceneTitle.h]
-// Author : HAL東京 GP12B332-11 81156 小松将吉
+// シーン基底クラス [Scene.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENETITLE_H_
-#define _SCENETITLE_H_
-
-#include "Scene.h"
+#ifndef _SCENE_H_
+#define _SCENE_H_
 
 //*****************************************************************************
-// マクロ定義
+// 構造体定義
 //*****************************************************************************
+// ゲーム結果
+typedef struct {
+	int rank;	// 順位
+	DWORD time;	// 時間
+}ResultData;
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneTitle :
-	public Scene
+class Scene
 {
 public:
-	SceneTitle();
-	~SceneTitle();
+	Scene();
+	virtual ~Scene();
 
-	void Update(int SceneID);
-	void Draw();
+	virtual void Update(int SceneID) = 0;
+	virtual void Draw() = 0;
 };
 
 #endif

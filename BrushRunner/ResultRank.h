@@ -1,30 +1,40 @@
 //=============================================================================
 //
-// タイトル画面処理 [SceneTitle.h]
-// Author : HAL東京 GP12B332-11 81156 小松将吉
+// プレイヤー順位 [ResultRank.h]
+// Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
-#ifndef _SCENETITLE_H_
-#define _SCENETITLE_H_
+#ifndef _RESULTRANK_H_
+#define _RESULTRANK_H_
 
-#include "Scene.h"
+#include "_2dobj.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define RESULTRANK_TEXTURE	("data/TEXTURE/ResultPlayer.png")
+#define RESULTRANK_DIVIDE_X	(1)
+#define RESULTRANK_DIVIDE_Y	(4)
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneTitle :
-	public Scene
+class ResultRank :
+	public _2dobj
 {
-public:
-	SceneTitle();
-	~SceneTitle();
+private:
+	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+	int rank;	// 順位
 
-	void Update(int SceneID);
+	HRESULT MakeVertex();
+
+public:
+	ResultRank(int rank);
+	~ResultRank();
+
+	void Update();
 	void Draw();
+
 };
 
 #endif

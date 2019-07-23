@@ -1,38 +1,43 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Face.cpp]
+// キャラクターの顔表示 [Face.cpp]
 // Author : HAL東京 GP11B341 17 染谷武志
 //
 //=============================================================================
 #include "Main.h"
 #include "Face.h"
-#include "Faceframe.h"
-#include "carsl_obj.h"
-#include "carsl_obj2.h"
-#include "carsl_obj3.h"
-#include "carsl_obj4.h"
-#include "carslobj.h"
-int fc1;
+#include "CursorObj.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
+#define FACE_POS		D3DXVECTOR3(31.0f, 30.5f, 0.0f)
+#define FACE_SPACE		(318.5f)							// 表示間隔
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Face::Face(D3DXVECTOR3 _pos, const char *texno)
+Face::Face(int playerNo, int charNo)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		texno,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
+			TEXTURE_CURSOROBJ,					// ファイルの名前
+			&D3DTexture);						// 読み込むメモリのポインタ
+	}
 
-									///////////////////////////////////////////////////////////////////////////////////////
-									// フレームの初期化
+	this->playerNo = playerNo;
+	this->charNo = charNo;
+
 	use = true;
-	pos = _pos;
-	PatternAnim = 1;
+	pos = FACE_POS;
+	pos.x += this->playerNo * FACE_SPACE;
+
 	// 頂点情報の作成
 	MakeVertex();
-	///////////////////////////////////////////////////////////////////////////////////////
-
 }
 
 //=============================================================================
@@ -54,12 +59,8 @@ void Face::Update()
 {
 	if (use == true)
 	{
-			fc1 = Getchar1num();
-		//テクスチャ座標をセット
-		SetTexture(PatternAnim);
 
 	}
-	SetVertex();
 }
 
 //=============================================================================
@@ -74,41 +75,12 @@ void Face::Draw()
 
 	if (use == true)
 	{
-		if (fc1 == AO)
-		{
-			// テクスチャの読み込み
-			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-				TEXTURE_FACE1,				// ファイルの名前
-				&D3DTexture);				// 読み込むメモリのポインタ
-		}
-		else if (fc1 == AKA)
-		{
-			// テクスチャの読み込み
-			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-				TEXTURE_FACE2,				// ファイルの名前
-				&D3DTexture);				// 読み込むメモリのポインタ
-		}
-		else if (fc1 == MIDORI)
-		{
-			// テクスチャの読み込み
-			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-				TEXTURE_FACE3,				// ファイルの名前
-				&D3DTexture);				// 読み込むメモリのポインタ
-		}
-		else if (fc1 == KI)
-		{
-			// テクスチャの読み込み
-			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-				TEXTURE_FACE4,				// ファイルの名前
-				&D3DTexture);				// 読み込むメモリのポインタ
-		}
-
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(VERTEX_2D));
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
 
 }
@@ -135,11 +107,7 @@ HRESULT Face::MakeVertex(void)
 	vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
-	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture();
 
 	return S_OK;
 }
@@ -147,24 +115,22 @@ HRESULT Face::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void Face::SetTexture(int cntPattern)
+void Face::SetTexture()
 {
-	int x = cntPattern;
-	int y = cntPattern;
-	float sizeX = 1.0f;
-	float sizeY = 1.0f;
+	int x = this->charNo;
+	float sizeX = 1.0f / (float)CURSOROBJ_DIVIDE_X;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
 }
 
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void Face::SetVertex(void)
+void Face::SetVertex()
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

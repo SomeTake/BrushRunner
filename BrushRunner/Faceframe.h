@@ -18,17 +18,11 @@
 #define TEXTURE_FACE3		_T("data/texture/charasl_obj3.png")			// フレーム用画像
 #define TEXTURE_FACE4		_T("data/texture/charasl_obj4.png")			// フレーム用画像
 
-#define FACEFRAME_SIZE		D3DXVECTOR3(200.0f, 88.0f, 0.0f)		// テクスチャサイズ
-
 #define FACEFRAME_POS01     D3DXVECTOR3(0.0f, 0.0f, 0.0f)
 #define FACEFRAME_POS02		D3DXVECTOR3(318.0f, 0.0f, 0.0f)
 #define FACEFRAME_POS03		D3DXVECTOR3(636.0f, 0.0f, 0.0f)
 #define FACEFRAME_POS04		D3DXVECTOR3(954.0f, 0.0f, 0.0f)
 
-//#define FACE1_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)
-//#define FACE2_POS			D3DXVECTOR3(318.0f, 0.0f, 0.0f)
-//#define FACE3_POS			D3DXVECTOR3(636.0f, 0.0f, 0.0f)
-//#define FACE4_POS			D3DXVECTOR3(954.0f, 0.0f, 0.0f)
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************

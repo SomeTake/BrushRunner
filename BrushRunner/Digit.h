@@ -1,36 +1,39 @@
 //=============================================================================
 //
-// バトル画面フレーム表示処理 [Carsl_logo.h]
-// Author : HAL東京 GP11B341 17 染谷武志
+// 桁 [Digit.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _CARSL_LOGO_H_
-#define _CARSL_LOGO_H_
+#ifndef _DIGIT_H_
+#define _DIGIT_H_
 
 #include "_2dobj.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_CARSL_LOGO	_T("data/texture/charasl_logo.png")			// フレーム用画像
-#define CARSL_LOGO_SIZE		D3DXVECTOR3(1280.0f, 114.0f, 0.0f)		// テクスチャサイズ
+#define DIGIT_MAX		(6)		// 表示桁数
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Carsl_logo :
-	public _2dobj {
-public:
-	Carsl_logo();
-	~Carsl_logo();
+class Digit :
+	public _2dobj
+{
+private:
+	static LPDIRECT3DTEXTURE9 D3DTexture;	// テクスチャのポインタ
+	DWORD time;								// その桁に表示する数字（0-9 or 0-5）
 
-	// オーバーライド関数
-	void Update();
-	void Draw();
 	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex();
-};
+	void SetTexture();
 
+public:
+	Digit(int digit);
+	~Digit();
+
+	void Update()override {};
+	void Update(DWORD time);
+	void Draw()override;
+};
 
 #endif
