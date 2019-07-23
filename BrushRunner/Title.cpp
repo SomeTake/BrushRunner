@@ -1,6 +1,6 @@
 #include "Main.h"
 #include "Title.h"
-#include "carslobj.h"
+#include "CursorObj.h"
 #include "Sound.h"
 #include "Input.h"
 #include "SceneManager.h"
@@ -55,13 +55,6 @@ void  TITLE::Update()
 
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
-
-		if (GetKeyboardTrigger(DIK_SPACE))
-		{
-			SetScene(nSceneCharacterSelect);
-			StopSound(BGM_TITLE);
-			Playsound(BGM_CHARSEL);
-		}
 
 	}
 	 SetVertex();
