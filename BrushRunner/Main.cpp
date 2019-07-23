@@ -7,7 +7,6 @@
 #include "Main.h"
 #include "SceneManager.h"
 #include "DebugWindow.h"
-#include "Sound.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -308,7 +307,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitDebugWindow(hWnd, g_pD3DDevice);
 #endif
 	pSceneManager = new SceneManager(hInstance, hWnd);
-	InitSound(hWnd);
 	return S_OK;
 }
 
@@ -322,7 +320,6 @@ void Uninit(void)
 #endif
 
 	delete pSceneManager;
-	UninitSound();
 	// デバイスの開放
 	SAFE_RELEASE(g_pD3DDevice);
 

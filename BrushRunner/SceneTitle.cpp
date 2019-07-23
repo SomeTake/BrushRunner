@@ -53,15 +53,20 @@ SceneTitle::~SceneTitle()
 //=============================================================================
 void SceneTitle::Update(int SceneID)
 {
-	for (int i = 0; i < UIMax; i++)
-	{
-		p2dObj[i]->Update();
-
+//<<<<<<< HEAD
+//	for (int i = 0; i < UIMax; i++)
+//	{
+//		p2dObj[i]->Update();
+//
+//=======
+//>>>>>>> 984c4f7405073e37ddd3ea866bedff44575f9d55
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
 			SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+			StopSound(BGM_TITLE);
+			Playsound(BGM_CHARSEL);
 			return;
 		}
 	}

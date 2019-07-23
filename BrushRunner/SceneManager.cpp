@@ -24,6 +24,8 @@ static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
 //*****************************************************************************
 static int eScene = nSceneGame;	// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
+static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
+static Scene *scene;				// ゲームシーンのポインタ
 
 //=============================================================================
 // コンストラクタ
@@ -33,6 +35,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	InitInput(hInstance, hWnd);
 	InitCamera();
 	InitLight();
+	InitSound(hWnd);
 
 	//title = new SceneTitle();
 	//scene = new SceneCharacterSelect();
@@ -69,6 +72,7 @@ SceneManager::~SceneManager()
 	//delete result;
 
 	delete scene;
+	UninitSound();
 
 	UninitInput();
 }
