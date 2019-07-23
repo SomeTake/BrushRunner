@@ -40,21 +40,21 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	switch (eScene)
 	{
 	case nSceneTitle:
-		Playsound(BGM_TITLE);
+		PlaySound(BGM_TITLE);
 		scene = new SceneTitle();
 		break;
 	case nSceneCharacterSelect:
-		StopSound(BGM_TITLE);
-		Playsound(BGM_CHARSEL);
+		//StopSound(BGM_TITLE);
+		PlaySound(BGM_CHARSEL);
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
-		StopSound(BGM_CHARSEL);
-		Playsound(BGM_TRAINING);
+		//StopSound(BGM_CHARSEL);
+		PlaySound(BGM_TRAINING);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
-		StopSound(BGM_TRAINING);
+		//StopSound(BGM_TRAINING);
 		scene = new SceneResult();
 		break;
 	default:
@@ -144,15 +144,15 @@ void SetScene(Scene *NewScene, int _scene)
 	switch (eScene)
 	{
 	case nSceneTitle:
-		Playsound(BGM_TITLE);
+		PlaySound(BGM_TITLE);
 		break;
 	case nSceneCharacterSelect:
 		StopSound(BGM_TITLE);
-		Playsound(BGM_CHARSEL);
+		PlaySound(BGM_CHARSEL);
 		break;
 	case nSceneGame:
 		StopSound(BGM_CHARSEL);
-		Playsound(BGM_TRAINING);
+		PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
 		StopSound(BGM_TRAINING);
