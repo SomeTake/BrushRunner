@@ -44,17 +44,14 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneTitle();
 		break;
 	case nSceneCharacterSelect:
-		//StopSound(BGM_TITLE);
 		PlaySound(BGM_CHARSEL);
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
-		//StopSound(BGM_CHARSEL);
 		PlaySound(BGM_TRAINING);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
-		//StopSound(BGM_TRAINING);
 		scene = new SceneResult();
 		break;
 	default:

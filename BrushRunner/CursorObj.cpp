@@ -12,7 +12,7 @@
 int pnum=0;
 bool canch = false;
 #include "MyLibrary.h"
-
+#include "Sound.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -165,12 +165,14 @@ void CursorObj::Move()
 	// 右に移動
 	if (GetKeyboardRepeat(DIK_RIGHT) || IsButtonRepeated(this->playerNo, STICK_RIGHT))
 	{
+		PlaySound(SE_SELECT);
 		this->selectNo = LoopCountDown(this->selectNo, 0, CURSOROBJ_MAX - 1);
 	}
 
 	// 左に移動
 	if (GetKeyboardRepeat(DIK_LEFT) || IsButtonRepeated(this->playerNo, STICK_LEFT))
 	{
+		PlaySound(SE_SELECT);
 		this->selectNo = LoopCountUp(this->selectNo, 0, CURSOROBJ_MAX - 1);
 	}
 }

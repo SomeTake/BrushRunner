@@ -17,6 +17,7 @@
 #include "SpInkState.h"
 #include "DebugWindow.h"
 #include "EffectManager.h"
+#include "Sound.h"
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -97,12 +98,11 @@ void Item::Update()
 			std::vector<Effect*> *EffectVector = GetEffectVector();
 			effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
 			EffectVector->push_back(effect);
-
 			use = false;
 			active = true;
 			state[PatternAnim]->Start();
 
-			// PlaySound(アイテム使用)
+			PlaySound(SE_USEITEM);
 		}
 
 		//テクスチャ座標をセット

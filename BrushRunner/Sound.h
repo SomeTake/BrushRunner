@@ -22,7 +22,7 @@ typedef enum
 	SE_CHOICE,
 	SE_SELECT,
 	SE_PICITEM,
-	SE_FALL,
+	SE_EXP,
 	SE_USEITEM,
 	SE_PAINT,
 	//SE_WINNER0,

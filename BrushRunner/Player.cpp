@@ -434,7 +434,7 @@ void Player::CheckOnCamera()
 		Effect3D *effect = new Effect3D(DeadEffect3D, setpos, 1);
 		Effect3DVector->push_back(effect);
 
-		// PlaySound(爆発音)
+		PlaySound(SE_EXP);
 	}
 }
 
@@ -569,9 +569,8 @@ void Player::ObjectItemCollider(Map *pMap)
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
-			PlaySound(SE_PICITEM);
 			hitItem = true;
-			// PlaySound(アイテム取得音)
+			PlaySound(SE_PICITEM);
 			return;
 		}
 	}
@@ -613,7 +612,7 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
 			Effect3DVector->push_back(effect);
 
-			// PlaySound(アイテムヒット音)
+			PlaySound(SE_EXP);
 		}
 	}
 }
@@ -685,7 +684,7 @@ void Player::HitObjectInfluence(int type)
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(max(--ink, 0), ColorInk);
 
-				// PlaySound(インクが減る音)
+				//PlaySound(インクが減る音)
 			}
 		}
 

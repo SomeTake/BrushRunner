@@ -45,8 +45,8 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 { "data/SE/choice.wav", false, 0.50f },
 { "data/SE/select.wav", false, 0.50f },
 { "data/SE/kaifuku.wav", false, 0.50f },
-{ "data/SE/fall.wav", false, 0.50f },
 { "data/SE/explosion.wav", false, 0.50f },
+{ "data/SE/explosion.wav", false, 0.50f }, //óvïœçX
 { "data/SE/slime.wav", false, 0.50f },
 //{ "data/SE/yattaze0.wav", false, 0.20f },
 //{ "data/SE/KO.wav", false, 0.20f },

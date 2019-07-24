@@ -104,6 +104,7 @@ void SceneCharacterSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
+			PlaySound(SE_CHOICE);
 			SetScene(new SceneGame(), nSceneGame);
 			return;
 		}
