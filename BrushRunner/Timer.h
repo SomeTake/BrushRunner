@@ -32,7 +32,7 @@ public:
 	~Timer();
 
 	virtual void Update();
-	void Draw();
+	virtual void Draw();
 
 	void Start();			// タイマースタート
 	void Stop();			// タイマーストップ

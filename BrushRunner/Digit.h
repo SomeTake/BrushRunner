@@ -34,7 +34,7 @@ public:
 	Digit(int digit);
 	~Digit();
 
-	void Update()override {};
+	void Update()override;
 	void Update(DWORD time);
 	void Draw()override;
 };

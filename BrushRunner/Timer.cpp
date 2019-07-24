@@ -59,11 +59,11 @@ void Timer::Update()
 
 	// ïb
 	digit[2] = (elapsedTime / 1000) % 10;
-	digit[3] = ((elapsedTime / 1000) % 60) / 10;
-	
+	digit[3] = (elapsedTime / 10000) % 6;
+
 	// ï™
-	digit[4] = ((elapsedTime / 1000) % 600) / 60;
-	digit[5] = min(((elapsedTime / 1000) / 600), 5);
+	digit[4] = (elapsedTime / 60000) % 10;
+	digit[5] = (elapsedTime / 600000) % 6;
 
 	// Ç–Ç∆ÇØÇΩÇ∏Ç¬çXêV
 	for (int i = 0; i < DIGIT_MAX; i++)
