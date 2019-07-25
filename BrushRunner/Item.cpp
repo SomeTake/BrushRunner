@@ -208,6 +208,7 @@ void Item::Start()
 	rouletteCnt = LoopCountUp(rouletteCnt, 0, ROULETTE_COUNTER);
 	if (rouletteCnt == 0)
 	{
+		PlaySound(SE_ITEMRU);
 		// テクスチャも回す
 		PatternAnim = LoopCountUp(PatternAnim, 0, NumItemMax);
 		if (PatternAnim == 0)

@@ -6,7 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "CountDown.h"
-
+#include "Sound.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -54,6 +54,10 @@ void CountDown::Update()
 {
 	if (use)
 	{
+		if (starttimer == 0)
+		{
+			PlaySound(SE_COUNT);
+		}
 		if (starttimer < START_TIMER)
 		{
 			starttimer++;
@@ -61,7 +65,6 @@ void CountDown::Update()
 
 			SetTexture();
 
-			// PlaySound(カウントダウン)
 		}
 		// カウントダウン終了
 		else

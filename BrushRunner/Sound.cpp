@@ -48,8 +48,8 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 { "data/SE/explosion.wav", false, 0.50f },
 { "data/SE/explosion.wav", false, 0.50f }, //óvïœçX
 { "data/SE/slime.wav", false, 0.50f },
-//{ "data/SE/yattaze0.wav", false, 0.20f },
-//{ "data/SE/KO.wav", false, 0.20f },
+{ "data/SE/count.wav", false, 0.20f },
+{ "data/SE/itemru.wav", false, 0.20f },
 //{ "data/SE/effect0.wav", false, 1.00f },
 //{ "data/SE/cutin0.wav", false, 1.00f },
 //{ "data/SE/countdown0.wav", false, 1.00f },
