@@ -14,11 +14,15 @@
 #include "DebugWindow.h"
 #include "SceneResult.h"
 
-//2d obj
+// 2d obj
 #include "Frame01.h"
 #include "Face.h"
 #include "CountDown.h"
 #include "Item.h"
+
+// 3d obj
+#include "Sky.h"
+#include "GoalFlag.h"
 
 //*****************************************************************************
 // メンバ変数の初期化
@@ -30,6 +34,7 @@ ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
 //=============================================================================
 SceneGame::SceneGame()
 {
+	// ゲームの結果を初期化
 	startframe = 0;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -67,8 +72,9 @@ SceneGame::SceneGame()
 	// エフェクトマネージャ
 	pEffectManager = new EffectManager();
 
-	// 空
-	pSky = new Sky();
+	// 3Dオブジェクト
+	object3d.push_back(new Sky());
+	object3d.push_back(new GoalFlag());
 
 	// タイマー
 	pTimer = new Timer();
@@ -105,8 +111,13 @@ SceneGame::~SceneGame()
 	// エフェクトマネージャの削除
 	delete pEffectManager;
 
-	// 空の削除
-	delete pSky;
+	// 3Dオブジェクトの削除
+	for (auto &Obj3D : object3d)
+	{
+		SAFE_DELETE(Obj3D);
+	}
+	object3d.clear();
+	ReleaseVector(object3d);
 
 	// タイマーの削除
 	delete pTimer;
@@ -156,8 +167,11 @@ void SceneGame::Update(int SceneID)
 	// エフェクトマネージャの更新
 	pEffectManager->Update();
 
-	// 空の更新
-	pSky->Update();
+	// 3Dオブジェクトの更新
+	for (auto &Obj3D : object3d)
+	{
+		Obj3D->Update();
+	}
 
 	// タイマーの更新
 	pTimer->Update();
@@ -174,14 +188,17 @@ void SceneGame::Update(int SceneID)
 //=============================================================================
 void SceneGame::Draw()
 {
-	// 空の描画
-	pSky->Draw();
-
 	// マップの描画
 	pMap->Draw();
 
 	// エフェクトマネージャの描画
 	pEffectManager->Draw();
+
+	// 3Dオブジェクトの描画
+	for (auto &Obj3D : object3d)
+	{
+		Obj3D->Draw();
+	}
 
 	// プレイヤーの描画
 	for (int i = 0; i < PLAYER_MAX; i++)

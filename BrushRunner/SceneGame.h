@@ -16,7 +16,7 @@
 #include "Player.h"
 #include "PaintManager.h"
 #include "EffectManager.h"
-#include "Sky.h"
+#include "Object3D.h"
 #include "Timer.h"
 
 //*****************************************************************************
@@ -31,12 +31,12 @@ class SceneGame :
 	public Scene
 {
 private:
-	std::vector<_2dobj*> UIObject;			// UI
+	std::vector<_2dobj*>		UIObject;	// UI
+	std::vector < Object3D*>	object3d;	// 3Dオブジェクト
 	Map				*pMap;					// マップ
 	Player			*pPlayer[PLAYER_MAX];	// プレイヤー
 	QUADTREE		*Quadtree = nullptr;	// 四分木
 	EffectManager	*pEffectManager;		// 2Dエフェクト管理
-	Sky				*pSky;					// 空
 	Timer			*pTimer;				// タイマー
 
 	int				startframe;				// 開始カウントダウン

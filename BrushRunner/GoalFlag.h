@@ -1,35 +1,28 @@
 //=============================================================================
 //
-// 空 [Sky.cpp]
+// ゴール地点表示 [GoalFlag.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SKY_H_
-#define _SKY_H_
-
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-#define SKY_TEXTURE	("data/MAP/BG000.png")
-#define SKY_NUM_X		(13)						// 横に並べる数
-#define SKY_NUM_Y		(3)							// 縦に並べる数
+#ifndef _GOALFLAG_H_
+#define _GOALFLAG_H_
 
 #include "Object3D.h"
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Sky :
+class GoalFlag :
 	public Object3D
 {
-private:
-	HRESULT MakeVertex();
-
 public:
-	Sky();
-	~Sky();
+	GoalFlag();
+	~GoalFlag();
 
 	void Update()override;
 	void Draw()override;
+
+	HRESULT MakeVertex();
 };
 
 #endif

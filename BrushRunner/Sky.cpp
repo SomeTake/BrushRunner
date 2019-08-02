@@ -61,9 +61,9 @@ void Sky::Draw()
 	D3DXVECTOR3 oldpos = pos;
 
 	// αテストを有効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	//pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	for (int cntY = 0; cntY < SKY_NUM_Y; cntY++)
 	{
@@ -100,7 +100,7 @@ void Sky::Draw()
 	pos = oldpos;
 
 	// αテストを無効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 }
 
