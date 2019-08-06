@@ -1,18 +1,18 @@
 //=============================================================================
 //
-// 表彰台[Podium.h]
+// トロフィー[Trophy.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _PODIUM_H_
-#define _PODIUM_H_
+#ifndef _TROPHY_H_
+#define _TROPHY_H_
 
 #include "D3DXAnimation.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Podium :
+class Trophy :
 	public D3DXANIMATION
 {
 private:
@@ -24,8 +24,8 @@ private:
 	void CreateAnimSet();
 
 public:
-	Podium();
-	~Podium();
+	Trophy();
+	~Trophy();
 
 	void Update()override;
 	void Draw()override;

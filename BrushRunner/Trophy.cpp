@@ -1,52 +1,58 @@
 //=============================================================================
 //
-// 表彰台[Podium.cpp]
+// トロフィー[Trophy.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Podium.h"
+#include "Trophy.h"
 
-#define PODIUM_MODEL	("data/MODEL/Podium/Podium.x")
-#define PODIUM_ROT		D3DXVECTOR3(0.0f, D3DXToRadian(90), 0.0f)
+#define TROPHY_MODEL	("data/MODEL/Trophy.x")
+#define TROPHY_POS		D3DXVECTOR3(0.0f, 100.0f, 0.0f)
+#define TROPHY_ROT		D3DXVECTOR3(0.0f, 0.0f, D3DXToRadian(30))
+#define TROPHY_MOVE		D3DXVECTOR3(0.0f, D3DXToRadian(1), 0.0f)
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Podium::Podium()
+Trophy::Trophy()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	this->Load_xFile(PODIUM_MODEL, "Podium");
+	this->Load_xFile(TROPHY_MODEL, "Podium");
 
 	// アニメーションセットの初期化
 	this->CreateAnimSet();
 
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	rot = PODIUM_ROT;
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-
+	pos = TROPHY_POS;
+	rot = D3DXVECTOR3(0.0f, 0.0f, D3DXToRadian(30));
+	scl = D3DXVECTOR3(0.1f, 0.1f, 0.1f);
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Podium::~Podium()
+Trophy::~Trophy()
 {
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void Podium::Update()
+void Trophy::Update()
 {
-
+	// 回転させる
+	rot += TROPHY_MOVE;
+	if (rot.y >= D3DX_PI)
+	{
+		rot.y = -D3DX_PI;
+	}
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void Podium::Draw()
+void Trophy::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	D3DMATERIAL9 matDef;
@@ -84,7 +90,7 @@ void Podium::Draw()
 //=============================================================================
 // アニメーションセットの作成
 //=============================================================================
-void Podium::CreateAnimSet()
+void Trophy::CreateAnimSet()
 {
 	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
 	vector<KEYDATA>Keydata;
@@ -95,7 +101,7 @@ void Podium::CreateAnimSet()
 //=====================================================================================================
 // アニメーションCallbackKeyの処理イベント
 //=====================================================================================================
-HRESULT CALLBACK Podium::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+HRESULT CALLBACK Trophy::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
 {
 	return S_OK;
 }

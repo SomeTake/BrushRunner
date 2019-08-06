@@ -16,6 +16,7 @@
 #include "ResultRank.h"
 #include "ResultTimer.h"
 #include "Podium.h"
+#include "Trophy.h"
 
 //=============================================================================
 // グローバル変数
@@ -38,6 +39,7 @@ SceneResult::SceneResult()
 
 	// 3Dモデルのインスタンス作成
 	anim.push_back(new Podium());
+	anim.push_back(new Trophy());
 }
 
 //=============================================================================

@@ -29,6 +29,7 @@
     <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="Podium.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="ResultDigit.h" />
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="Digit.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Title.h" />
+    <ClInclude Include="Trophy.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
@@ -175,8 +177,12 @@
     <ClCompile Include="Digit.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BrushRunner.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
