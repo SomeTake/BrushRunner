@@ -28,6 +28,7 @@
     <ClInclude Include="CursorObj.h" />
     <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="Object3D.h" />
+    <ClInclude Include="Podium.h" />
     <ClInclude Include="ResultDigit.h" />
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="CursorObj.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="Object3D.cpp" />
+    <ClCompile Include="Podium.cpp" />
     <ClCompile Include="ResultDigit.cpp" />
     <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="ResultTimer.cpp" />

@@ -15,6 +15,7 @@
 #include "SceneTitle.h"
 #include "ResultRank.h"
 #include "ResultTimer.h"
+#include "Podium.h"
 
 //=============================================================================
 // グローバル変数
@@ -27,6 +28,7 @@ SceneResult::SceneResult()
 {
 	data = SceneGame::GetResultData(0);
 
+	// 2Dオブジェクトのインスタンスを作成
 	p2dObj.push_back(new RESULT());
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++, data++)
 	{
@@ -34,7 +36,8 @@ SceneResult::SceneResult()
 		p2dObj.push_back(new ResultTimer(data->time, data->rank));
 	}
 
-	
+	// 3Dモデルのインスタンス作成
+	anim.push_back(new Podium());
 }
 
 //=============================================================================
@@ -50,9 +53,13 @@ SceneResult::~SceneResult()
 	p2dObj.clear();
 	ReleaseVector(p2dObj);
 
-	// タイマーの削除
-
-
+	// 3Dオブジェクトの削除
+	for (auto &Anim : anim)
+	{
+		SAFE_DELETE(Anim);
+	}
+	anim.clear();
+	ReleaseVector(anim);
 }
 
 //=============================================================================
@@ -60,6 +67,7 @@ SceneResult::~SceneResult()
 //=============================================================================
 void SceneResult::Update(int SceneID)
 {
+	// シーンチェンジ
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
@@ -75,6 +83,12 @@ void SceneResult::Update(int SceneID)
 		Obj->Update();
 	}
 
+	// 3Dオブジェクトの更新
+	for (auto &Anim : anim)
+	{
+		Anim->Update();
+	}
+
 	Debug();
 }
 
@@ -83,6 +97,12 @@ void SceneResult::Update(int SceneID)
 //=============================================================================
 void SceneResult::Draw()
 {
+	// 3Dオブジェクトの描画
+	for (auto &Anim : anim)
+	{
+		Anim->Draw();
+	}
+
 	// 2Dオブジェクトの描画
 	for (auto &Obj : p2dObj)
 	{

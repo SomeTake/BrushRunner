@@ -48,6 +48,9 @@ protected:
 public:
 	D3DXANIMATION();
 	~D3DXANIMATION();
+	// 純粋仮想関数
+	virtual void Update() = 0;
+	virtual void Draw() = 0;
 
 	void ChangeAnim(UINT AnimID);
 
