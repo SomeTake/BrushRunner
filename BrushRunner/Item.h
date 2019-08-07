@@ -55,6 +55,7 @@ private:
 	int rouletteCnt;						// ルーレットのカウンタ
 	int useCnt;								// ルーレットでアイテムのテクスチャも回すためのカウンタ
 	bool active;							// アイテム使用中
+	static 	LPDIRECT3DTEXTURE9	D3DTexture; // テクスチャのポインタ
 
 	HRESULT MakeVertex();
 	void SetTexture();

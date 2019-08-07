@@ -27,7 +27,7 @@ protected:
 
 public:
 	Billboard();
-	~Billboard();
+	virtual ~Billboard();
 
 	// ƒˆ‰¼‘zŠÖ”
 	virtual void Update() = 0;

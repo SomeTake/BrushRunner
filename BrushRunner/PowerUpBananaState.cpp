@@ -25,7 +25,6 @@ PowerUpBananaState::PowerUpBananaState(Item *owner) : owner_(owner)
 //=============================================================================
 PowerUpBananaState::~PowerUpBananaState()
 {
-	delete owner_;
 }
 
 //=============================================================================

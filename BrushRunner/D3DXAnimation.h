@@ -47,7 +47,7 @@ protected:
 	virtual void CreateAnimSet(void) = 0;
 public:
 	D3DXANIMATION();
-	~D3DXANIMATION();
+	virtual ~D3DXANIMATION();
 	// 純粋仮想関数
 	virtual void Update() = 0;
 	virtual void Draw() = 0;

@@ -18,6 +18,8 @@
 #include "DebugWindow.h"
 #include "EffectManager.h"
 
+LPDIRECT3DTEXTURE9	Item::D3DTexture = NULL; // テクスチャのポインタ
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -60,11 +62,7 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 //=============================================================================
 Item::~Item()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	SAFE_RELEASE(D3DTexture);
 
 	// ステートパターンの削除
 	for (int i = 0; i < NumItemMax; i++)
