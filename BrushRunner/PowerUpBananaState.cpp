@@ -25,6 +25,7 @@ PowerUpBananaState::PowerUpBananaState(Item *owner) : owner_(owner)
 //=============================================================================
 PowerUpBananaState::~PowerUpBananaState()
 {
+	owner_ = nullptr;
 }
 
 //=============================================================================

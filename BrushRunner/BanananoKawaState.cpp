@@ -20,6 +20,7 @@ BanananoKawaState::BanananoKawaState(Item *owner) : owner_(owner)
 //=============================================================================
 BanananoKawaState::~BanananoKawaState()
 {
+	owner_ = nullptr;
 }
 
 //=============================================================================
