@@ -21,7 +21,6 @@ class SceneResult :
 private:
 	std::vector<_2dobj*>	p2dObj;		// 2Dオブジェクト用のポインタ
 	std::vector<D3DXANIMATION*> anim;	// 3Dモデル用のポインタ
-	ResultData*				data;		// ゲームシーンの結果を取得するポインタ
 
 	void Debug();
 

@@ -38,30 +38,6 @@
 #define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
 #define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
 
-// 読み込むキャラクターモデル
-static const char* CharaModel[] =
-{
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
-};
-
-// キャラクターモデルの番号
-enum CharaModelNum
-{
-	ShachikuModel,
-	KouhaiModel,
-
-	// モデルの種類
-	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] =
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
-};
-
 enum CallbackKeyType
 {
 	e_NoEvent = 0,
@@ -318,6 +294,10 @@ void Player::JumpMove()
 	if (jet)
 	{
 		jumpValue = JETPACK_VALUE;
+	}
+	else
+	{
+		jumpValue = 1.0f;
 	}
 }
 

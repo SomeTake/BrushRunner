@@ -8,7 +8,7 @@
 #include "Trophy.h"
 
 #define TROPHY_MODEL	("data/MODEL/Trophy.x")
-#define TROPHY_POS		D3DXVECTOR3(0.0f, 100.0f, 0.0f)
+#define TROPHY_POS		D3DXVECTOR3(0.0f, 150.0f, 0.0f)
 #define TROPHY_ROT		D3DXVECTOR3(0.0f, 0.0f, D3DXToRadian(30))
 #define TROPHY_MOVE		D3DXVECTOR3(0.0f, D3DXToRadian(1), 0.0f)
 
@@ -96,6 +96,13 @@ void Trophy::CreateAnimSet()
 	vector<KEYDATA>Keydata;
 	Keydata.reserve(Keydata_Max);
 	AnimationSet->SetData("Idle", NULL, 1.0f, 0.1f, 0.0f);
+	this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
+	AnimationSet->SetAnimSetPtr(this->AnimController);
+	this->AnimSet.push_back(*AnimationSet);
+	Keydata.clear();
+	SAFE_DELETE(AnimationSet);
+	ReleaseVector(Keydata);
+
 }
 
 //=====================================================================================================

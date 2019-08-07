@@ -90,6 +90,12 @@ void Podium::CreateAnimSet()
 	vector<KEYDATA>Keydata;
 	Keydata.reserve(Keydata_Max);
 	AnimationSet->SetData("Idle", NULL, 1.0f, 0.1f, 0.0f);
+	this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
+	AnimationSet->SetAnimSetPtr(this->AnimController);
+	this->AnimSet.push_back(*AnimationSet);
+	Keydata.clear();
+	SAFE_DELETE(AnimationSet);
+	ReleaseVector(Keydata);
 }
 
 //=====================================================================================================

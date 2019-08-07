@@ -17,6 +17,7 @@
 #include "ResultTimer.h"
 #include "Podium.h"
 #include "Trophy.h"
+#include "ResultPlayer.h"
 
 //=============================================================================
 // グローバル変数
@@ -27,19 +28,21 @@
 //=============================================================================
 SceneResult::SceneResult()
 {
-	data = SceneGame::GetResultData(0);
-
 	// 2Dオブジェクトのインスタンスを作成
 	p2dObj.push_back(new RESULT());
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++, data++)
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
-		p2dObj.push_back(new ResultRank(data->rank));
-		p2dObj.push_back(new ResultTimer(data->time, data->rank));
+		p2dObj.push_back(new ResultRank(SceneGame::GetResultData(playerNo)->rank));
+		p2dObj.push_back(new ResultTimer(SceneGame::GetResultData(playerNo)->time, SceneGame::GetResultData(playerNo)->rank));
 	}
 
 	// 3Dモデルのインスタンス作成
 	anim.push_back(new Podium());
 	anim.push_back(new Trophy());
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		anim.push_back(new ResultPlayer(SceneGame::GetResultData(playerNo)->rank, playerNo));
+	}
 }
 
 //=============================================================================
@@ -120,8 +123,8 @@ void SceneResult::Debug()
 #ifndef _DEBUG_
 	BeginDebugWindow("Result");
 
-	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].rank, data[1].rank, data[2].rank, data[3].rank);
-	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->rank, SceneGame::GetResultData(1)->rank, SceneGame::GetResultData(2)->rank, SceneGame::GetResultData(3)->rank);
+	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->time, SceneGame::GetResultData(1)->time, SceneGame::GetResultData(2)->time, SceneGame::GetResultData(3)->time);
 
 	EndDebugWindow("Result");
 

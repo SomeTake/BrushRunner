@@ -31,6 +31,7 @@
     <ClInclude Include="Podium.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResultDigit.h" />
+    <ClInclude Include="ResultPlayer.h" />
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
     <ClInclude Include="Scene.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="Object3D.cpp" />
     <ClCompile Include="Podium.cpp" />
     <ClCompile Include="ResultDigit.cpp" />
+    <ClCompile Include="ResultPlayer.cpp" />
     <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="ResultTimer.cpp" />
     <ClCompile Include="Scene.cpp" />
