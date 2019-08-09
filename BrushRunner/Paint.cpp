@@ -80,7 +80,7 @@ void Paint::Update()
 		else
 		{
 			// “§–¾“x‚ğŒ¸Š’l‚É‡‚í‚¹‚Ä’Ç‰Á
-			col.a -= DecAlpha;
+			//col.a -= DecAlpha;
 
 			if (col.a <= 0.0f)
 			{

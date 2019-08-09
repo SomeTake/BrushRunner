@@ -13,62 +13,13 @@
 #include "Effect.h"
 #include "Quadtree.h"
 #include "Player.h"
-#include "PaintManager.h"
-#include "Pop.h"
+#include "PaintGroup.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define START_FRAME (240)	// スタートするまでのタイマー
 
-// 2dobjの個数(描画順先→後)
-enum Num2dobj
-{
-	// 一番外のフレーム
-	NumFrame,
-
-	// 黒インク
-	NumInkblack00,
-	NumInkblack01,
-	NumInkblack02,
-	NumInkblack03,
-
-	// 黒インクのフレーム
-	NumBlackFrame00,
-	NumBlackFrame01,
-	NumBlackFrame02,
-	NumBlackFrame03,
-
-	// カラーインク
-	NumInkblue,
-	NumInkred,
-	NumInkyellow,
-	NumInkgreen,
-
-	// カラーインクのフレーム
-	NumColorFrame00,
-	NumColorFrame01,
-	NumColorFrame02,
-	NumColorFrame03,
-
-	// 顔のフレーム
-	NumFaceframe00,
-	NumFaceframe01,
-	NumFaceframe02,
-	NumFaceframe03,
-
-	// カウントダウン
-	NumCountDown,
-
-	// アイテム表示
-	NumItem00,
-	NumItem01,
-	NumItem02,
-	NumItem03,
-
-	// ----- 最大数 -----
-	_2dMax,
-};
 
 //*****************************************************************************
 // クラス定義
@@ -76,14 +27,12 @@ enum Num2dobj
 class SceneGame
 {
 private:
-	_2dobj *p2dobj[_2dMax];				// 2Dオブジェクト用のポインタ
+	std::vector<_2dobj*> UIObject;
 	Map *pMap;							// マップ用のポインタ
 	Effect *pEffect[EffectMax];			// エフェクト用のポインタ
 	Player *pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
-	Cursor *pCursor[PLAYER_MAX];			// カーソル用のポインタ
-	PaintManager *pPManager[PLAYER_MAX];	// ペイントシステム用のポインタ
-	Pop *pPop[PLAYER_MAX];				// ポップアップ用のポインタ
 	QUADTREE *Quadtree = nullptr;
+	PaintGroup *paintGroup = nullptr;
 
 	void Collision();
 
@@ -94,8 +43,5 @@ public:
 	void Draw();
 
 };
-
-void ChangeDrawOrder(int NumA, int NumB);			// 描画順を入れ替える
-
 
 #endif

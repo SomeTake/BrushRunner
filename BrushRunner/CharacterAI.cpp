@@ -7,27 +7,29 @@
 #include "Main.h"
 #include "CharacterAI.h"
 #include "Map.h"
-#include "PaintManager.h"
+#include "Input.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define ScanRange (5)
+PaintGroup *CharacterAI::paintGroup = nullptr;
 
+#define ScanRange (10)		// プラットフォームのへりが探せる範囲
 
-#if _DEBUG
-// ３Ｄ直線頂点フォーマット( 頂点座標[3D] / 反射光 )
-#define	FVF_LINE_3D		(D3DFVF_XYZ | D3DFVF_DIFFUSE)
-#endif
-
-enum e_ChipNo
+// CSV中の番号の事件
+enum e_ChipEvent
 {
-	eJumpChip = -2,
-	eDetermineChip = -3,
-	ePlatformEdge = -4
+	eRandomChip = -2,		// ペイント、落下のどちらかランダムで決める
+	eJumpChip = -3,			// ジャンプする
+	ePaintChip = -4,		// ジャンプする
+	ePlatformEdge = -5		// 向こうのプラットフォームのへり
 };
 
 #if _DEBUG
+// 3D直線頂点フォーマット( 頂点座標[3D] / 反射光 )
+#define	FVF_LINE_3D		(D3DFVF_XYZ | D3DFVF_DIFFUSE)
+
 // 3D空間で直線描画用構造体を定義
 typedef struct
 {
@@ -39,8 +41,9 @@ typedef struct
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-CharacterAI::CharacterAI()
+CharacterAI::CharacterAI(int Owner)
 {
+	this->Owner = Owner;
 }
 
 //=====================================================================================================
@@ -51,34 +54,118 @@ CharacterAI::~CharacterAI()
 
 }
 
+//=====================================================================================================
+// 更新処理
+//=====================================================================================================
 void CharacterAI::Update(D3DXVECTOR3 Pos)
 {
 	int MapChipNo = Map::GetMapTbl(Pos, eCenterUp);
 	this->Action = eNoAction;
+#if _DEBUG
 	this->DrawLineFlag = false;
+#endif
 
-	switch (MapChipNo)
+	// マップチップの番号によって行動する
+	MapChipAction(Pos, MapChipNo);
+
+	// 画面内のペイントを探して、ペイントする
+	if (State != ePaintPath && GetKeyboardTrigger(DIK_V))
 	{
-	case eJumpChip:
+		PaintAction();
+	}
 
+#if _DEBUG
+	ImGui::SetNextWindowPos(ImVec2(5, 330), ImGuiSetCond_Once);
+
+	BeginDebugWindow("AI");
+
+	DebugText("Action : %d", this->Action);
+	DebugText("State : %d", this->State);
+
+	EndDebugWindow("AI");
+#endif
+}
+
+//=====================================================================================================
+// マップチップの番号によって行動する
+//=====================================================================================================
+void CharacterAI::MapChipAction(D3DXVECTOR3 Pos, int MapChipNo)
+{
+	// フラグの初期化
+	if (MapChipNo != eRandomChip)
+	{
+		RandomOver = false;
+		if (MapChipNo != ePaintChip)
+		{
+			FindEdgeOver = false;
+		}
+	}
+
+	if (MapChipNo == eRandomChip && !RandomOver)
+	{
+		int Random = rand() % (1 + 1);
+
+		// ペイント
+		if (Random == 0)
+		{
+			// プラットフォームのへりを探す
+			this->FindPlatform(Pos);
+		}
+		// 落下
+		else if (Random == 1)
+		{
+			int i = 0;
+			;	// 現在は何もしない
+		}
+
+		RandomOver = true;
+	}
+	else if (MapChipNo == eJumpChip)
+	{
+		// ジャンプする
 		this->Action = eActJump;
-		break;
-
-	case eDetermineChip:
-
+	}
+	else if (MapChipNo == ePaintChip)
+	{
+		// プラットフォームのへりを探す
 		this->FindPlatform(Pos);
-		break;
-
-	default:
-		break;
 	}
 }
 
+//=====================================================================================================
+// 他のプレイヤーのペイントを探して、削除する
+//=====================================================================================================
+void CharacterAI::PaintAction(void)
+{
+	if (!FindEnemyPaint)
+	{
+		if (CharacterAI::paintGroup->GetEnemyPaint(&EnemyPaint, Owner))
+		{
+			State = eUseBlackPaint;
+			if (InkType != BlackInk)
+			{
+				ChangeInk = true;
+				InkType = BlackInk;
+			}
+			FindEnemyPaint = true;
+		}
+	}
+}
+
+//=====================================================================================================
+// 向こうのプラットフォームを探す
+//=====================================================================================================
 void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 {
 	int PlayerChip_X = 0;
 	int PlayerChip_Y = 0;
 	Map::GetMapChipXY(Pos, &PlayerChip_X, &PlayerChip_Y);
+	std::vector<D3DXVECTOR3> TempPos;
+
+	if (FindEdgeOver)
+	{
+		return;
+	}
 
 	// スキャンできる横幅の範囲
 	for (int i = PlayerChip_X + 1; i <= PlayerChip_X + ScanRange; i++)
@@ -89,15 +176,33 @@ void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 			if (k == ePlatformEdge)
 			{
 				// 探したプラットフォームの座標
-				this->PaintEndPos = Map::GetMapChipPos(i, j + 1, eLeftUp);
+				TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
 				// キャラクター下のチップの座標
-				this->PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
-				this->State = eCursorMove;
+				PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
+				State = ePaintPath;
+				if (InkType != ColorInk)
+				{
+					ChangeInk = true;
+					InkType = ColorInk;
+				}
+				FindEdgeOver = true;
+
 #if _DEBUG
-				this->DrawLineFlag = true;
+				DrawLineFlag = true;
 #endif
 			}
 		}
+	}
+
+	// もし複数のプラットフォームがあれば、ランダムで決める
+	if (TempPos.size() > 1)
+	{
+		int Random = rand() % TempPos.size();
+		PaintEndPos = TempPos.at(Random);
+	}
+	else if (TempPos.size() == 1)
+	{
+		PaintEndPos = TempPos.at(0);
 	}
 }
 
