@@ -25,6 +25,7 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 	use = true;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
+	//this->PaintReady = false;
 	if (AIUse)
 	{
 		this->AIUse = true;
@@ -68,16 +69,11 @@ void Cursor::Update()
 		// スクリーン座標からワールド座標に変換
 		CalWorldPos();
 
-		if (GetKeyboardTrigger(DIK_P))
-		{
-			// テクスチャの切り替え
-			Change();
-		}
-
 		// 頂点座標の設定
 		SetVertex();
 	}
 
+#if 0
 #if _DEBUG
 	ImGui::SetNextWindowPos(ImVec2(5, 300), ImGuiSetCond_Once);
 
@@ -96,34 +92,12 @@ void Cursor::Update()
 			DebugText("X:%.2f\nY:%.2f\nZ:%.2f\n", WorldPos.x, WorldPos.y, WorldPos.z);
 			ImGui::TreePop();
 		}
-		//if (ImGui::TreeNode("DestWorldPos"))
-		//{
-		//	DebugText("X:%.2f\nY:%.2f\nZ:%.2f\n", PaintStartPos_World.x, PaintStartPos_World.y, PaintStartPos_World.z);
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("DestScreenPos"))
-		//{
-		//	D3DXMATRIX WorldMtx, TransMtx;
-		//	D3DXVECTOR2 DestPos_Screen;
-
-		//	// ワールドマトリックスの初期化
-		//	D3DXMatrixIdentity(&WorldMtx);
-
-		//	// 移動を反映
-		//	D3DXMatrixTranslation(&TransMtx, PaintStartPos_World.x, PaintStartPos_World.y, PaintStartPos_World.z);
-		//	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-
-		//	DestPos_Screen = WorldToScreenPos(WorldMtx);
-
-		//	DebugText("X:%.2f\nY:%.2f\n", DestPos_Screen.x, DestPos_Screen.y);
-		//	ImGui::TreePop();
-		//}
-
 		ImGui::TreePop();
 	}
 
 	EndDebugWindow("Cursor");
 
+#endif
 #endif
 }
 
@@ -232,9 +206,13 @@ void Cursor::Move()
 	else
 	{
 		KeyMove();	// キーボード操作
-		if (AIptr->GetAIState() == eCursorMove)
+		if (AIptr->GetAIState() == ePaintPath)
 		{
-			AIMove();
+			PaintPath();
+		}
+		else if (AIptr->GetAIState() == eUseBlackPaint)
+		{
+			DeletePath();
 		}
 	}
 }
@@ -242,7 +220,7 @@ void Cursor::Move()
 //=============================================================================
 // カーソルの切り替え
 //=============================================================================
-void Cursor::Change()
+void Cursor::ChangeInk()
 {
 	// テクスチャとプレイヤーのインクの切り替え
 	// カラー→黒
@@ -279,7 +257,6 @@ void Cursor::KeyMove()
 
 		// 画面外判定
 		pos.y = min(pos.y, SCREEN_HEIGHT);
-
 	}
 
 	// 左右
@@ -316,6 +293,9 @@ void Cursor::PadMove()
 	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 }
 
+//=============================================================================
+// ワールド座標を計算する
+//=============================================================================
 void Cursor::CalWorldPos()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
@@ -348,10 +328,12 @@ void Cursor::CalWorldPos()
 	}
 }
 
-void Cursor::AIMove()
+//=============================================================================
+// インクで通れる道を作る
+//=============================================================================
+void Cursor::PaintPath()
 {
 	float Distance = 0.0f;
-	int AIState = AIptr->GetAIState();
 	D3DXMATRIX WorldMtx, TransMtx;
 	D3DXVECTOR3 DestPos_World;
 	D3DXVECTOR2 DestPos_Screen;
@@ -359,40 +341,114 @@ void Cursor::AIMove()
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&WorldMtx);
 
-	// 移動を反映
-	if (AIptr->GetAIPaint())
+	// カーソルが始点までに移動していない
+	if (AIptr->GetAIPaintState() == eNoAction)
+	{
+		//PaintReady = false;
+		DestPos_World = AIptr->GetPaintStartPos();
+	}
+	// ペイントしている
+	else
 	{
 		DestPos_World = AIptr->GetPaintEndPos();
 	}
-	else
-	{
-		DestPos_World = AIptr->GetPaintStartPos();
-	}
+
+	// 目標のスクリーン座標を計算する
 	D3DXMatrixTranslation(&TransMtx, DestPos_World.x, DestPos_World.y, DestPos_World.z);
 	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-
 	DestPos_Screen = WorldToScreenPos(WorldMtx);
 
+	// カーソルと目標の座標を計算する
 	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
 	Distance = D3DXVec2LengthSq(&Vec);
 
 	if (Distance > pow(20.0f, 2))
 	{
+		// カーソルが目標に移動する
 		float Angle = atan2f(Vec.y, Vec.x);
 		pos.x += cosf(Angle) * CURSOR_SPEED;
 		pos.y += sinf(Angle) * CURSOR_SPEED;
 	}
 	else
 	{
-		(D3DXVECTOR2)pos = DestPos_Screen;
-		if (!AIptr->GetAIPaint())
+		pos.x = DestPos_Screen.x;
+		pos.y = DestPos_Screen.y;
+
+		// ペイントが始まる
+		if (AIptr->GetAIPaintState() == eNoAction)
 		{
-			AIptr->SetAIPaint(true);
+			AIptr->SetAIPaintState(ePaintStart);
+		}
+		// ペイント終了
+		else
+		{
+			AIptr->SetAIState(eNoAction);
+			AIptr->SetAIPaintState(ePaintEnd);
+		}
+	}
+}
+
+//=============================================================================
+// 他のプレイヤーのペイントを削除
+//=============================================================================
+void Cursor::DeletePath()
+{
+	float Distance = 0.0f;
+	D3DXVECTOR2 DestPos_Screen;
+	D3DXMATRIX WorldMtx, TransMtx;
+	GroupStruct *EnemyPaint = AIptr->GetEnemyPaint();
+
+	// 削除が間に合わない
+	if (EnemyPaint->Count <= 5)
+	{
+		AIptr->SetAIState(eNoAction);
+		AIptr->SetAIPaintState(ePaintEnd);
+		AIptr->SetFindEnemyPaint(false);
+		return;
+	}
+
+#if 1
+	// 目標のスクリーン座標を計算する
+	D3DXMatrixTranslation(&TransMtx, EnemyPaint->PaintPath.at(0).x, EnemyPaint->PaintPath.at(0).y, EnemyPaint->PaintPath.at(0).z);
+	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+	DestPos_Screen = WorldToScreenPos(WorldMtx);
+
+	// カーソルと目標の座標を計算する
+	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
+	Distance = D3DXVec2LengthSq(&Vec);
+
+	if (AIptr->GetAIPaintState() == eNoAction)
+	{
+		if (Distance > pow(20.0f, 2))
+		{
+			// カーソルが目標に移動する
+			float Angle = atan2f(Vec.y, Vec.x);
+			pos.x += cosf(Angle) * CURSOR_SPEED;
+			pos.y += sinf(Angle) * CURSOR_SPEED;
 		}
 		else
 		{
-			AIptr->SetAIPaint(false);
-			AIptr->SetAIState(eNoEvent);
+			// ペイントが始まる
+			AIptr->SetAIPaintState(ePaintStart);
 		}
 	}
+	// ペイントしている
+	else
+	{
+		pos.x = DestPos_Screen.x;
+		pos.y = DestPos_Screen.y;
+
+		// Vectorの一番目の座標を消す
+		EnemyPaint->PaintPath.erase(EnemyPaint->PaintPath.begin());
+
+		// ペイント終了
+		if (EnemyPaint->PaintPath.empty())
+		{
+			AIptr->SetAIState(eNoAction);
+			AIptr->SetAIPaintState(ePaintEnd);
+			AIptr->SetFindEnemyPaint(false);
+			EnemyPaint->Count = 0;
+		}
+	}
+#endif
 }

@@ -17,7 +17,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define PLAYER_MAX				(1)										// 操作するプレイヤーの数
+#define PLAYER_MAX				(2)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
@@ -62,6 +62,7 @@ private:
 	float				animSpd;			// アニメーションの再生スピード
 	bool				playable;			// 操作可能
 	bool				onCamera;			// 画面内にいるとき
+	bool				AIUse = false;
 
 	// ステータス関係
 	float				runSpd;				// ダッシュ速度(0.0-1.0-2.0)
@@ -87,7 +88,7 @@ private:
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum,bool AIUse);
+	Player(int _CtrlNum, bool AIUse);
 	~Player();
 	void Update();
 	void Draw();
@@ -123,6 +124,9 @@ public:
 	bool GetBlind() { return blind; };
 	bool GetSpInk() { return spink; };
 
+	// AI用
+	int GetAIAction() { return AIUse == true ? AI->GetAIAction() : eNoAction; };
+
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
@@ -131,7 +135,7 @@ public:
 
 	void SetSpike(bool _spike) { spike = _spike; };
 	void SetGun(bool _gun) { gun = _gun; };
-	void SetBlind(bool _blind){ blind = _blind; };
+	void SetBlind(bool _blind) { blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
 	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
 	void SetSpInk(bool _spink) { spink = spink; };

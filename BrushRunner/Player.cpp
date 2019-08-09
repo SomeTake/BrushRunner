@@ -93,12 +93,14 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 	ctrlNum = _CtrlNum;
 	if (AIUse)
 	{
-		this->AI = new CharacterAI();
+		this->AI = new CharacterAI(ctrlNum);
+		this->AIUse = true;
 		this->PaintSystem = new PaintManager(ctrlNum, true, this->AI);
 	}
 	else
 	{
 		this->AI = nullptr;
+		this->AIUse = false;
 		this->PaintSystem = new PaintManager(ctrlNum, false, nullptr);
 	}
 	this->playerUI = new PlayerUI(ctrlNum);
@@ -655,7 +657,6 @@ void Player::HitObjectInfluence(int type)
 	default:
 		break;
 	}
-
 }
 
 //=====================================================================================================
