@@ -35,12 +35,10 @@ private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 
 	// AI用
-	CharacterAI		*AIptr = nullptr;
-	bool			AIUse = false;
-	//bool			PaintReady = false;
+	CharacterAI		*AIptr;
+	bool			AIUse;
 	D3DXVECTOR3		WorldPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	void PaintPath();					// インクで通れる道を作る
-	void DeletePath();					// 他のプレイヤーのペイントを削除
+	void AIMove();						// AIがカーソルを移動する
 
 	HRESULT MakeVertex();				// 頂点の作成
 	void SetTexture();					// テクスチャ座標の設定
@@ -48,6 +46,7 @@ private:
 	void KeyMove();						// キーボード操作
 	void PadMove();						// コントローラ操作
 	void Move();						// 操作
+	void Change();						// 切り替え
 	void CalWorldPos();
 
 public:
@@ -57,9 +56,7 @@ public:
 	// 更新
 	void Update();
 	// 描画
-	void Draw();	
-	// インクを切り替え
-	void ChangeInk();						
+	void Draw();						
 	// テクスチャの開放
 	static void ReleaseTexture(void) { SAFE_RELEASE(Cursor::D3DTexture); };
 

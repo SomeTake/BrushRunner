@@ -25,30 +25,29 @@
 //*****************************************************************************
 // オブジェクトのポインタ
 //*****************************************************************************
+static std::vector<_2dobj*> UIObject;
+static Map		*pMap;							// マップ用のポインタ
+static Effect	*pEffect[EffectMax];			// エフェクト用のポインタ
+static Player	*pPlayer[PLAYER_MAX];			// プレイヤー用のポインタ
+static QUADTREE *Quadtree = nullptr;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneGame::SceneGame()
 {
+	// プレイヤーの初期化
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo, true);
+	}
+
 	// マップの初期化
 	pMap = new Map();
 
 	// 四分木の初期化
 	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 	PaintManager::SetQuadtreePtr(Quadtree);
-
-	// ペイントグループの初期化
-	paintGroup = new PaintGroup();
-	PaintManager::SetPaintGroupPtr(paintGroup);
-
-	// プレイヤーの初期化
-	//for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
-	//{
-	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
-	//}
-	pPlayer[0] = new Player(0, false);
-	pPlayer[1] = new Player(1, true);
 
 	// 2DUIの初期化
 	// フレーム
@@ -74,9 +73,6 @@ SceneGame::~SceneGame()
 
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
-
-	// ペイントグループの削除
-	SAFE_DELETE(paintGroup);
 
 	// ペイントテクスチャの削除
 	Paint::ReleaseTexture();
@@ -159,9 +155,6 @@ void SceneGame::Update()
 
 	// 当たり判定の更新
 	Collision();
-
-	// ペイントグループの更新
-	paintGroup->Update();
 }
 
 //=============================================================================

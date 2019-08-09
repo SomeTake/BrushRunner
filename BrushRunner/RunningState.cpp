@@ -38,17 +38,14 @@ void RunningState::Update(int AnimCurtID)
 		owner_->ChangeState(new VictoryState(owner_));
 		return;
 	}
-
 	// 上キーを押してジャンプ
-	if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B)
-		|| owner_->GetAIAction() == eActJump)
+	if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B))
 	{
 		owner_->SetJumpSpeed(JUMP_SPEED);
 		owner_->ChangeAnim(Jump);
 		owner_->ChangeState(new JumpState(owner_));
 		return;
 	}
-
 	// 前方オブジェクトにヒットしているので待機状態へ
 	if (owner_->GetHitHorizon())
 	{

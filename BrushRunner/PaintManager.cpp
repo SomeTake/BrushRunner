@@ -16,7 +16,7 @@
 #include "Player.h"
 
 QUADTREE *PaintManager::Quadtree = nullptr;
-PaintGroup *PaintManager::paintGroup = nullptr;
+bool PaintManager::PressMode = true;
 
 //=============================================================================
 // コンストラクタ
@@ -31,7 +31,6 @@ PaintManager::PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 		this->AIptr = AIptr;
 		// カーソルオブジェクト作成
 		this->pCursor = new Cursor(this->Owner, true, AIptr);
-		CharacterAI::SetPaintGroupPtr(PaintManager::paintGroup);
 	}
 	else
 	{
@@ -117,79 +116,37 @@ void PaintManager::Update()
 	}
 
 	// インクの種類交換
-	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(Owner, BUTTON_R1) ||
-		(AIUse && AIptr->GetAIChangeInk()))
+	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(Owner, BUTTON_R1))
 	{
 		InkType = InkType == BlackInk ? ColorInk : BlackInk;
-		pCursor->ChangeInk();
-		if (AIUse)
-		{
-			AIptr->SetInkType(InkType);
-			AIptr->SetAIChangeInk(false);
-		}
 	}
 
 	// インクを使う
-	if (!AIUse)
+	if (((GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && PressMode) ||
+		AIptr->GetAIPaint() == true)
 	{
 		// 使用するインクの残量チェック
 		if (this->InkValue[InkType] > 0)
 		{
-			if (GetKeyboardTrigger(DIK_O) || IsButtonTriggered(Owner, BUTTON_C))
-			{
-				PaintManager::paintGroup->Start(Owner);
-			}
-
-			if (GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C))
-			{
-				// ペイントを設置する
-				SetPaint(InkType);
-				// インクを減らす
-				InkValue[InkType]--;
-			}
-
-			if ((GetKeyboardRelease(DIK_O) || IsButtonReleased(Owner, BUTTON_C)) ||
-				InkValue[InkType] <= 0)
-			{
-				PaintManager::paintGroup->End(Owner);
-			}
+			// ペイントを設置する
+			SetPaint(InkType);
+			// インクを減らす
+			InkValue[InkType]--;
 		}
 	}
-	// AIがインクを使う
-	else
+#if _DEBUG
+	else if ((GetKeyboardTrigger(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C)) && !PressMode)
 	{
-		if (AIptr->GetAIPaintState() == ePaintStart)
+		// 使用するインクの残量チェック
+		if (this->InkValue[InkType] > 0)
 		{
-			if (InkType == ColorInk)
-			{
-				PaintManager::paintGroup->Start(Owner);
-			}
-			AIptr->SetAIPaintState(ePainting);
-		}
-		else if (AIptr->GetAIPaintState() == ePainting)
-		{
-			// 使用するインクの残量チェック
-			if (this->InkValue[InkType] > 0)
-			{
-				// ペイントを設置する
-				SetPaint(InkType);
-				// インクを減らす
-				InkValue[InkType]--;
-			}
-			else
-			{
-				AIptr->SetAIPaintState(ePaintEnd);
-			}
-		}
-		else if (AIptr->GetAIPaintState() == ePaintEnd)
-		{
-			if (InkType == ColorInk)
-			{
-				PaintManager::paintGroup->End(Owner);
-			}
-			AIptr->SetAIPaintState(eNoAction);
+			// ペイントを設置する
+			SetPaint(InkType);
+			// インクを減らす
+			InkValue[InkType]--;
 		}
 	}
+#endif
 
 	// インクゲージを更新
 	inkGauge.at(ColorInk)->Update(InkValue[ColorInk]);
@@ -235,6 +192,34 @@ void PaintManager::Update()
 		}
 		this->ColorPaint.clear();
 	}
+
+	if (this->Owner == 0)
+	{
+		BeginDebugWindow("Information");
+
+		enum ePaintMode
+		{
+			ePress,
+			eTrigger,
+		};
+		static int Mode = 0;
+
+		DebugText("PaintMode : ");
+		ImGui::SameLine();
+		ImGui::RadioButton("Press", &Mode, ePress);
+		ImGui::SameLine();
+		ImGui::RadioButton("Trigger", &Mode, eTrigger);
+		if (Mode == ePress)
+		{
+			PressMode = true;
+		}
+		else
+		{
+			PressMode = false;
+		}
+
+		EndDebugWindow("Information");
+	}
 #endif
 }
 
@@ -276,8 +261,14 @@ void PaintManager::Draw()
 //=============================================================================
 void PaintManager::SetPaint(int InkType)
 {
+	//LPDIRECT3DDEVICE9 Device = GetDevice();
+	//CAMERA *camerawk = GetCamera();
+	//D3DXMATRIX ViewMtx, ProjMtx;
 	D3DXVECTOR3 CursorScreenPos = pCursor->GetPos();
 	D3DXVECTOR3 CursorWorldPos = pCursor->GetWorldPos();
+
+	//Device->GetTransform(D3DTS_VIEW, &ViewMtx);
+	//Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
 
 	// 黒インクの場合
 	if (InkType == BlackInk)
@@ -289,6 +280,31 @@ void PaintManager::SetPaint(int InkType)
 
 		Paint *Object = new Paint(this->Owner, BlackInkColor);
 
+#if 0
+		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+		// スクリーン座標とXZ平面のワールド座標交点算出
+		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+		CalcScreenToWorld(&OutPos1, (int)CursorPos.x, (int)CursorPos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)CursorPos.x, (int)CursorPos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+		// 判定用三角形ポリゴン
+		TriangleStr triPos1, triPos2;
+		triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		// 2点を使って当たった場所をセットする場所とする
+		if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+		{
+			hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+		}
+
+		Object->SetPos(SetPos);
+#endif
 		Object->SetPos(CursorWorldPos);
 		Object->SetUse(true);
 
@@ -313,6 +329,31 @@ void PaintManager::SetPaint(int InkType)
 
 		Paint *Object = new Paint(this->Owner, this->Owner);
 
+#if 0
+		// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
+		// スクリーン座標とXZ平面のワールド座標交点算出
+		D3DXVECTOR3 OutPos1, OutPos2, SetPos;
+		CalcScreenToWorld(&OutPos1, (int)CursorPos.x, (int)CursorPos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+		CalcScreenToWorld(&OutPos2, (int)CursorPos.x, (int)CursorPos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
+
+		// 判定用三角形ポリゴン
+		TriangleStr triPos1, triPos2;
+		triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
+			camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
+
+		// 2点を使って当たった場所をセットする場所とする
+		if (!hitCheck(&SetPos, triPos1, OutPos1, OutPos2))
+		{
+			hitCheck(&SetPos, triPos2, OutPos1, OutPos2);
+		}
+
+		Object->SetPos(SetPos);
+#endif
 		Object->SetPos(CursorWorldPos);
 		Object->SetUse(true);
 
@@ -320,8 +361,6 @@ void PaintManager::SetPaint(int InkType)
 		Object->SetScreenPos((D3DXVECTOR2)CursorScreenPos);
 		// 四分木に入れる
 		PaintManager::Quadtree->InsertObject(Object);
-
-		PaintManager::paintGroup->Insert(CursorWorldPos, this->Owner);
 
 		// 使用しているインクの色に合わせて表示時間、テクスチャをセット
 		Object->SetTime(DRAW_FRAME_COLOR);
