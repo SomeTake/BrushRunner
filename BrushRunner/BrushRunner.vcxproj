@@ -27,6 +27,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CursorObj.h" />
     <ClInclude Include="GoalFlag.h" />
+    <ClInclude Include="MeshField.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="Podium.h" />
     <ClInclude Include="resource.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="Sky.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SlipState.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpikeState.h" />
@@ -112,6 +114,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CursorObj.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
+    <ClCompile Include="MeshField.cpp" />
     <ClCompile Include="Object3D.cpp" />
     <ClCompile Include="Podium.cpp" />
     <ClCompile Include="ResultDigit.cpp" />
@@ -171,6 +174,7 @@
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="Sky.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="SlipState.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpikeState.cpp" />

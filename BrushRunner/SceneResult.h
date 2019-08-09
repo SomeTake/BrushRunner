@@ -11,6 +11,7 @@
 #include "_2dobj.h"
 #include "Timer.h"
 #include "D3DXAnimation.h"
+#include "Object3D.h"
 
 //*****************************************************************************
 // クラス定義
@@ -19,8 +20,9 @@ class SceneResult :
 	public Scene
 {
 private:
-	std::vector<_2dobj*>	p2dObj;		// 2Dオブジェクト用のポインタ
-	std::vector<D3DXANIMATION*> anim;	// 3Dモデル用のポインタ
+	std::vector<_2dobj*>		Obj2d;		// 2Dオブジェクト用のポインタ
+	std::vector<D3DXANIMATION*> anim;		// 3Dモデル用のポインタ（Xファイル）
+	std::vector < Object3D*>	Obj3d;		// 3Dポリゴン用のポインタ
 
 	void Debug();
 

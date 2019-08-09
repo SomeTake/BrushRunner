@@ -15,6 +15,7 @@ class Object3D
 protected:
 	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff;	// 頂点バッファへのポインタ
 	LPDIRECT3DTEXTURE9		D3DTexture;	// テクスチャへのポインタ
+	LPDIRECT3DINDEXBUFFER9	D3DIdxBuff;	// インデックスバッファインターフェースへのポインタ
 	D3DXVECTOR3				pos;		// 座標
 	D3DXVECTOR3				rot;		// 回転
 	D3DXVECTOR3				scl;		// スケール
