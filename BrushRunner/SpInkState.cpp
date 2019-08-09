@@ -25,7 +25,7 @@ SpInkState::SpInkState(Item *owner) : owner_(owner)
 //=============================================================================
 SpInkState::~SpInkState()
 {
-	delete owner_;
+	owner_ = nullptr;
 }
 
 //=============================================================================
@@ -38,9 +38,8 @@ void SpInkState::Update()
 	// アイテムの効果が終了
 	if (cnt == ACTIVE_TIME)
 	{
-		owner_->SetActive(false);
-		owner_->GetPlayer()->SetSpInk(false);
-		owner_->GetPlayer()->SetHitItem(false);
+		owner_->Reset();
+		owner_->GetPlayer()->GetPaintManager()->SetSpInk(false);
 	}
 }
 
@@ -50,5 +49,5 @@ void SpInkState::Update()
 void SpInkState::Start()
 {
 	cnt = 0;
-	owner_->GetPlayer()->SetSpInk(true);
+	owner_->GetPlayer()->GetPaintManager()->SetSpInk(true);
 }

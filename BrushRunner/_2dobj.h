@@ -7,7 +7,6 @@
 #ifndef _2DOBJ_H_
 #define _2DOBJ_H_
 
-#include "Struct.h"
 
 //*****************************************************************************
 // 2D用オブジェクト基底クラス定義
@@ -22,13 +21,16 @@ protected:
 	LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 	Vertex2D			vertexWk[NUM_VERTEX];		// 頂点情報格納構造体
 	D3DXVECTOR3			pos;						// 座標
+	D3DXVECTOR3			size;						// サイズ
 	int					PatternAnim;				// アニメーションパターン
 	bool				use;						// 使用フラグ
+//	Character			*pChara;					// 参照したいキャラクタークラスのポインタ
 
 public:
 	// メンバ関数
 	_2dobj();
-	~_2dobj();
+	virtual ~_2dobj();
+		
 
 	// 仮想関数
 	virtual void Update() {};						// 更新

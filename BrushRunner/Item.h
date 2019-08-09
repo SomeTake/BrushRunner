@@ -29,18 +29,19 @@ static D3DXVECTOR3 ItemPos[PLAYER_MAX] = {
 
 enum ItemNum
 {
-	NumJet,
-	NumSpike,
-	NumPowerUp,
-	NumKawa,
-	NumBlind,
-	NumSpInk,
-	NumGun,
+	NumJet,		// ジェットパック
+	NumSpike,	// スパイクブーツ
+	NumPowerUp,	// パワーアップバナナ
+	NumKawa,	// バナナの皮
+	NumBlind,	// ブラインド
+	NumSpInk,	// スペシャルインク
+	NumGun,		// トリモチガン
 
 	NumItemMax,
 };
 
 class ItemState;
+class Effect;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -48,11 +49,13 @@ class Item :
 	public _2dobj
 {
 private:
+	Effect * effect;
 	ItemState * state[NumItemMax];			// ステータス抽象クラス
 	Player * pPlayer;						// 参照するプレイヤークラスのポインタ
 	int rouletteCnt;						// ルーレットのカウンタ
 	int useCnt;								// ルーレットでアイテムのテクスチャも回すためのカウンタ
 	bool active;							// アイテム使用中
+	static 	LPDIRECT3DTEXTURE9	D3DTexture; // テクスチャのポインタ
 
 	HRESULT MakeVertex();
 	void SetTexture();
@@ -60,6 +63,7 @@ private:
 
 	void Start();
 	void ActiveState(int ItemID);
+	void Debug();
 
 public:
 	Item(D3DXVECTOR3 _pos, Player* ptr);
@@ -69,12 +73,12 @@ public:
 	void Draw();
 
 	void ChangeState(int ItemID);
+	void Reset();
 
 	bool GetUse() { return use; };
 	Player *GetPlayer() { return pPlayer; };
+	Effect *GetEffect() { return effect; };
 
-	void SetUse(bool _use) { use = _use; };
-	void SetActive(bool _active) { active = _active; };
 	void SetPatternAnim(int Anim) { PatternAnim = Anim; };
 };
 

@@ -6,31 +6,43 @@
 //=============================================================================
 #include "Main.h"
 #include "SceneGame.h"
+#include "SceneManager.h"
 #include "Map.h"
 #include "Camera.h"
 #include "Collision.h"
 #include "Input.h"
-#include "MyLibrary.h"
+#include "DebugWindow.h"
+#include "SceneResult.h"
 
-//2d obj
+// 2d obj
 #include "Frame01.h"
+#include "Face.h"
 #include "CountDown.h"
 #include "Item.h"
 
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
+// 3d obj
+#include "Sky.h"
+#include "GoalFlag.h"
 
-
 //*****************************************************************************
-// オブジェクトのポインタ
+// メンバ変数の初期化
 //*****************************************************************************
+ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneGame::SceneGame()
 {
+	// ゲームの結果を初期化
+	startframe = 0;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		data[i].rank = -1;
+		data[i].time = 0;
+	}
+	result = false;
+
 	// マップの初期化
 	pMap = new Map();
 
@@ -54,14 +66,24 @@ SceneGame::SceneGame()
 	// フレーム
 	UIObject.push_back(new Frame());
 
-	// カウントダウンの初期化
-	UIObject.push_back(new CountDown());
-
-	// アイテムの初期化
+	// アイテム表示の初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
 		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
 	}
+
+	// カウントダウンの初期化
+	UIObject.push_back(new CountDown());
+
+	// エフェクトマネージャ
+	pEffectManager = new EffectManager();
+
+	// 3Dオブジェクト
+	object3d.push_back(new Sky());
+	object3d.push_back(new GoalFlag());
+
+	// タイマー
+	pTimer = new Timer();
 }
 
 //=============================================================================
@@ -81,12 +103,6 @@ SceneGame::~SceneGame()
 	// ペイントテクスチャの削除
 	Paint::ReleaseTexture();
 
-	// エフェクトの削除
-	for (int i = 0; i < EffectMax; i++)
-	{
-		SAFE_DELETE(pEffect[i]);
-	}
-
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -100,26 +116,31 @@ SceneGame::~SceneGame()
 	}
 	UIObject.clear();
 	ReleaseVector(UIObject);
+
+	// エフェクトマネージャの削除
+	delete pEffectManager;
+
+	// 3Dオブジェクトの削除
+	for (auto &Obj3D : object3d)
+	{
+		SAFE_DELETE(Obj3D);
+	}
+	object3d.clear();
+	ReleaseVector(object3d);
+
+	// タイマーの削除
+	delete pTimer;
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneGame::Update()
+void SceneGame::Update(int SceneID)
 {
-	static int startframe = 0;
-
-	// スタートタイマー更新
+	// 開始処理
 	if (startframe < START_FRAME)
 	{
-		startframe++;
-	}
-	if (startframe == START_FRAME)
-	{
-		for (int i = 0; i < PLAYER_MAX; i++)
-		{
-			pPlayer[i]->SetPlayable(true);
-		}
+		Start();
 	}
 
 	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
@@ -134,22 +155,8 @@ void SceneGame::Update()
 	// カメラの更新
 	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
 
-	// 2Dオブジェクトの更新
-	for (auto &Object : UIObject)
-	{
-		Object->Update();
-	}
-
 	// マップの更新
 	pMap->Update();
-
-	// エフェクトの更新
-#if 0
-	for (int i = 0; i < EffectMax; i++)
-	{
-		pEffect[i]->Update();
-	}
-#endif
 
 	// プレイヤーの更新
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -162,6 +169,30 @@ void SceneGame::Update()
 
 	// ペイントグループの更新
 	paintGroup->Update();
+
+	// 2Dオブジェクトの更新
+	for (auto &Object : UIObject)
+	{
+		Object->Update();
+	}
+
+	// エフェクトマネージャの更新
+	pEffectManager->Update();
+
+	// 3Dオブジェクトの更新
+	for (auto &Obj3D : object3d)
+	{
+		Obj3D->Update();
+	}
+
+	// タイマーの更新
+	pTimer->Update();
+
+	// リザルト画面へ遷移していいか確認
+	CheckResult();
+
+	// デバッグ
+	Debug();
 }
 
 //=============================================================================
@@ -172,10 +203,13 @@ void SceneGame::Draw()
 	// マップの描画
 	pMap->Draw();
 
-	// 2Dオブジェクトの描画
-	for (auto &Object : UIObject)
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
+
+	// 3Dオブジェクトの描画
+	for (auto &Obj3D : object3d)
 	{
-		Object->Draw();
+		Obj3D->Draw();
 	}
 
 	// プレイヤーの描画
@@ -184,13 +218,14 @@ void SceneGame::Draw()
 		pPlayer[i]->Draw();
 	}
 
-#if 0
-	// エフェクトの描画
-	for (int i = 0; i < EffectMax; i++)
+	// 2Dオブジェクトの描画
+	for (auto &Object : UIObject)
 	{
-		pEffect[i]->Draw();
+		Object->Draw();
 	}
-#endif
+
+	// タイマーの描画
+	pTimer->Draw();
 }
 
 //=============================================================================
@@ -204,6 +239,7 @@ void SceneGame::Collision()
 		pPlayer[i]->GroundCollider();
 		pPlayer[i]->HorizonCollider();
 		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
 	}
 
 	// プレイヤーとペイントマネージャの当たり判定
@@ -247,4 +283,145 @@ void SceneGame::Collision()
 	// 四分木を更新する
 	Quadtree->Update();
 
+}
+
+//=============================================================================
+// 開始処理
+//=============================================================================
+void SceneGame::Start()
+{
+	// スタートタイマー更新
+	startframe++;
+	
+	if (startframe == START_FRAME)
+	{
+		for (int i = 0; i < PLAYER_MAX; i++)
+		{
+			pPlayer[i]->SetPlayable(true);
+		}
+
+		pTimer->Start();
+	}
+}
+
+//=============================================================================
+// リザルト画面へ遷移していいか確認
+//=============================================================================
+void SceneGame::CheckResult()
+{
+	// 全員ゴールorゲームオーバーならシーン遷移可能
+	if (result)
+	{
+		// タイマーストップ
+		pTimer->Stop();
+
+		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+		{
+			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
+			{
+				SetScene(new SceneResult(), nSceneResult);
+				InitCamera();
+				return;
+			}
+		}
+	}
+
+	// 全員がゴールorゲームオーバーになったか確認
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (data[i].rank != -1)
+		{
+			result = true;
+		}
+		else
+		{
+			result = false;
+			break;
+		}
+	}
+
+	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
+	{
+		bool hit = false;
+		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (data[rNo].rank != pNo)
+			{
+				hit = false;
+			}
+			else
+			{
+				hit = true;
+				break;
+			}
+		}
+
+		if (!hit)
+		{
+			// まだ順位が登録されていない場合
+			InsertResult(pNo);
+		}
+	}
+}
+
+//=============================================================================
+// リザルト順位配列にデータの挿入
+//=============================================================================
+void SceneGame::InsertResult(int pNo)
+{
+	// ゲームオーバー確認
+	if (!pPlayer[pNo]->GetOnCamera())
+	{
+		// リザルト順位配列の後ろから入れていく
+		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
+		{
+			if (data[rNo].rank == -1)
+			{
+				data[rNo].rank = pNo;
+				data[rNo].time = 359999;
+				break;
+			}
+		}
+	}
+
+	// ゴール確認
+	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
+	{
+		// リザルト順位配列の前から入れていく
+		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
+		{
+			if (data[rNo].rank == -1)
+			{
+				data[rNo].rank = pNo;
+				data[rNo].time = pTimer->Check();
+				break;
+			}
+		}
+	}
+}
+
+//=============================================================================
+// デバッグ
+//=============================================================================
+void SceneGame::Debug()
+{
+#ifndef _DEBUG_
+	BeginDebugWindow("Result");
+
+	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
+	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].rank, data[1].rank, data[2].rank, data[3].rank);
+	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
+
+	EndDebugWindow("Result");
+
+#endif
+}
+
+//=============================================================================
+// 結果のゲッター
+//=============================================================================
+ResultData *SceneGame::GetResultData(int playerNo)
+{
+	return &data[playerNo];
 }

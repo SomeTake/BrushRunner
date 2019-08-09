@@ -20,6 +20,7 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Timer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -28,36 +29,14 @@
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define MOVE_SPEED			(2.0f)										// 動くスピード
-#define DefaultPosition		D3DXVECTOR3(45.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+#define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(10)				// オブジェクトにヒットしたとき有効になるまでのフレーム数
-#define MOVE_SPEED			(2.0f)				// 動くスピード
-#define FALL_VELOCITY_MAX	(20.0f)				// 最大の落下速度
-#define STANDARD_GRAVITY	(0.98f)				// 重力加速度
-
-// 読み込むキャラクターモデル
-static const char* CharaModel[] =
-{
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
-};
-
-// キャラクターモデルの番号
-enum CharaModelNum
-{
-	ShachikuModel,
-	KouhaiModel,
-
-	// モデルの種類
-	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] =
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
-};
+#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define MOVE_SPEED			(2.0f)										// 動くスピード
+#define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
+#define STANDARD_GRAVITY	(0.98f)										// 重力加速度
+#define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
+#define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
 
 enum CallbackKeyType
 {
@@ -104,7 +83,6 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 		this->PaintSystem = new PaintManager(ctrlNum, false, nullptr);
 	}
 	this->playerUI = new PlayerUI(ctrlNum);
-	inkType = ColorInk;
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
@@ -114,14 +92,8 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 	jumpValue = 1.0f;
 
 	spike = false;
-	gun = false;
+	//gun = false;
 	blind = false;
-	spink = false;
-
-	for (int i = 0; i < InkNum; i++)
-	{
-		inkValue[i] = INK_MAX;
-	}
 
 	// 待機状態からスタートする
 	state = new IdleState(this);
@@ -175,9 +147,6 @@ void Player::Update()
 
 		// フィールド上に生成したアイテムの更新
 		itemManager->Update();
-
-		// フィールド上に生成したアイテムのチェック
-		itemManager->Check();
 	}
 
 	// デバッグ表示＆操作
@@ -226,7 +195,7 @@ void Player::Draw()
 		}
 
 		// プレイヤーUIの描画
-		playerUI->Draw(onCamera);
+		playerUI->Draw(onCamera,blind);
 
 		// ペイントの描画
 		PaintSystem->Draw();
@@ -234,7 +203,7 @@ void Player::Draw()
 	else
 	{
 		// プレイヤーUIの描画(プレイヤー死亡のUI)
-		playerUI->Draw(onCamera);
+		playerUI->Draw(onCamera, blind);
 	}
 
 	// フィールド上に生成したアイテムの描画
@@ -270,14 +239,16 @@ void Player::ChangeState(PlayerState *NewState)
 //=====================================================================================================
 void Player::Move()
 {
-	// オート移動
-	if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip)
+	if (onCamera)
 	{
-		//pos.x += MOVE_SPEED * runSpd;
+		// オート移動
+		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip && GetAnimCurtID() != Stop)
+		{
+			pos.x += MOVE_SPEED * runSpd;
+		}
 	}
-
-	// 空中判定
-	JumpMove();
+		// 空中判定
+		JumpMove();
 
 }
 
@@ -286,11 +257,21 @@ void Player::Move()
 //=====================================================================================================
 void Player::JumpMove()
 {
-	pos.y += jumpSpd * jumpValue;
+	pos.y += jumpSpd;
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
 	if (jumpSpd > -FALL_VELOCITY_MAX)
 	{
 		jumpSpd -= STANDARD_GRAVITY;
+	}
+
+	// ジェットパック装備中はジャンプ力アップ
+	if (jet)
+	{
+		jumpValue = JETPACK_VALUE;
+	}
+	else
+	{
+		jumpValue = 1.0f;
 	}
 }
 
@@ -390,23 +371,24 @@ void Player::CheckOnCamera()
 	CAMERA *camera = GetCamera();
 
 	// 縦
-	if ((pos.x > camera->at.x - DRAW_RANGE.x) && (pos.x < camera->at.x + DRAW_RANGE.x))
+	if (pos.x > camera->at.x - DRAW_RANGE.x)
 	{
-		// 横
-		if ((pos.y > camera->at.y - DRAW_RANGE.y) && (pos.y < camera->at.y + DRAW_RANGE.y))
-		{
-			onCamera = true;
-		}
-		else
-		{
-			onCamera = false;
-			playerUI->SetPlayerDeadTexture();
-		}
+		onCamera = true;
 	}
 	else
 	{
 		onCamera = false;
 		playerUI->SetPlayerDeadTexture();
+
+		// エフェクト発生
+		D3DXVECTOR3 setpos = pos;
+		setpos.z -= 1.0f;
+		setpos.x += 150.0f;
+		std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
+		Effect3D *effect = new Effect3D(DeadEffect3D, setpos, 1);
+		Effect3DVector->push_back(effect);
+
+		// PlaySound(爆発音)
 	}
 }
 
@@ -423,13 +405,6 @@ void Player::GroundCollider()
 		Map::GetMapChipXY(pos, &x, &y);
 
 		D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
-
-		//// マップ外判定
-		//if (x < 0 || y > 0)
-		//{
-		//	hitGround = false;
-		//	return;
-		//}
 
 		// 現在座標があるところになにかオブジェクトがあればヒットしている
 		if (Map::GetMapTbl(x, y) >= 0)
@@ -457,27 +432,34 @@ void Player::GroundCollider()
 //=====================================================================================================
 void Player::PaintCollider()
 {
-	for (auto &Paint : PaintSystem->GetColorPaint())
+	// 上昇中は判定しない
+	if (jumpSpd <= 0)
 	{
-		if (!Paint->GetUse())
-			continue;
+		for (auto &Paint : PaintSystem->GetColorPaint())
+		{
+			if (!Paint->GetUse())
+				continue;
 
-		// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-		if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
-		{
-			// 当たった場合、プレイヤーの座標を修正
-			pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
-			jumpSpd = 0.0f;
-			animSpd = 1.0f;
-			hitPaint = true;
-			return;
-		}
-		else
-		{
-			hitPaint = false;
+			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
+			if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
+			{
+				// 当たった場合、プレイヤーの座標を修正
+				pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
+				jumpSpd = 0.0f;
+				animSpd = 1.0f;
+				hitPaint = true;
+				return;
+			}
+			else
+			{
+				hitPaint = false;
+			}
 		}
 	}
-
+	else
+	{
+		hitPaint = false;
+	}
 }
 
 //=====================================================================================================
@@ -493,13 +475,6 @@ void Player::HorizonCollider()
 	x++;
 	y--;
 
-	// マップ外
-	//if (x < 0 || y > 0)
-	//{
-	//	hitHorizon = false;
-	//	return;
-	//}
-
 	// テーブルを調べて0以上ならヒット
 	if (Map::GetMapTbl(x, y) >= 0)
 	{
@@ -514,18 +489,47 @@ void Player::HorizonCollider()
 }
 
 //=====================================================================================================
-// フィールドオブジェクトとの当たり判定
+// フィールドオブジェクト（足元）との当たり判定
 //=====================================================================================================
 void Player::ObjectCollider()
 {
 	// キャラクターの座標からマップ配列の場所を調べる
-	int x = (int)((pos.x + CHIP_SIZE / 2) / CHIP_SIZE);
-	int y = (int)((pos.y - CHIP_SIZE / 2) / CHIP_SIZE);
+	int x, y;
+	Map::GetMapChipXY(pos, &x, &y);
 
-	int objType = Map::GetObjTbl(x, -y);
+	int objType = Map::GetObjTbl(x, y);
 
 	HitObjectInfluence(objType);
 
+}
+
+//=====================================================================================================
+// フィールドオブジェクト（アイテム）との当たり判定
+//=====================================================================================================
+void Player::ObjectItemCollider(Map *pMap)
+{
+	// アイテムを取得している状態なら判定しない
+	if (hitItem)
+		return;
+
+	D3DXVECTOR3 colliderpos = pos;
+	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
+
+	for (auto &Obj : pMap->GetObjectChip())
+	{
+		if (Obj->GetTextureNum() != eObjItem)
+			continue;
+
+		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
+		{
+			hitItem = true;
+			// PlaySound(アイテム取得音)
+			return;
+		}
+	}
+
+	hitItem = false;
+	return;
 }
 
 //=====================================================================================================
@@ -555,6 +559,13 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 				break;
 			}
 			item->SetUse(false);
+
+			// エフェクトを発生
+			std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
+			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
+			Effect3DVector->push_back(effect);
+
+			// PlaySound(アイテムヒット音)
 		}
 	}
 }
@@ -610,18 +621,23 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjJump:
-		jumpSpd = JUMP_SPEED;
+		jumpSpd = JUMP_SPEED * jumpValue;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
+		// 時間経過でインク減少
 		if (!spike)
 		{
 			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
 			if (hitObjCnt == 0)
 			{
-				inkValue[BlackInk] = max(--inkValue[BlackInk], 0);
-				inkValue[ColorInk] = max(--inkValue[ColorInk], 0);
+				int ink = PaintSystem->GetInkValue(BlackInk);
+				PaintSystem->SetInkValue(max(--ink, 0), BlackInk);
+				ink = PaintSystem->GetInkValue(ColorInk);
+				PaintSystem->SetInkValue(max(--ink, 0), ColorInk);
+
+				// PlaySound(インクが減る音)
 			}
 		}
 
@@ -631,13 +647,18 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjHeal:
+		// 時間経過でインク増加
 		if (!spike)
 		{
 			hitObjCnt = LoopCountUp(hitObjCnt, 0, OBJECT_HIT_COUNTER);
 			if (hitObjCnt == 0)
 			{
-				inkValue[BlackInk] = min(++inkValue[BlackInk], INK_MAX);
-				inkValue[ColorInk] = min(++inkValue[ColorInk], INK_MAX);
+				int ink = PaintSystem->GetInkValue(BlackInk);
+				PaintSystem->SetInkValue(min(++ink, INK_MAX), BlackInk);
+				ink = PaintSystem->GetInkValue(ColorInk);
+				PaintSystem->SetInkValue(min(++ink, INK_MAX), ColorInk);
+
+				// PlaySound(インクが回復する音)
 			}
 		}
 
@@ -647,8 +668,6 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjItem:
-		hitItem = true;
-
 		// 他のステータスはリセット
 		hitObjCnt = 0;
 		runSpd = 1.0f;

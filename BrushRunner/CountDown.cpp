@@ -60,6 +60,8 @@ void CountDown::Update()
 			startsecond = starttimer / SECOND_PER_FRAME;
 
 			SetTexture();
+
+			// PlaySound(カウントダウン)
 		}
 		// カウントダウン終了
 		else
@@ -76,6 +78,14 @@ void CountDown::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
+	// Zテストを有効に
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+
+	// αテストを有効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
 	// 頂点フォーマットの設定
 	Device->SetFVF(FVF_VERTEX_2D);
 
@@ -88,6 +98,13 @@ void CountDown::Draw()
 		// ポリゴンの描画
 		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
+
+	// αテストを無効に
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	// Z比較を無効に
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 }
 
 //=============================================================================

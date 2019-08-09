@@ -7,16 +7,28 @@
 #ifndef _SCENERESULT_H_
 #define _SCENERESULT_H_
 
+#include "Scene.h"
+#include "_2dobj.h"
+#include "Timer.h"
+#include "D3DXAnimation.h"
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneResult
+class SceneResult :
+	public Scene
 {
+private:
+	std::vector<_2dobj*>	p2dObj;		// 2Dオブジェクト用のポインタ
+	std::vector<D3DXANIMATION*> anim;	// 3Dモデル用のポインタ
+
+	void Debug();
+
 public:
 	SceneResult();
 	~SceneResult();
 
-	void Update();
+	void Update(int SceneID);
 	void Draw();
 };
 

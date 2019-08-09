@@ -25,14 +25,29 @@
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CursorObj.h" />
+    <ClInclude Include="GoalFlag.h" />
+    <ClInclude Include="Object3D.h" />
+    <ClInclude Include="Podium.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ResultDigit.h" />
+    <ClInclude Include="ResultPlayer.h" />
+    <ClInclude Include="ResultRank.h" />
+    <ClInclude Include="ResultTimer.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SelectLogo.h" />
     <ClInclude Include="CharacterAI.h" />
     <ClInclude Include="Chip.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="colorinkline.h" />
     <ClInclude Include="CountDown.h" />
     <ClInclude Include="Cursor.h" />
     <ClInclude Include="D3DXAnimation.h" />
     <ClInclude Include="DebugWindow.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="Effect3D.h" />
+    <ClInclude Include="EffectManager.h" />
+    <ClInclude Include="Face.h" />
     <ClInclude Include="Faceframe.h" />
     <ClInclude Include="FieldItem.h" />
     <ClInclude Include="FieldItemManager.h" />
@@ -68,18 +83,24 @@
     <ClInclude Include="Pop.h" />
     <ClInclude Include="PowerUpBananaState.h" />
     <ClInclude Include="Quadtree.h" />
+    <ClInclude Include="Result.h" />
     <ClInclude Include="RunningState.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
     <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneResult.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="Sky.h" />
     <ClInclude Include="SlipState.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpikeState.h" />
     <ClInclude Include="SpInkState.h" />
     <ClInclude Include="StopState.h" />
     <ClInclude Include="Struct.h" />
+    <ClInclude Include="Digit.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="Trophy.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
@@ -90,14 +111,28 @@
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CursorObj.cpp" />
+    <ClCompile Include="GoalFlag.cpp" />
+    <ClCompile Include="Object3D.cpp" />
+    <ClCompile Include="Podium.cpp" />
+    <ClCompile Include="ResultDigit.cpp" />
+    <ClCompile Include="ResultPlayer.cpp" />
+    <ClCompile Include="ResultRank.cpp" />
+    <ClCompile Include="ResultTimer.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SelectLogo.cpp" />
     <ClCompile Include="CharacterAI.cpp" />
     <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="colorinkline.cpp" />
     <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />
     <ClCompile Include="DebugWindow.cpp" />
     <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="Effect3D.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
+    <ClCompile Include="Face.cpp" />
     <ClCompile Include="Faceframe.cpp" />
     <ClCompile Include="FieldItem.cpp" />
     <ClCompile Include="FieldItemManager.cpp" />
@@ -130,19 +165,28 @@
     <ClCompile Include="Pop.cpp" />
     <ClCompile Include="PowerUpBananaState.cpp" />
     <ClCompile Include="Quadtree.cpp" />
+    <ClCompile Include="Result.cpp" />
     <ClCompile Include="RunningState.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />
     <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneResult.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Sky.cpp" />
     <ClCompile Include="SlipState.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpikeState.cpp" />
     <ClCompile Include="SpInkState.cpp" />
     <ClCompile Include="StopState.cpp" />
+    <ClCompile Include="Digit.cpp" />
+    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BrushRunner.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -205,13 +249,9 @@
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -228,7 +268,6 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -254,7 +293,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

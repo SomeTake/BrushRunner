@@ -26,6 +26,8 @@ FieldItemManager::~FieldItemManager()
 //=====================================================================================================
 void FieldItemManager::Update()
 {
+	Check();
+
 	for (auto &i : this->Item)
 	{
 		i->Update();

@@ -46,9 +46,12 @@ void IdleState::Update(int AnimCurtID)
 			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B) 
 				|| owner_->GetAIAction() == eActJump)
 			{
-				owner_->SetJumpSpeed(JUMP_SPEED);
+				float value = owner_->GetJumpValue();
+				owner_->SetJumpSpeed(JUMP_SPEED * value);
 				owner_->ChangeAnim(Jump);
 				owner_->ChangeState(new JumpState(owner_));
+
+				// PlaySound(ƒWƒƒƒ“ƒv‰¹)
 				return;
 			}
 		}

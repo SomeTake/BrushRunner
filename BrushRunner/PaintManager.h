@@ -33,6 +33,10 @@ private:
 	int						Owner;
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
+	bool					SpInk;					// trueのときインクが減らない
+	int						HealCnt;				// 自動回復カウント
+
+	// AI用
 	bool					PressPaint = false;
 	bool					AIUse = false;
 	CharacterAI				*AIptr = nullptr;
@@ -42,6 +46,7 @@ private:
 
 	void SetPaint(int InkType);
 	void CheckPaintUse(void);
+	void AutoHeal();
 
 public:
 	PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr);
@@ -53,11 +58,17 @@ public:
 	static void SetPaintGroupPtr(PaintGroup *Ptr) { if (!PaintManager::paintGroup) { PaintManager::paintGroup = Ptr; } };
 
 	// ゲッター
+	bool GetSpInk() { return SpInk; };
+	int GetInkValue(int type) { return InkValue[type]; };
 	int GetOwner(void) { return this->Owner; };
 	std::vector<Paint*> GetBlackPaint(void) { return this->BlackPaint; };
 	std::vector<Paint*> GetColorPaint(void) { return this->ColorPaint; };
 	// 四分木から衝突可能なオブジェクトを探す
 	std::vector<Paint*> GetCollisionList(int NodeID);
+
+	// セッター
+	void SetSpInk(bool _SpInk) { SpInk = _SpInk; };
+	void SetInkValue(int value, int type) { InkValue[type] = value; };
 };
 
 #endif

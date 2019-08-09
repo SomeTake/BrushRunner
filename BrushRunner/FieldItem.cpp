@@ -9,6 +9,9 @@
 #include "Item.h"
 #include "Camera.h"
 
+//*****************************************************************************
+// ÉÅÉìÉoÇÃèâä˙âª
+//*****************************************************************************
 LPDIRECT3DTEXTURE9		FieldItem::D3DTexture = NULL;
 LPDIRECT3DVERTEXBUFFER9	FieldItem::D3DVtxBuff = NULL;
 

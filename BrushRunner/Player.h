@@ -13,13 +13,38 @@
 #include "PlayerState.h"
 #include "FieldItemManager.h"
 #include "PaintManager.h"
+#include "Map.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define PLAYER_MAX				(2)										// 操作するプレイヤーの数
-#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ
+#define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
+
+// 読み込むキャラクターモデル
+static const char* CharaModel[] =
+{
+	"data/MODEL/Shachiku/Shachiku.x",
+	"data/MODEL/Kouhai/Kouhai.x",
+};
+
+// キャラクターモデルの番号
+enum CharaModelNum
+{
+	ShachikuModel,
+	KouhaiModel,
+
+	// モデルの種類
+	MaxModel
+};
+
+// モデルの大きさ設定
+static D3DXVECTOR3 ModelScl[MaxModel] =
+{
+	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
+};
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
@@ -52,7 +77,7 @@ private:
 
 	// メンバ関数
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
-	void CreateAnimSet(void);
+	void CreateAnimSet()override;
 	void Move();			// 移動
 	void CheckOnCamera();
 	void JumpMove();		// ジャンプ移動
@@ -68,8 +93,6 @@ private:
 	float				runSpd;				// ダッシュ速度(0.0-1.0-2.0)
 	float				jumpSpd;			// ジャンプ速度
 	float				jumpValue;			// ジャンプ速度に掛けて使う(0.0-1.0-2.0)
-	int					inkValue[InkNum];	// インクの残量
-	int					inkType;			// 使用中のインクの種類(enum ColorInk=カラー, BlackInk=黒)
 
 	// 当たり判定関係のフラグ
 	bool				hitGround;			// 地上判定(↓と合わせて両方falseだと空中状態)
@@ -82,16 +105,15 @@ private:
 
 	// アイテム関連のステータス
 	bool				spike;				// スパイクブーツ装備中
-	bool				gun;				// トリモチガン装備中
 	bool				blind;				// ブラインド中
-	bool				spink;				// SPインク
+	bool				jet;				// ジェットパック装備中
 
 public:
 	// メンバ関数
 	Player(int _CtrlNum, bool AIUse);
 	~Player();
-	void Update();
-	void Draw();
+	void Update()override;
+	void Draw()override;
 
 	// 状態抽象インターフェース
 	void UpdateState(int AnimCurtID);
@@ -100,9 +122,10 @@ public:
 	// 当たり判定
 	void GroundCollider();
 	void HorizonCollider();
-	void ObjectCollider();
+	void ObjectCollider();		// フィールドオブジェクト
+	void ObjectItemCollider(Map *pMap);	// フィールドオブジェクト（アイテム）
 	void PaintCollider();
-	void FieldItemCollider(FieldItemManager *pFIManager);
+	void FieldItemCollider(FieldItemManager *pFIManager);	// フィールド内に設置されたアイテム
 
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
@@ -110,8 +133,9 @@ public:
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
 	D3DXVECTOR3	GetPos() { return pos; };
 	float GetJumpSpeed() { return jumpSpd; };
+	float GetJumpValue() { return jumpValue; };
 	PaintManager* GetPaintManager(void) { return this->PaintSystem; };
-
+	bool GetOnCamera() { return onCamera; };
 	int GetCtrlNum() { return ctrlNum; };
 	bool GetPlayable() { return playable; };
 	bool GetHitGround() { return hitGround; };
@@ -120,9 +144,7 @@ public:
 	bool GetHitItem() { return hitItem; };
 
 	bool GetSpike() { return spike; };
-	bool GetGun() { return gun; };
 	bool GetBlind() { return blind; };
-	bool GetSpInk() { return spink; };
 
 	// AI用
 	int GetAIAction() { return AIUse == true ? AI->GetAIAction() : eNoAction; };
@@ -132,13 +154,12 @@ public:
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
-
+	void SetJet(bool _jet) { jet = _jet; };
 	void SetSpike(bool _spike) { spike = _spike; };
-	void SetGun(bool _gun) { gun = _gun; };
+	//void SetGun(bool _gun) { gun = _gun; };
 	void SetBlind(bool _blind) { blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
 	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
-	void SetSpInk(bool _spink) { spink = spink; };
 };
 
 #endif

@@ -14,6 +14,9 @@
 #include "DebugWindow.h"
 #include "SceneGame.h"
 #include "Player.h"
+#include "MyLibrary.h"
+
+#define HEAL_FRAME		(30)	// 何フレームごとに自動回復を行うか
 
 QUADTREE *PaintManager::Quadtree = nullptr;
 PaintGroup *PaintManager::paintGroup = nullptr;
@@ -50,6 +53,9 @@ PaintManager::PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 	// インクゲージUIオブジェクト作成
 	this->inkGauge.push_back(new InkGauge(ColorInk, PlayerNo));
 	this->inkGauge.push_back(new InkGauge(BlackInk, PlayerNo));
+
+	this->SpInk = false;
+	this->HealCnt = 0;
 
 	// ペイントベクトルのメモリ領域確保
 	BlackPaint.reserve(INK_MAX);
@@ -91,6 +97,9 @@ PaintManager::~PaintManager()
 //=============================================================================
 void PaintManager::Update()
 {
+	// インクの自動回復
+	AutoHeal();
+
 	// カーソルの更新
 	this->pCursor->Update();
 
@@ -145,7 +154,10 @@ void PaintManager::Update()
 				// ペイントを設置する
 				SetPaint(InkType);
 				// インクを減らす
-				InkValue[InkType]--;
+				if (!SpInk)
+				{
+					InkValue[InkType]--;
+				}
 			}
 
 			if ((GetKeyboardRelease(DIK_O) || IsButtonReleased(Owner, BUTTON_C)) ||
@@ -174,7 +186,10 @@ void PaintManager::Update()
 				// ペイントを設置する
 				SetPaint(InkType);
 				// インクを減らす
-				InkValue[InkType]--;
+				if (!SpInk)
+				{
+					InkValue[InkType]--;
+				}
 			}
 			else
 			{
@@ -199,18 +214,12 @@ void PaintManager::Update()
 	// インクの残量を調整
 	if (GetKeyboardPress(DIK_Z))
 	{
-		if (InkValue[InkType] > 0)
-		{
-			InkValue[InkType]--;
-		}
+		InkValue[InkType] = max(--InkValue[InkType], 0);
 	}
 
 	if (GetKeyboardPress(DIK_X))
 	{
-		if (InkValue[InkType] < INK_MAX)
-		{
-			InkValue[InkType]++;
-		}
+		InkValue[InkType] = min(++InkValue[InkType], INK_MAX);
 	}
 
 	if (GetKeyboardPress(DIK_C))
@@ -369,4 +378,17 @@ void PaintManager::CheckPaintUse(void)
 std::vector<Paint*> PaintManager::GetCollisionList(int NodeID)
 {
 	return PaintManager::Quadtree->GetObjectsAt(NodeID);
+}
+
+//=============================================================================
+// 自動回復処理
+//=============================================================================
+void PaintManager::AutoHeal()
+{
+	HealCnt = LoopCountUp(HealCnt, 0, HEAL_FRAME);
+	if (HealCnt == 0)
+	{
+		InkValue[ColorInk] = min(++InkValue[ColorInk], INK_MAX);
+		InkValue[BlackInk] = min(++InkValue[BlackInk], INK_MAX);
+	}
 }

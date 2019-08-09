@@ -10,6 +10,7 @@
 #include "VictoryState.h"
 #include "Input.h"
 #include "Map.h"
+#include "Timer.h"
 
 //=============================================================================
 // コンストラクタ
@@ -43,9 +44,12 @@ void RunningState::Update(int AnimCurtID)
 	if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B)
 		|| owner_->GetAIAction() == eActJump)
 	{
-		owner_->SetJumpSpeed(JUMP_SPEED);
+		float value = owner_->GetJumpValue();
+		owner_->SetJumpSpeed(JUMP_SPEED * value);
 		owner_->ChangeAnim(Jump);
 		owner_->ChangeState(new JumpState(owner_));
+
+		// PlaySound(ジャンプ音)
 		return;
 	}
 
