@@ -26,6 +26,7 @@
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CursorObj.h" />
+    <ClInclude Include="Finish.h" />
     <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="MeshField.h" />
     <ClInclude Include="MyColor.h" />
@@ -116,6 +117,7 @@
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CursorObj.cpp" />
+    <ClCompile Include="Finish.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="MeshField.cpp" />
     <ClCompile Include="Object3D.cpp" />

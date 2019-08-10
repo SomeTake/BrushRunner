@@ -19,6 +19,7 @@
 #include "Face.h"
 #include "CountDown.h"
 #include "Item.h"
+#include "Finish.h"
 
 // 3d obj
 #include "Sky.h"
@@ -312,6 +313,8 @@ void SceneGame::CheckResult()
 				return;
 			}
 		}
+
+		return;	// 全員ゴールしていたらここから先の処理はしない
 	}
 
 	// 全員がゴールorゲームオーバーになったか確認
@@ -326,6 +329,12 @@ void SceneGame::CheckResult()
 			result = false;
 			break;
 		}
+	}
+
+	// 全員ゴールした瞬間のみ
+	if (result)
+	{
+		UIObject.push_back(new Finish());
 	}
 
 	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)

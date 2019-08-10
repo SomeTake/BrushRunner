@@ -53,7 +53,7 @@ private:
 	void Loop();								// エフェクトのループ処理
 
 public:
-	Effect(int EffectNum, D3DXVECTOR3 _pos, int _LoopNum);
+	Effect(EffectNum num, D3DXVECTOR3 _pos, int _LoopNum);
 	~Effect();
 
 	void Update();
