@@ -56,7 +56,7 @@ public:
 	void Update(int SceneID);
 	void Draw();
 
-	static ResultData *GetResultData(int playerNo);
+	static ResultData *GetResultData(int rank);
 
 };
 #endif

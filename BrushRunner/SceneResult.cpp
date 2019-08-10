@@ -23,33 +23,34 @@
 #include "MeshField.h"
 
 //=============================================================================
-// グローバル変数
-//=============================================================================
-
-//=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneResult::SceneResult()
 {
 	// 2Dオブジェクトのインスタンスを作成
 	Obj2d.push_back(new RESULT());
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	// 1位から順に生成
+	for (int resultNo = 0; resultNo < PLAYER_MAX; resultNo++)
 	{
-		Obj2d.push_back(new ResultRank(SceneGame::GetResultData(playerNo)->rank));
-		Obj2d.push_back(new ResultTimer(SceneGame::GetResultData(playerNo)->time, SceneGame::GetResultData(playerNo)->rank));
+		Obj2d.push_back(new ResultRank(resultNo, SceneGame::GetResultData(resultNo)->playerNo));
+		Obj2d.push_back(new ResultTimer(SceneGame::GetResultData(resultNo)->time, resultNo));
 	}
 
 	// 3Dモデルのインスタンス作成
 	anim.push_back(new Podium());
 	anim.push_back(new Trophy());
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	// 1位から順に生成
+	for (int resultNo = 0; resultNo < PLAYER_MAX; resultNo++)
 	{
-		anim.push_back(new ResultPlayer(SceneGame::GetResultData(playerNo)->rank, playerNo));
+		anim.push_back(new ResultPlayer(resultNo, SceneGame::GetResultData(resultNo)->playerNo));
 	}
 
 	// 3Dポリゴンのインスタンス作成
 	Obj3d.push_back(new SkyBox());
 	Obj3d.push_back(new MeshField());
+
+	// パーティクルマネージャのインスタンス作成
+	particleManager = new ParticleManager();
 }
 
 //=============================================================================
@@ -81,6 +82,8 @@ SceneResult::~SceneResult()
 	Obj3d.clear();
 	ReleaseVector(Obj3d);
 
+	// パーティクルマネージャの削除
+	delete particleManager;
 }
 
 //=============================================================================
@@ -119,6 +122,9 @@ void SceneResult::Update(int SceneID)
 		Obj->Update();
 	}
 
+	// パーティクルマネージャの更新
+	particleManager->Update();
+
 	Debug();
 }
 
@@ -139,6 +145,9 @@ void SceneResult::Draw()
 		Obj->Draw();
 	}
 
+	// パーティクルマネージャの描画
+	particleManager->Draw();
+
 	// 2Dオブジェクトの描画
 	for (auto &Obj : Obj2d)
 	{
@@ -154,7 +163,7 @@ void SceneResult::Debug()
 #ifndef _DEBUG_
 	BeginDebugWindow("Result");
 
-	DebugText("No1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->rank, SceneGame::GetResultData(1)->rank, SceneGame::GetResultData(2)->rank, SceneGame::GetResultData(3)->rank);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->playerNo, SceneGame::GetResultData(1)->playerNo, SceneGame::GetResultData(2)->playerNo, SceneGame::GetResultData(3)->playerNo);
 	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->time, SceneGame::GetResultData(1)->time, SceneGame::GetResultData(2)->time, SceneGame::GetResultData(3)->time);
 
 	EndDebugWindow("Result");

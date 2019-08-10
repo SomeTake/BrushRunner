@@ -1,31 +1,31 @@
 //=============================================================================
 //
-// リザルト画面でのタイマー表示 [ResultTimer.cpp]
+// パーティクルマネージャ [ParticleManager.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _RESULTTIMER_H_
-#define  RESULTTIMER_H_
+#ifndef _PARTICLEMANAGER_H_
+#define _PARTICLEMANAGER_H_
 
-#include "Timer.h"
-#include "ResultDigit.h"
+#include "Particle.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class ResultTimer :
-	public Timer
+class ParticleManager
 {
 private:
-	ResultDigit * time[DIGIT_MAX];	// それぞれの桁を表示するオブジェクトのポインタ
-	int			owner;				// プレイヤー番号
+	std::vector<Particle*> particle;
+
+	void Check();
+	void Debug();
 
 public:
-	ResultTimer(DWORD _time, int _rank);
-	~ResultTimer();
+	ParticleManager();
+	~ParticleManager();
 
-	void Update()override;
-	void Draw()override;
+	void Update();
+	void Draw();
 };
 
 #endif

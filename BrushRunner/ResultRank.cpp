@@ -26,12 +26,13 @@ LPDIRECT3DTEXTURE9	ResultRank::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-ResultRank::ResultRank(int rank)
+ResultRank::ResultRank(int rank, int owner)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	this->use = true;
 	this->rank = rank;
+	this->owner = owner;
 	pos = Rank[this->rank].pos;
 	size = Rank[this->rank].size;
 
@@ -108,8 +109,8 @@ HRESULT ResultRank::MakeVertex()
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	int x = rank % RESULTRANK_DIVIDE_X;
-	int y = rank / RESULTRANK_DIVIDE_X;
+	int x = owner % RESULTRANK_DIVIDE_X;
+	int y = owner / RESULTRANK_DIVIDE_X;
 	float sizeX = 1.0f / RESULTRANK_DIVIDE_X;
 	float sizeY = 1.0f / RESULTRANK_DIVIDE_Y;
 

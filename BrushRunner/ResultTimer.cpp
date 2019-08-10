@@ -12,6 +12,7 @@
 //=============================================================================
 ResultTimer::ResultTimer(DWORD _time, int _rank)
 {
+
 	startTime = 0;
 	currentTime = 0;
 	elapsedTime = _time;

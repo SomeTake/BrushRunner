@@ -38,6 +38,7 @@
 #include "imgui\imgui_impl_win32.h"
 
 #include "Struct.h"
+#include "MyColor.h"
 
 using namespace std;
 

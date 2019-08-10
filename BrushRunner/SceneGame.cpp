@@ -38,7 +38,7 @@ SceneGame::SceneGame()
 	startframe = 0;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		data[i].rank = -1;
+		data[i].playerNo = -1;
 		data[i].time = 0;
 	}
 	result = false;
@@ -317,7 +317,7 @@ void SceneGame::CheckResult()
 	// 全員がゴールorゲームオーバーになったか確認
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (data[i].rank != -1)
+		if (data[i].playerNo != -1)
 		{
 			result = true;
 		}
@@ -334,7 +334,7 @@ void SceneGame::CheckResult()
 		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (data[rNo].rank != pNo)
+			if (data[rNo].playerNo != pNo)
 			{
 				hit = false;
 			}
@@ -364,9 +364,9 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の後ろから入れていく
 		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
 		{
-			if (data[rNo].rank == -1)
+			if (data[rNo].playerNo == -1)
 			{
-				data[rNo].rank = pNo;
+				data[rNo].playerNo = pNo;
 				data[rNo].time = 359999;
 				break;
 			}
@@ -379,9 +379,9 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (data[rNo].rank == -1)
+			if (data[rNo].playerNo == -1)
 			{
-				data[rNo].rank = pNo;
+				data[rNo].playerNo = pNo;
 				data[rNo].time = pTimer->Check();
 				break;
 			}
@@ -398,7 +398,7 @@ void SceneGame::Debug()
 	BeginDebugWindow("Result");
 
 	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
-	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].rank, data[1].rank, data[2].rank, data[3].rank);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].playerNo, data[1].playerNo, data[2].playerNo, data[3].playerNo);
 	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
 
 	EndDebugWindow("Result");
@@ -409,7 +409,7 @@ void SceneGame::Debug()
 //=============================================================================
 // 結果のゲッター
 //=============================================================================
-ResultData *SceneGame::GetResultData(int playerNo)
+ResultData *SceneGame::GetResultData(int rank)
 {
-	return &data[playerNo];
+	return &data[rank];
 }
