@@ -14,7 +14,7 @@
 //*****************************************************************************
 #define TEXTURE_GOAL	("data/TEXTURE/GoalFlag.png")
 #define GOAL_SIZE		D3DXVECTOR3(12.8f, 12.8f, 0.0f)
-#define FLAG_POS	D3DXVECTOR3(GOAL_POS.x, -88.0f, -10.0f)
+#define FLAG_POS		D3DXVECTOR3(GOAL_POS.x, -88.0f, -10.0f)
 
 //=============================================================================
 // コンストラクタ

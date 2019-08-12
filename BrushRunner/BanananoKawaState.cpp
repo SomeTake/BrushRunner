@@ -28,15 +28,12 @@ BanananoKawaState::~BanananoKawaState()
 //=============================================================================
 void BanananoKawaState::Update()
 {
-	if (IsButtonTriggered(owner_->GetPlayer()->GetCtrlNum(), BUTTON_D) || GetKeyboardTrigger(DIK_I))
-	{
-		D3DXVECTOR3 setpos = owner_->GetPlayer()->GetPos();
-		owner_->GetPlayer()->GetFieldItemManager()->Set(NumKawa, setpos, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-		// アイテムを使用
-		owner_->Reset();
+	D3DXVECTOR3 setpos = owner_->GetPlayer()->GetPos();
+	owner_->GetPlayer()->GetFieldItemManager()->Set(NumKawa, setpos, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	// アイテムを使用
+	owner_->Reset();
 
-		// PlaySound(アイテム使用)
-	}
+	// PlaySound(アイテム使用)
 }
 
 //=============================================================================

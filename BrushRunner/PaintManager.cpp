@@ -170,15 +170,15 @@ void PaintManager::Update()
 	// AIがインクを使う
 	else
 	{
-		if (AIptr->GetAIPaintState() == ePaintStart)
+		if (AIptr->GetPaintState() == ePaintStart)
 		{
 			if (InkType == ColorInk)
 			{
 				PaintManager::paintGroup->Start(Owner);
 			}
-			AIptr->SetAIPaintState(ePainting);
+			AIptr->SetPaintState(ePainting);
 		}
-		else if (AIptr->GetAIPaintState() == ePainting)
+		else if (AIptr->GetPaintState() == ePainting)
 		{
 			// 使用するインクの残量チェック
 			if (this->InkValue[InkType] > 0)
@@ -193,16 +193,16 @@ void PaintManager::Update()
 			}
 			else
 			{
-				AIptr->SetAIPaintState(ePaintEnd);
+				AIptr->SetPaintState(ePaintEnd);
 			}
 		}
-		else if (AIptr->GetAIPaintState() == ePaintEnd)
+		else if (AIptr->GetPaintState() == ePaintEnd)
 		{
 			if (InkType == ColorInk)
 			{
 				PaintManager::paintGroup->End(Owner);
 			}
-			AIptr->SetAIPaintState(eNoAction);
+			AIptr->SetPaintState(eNoAction);
 		}
 	}
 

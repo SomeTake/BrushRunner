@@ -37,7 +37,6 @@ private:
 	// AI用
 	CharacterAI		*AIptr = nullptr;
 	bool			AIUse = false;
-	//bool			PaintReady = false;
 	D3DXVECTOR3		WorldPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	void PaintPath();					// インクで通れる道を作る
 	void DeletePath();					// 他のプレイヤーのペイントを削除

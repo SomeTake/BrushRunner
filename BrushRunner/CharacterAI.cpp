@@ -7,6 +7,8 @@
 #include "Main.h"
 #include "CharacterAI.h"
 #include "Map.h"
+#include "Item.h"
+#include "SceneGame.h"
 #include "Input.h"
 #include "DebugWindow.h"
 
@@ -69,9 +71,15 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 	MapChipAction(Pos, MapChipNo);
 
 	// 画面内のペイントを探して、ペイントする
-	if (State != ePaintPath && GetKeyboardTrigger(DIK_V))
+	if (CursorState != ePaintPath && GetKeyboardTrigger(DIK_V))
 	{
 		PaintAction();
+	}
+
+	// アイテムを持っていたら、アイテムを使用する
+	if (HaveItem)
+	{
+		ItemAction();
 	}
 
 #if _DEBUG
@@ -80,7 +88,7 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 	BeginDebugWindow("AI");
 
 	DebugText("Action : %d", this->Action);
-	DebugText("State : %d", this->State);
+	DebugText("State : %d", this->CursorState);
 
 	EndDebugWindow("AI");
 #endif
@@ -141,7 +149,7 @@ void CharacterAI::PaintAction(void)
 	{
 		if (CharacterAI::paintGroup->GetEnemyPaint(&EnemyPaint, Owner))
 		{
-			State = eUseBlackPaint;
+			CursorState = eUseBlackPaint;
 			if (InkType != BlackInk)
 			{
 				ChangeInk = true;
@@ -149,6 +157,115 @@ void CharacterAI::PaintAction(void)
 			}
 			FindEnemyPaint = true;
 		}
+	}
+}
+
+//=====================================================================================================
+// アイテムを使用する
+//=====================================================================================================
+void CharacterAI::ItemAction(void)
+{
+	bool ItemTrigger = false;
+	static int Count = 0;
+	static int Bonus = 0;
+
+	switch (ItemType)
+	{
+		// ジェットパック
+	case NumJet:
+		// パワーアップバナナ
+	case NumPowerUp:
+		// スペシャルインク
+	case NumSpInk:
+		// ブラインド
+	case NumBlind:
+
+		Count++;
+		// 2秒ごとに判定する
+		if (Count % 120 == 0)
+		{
+			int Rand = rand() % (10 + 1);
+			if (Rand + Bonus > 5)
+			{
+				// アイテムを使用する
+				ItemTrigger = true;
+			}
+			else
+			{
+				// 使用しないが、時間によって使用する確率が高くなる
+				Bonus++;
+			}
+		}
+		break;
+
+		// スパイクブーツ
+	case NumSpike:
+
+		break;
+
+		// バナナの皮
+	case NumKawa:
+
+		// 最下位じゃなくて、後ろに他のプレイヤーがいるならバナナの皮を使う
+		if (SceneGame::GetTheLastPlayer() != Owner)
+		{
+			// アイテムを使用する
+			ItemTrigger = true;
+		}
+		else
+		{
+			Count++;
+			// 2秒ごとに判定する
+			if (Count % 120 == 0)
+			{
+				int Rand = rand() % (10 + 1);
+				if (Rand + Bonus > 5)
+				{
+					// アイテムを使用する
+					ItemTrigger = true;
+				}
+				else
+				{
+					// 使用しないが、時間によって使用する確率が高くなる
+					Bonus++;
+				}
+			}
+		}
+
+		break;
+
+		// トリモチガン
+	case NumGun:
+
+		Count++;
+		// 1.5秒ごとに判定する
+		if (Count % 90 == 0 || Bonus >= 10)
+		{
+			if (ShotBullet)
+			{
+				// アイテムを使用する
+				ItemTrigger = true;
+				ShotBullet = false;
+			}
+			else
+			{
+				// 使用しないが、時間によって使用する確率が高くなる
+				Bonus++;
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	// アイテムを使用する
+	if (ItemTrigger)
+	{
+		HaveItem = false;
+		UseItem = true;
+		Count = 0;
+		Bonus = 0;
 	}
 }
 
@@ -179,7 +296,7 @@ void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 				TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
 				// キャラクター下のチップの座標
 				PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
-				State = ePaintPath;
+				CursorState = ePaintPath;
 				if (InkType != ColorInk)
 				{
 					ChangeInk = true;

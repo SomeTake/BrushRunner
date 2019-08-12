@@ -18,7 +18,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define PLAYER_MAX				(2)										// 操作するプレイヤーの数
+#define PLAYER_MAX				(4)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
@@ -67,11 +67,9 @@ private:
 	// メンバ変数
 	PlayerState			*state;				// ステータス管理抽象クラス
 	FieldItemManager	*itemManager;		// フィールドアイテム管理クラス
-
 	D3DXVECTOR3			pos;				// モデルの位置
 	D3DXVECTOR3			rot;				// 現在の向き
 	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
-	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
 	PlayerUI			*playerUI;
 
@@ -87,6 +85,9 @@ private:
 	float				animSpd;			// アニメーションの再生スピード
 	bool				playable;			// 操作可能
 	bool				onCamera;			// 画面内にいるとき
+
+	// AI用
+	CharacterAI			*AI;				// キャラクターAI
 	bool				AIUse = false;
 
 	// ステータス関係
@@ -107,6 +108,7 @@ private:
 	bool				spike;				// スパイクブーツ装備中
 	bool				blind;				// ブラインド中
 	bool				jet;				// ジェットパック装備中
+	bool				PowerBanana;		// パワーバナナ使用中
 
 public:
 	// メンバ関数
@@ -142,19 +144,22 @@ public:
 	bool GetHitHorizon() { return hitHorizon; };
 	bool GetHitPaint() { return hitPaint; };
 	bool GetHitItem() { return hitItem; };
-
 	bool GetSpike() { return spike; };
 	bool GetBlind() { return blind; };
 
 	// AI用
-	int GetAIAction() { return AIUse == true ? AI->GetAIAction() : eNoAction; };
+	bool GetAIUse(void) { return this->AIUse; };
+	CharacterAI* GetAIPtr(void) { return this->AI; };
+	int GetAIAction(void) { return AIUse == true ? AI->GetAIAction() : eNoAction; };
 
 	// セッター
 	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
+	void SetOnCamera(bool Flag) { this->onCamera = Flag; };
 	void SetJet(bool _jet) { jet = _jet; };
+	void SetPowerBanana(bool Flag) { this->PowerBanana = Flag; };
 	void SetSpike(bool _spike) { spike = _spike; };
 	//void SetGun(bool _gun) { gun = _gun; };
 	void SetBlind(bool _blind) { blind = _blind; };

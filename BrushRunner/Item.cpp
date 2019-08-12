@@ -20,10 +20,20 @@
 
 LPDIRECT3DTEXTURE9	Item::D3DTexture = NULL; // テクスチャのポインタ
 
+#define ItemPos (D3DXVECTOR3(245.0f, 30.0f, 0.0f))
+#define ItemInterval (320.0f)
+
+//static D3DXVECTOR3 ItemPos[PLAYER_MAX] = {
+//	D3DXVECTOR3(245.0f, 30.0f, 0.0f),
+//	//D3DXVECTOR3(565.0f, 30.0f, 0.0f),
+//	//D3DXVECTOR3(885.0f, 30.0f, 0.0f),
+//	//D3DXVECTOR3(1200.0f, 30.0f, 0.0f),
+//};
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Item::Item(D3DXVECTOR3 _pos, Player *ptr)
+Item::Item(Player *ptr)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -37,7 +47,7 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 
 	pPlayer = ptr;
 	use = false;
-	pos = _pos;
+	pos = D3DXVECTOR3(ItemPos.x + pPlayer->GetCtrlNum() * ItemInterval, ItemPos.y, ItemPos.z);
 	PatternAnim = 0;
 	rouletteCnt = 0;
 	useCnt = 0;
@@ -54,7 +64,6 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 	state[NumBlind] = new BlindState(this);
 	state[NumSpInk] = new SpInkState(this);
 	state[NumGun] = new GunState(this);
-
 }
 
 //=============================================================================
@@ -77,44 +86,54 @@ Item::~Item()
 //=============================================================================
 void Item::Update()
 {
-	// アイテムを取得した瞬間の処理
-	if (!use && pPlayer->GetHitItem() && !active)
+	if (pPlayer->GetOnCamera())
 	{
-		Start();
-
-		//テクスチャ座標をセット
-		SetTexture();
-	}
-
-	// 取得している状態
-	if (use)
-	{
-		// アイテムを使用する
-		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
+		// アイテムを取得した瞬間の処理
+		if (!use && pPlayer->GetHitItem() && !active)
 		{
-			// エフェクトを発生させる
-			std::vector<Effect*> *EffectVector = GetEffectVector();
-			effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
-			EffectVector->push_back(effect);
+			Start();
 
-			use = false;
-			active = true;
-			state[PatternAnim]->Start();
-
-			// PlaySound(アイテム使用)
+			//テクスチャ座標をセット
+			SetTexture();
 		}
 
-		//テクスチャ座標をセット
-		SetTexture();
-	}
+		// 取得している状態
+		if (use)
+		{
+			// アイテムを使用する
+			if ((GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D)) ||
+				(pPlayer->GetAIUse() && pPlayer->GetAIPtr()->GetUseItem()))
+			{
+				// エフェクトを発生させる
+				std::vector<Effect*> *EffectVector = GetEffectVector();
+				effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
+				EffectVector->push_back(effect);
 
-	// アイテム使用中
-	if (active)
-	{
-		ActiveState(PatternAnim);
+				use = false;
+				active = true;
+				state[PatternAnim]->Start();
+
+				// AIがアイテムを使用したら
+				if (pPlayer->GetAIUse())
+				{
+					pPlayer->GetAIPtr()->SetUseItem(false);
+				}
+
+				// PlaySound(アイテム使用)
+			}
+
+			//テクスチャ座標をセット
+			SetTexture();
+		}
+
+		// アイテム使用中
+		if (active)
+		{
+			ActiveState(PatternAnim);
+		}
+
+		Debug();
 	}
-	
-	Debug();
 }
 
 //=============================================================================
@@ -149,10 +168,10 @@ HRESULT Item::MakeVertex()
 	SetVertex();
 
 	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// 反射光の設定
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
@@ -175,15 +194,13 @@ HRESULT Item::MakeVertex()
 void Item::SetTexture()
 {
 	int x = PatternAnim % DIVIDE_ITEM_X;
-	int y = PatternAnim / DIVIDE_ITEM_X;
 	float sizeX = 1.0f / DIVIDE_ITEM_X;
-	float sizeY = 1.0f / DIVIDE_ITEM_Y;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
 }
 
 //=============================================================================
@@ -221,6 +238,12 @@ void Item::Start()
 
 				// ランダムでアイテムの種類をセット
 				PatternAnim = rand() % NumItemMax;
+
+				if (pPlayer->GetAIUse())
+				{
+					pPlayer->GetAIPtr()->SetHaveItem(true);
+					pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+				}
 			}
 		}
 	}
@@ -243,6 +266,11 @@ void Item::ChangeState(int ItemID)
 	SetTexture();
 	active = false;
 	use = true;
+	if (pPlayer->GetAIUse())
+	{
+		pPlayer->GetAIPtr()->SetHaveItem(true);
+		pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+	}
 
 	// エフェクトも終了
 	if (effect != nullptr)
@@ -272,7 +300,79 @@ void Item::Reset()
 //=============================================================================
 void Item::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG
+	if (GetKeyboardTrigger(DIK_NUMPAD0))
+	{
+		use = true;
+		PatternAnim = 0;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD1))
+	{
+		use = true;
+		PatternAnim = 1;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD2))
+	{
+		use = true;
+		PatternAnim = 2;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD3))
+	{
+		use = true;
+		PatternAnim = 3;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD4))
+	{
+		use = true;
+		PatternAnim = 4;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD5))
+	{
+		use = true;
+		PatternAnim = 5;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_NUMPAD6))
+	{
+		use = true;
+		PatternAnim = 6;
+		if (pPlayer->GetAIUse())
+		{
+			pPlayer->GetAIPtr()->SetHaveItem(true);
+			pPlayer->GetAIPtr()->SetItemType(PatternAnim);
+		}
+	}
+
+#if 0
 	ImGui::SetNextWindowPos(ImVec2(5, 145), ImGuiSetCond_Once);
 
 	BeginDebugWindow("Item");
@@ -291,6 +391,7 @@ void Item::Debug()
 	}
 
 	EndDebugWindow("Item");
+#endif
 
 #endif
-}
+	}

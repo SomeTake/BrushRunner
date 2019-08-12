@@ -28,6 +28,7 @@
 // メンバ変数の初期化
 //*****************************************************************************
 ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
+int SceneGame::TheLastPlayer = 0;		// 結果
 
 //=============================================================================
 // コンストラクタ
@@ -59,8 +60,16 @@ SceneGame::SceneGame()
 	//{
 	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
 	//}
+
+#if _DEBUG
 	pPlayer[0] = new Player(0, false);
 	pPlayer[1] = new Player(1, true);
+	//pPlayer[1]->SetOnCamera(false);
+	pPlayer[2] = new Player(2, true);
+	pPlayer[2]->SetOnCamera(false);
+	pPlayer[3] = new Player(3, true);
+	pPlayer[3]->SetOnCamera(false);
+#endif
 
 	// 2DUIの初期化
 	// フレーム
@@ -69,7 +78,7 @@ SceneGame::SceneGame()
 	// アイテム表示の初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
+		UIObject.push_back(new Item(pPlayer[i]));
 	}
 
 	// カウントダウンの初期化
@@ -143,17 +152,74 @@ void SceneGame::Update(int SceneID)
 		Start();
 	}
 
-	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+	float MaxPosX = 0.0f;
+	float MinPosX = 100000.0f;
+	int FirstPlayer = 0;
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		if (pPlayer[i]->GetOnCamera())
+		{
+			// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+			if (pPlayer[i]->GetPos().x > MaxPosX)
+			{
+				MaxPosX = pPlayer[i]->GetPos().x;
+				FirstPlayer = i;
+			}
+
+			// プレイヤー座標の中でXが最も小さい
+			if (pPlayer[i]->GetPos().x < MinPosX)
+			{
+				MinPosX = pPlayer[i]->GetPos().x;
+				SceneGame::TheLastPlayer = i;
+			}
+
+			// 前方にプレイヤーがいるかどうかを確認
+			if (pPlayer[i]->GetAIUse())
+			{
+				for (int j = 0; j < PLAYER_MAX; j++)
+				{
+					// 現在のプレイヤーとは違う
+					if (i != j && pPlayer[j]->GetOnCamera())
+					{
+						// 現在のプレイヤーより右、かつ高さが同じぐらい
+						if (pPlayer[i]->GetPos().x < pPlayer[j]->GetPos().x &&
+							fabsf(pPlayer[i]->GetPos().y - pPlayer[j]->GetPos().y) < 10.0f)
+						{
+							pPlayer[i]->GetAIPtr()->SetShotBullet(true);
+							break;
+						}
+						else
+						{
+							pPlayer[i]->GetAIPtr()->SetShotBullet(false);
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+	// カメラの更新
+	UpdateCamera(pPlayer[FirstPlayer]->GetPos());
+
+#if 0
 	std::vector<float> vec(PLAYER_MAX);
 	for (size_t i = 0; i < vec.size(); i++)
 	{
-		vec.at(i) = pPlayer[i]->GetPos().x;
+		if (pPlayer[i]->GetOnCamera())
+		{
+			vec.at(i) = pPlayer[i]->GetPos().x;
+		}
 	}
 	auto max = std::max_element(vec.begin(), vec.end());
 	size_t maxIdx = std::distance(vec.begin(), max);
 
+	auto min = std::min_element(vec.begin(), vec.end());
+	SceneGame::TheLastPlayer = (int)std::distance(vec.begin(), min);
+
 	// カメラの更新
 	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
+#endif
 
 	// マップの更新
 	pMap->Update();
@@ -233,19 +299,19 @@ void SceneGame::Draw()
 //=============================================================================
 void SceneGame::Collision()
 {
-	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		pPlayer[i]->GroundCollider();
-		pPlayer[i]->HorizonCollider();
-		pPlayer[i]->ObjectCollider();
-		pPlayer[i]->ObjectItemCollider(pMap);
-	}
+		if (pPlayer[i]->GetOnCamera())
+		{
+			// プレイヤーとマップの当たり判定
+			pPlayer[i]->GroundCollider();
+			pPlayer[i]->HorizonCollider();
+			pPlayer[i]->ObjectCollider();
+			pPlayer[i]->ObjectItemCollider(pMap);
 
-	// プレイヤーとペイントマネージャの当たり判定
-	for (int i = 0; i < PLAYER_MAX; i++)
-	{
-		pPlayer[i]->PaintCollider();
+			// プレイヤーとペイントマネージャの当たり判定
+			pPlayer[i]->PaintCollider();
+		}
 	}
 
 	// ペイントマネージャ同士の当たり判定
@@ -253,8 +319,22 @@ void SceneGame::Collision()
 	{
 		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
 		{
-			// 画面を16分割、それぞれのオブジェクトを判定する
-			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
+			std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt((TenDigit * 10 + OneDigit));
+
+			// 現在のノードはオブジェクトがない
+			if (CollisionList.empty())
+			{
+				continue;
+			}
+
+			for (int i = 0; i < PLAYER_MAX; i++)
+			{
+				if (pPlayer[i]->GetOnCamera())
+				{
+					// 画面を16分割、それぞれのオブジェクトを判定する
+					HitCheckSToS(&CollisionList, i);
+				}
+			}
 		}
 	}
 
@@ -292,7 +372,7 @@ void SceneGame::Start()
 {
 	// スタートタイマー更新
 	startframe++;
-	
+
 	if (startframe == START_FRAME)
 	{
 		for (int i = 0; i < PLAYER_MAX; i++)
@@ -425,3 +505,4 @@ ResultData *SceneGame::GetResultData(int playerNo)
 {
 	return &data[playerNo];
 }
+

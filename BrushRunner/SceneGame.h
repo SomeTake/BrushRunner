@@ -45,6 +45,7 @@ private:
 	int				startframe;				// 開始カウントダウン
 	bool			result;					// 終了フラグ
 	static ResultData data[PLAYER_MAX];		// 結果
+	static int TheLastPlayer;				// 最下位のプレイヤー
 
 	void Start();
 	void Collision();
@@ -58,7 +59,7 @@ public:
 	void Update(int SceneID);
 	void Draw();
 	static ResultData *GetResultData(int playerNo);
-
+	static int GetTheLastPlayer(void) { return SceneGame::TheLastPlayer; };
 };
 
 

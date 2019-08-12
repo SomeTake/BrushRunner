@@ -134,10 +134,12 @@ bool PaintGroup::GetEnemyPaint(GroupStruct** GroupPtr, int PlayerNo)
 		{
 			int Random = rand() % TempVec.size();
 			*GroupPtr = TempVec.at(Random);
+			(*GroupPtr)->Use = false;
 		}
 		else if (TempVec.size() == 1)
 		{
 			*GroupPtr = TempVec.at(0);
+			(*GroupPtr)->Use = false;
 		}
 		return true;
 	}

@@ -206,11 +206,11 @@ void Cursor::Move()
 	else
 	{
 		KeyMove();	// キーボード操作
-		if (AIptr->GetAIState() == ePaintPath)
+		if (AIptr->GetCursorState() == ePaintPath)
 		{
 			PaintPath();
 		}
-		else if (AIptr->GetAIState() == eUseBlackPaint)
+		else if (AIptr->GetCursorState() == eUseBlackPaint)
 		{
 			DeletePath();
 		}
@@ -289,8 +289,10 @@ void Cursor::PadMove()
 	pos.y += vec * moveY * CURSOR_SPEED;
 
 	// 画面外に出た場合、古い座標に戻す
+	//pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
+	//pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
-	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
+	pos.y = clamp(pos.y, CURSOR_SIZE.y, (float)SCREEN_HEIGHT);
 }
 
 //=============================================================================
@@ -342,7 +344,7 @@ void Cursor::PaintPath()
 	D3DXMatrixIdentity(&WorldMtx);
 
 	// カーソルが始点までに移動していない
-	if (AIptr->GetAIPaintState() == eNoAction)
+	if (AIptr->GetPaintState() == eNoAction)
 	{
 		//PaintReady = false;
 		DestPos_World = AIptr->GetPaintStartPos();
@@ -375,15 +377,15 @@ void Cursor::PaintPath()
 		pos.y = DestPos_Screen.y;
 
 		// ペイントが始まる
-		if (AIptr->GetAIPaintState() == eNoAction)
+		if (AIptr->GetPaintState() == eNoAction)
 		{
-			AIptr->SetAIPaintState(ePaintStart);
+			AIptr->SetPaintState(ePaintStart);
 		}
 		// ペイント終了
 		else
 		{
-			AIptr->SetAIState(eNoAction);
-			AIptr->SetAIPaintState(ePaintEnd);
+			AIptr->SetCursorState(eNoAction);
+			AIptr->SetPaintState(ePaintEnd);
 		}
 	}
 }
@@ -401,8 +403,8 @@ void Cursor::DeletePath()
 	// 削除が間に合わない
 	if (EnemyPaint->Count <= 5)
 	{
-		AIptr->SetAIState(eNoAction);
-		AIptr->SetAIPaintState(ePaintEnd);
+		AIptr->SetCursorState(eNoAction);
+		AIptr->SetPaintState(ePaintEnd);
 		AIptr->SetFindEnemyPaint(false);
 		return;
 	}
@@ -417,7 +419,7 @@ void Cursor::DeletePath()
 	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
 	Distance = D3DXVec2LengthSq(&Vec);
 
-	if (AIptr->GetAIPaintState() == eNoAction)
+	if (AIptr->GetPaintState() == eNoAction)
 	{
 		if (Distance > pow(20.0f, 2))
 		{
@@ -429,7 +431,7 @@ void Cursor::DeletePath()
 		else
 		{
 			// ペイントが始まる
-			AIptr->SetAIPaintState(ePaintStart);
+			AIptr->SetPaintState(ePaintStart);
 		}
 	}
 	// ペイントしている
@@ -444,8 +446,8 @@ void Cursor::DeletePath()
 		// ペイント終了
 		if (EnemyPaint->PaintPath.empty())
 		{
-			AIptr->SetAIState(eNoAction);
-			AIptr->SetAIPaintState(ePaintEnd);
+			AIptr->SetCursorState(eNoAction);
+			AIptr->SetPaintState(ePaintEnd);
 			AIptr->SetFindEnemyPaint(false);
 			EnemyPaint->Count = 0;
 		}
