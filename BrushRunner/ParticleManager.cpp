@@ -13,9 +13,6 @@
 //=============================================================================
 ParticleManager::ParticleManager()
 {
-	// テクスチャの読み込み
-	Particle::LoadTexture();
-
 	// メモリ確保
 	particle.reserve(500);
 }
@@ -32,9 +29,6 @@ ParticleManager::~ParticleManager()
 	}
 	particle.clear();
 	ReleaseVector(particle);
-
-	// テクスチャの開放
-	Particle::ReleaseTexture();
 }
 
 //=============================================================================

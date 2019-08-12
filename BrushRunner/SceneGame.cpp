@@ -92,9 +92,6 @@ SceneGame::~SceneGame()
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
 
-	// ペイントテクスチャの削除
-	Paint::ReleaseTexture();
-
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
@@ -192,9 +189,6 @@ void SceneGame::Draw()
 	// マップの描画
 	pMap->Draw();
 
-	// エフェクトマネージャの描画
-	pEffectManager->Draw();
-
 	// 3Dオブジェクトの描画
 	for (auto &Obj3D : object3d)
 	{
@@ -206,6 +200,9 @@ void SceneGame::Draw()
 	{
 		pPlayer[i]->Draw();
 	}
+
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
 
 	// 2Dオブジェクトの描画
 	for (auto &Object : UIObject)

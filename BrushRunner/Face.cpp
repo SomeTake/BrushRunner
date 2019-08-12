@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Face.h"
 #include "CursorObj.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -20,14 +21,7 @@
 //=============================================================================
 Face::Face(int playerNo, int charNo)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_CURSOROBJ,					// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
+	ResourceManager::Instance()->GetTexture("SelectCursor", &D3DTexture);
 
 	this->playerNo = playerNo;
 	this->charNo = charNo;
@@ -45,11 +39,7 @@ Face::Face(int playerNo, int charNo)
 //=============================================================================
 Face::~Face()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================

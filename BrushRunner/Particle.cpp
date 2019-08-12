@@ -8,11 +8,11 @@
 #include "Particle.h"
 #include "Camera.h"
 #include "MyLibrary.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_PARTICLE	("data/TEXTURE/Confetti.png")
 #define PARTICLE_WIDTH		(10.0f)		// 大きさ
 #define PARTICLE_HEIGHT		(10.0f)		// 大きさ
 #define PARTICLE_RANGE_X	(500.0f)	// 落下範囲
@@ -23,16 +23,13 @@
 #define PARTICLE_MOVE_COUNT	(20)		// 動きをつけるタイミング
 #define PARTICLE_MOVE_VALUE	(0.3f)		// 前後左右に動くスピードの最大
 
-//*****************************************************************************
-// メンバの初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9	Particle::D3DTexture = NULL;		// テクスチャへのポインタ
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Particle::Particle()
 {
+	ResourceManager::Instance()->GetTexture("Confetti", &D3DTexture);
+
 	// 発生座標、色、テクスチャをランダムで指定する
 	pos.x = RandomRange(-PARTICLE_RANGE_X, PARTICLE_RANGE_X);
 	pos.y = PARTICLE_POS_Y;
@@ -53,35 +50,14 @@ Particle::Particle()
 }
 
 //=============================================================================
-// テクスチャの読み込み
-//=============================================================================
-void Particle::LoadTexture()
-{
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-			TEXTURE_PARTICLE,				// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
-}
-
-//=============================================================================
 // デストラクタ
 //=============================================================================
 Particle::~Particle()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
-}
 
-//=============================================================================
-// テクスチャの開放
-//=============================================================================
-void Particle::ReleaseTexture()
-{
-	SAFE_RELEASE(Particle::D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

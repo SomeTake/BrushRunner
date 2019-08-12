@@ -6,11 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "SkyBox.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_SKYBOX			_T("data/TEXTURE/SkyBox.png")		// 読み込むテクスチャファイル名
 #define SKYBOX_DIVIDE_X			(4)									// テクスチャ分割数
 #define SKYBOX_DIVIDE_Y			(3)
 #define SURFACE_NUM				(6)									// 面の数
@@ -22,19 +22,14 @@
 //*****************************************************************************
 SkyBox::SkyBox()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	ResourceManager::Instance()->GetTexture("SkyBox", &D3DTexture);
 
 	// 位置・回転・スケールの初期設定
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		TEXTURE_SKYBOX,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリー
-
-										// 頂点情報の作成
+	// 頂点情報の作成
 	MakeVertex();
 
 }
@@ -50,11 +45,7 @@ SkyBox::~SkyBox()
 		D3DVtxBuff = NULL;
 	}
 
-	if (D3DTexture)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================

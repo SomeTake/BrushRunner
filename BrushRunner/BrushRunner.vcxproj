@@ -22,6 +22,7 @@
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="AnimationSet.h" />
     <ClInclude Include="BanananoKawaState.h" />
+    <ClInclude Include="BaseSingleton.h" />
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Podium.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResultDigit.h" />
     <ClInclude Include="ResultPlayer.h" />
@@ -124,6 +126,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Podium.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ResultDigit.cpp" />
     <ClCompile Include="ResultPlayer.cpp" />
     <ClCompile Include="ResultRank.cpp" />

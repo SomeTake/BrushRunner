@@ -6,13 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "Finish.h"
-#include "EffectManager.h"
-#include "Effect.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_FINISH	("data/TEXTURE/Finish.png")
 #define FINISH_SIZE		D3DXVECTOR3(1024.0f, 512.0f, 0.0f)
 #define FINISH_MOVE_SPEED	(100.0f)
 
@@ -21,11 +19,7 @@
 //=============================================================================
 Finish::Finish()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		TEXTURE_FINISH,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
+	ResourceManager::Instance()->GetTexture("Finish", &D3DTexture);
 
 	use = true;
 	pos = D3DXVECTOR3(SCREEN_WIDTH + FINISH_SIZE.x / 2, SCREEN_CENTER_Y, 0.0f);
@@ -39,11 +33,7 @@ Finish::Finish()
 //=============================================================================
 Finish::~Finish()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================

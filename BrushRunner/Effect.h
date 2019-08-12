@@ -23,26 +23,22 @@ enum EffectNum{
 
 #define INFINITY_LOOP	(-1)	// エフェクトを無限ループさせる
 
+#include "_2dobj.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Effect
+class Effect :
+	public _2dobj
 {
 private:
-	static LPDIRECT3DTEXTURE9	D3DTexture[EffectMax];	// テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9		D3DVtxBuff;				// 頂点バッファへのポインタ
-	Vertex2D					vertexWk[NUM_VERTEX];	// 頂点情報格納構造体
-	D3DXVECTOR3					pos;
 	D3DXVECTOR3					rot;
 	D3DXVECTOR3					scl;
-	bool						use;
 	int							CountAnim;
-	int							PatternAnim;			// アニメーションパターン
 	int							AnimationCnt;
 	int							TexNo;
 	int							TexAnimNum;				// アニメーションの分割数
 	int							xPattern, yPattern;		// 分割数
-	D3DXVECTOR3					size;					// 表示サイズ
 	int							loopnum;				// ループさせる回数(無限ループは-1)
 	int							loopcnt;				// 現在のループ回数
 
@@ -61,9 +57,6 @@ public:
 
 	bool GetUse() { return use; };
 	void SetUse(bool _use) { use = _use; };
-
-	static void LoadTexture();
-	static void ReleaseTexture();
 };
 
 #endif

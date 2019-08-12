@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "ResultRank.h"
 #include "Player.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // 構造体データ入力
@@ -18,30 +19,18 @@ ResultStr Rank[PLAYER_MAX] = {
 	D3DXVECTOR3(260.0f, 590.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
 };
 
-//*****************************************************************************
-// メンバ変数の初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9	ResultRank::D3DTexture = NULL;	// テクスチャのポインタ
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 ResultRank::ResultRank(int rank, int owner)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	ResourceManager::Instance()->GetTexture("ResultRank", &D3DTexture);
 
 	this->use = true;
 	this->rank = rank;
 	this->owner = owner;
 	pos = Rank[this->rank].pos;
 	size = Rank[this->rank].size;
-
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスのポインタ
-			RESULTRANK_TEXTURE,				// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
 
 	MakeVertex();
 }
@@ -51,7 +40,7 @@ ResultRank::ResultRank(int rank, int owner)
 //=============================================================================
 ResultRank::~ResultRank()
 {
-	SAFE_RELEASE(D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

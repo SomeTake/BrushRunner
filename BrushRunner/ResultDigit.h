@@ -16,8 +16,6 @@ class ResultDigit :
 	public Digit
 {
 private:
-	static LPDIRECT3DTEXTURE9 D3DTexture; // テクスチャのポインタ
-
 	int rank;
 
 public:

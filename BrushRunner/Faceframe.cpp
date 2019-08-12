@@ -6,23 +6,21 @@
 //=============================================================================
 #include "Main.h"
 #include "Faceframe.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_FACEFRAME	_T("data/texture/faceframe.png")		// フレーム用画像
 #define FACEFRAME_SIZE		D3DXVECTOR3(100.0f, 88.0f, 0.0f)		// テクスチャサイズ
 #define FACEFRAME_POS		D3DXVECTOR3(10.0f, 10.0f, 0.0f)
 #define FACEFRAME_INTERVAL	(318.0f)
-
-LPDIRECT3DTEXTURE9	FaceFrame::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 FaceFrame::FaceFrame(int PlayerNo)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("FaceFrame", &D3DTexture);
 
 	pos = FACEFRAME_POS + D3DXVECTOR3(FACEFRAME_INTERVAL * PlayerNo, 0.0f, 0.0f);
 
@@ -30,14 +28,6 @@ FaceFrame::FaceFrame(int PlayerNo)
 
 	// 頂点情報の作成
 	MakeVertex();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			TEXTURE_FACEFRAME,				// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
 }
 
 //=============================================================================
@@ -45,12 +35,7 @@ FaceFrame::FaceFrame(int PlayerNo)
 //=============================================================================
 FaceFrame::~FaceFrame()
 {
-
-}
-
-void FaceFrame::ReleaseTexture(void)
-{
-	SAFE_RELEASE(FaceFrame::D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

@@ -17,7 +17,6 @@ class Particle :
 {
 private:
 	bool						use;			// 使用しているかどうか
-	static LPDIRECT3DTEXTURE9	D3DTexture;		// テクスチャへのポインタ
 	int							texNo;			// 使用するテクスチャ番号
 	int							moveCnt;		// 動きをつけるタイミング
 	HRESULT MakeVertex();
@@ -28,8 +27,6 @@ public:
 
 	void Update();
 	void Draw();
-	static void LoadTexture();
-	static void ReleaseTexture();
 
 	bool GetUse() { return use; };
 

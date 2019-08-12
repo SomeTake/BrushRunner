@@ -6,11 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "MeshField.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_MESHFIELD		"data/TEXTURE/Block.jpg"		// 読み込むテクスチャファイル名
 #define MESHFIELD_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)	// 表示位置
 #define MESHFIELD_ROT			D3DXVECTOR3(0.0f, 0.0f, 0.0f)	// 回転
 #define MESHFIELD_NUM_BLOCK_X	(10)							// ブロック数
@@ -24,16 +24,13 @@ MeshField::MeshField()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
+	ResourceManager::Instance()->GetTexture("MeshField", &D3DTexture);
+
 	// ポリゴン表示位置の中心座標を設定
 	pos = MESHFIELD_POS;
 	rot = MESHFIELD_ROT;
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-		TEXTURE_MESHFIELD,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリー
-
-										// ブロック数の設定
+	// ブロック数の設定
 	NumBlockX = MESHFIELD_NUM_BLOCK_X;
 	NumBlockZ = MESHFIELD_NUM_BLOCK_Z;
 
@@ -156,11 +153,7 @@ MeshField::~MeshField()
 		D3DIdxBuff = NULL;
 	}
 
-	if (D3DTexture)
-	{// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================

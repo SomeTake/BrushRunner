@@ -16,15 +16,6 @@
 // グローバル変数
 //=============================================================================
 
-enum
-{	
-	TitleLogo,
-	TitleRunner,
-	TitleMenu,
-	UIMax,										// UI表示の最大数
-};
-
-
 static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
 
 //=============================================================================
@@ -32,9 +23,9 @@ static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
 //=============================================================================
 SceneTitle::SceneTitle()
 {
-	p2dObj[TitleRunner] = new TITLE(TITLE_POS01 - TITLE_SIZE01/2,TITLE_SIZE01,TEXTURE_TITLE01);
-	p2dObj[TitleLogo] = new TITLE(TITLE_POS02 - TITLE_SIZE02/2, TITLE_SIZE02, TEXTURE_TITLE02);
-	p2dObj[TitleMenu] = new TITLE(TITLE_POS03 - TITLE_SIZE03/2, TITLE_SIZE03, TEXTURE_TITLE03);
+	p2dObj[TitleLogo] = new TITLE(TitleLogo);
+	p2dObj[TitleRunner] = new TITLE(TitleRunner);
+	p2dObj[TitleMenu] = new TITLE(TitleMenu);
 
 }
 

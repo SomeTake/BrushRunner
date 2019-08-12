@@ -8,16 +8,12 @@
 #include "ResultDigit.h"
 #include "ResultRank.h"
 #include "Player.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define DIGIT_SPACE	(1.0f)
-
-//*****************************************************************************
-// クラスのメンバ初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9	ResultDigit::D3DTexture = NULL; // テクスチャのポインタ
 
 //*****************************************************************************
 // データ定義
@@ -35,7 +31,7 @@ ResultStr ResultData[PLAYER_MAX] = {
 //=============================================================================
 ResultDigit::ResultDigit(DWORD _time, int _digit, int _rank) : Digit(_digit)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Digit", &D3DTexture);
 
 	time = _time;
 	use = true;
@@ -43,13 +39,6 @@ ResultDigit::ResultDigit(DWORD _time, int _digit, int _rank) : Digit(_digit)
 	pos = ResultData[rank].pos;
 	pos.x -= _digit * ResultData[rank].size.x;
 	size = ResultData[rank].size;
-
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			TEXTURE_DIGIT,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
 
 	MakeVertex();
 }
@@ -60,7 +49,7 @@ ResultDigit::ResultDigit(DWORD _time, int _digit, int _rank) : Digit(_digit)
 //=============================================================================
 ResultDigit::~ResultDigit()
 {
-	SAFE_RELEASE(D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

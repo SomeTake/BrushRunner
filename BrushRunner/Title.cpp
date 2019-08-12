@@ -1,30 +1,51 @@
 #include "Main.h"
 #include "Title.h"
+#include "ResourceManager.h"
+#include "SceneTitle.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define LOGO_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)				// テクスチャサイズ
+#define LOGO_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)			// テクスチャ座標
+
+#define RUNNER_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
+#define RUNNER_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
+
+#define MENU_SIZE			D3DXVECTOR3(702.0f * 0.45f, 515.0f * 0.45f, 0.0f)		// テクスチャサイズ
+#define MENU_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 1.65f, 0.0f)		// テクスチャ座標
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-TITLE::TITLE(D3DXVECTOR3 _pos,D3DXVECTOR3 _size,const char *texno)
+TITLE::TITLE(int num)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	switch (num)
+	{
+	case TitleLogo:
+		ResourceManager::Instance()->GetTexture("TitleLogo", &D3DTexture);
+		size = LOGO_SIZE;
+		pos = LOGO_POS;
+		break;
+	case TitleRunner:
+		ResourceManager::Instance()->GetTexture("TitleRunner", &D3DTexture);
+		size = RUNNER_SIZE;
+		pos = RUNNER_POS;
+		break;
+	case TitleMenu:
+		ResourceManager::Instance()->GetTexture("TitleMenu", &D3DTexture);
+		size = MENU_SIZE;
+		pos = MENU_POS;
+		break;
+	default:
+		break;
+	}
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
-								texno,				// ファイルの名前
-								&D3DTexture);		// 読み込むメモリのポインタ
-
-	//*************************************************************************
-	// タイトルの初期化
 	use = true;
-	pos = _pos;
-	size = _size;
-
 	PatternAnim = 1;
 
 	// 頂点情報の作成
 	MakeVertex();
-	//*************************************************************************
 
 }
 
@@ -33,11 +54,8 @@ TITLE::TITLE(D3DXVECTOR3 _pos,D3DXVECTOR3 _size,const char *texno)
 //=============================================================================
 TITLE::~TITLE()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// リソースの開放はリソースマネージャに任せるため、参照をやめるだけ
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -51,8 +69,8 @@ void  TITLE::Update()
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
+		SetVertex();
 	}
-	 SetVertex();
 }
 
 //=============================================================================
@@ -133,12 +151,11 @@ void TITLE::SetTexture(int cntPattern)
 //=============================================================================
 void TITLE::SetVertex(void)
 {
-
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + size.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
 }
 
 //=============================================================================

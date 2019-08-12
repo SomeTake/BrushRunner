@@ -7,16 +7,13 @@
 #include "Main.h"
 #include "InkGauge.h"
 #include "PaintManager.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_INKGAUGE		_T("data/texture/InkGauge.png")
 #define INKGAUGE_DIVIDE_X		(1)
 #define INKGAUGE_DIVIDE_Y		(5)
-
-#define TEXTURE_COLORINKFRAME   _T("data/texture/colorinkframe.png")
-#define TEXTURE_BLACKINKFRAME   _T("data/texture/blackinkframe.png")
 
 #define InkGauge_Size			D3DXVECTOR2(120.0f, 30.0f)	// 表示サイズ
 #define ColorInkGauge_Pos		D3DXVECTOR3(86.0f, 35.0f, 0.0f)
@@ -27,36 +24,26 @@
 #define GaugeFrame_Pos			D3DXVECTOR3(10.0f, 10.0f, 0.0f)
 #define GaugeFrame_Interval		(318.0f)
 
-//#define DISPLACE	(20.0f)		// 斜めにずらす角度
-
-LPDIRECT3DTEXTURE9 InkGauge::Texture_InkGauge = nullptr;
-LPDIRECT3DTEXTURE9 InkGauge::Texture_GaugeFrame[InkNum] = { nullptr };
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 InkGauge::InkGauge(int InkType, int PlayerNo)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-
 	// インクの初期化
 	use = true;
 	this->InkType = InkType;
 	this->Owner = PlayerNo;
 
-	// テクスチャの読み込み
-	if (Texture_InkGauge == nullptr)
+	if (this->InkType == ColorInk)
 	{
-		D3DXCreateTextureFromFile(Device, TEXTURE_INKGAUGE, &Texture_InkGauge);
+		ResourceManager::Instance()->GetTexture("ColorInkFrame", &Texture_GaugeFrame);
 	}
-	if (Texture_GaugeFrame[ColorInk] == nullptr)
+	else if (this->InkType == BlackInk)
 	{
-		D3DXCreateTextureFromFile(Device, TEXTURE_COLORINKFRAME, &Texture_GaugeFrame[ColorInk]);
+		ResourceManager::Instance()->GetTexture("BlackInkFrame", &Texture_GaugeFrame);
 	}
-	if (Texture_GaugeFrame[BlackInk] == nullptr)
-	{
-		D3DXCreateTextureFromFile(Device, TEXTURE_BLACKINKFRAME, &Texture_GaugeFrame[BlackInk]);
-	}
+
+	ResourceManager::Instance()->GetTexture("InkGauge", &Texture_InkGauge);
 
 	// インクの頂点情報
 	MakeVertex_GaugeFrame(INK_MAX);
@@ -70,9 +57,8 @@ InkGauge::InkGauge(int InkType, int PlayerNo)
 InkGauge::~InkGauge()
 {
 	// テクスチャの開放
-	SAFE_RELEASE(InkGauge::Texture_InkGauge);
-	SAFE_RELEASE(InkGauge::Texture_GaugeFrame[ColorInk]);
-	SAFE_RELEASE(InkGauge::Texture_GaugeFrame[BlackInk]);
+	Texture_InkGauge = NULL;
+	Texture_GaugeFrame = NULL;
 }
 
 //=============================================================================
@@ -101,21 +87,14 @@ void InkGauge::Draw()
 
 	if (use)
 	{
-		Device->SetTexture(0, InkGauge::Texture_InkGauge);
+		Device->SetTexture(0, Texture_InkGauge);
 
 		// ポリゴンの描画
 		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, GaugeVertex, sizeof(Vertex2D));
 
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
-		if (this->InkType == ColorInk)
-		{
-			Device->SetTexture(0, InkGauge::Texture_GaugeFrame[ColorInk]);
-		}
-		else if (this->InkType == BlackInk)
-		{
-			Device->SetTexture(0, InkGauge::Texture_GaugeFrame[BlackInk]);
-		}
+		Device->SetTexture(0, Texture_GaugeFrame);
 
 		// ポリゴンの描画
 		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, FrameVertex, sizeof(Vertex2D));

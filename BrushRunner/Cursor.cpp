@@ -8,15 +8,14 @@
 #include "Cursor.h"
 #include "Input.h"
 #include "MyLibrary.h"
-
-LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
+#include "ResourceManager.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Cursor::Cursor(int PlayerNo, bool AIFlag)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Cursor", &D3DTexture);
 
 	use = true;
 	this->AIFlag = AIFlag;
@@ -25,14 +24,6 @@ Cursor::Cursor(int PlayerNo, bool AIFlag)
 	vec = 0.0f;
 	moveX = 0.0f;
 	moveY = 0.0f;
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			CURSOR_TEXTURE,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -43,8 +34,7 @@ Cursor::Cursor(int PlayerNo, bool AIFlag)
 //=============================================================================
 Cursor::~Cursor()
 {
-	// テクスチャの開放
-	SAFE_RELEASE(Cursor::D3DTexture)
+	D3DTexture = NULL;
 }
 
 //=============================================================================

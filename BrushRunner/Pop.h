@@ -17,8 +17,6 @@ class Pop : public Billboard
 private:
 	int PlayerNo;
 
-	static LPDIRECT3DTEXTURE9 D3DTexture;		// テクスチャへのポインタ
-
 	HRESULT MakeVertex();
 
 public:

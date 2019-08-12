@@ -23,6 +23,7 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 #define DIRECTINPUT_VERSION (0x0800)	// åxçêëŒçÙ
 #include "dinput.h"
@@ -40,6 +41,9 @@
 #include "Struct.h"
 #include "MyColor.h"
 
+//*****************************************************************************
+// ñºëOãÛä‘ÇÃämï€
+//*****************************************************************************
 using namespace std;
 
 //*****************************************************************************

@@ -98,9 +98,6 @@ Map::~Map()
 	objtbl.clear();
 	ReleaseVector(objtbl);
 
-	// チップテクスチャリリース
-	Chip::ReleaseTexture();
-
 	// マップチップベクトルクリア
 	for (auto &MapChip : this->MapChipVector)
 	{

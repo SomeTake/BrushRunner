@@ -7,11 +7,11 @@
 #include "Main.h"
 #include "MiniPlayer.h"
 #include "Map.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MiniPlayer_Texture		_T("data/TEXTURE/MiniPlayer.png")	// テクスチャ
 #define MiniPlayer_Divide_X		(4)									// 横分割
 #define MiniPlayer_Size_X		(15)
 #define MiniPlayer_Size_Y		(30)
@@ -20,24 +20,14 @@
 #define Distance_Screen			(1200.0f)
 #define Distance_World			(GOAL_POS.x - START_POS.x)
 
-LPDIRECT3DTEXTURE9 MiniPlayer::D3DTexture = nullptr;
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 MiniPlayer::MiniPlayer(int PlayerNo)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("MiniPlayer", &D3DTexture);
 
 	pos = D3DXVECTOR3(MiniPlayer_Pos_X, MiniPlayer_Pos_Y, 0.0f);
-
-	// テクスチャの読み込み
-	if (MiniPlayer::D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,		// デバイスのポインタ
-			MiniPlayer_Texture,					// ファイルの名前
-			&MiniPlayer::D3DTexture);			// 読み込むメモリのポインタ
-	}
 
 	// 頂点情報の作成
 	MakeVertex(PlayerNo);
@@ -47,7 +37,7 @@ MiniPlayer::MiniPlayer(int PlayerNo)
 //=============================================================================
 MiniPlayer::~MiniPlayer()
 {
-
+	D3DTexture = NULL;
 }
 
 //=============================================================================

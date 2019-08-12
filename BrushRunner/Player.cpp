@@ -181,11 +181,12 @@ void Player::Draw()
 			pDevice->SetMaterial(&matDef);
 		}
 
-		// プレイヤーUIの描画
-		playerUI->Draw(onCamera,blind);
-
 		// ペイントの描画
 		PaintSystem->Draw();
+
+		// プレイヤーUIの描画
+		playerUI->Draw(onCamera, blind);
+
 	}
 	else
 	{
