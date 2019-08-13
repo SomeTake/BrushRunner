@@ -14,7 +14,6 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CURSOR_TEXTURE	_T("data/TEXTURE/brush.png")			// テクスチャ
 #define CURSOR_SIZE D3DXVECTOR3(75.0f, 75.0f, 0.0f)				// サイズ
 #define CURSOR_DIVIDE_X	(4)										// 横分割
 #define CURSOR_DIVIDE_Y	(2)										// 縦分割
@@ -32,7 +31,8 @@ private:
 	float	vec = 0.0f;			// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
 	float	moveX = 0.0f;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
 	float	moveY = 0.0f;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
-	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+	//static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
+	D3DXVECTOR3 oldPos;	// 画面外判定を行うための1f前の座標
 
 	// AI用
 	CharacterAI		*AIptr = nullptr;

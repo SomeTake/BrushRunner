@@ -17,8 +17,7 @@
 #include "SpInkState.h"
 #include "DebugWindow.h"
 #include "EffectManager.h"
-
-LPDIRECT3DTEXTURE9	Item::D3DTexture = NULL; // テクスチャのポインタ
+#include "ResourceManager.h"
 
 #define ItemPos (D3DXVECTOR3(245.0f, 30.0f, 0.0f))
 #define ItemInterval (320.0f)
@@ -35,15 +34,7 @@ LPDIRECT3DTEXTURE9	Item::D3DTexture = NULL; // テクスチャのポインタ
 //=============================================================================
 Item::Item(Player *ptr)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_ITEM,						// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
+	ResourceManager::Instance()->GetTexture("Item", &D3DTexture);
 
 	pPlayer = ptr;
 	use = false;
@@ -71,7 +62,7 @@ Item::Item(Player *ptr)
 //=============================================================================
 Item::~Item()
 {
-	SAFE_RELEASE(D3DTexture);
+	D3DTexture = NULL;
 
 	// ステートパターンの削除
 	for (int i = 0; i < NumItemMax; i++)
@@ -123,7 +114,7 @@ void Item::Update()
 			}
 
 			//テクスチャ座標をセット
-			SetTexture();
+			//SetTexture();
 		}
 
 		// アイテム使用中
@@ -394,4 +385,4 @@ void Item::Debug()
 #endif
 
 #endif
-	}
+}

@@ -6,6 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "Digit.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -14,30 +15,18 @@
 #define DIGIT_POS		D3DXVECTOR3(SCREEN_CENTER_X + ((DIGIT_SIZE.x / 2) * DIGIT_MAX), 135.0f, 0.0f)	// 表示場所（1番右、1桁目を基準とする）
 #define DIGIT_SPACE		(40.0f)	// 表示間隔（横）
 
-//*****************************************************************************
-// クラスのメンバ初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9	Digit::D3DTexture = NULL; // テクスチャのポインタ
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Digit::Digit(int digit)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Digit", &D3DTexture);
 
 	use = true;
 	time = 0;
 	pos = DIGIT_POS;
 	pos.x -= digit * DIGIT_SPACE;
 	size = DIGIT_SIZE;
-
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			TEXTURE_DIGIT,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
 
 	MakeVertex();
 }
@@ -47,7 +36,7 @@ Digit::Digit(int digit)
 //=============================================================================
 Digit::~Digit()
 {
-	SAFE_RELEASE(Digit::D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

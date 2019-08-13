@@ -8,11 +8,11 @@
 #include "GoalFlag.h"
 #include "Map.h"
 #include "Camera.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_GOAL	("data/TEXTURE/GoalFlag.png")
 #define GOAL_SIZE		D3DXVECTOR3(12.8f, 12.8f, 0.0f)
 #define FLAG_POS		D3DXVECTOR3(GOAL_POS.x, -88.0f, -10.0f)
 
@@ -21,16 +21,13 @@
 //=============================================================================
 GoalFlag::GoalFlag()
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("GoalFlag", &D3DTexture);
+
 	pos = FLAG_POS;
 	scl = GOAL_SIZE;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-		TEXTURE_GOAL,					// ファイルの名前
-		&D3DTexture);					// 読み込むメモリー
 
 	MakeVertex();
 }
@@ -40,7 +37,7 @@ GoalFlag::GoalFlag()
 //=============================================================================
 GoalFlag::~GoalFlag()
 {
-	SAFE_RELEASE(D3DTexture);
+	D3DTexture = NULL;
 	SAFE_RELEASE(D3DVtxBuff);
 }
 

@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Effect.h"
 #include "MyLibrary.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // 構造体定義
@@ -25,38 +26,50 @@ struct EffectData
 //*****************************************************************************
 static EffectData EffectDataWk[EffectMax] =
 {
-	{ "data/EFFECT/anmef000.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(5, 1) },
-{ "data/EFFECT/anmef001.png", D3DXVECTOR3(500.0f, 100.0f, 0.0f), 7, Int2D(1, 5) },
-{ "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 7, Int2D(2, 2) },
-{ "data/EFFECT/explo000.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 3, Int2D(5, 3) },
+	{ "data/EFFECT/Hit.png", D3DXVECTOR3(250.0f, 250.0f, 0.0f), 4, Int2D(2, 5) },
+{ "data/EFFECT/anmef001.png", D3DXVECTOR3(500.0f, 100.0f, 0.0f), 4, Int2D(1, 5) },
+{ "data/EFFECT/anmef002.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 4, Int2D(2, 2) },
+{ "data/EFFECT/explo000.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 4, Int2D(5, 3) },
 { "data/EFFECT/ief001.png", D3DXVECTOR3(100.0f, 100.0f, 0.0f), 10, Int2D(5, 2) },
 { "data/EFFECT/ief000.png", D3DXVECTOR3(70.0f, 70.0f, 0.0f), 4, Int2D(3, 1) },
 { "data/EFFECT/Charge.png", D3DXVECTOR3(75.0f, 75.0f, 0.0f), 10 ,Int2D(2, 7) },
 };
 
-//*****************************************************************************
-// クラスのメンバ初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9 Effect::D3DTexture[EffectMax] = { NULL };
-
 //=============================================================================
 // コンストラクタ(無限ループさせる場合はINFINITY_LOOPを渡す)
 //=============================================================================
-Effect::Effect(int EffectNum, D3DXVECTOR3 _pos, int _LoopNum)
+Effect::Effect(EffectNum num, D3DXVECTOR3 _pos, int _LoopNum)
 {
 	
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	D3DVtxBuff = NULL;
 
-	TexNo = EffectNum;
+	TexNo = num;
 
-	// テクスチャの読み込み
-	if (D3DTexture[TexNo] == NULL)
+	switch (TexNo)
 	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			EffectDataWk[TexNo].texture,	// ファイルの名前
-			&D3DTexture[TexNo]);			// 読み込むメモリのポインタ
+	case HitEffect:
+		ResourceManager::Instance()->GetTexture("HitEffect", &D3DTexture);
+		break;
+	case DeadEffect:
+		ResourceManager::Instance()->GetTexture("DeadEffect", &D3DTexture);
+		break;
+	case RunEffect:
+		ResourceManager::Instance()->GetTexture("RunEffect", &D3DTexture);
+		break;
+	case ExplosionEffect:
+		ResourceManager::Instance()->GetTexture("ExplosionEffect", &D3DTexture);
+		break;
+	case ItemEffect:
+		ResourceManager::Instance()->GetTexture("ItemEffect", &D3DTexture);
+		break;
+	case Item1Effect:
+		ResourceManager::Instance()->GetTexture("Item1Effect", &D3DTexture);
+		break;
+	case ChargeEffect:
+		ResourceManager::Instance()->GetTexture("ChargeEffect", &D3DTexture);
+		break;
+	default:
+		break;
 	}
 
 	// フレームの初期化
@@ -87,21 +100,8 @@ Effect::~Effect()
 		D3DVtxBuff->Release();
 		D3DVtxBuff = NULL;
 	}
-}
 
-//=============================================================================
-// テクスチャの開放
-//=============================================================================
-void Effect::ReleaseTexture()
-{
-	for (int i = 0; i < EffectMax; i++)
-	{
-		if (D3DTexture[i] != NULL)
-		{	// テクスチャの開放
-			D3DTexture[i]->Release();
-			D3DTexture[i] = NULL;
-		}
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -148,7 +148,7 @@ void Effect::Draw() {
 	{
 		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
 		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
-		pDevice->SetTexture(0, D3DTexture[TexNo]);
+		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
@@ -239,23 +239,4 @@ void Effect::SetVertex(void) {
 	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + size.y, pos.z);
 	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
 
-}
-
-//=============================================================================
-// テクスチャの読み込み
-//=============================================================================
-void Effect::LoadTexture()
-{
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	for (int effectNo = 0; effectNo < EffectMax; effectNo++)
-	{
-		if (D3DTexture[effectNo] == NULL)
-		{
-			D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-				EffectDataWk[effectNo].texture,		// ファイルの名前
-				&D3DTexture[effectNo]);				// 読み込むメモリのポインタ
-
-		}
-	}
 }

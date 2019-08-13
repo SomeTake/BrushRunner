@@ -7,11 +7,11 @@
 #include "Main.h"
 #include "Pop.h"
 #include "Camera.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_POP		"data/TEXTURE/pointer.png"		// 読み込むテクスチャファイル名
 #define	POP_WIDTH		(64.0f)							// 半径高さ
 #define	POP_HEIGHT		(32.0f)							// 半径幅
 #define POP_POS			D3DXVECTOR3(0.0f, 90.0f, -1.0f)	// 表示場所
@@ -19,27 +19,17 @@
 #define POP_DIVIDE_Y	(1)
 #define POP_ANIM_DIVIDE	(POP_DIVIDE_X * POP_DIVIDE_Y)
 
-LPDIRECT3DTEXTURE9	Pop::D3DTexture = NULL;	// テクスチャのポインタ
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Pop::Pop(int PlayerNo)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Pop", &D3DTexture);
 
 	this->PlayerNo = PlayerNo;
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	width = POP_WIDTH;
 	height = POP_HEIGHT;
-
-	// テクスチャの初期化
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-			TEXTURE_POP,						// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -50,8 +40,8 @@ Pop::Pop(int PlayerNo)
 //=============================================================================
 Pop::~Pop()
 {
-	// テクスチャの開放
-	SAFE_RELEASE(Pop::D3DTexture);
+	// テクスチャの参照をやめる
+	D3DTexture = NULL;
 
 	// 頂点バッファの開放
 	SAFE_RELEASE(D3DVtxBuff);

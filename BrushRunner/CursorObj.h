@@ -12,9 +12,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_CURSOROBJ	("data/TEXTURE/CharSelectCursor.png")		// フレーム用画像
-#define CURSOROBJ_DIVIDE_X	(4)											// 分割数
-#define CURSOROBJ_MAX		(4)											// 1プレイヤーあたりのカーソル数
+#define CURSOROBJ_MAX		(4)									// 1プレイヤーあたりのカーソル数
+#define CURSOROBJ_DIVIDE_X	(4)									// 分割数
 
 //*****************************************************************************
 // クラス定義
@@ -23,8 +22,10 @@ class CursorObj :
 	public _2dobj
 {
 private:
-	static LPDIRECT3DTEXTURE9	D3DTexture;	// テクスチャのポインタ
-
+	int playerNo;	// 参照するプレイヤー番号
+	int cursorNo;	// 座標を参照する番号
+	int selectNo;	// 選択したキャラクターの番号
+	
 	HRESULT MakeVertex();
 	void SetTexture();
 	void SetVertex();
@@ -32,10 +33,6 @@ private:
 	void Move();	// カーソルの移動
 
 public:
-	int playerNo;	// 参照するプレイヤー番号
-	int cursorNo;	// 座標を参照する番号
-	int selectNo;	// 選択したキャラクターの番号
-
 	CursorObj(int playerNo, int cursorNo);
 	~CursorObj();
 

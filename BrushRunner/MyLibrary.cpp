@@ -157,3 +157,11 @@ int LoopCountDown(int counter, int low, int high)
 	counter--;
 	return (counter < low) ? high : counter;
 }
+
+//=============================================================================
+// floatのランダム値を取得（マイナス対応）
+//=============================================================================
+float RandomRange(float min, float max)
+{
+	return min + (float)(rand() % 1000) / 999.0f * (max - min);
+}

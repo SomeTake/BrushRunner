@@ -28,8 +28,8 @@ private:
 	Vertex2D	GaugeVertex[NUM_VERTEX];		// ’¸“_î•ñŠi”[\‘¢‘Ì
 	Vertex2D	FrameVertex[NUM_VERTEX];		// ’¸“_î•ñŠi”[\‘¢‘Ì
 
-	static LPDIRECT3DTEXTURE9 Texture_InkGauge;
-	static LPDIRECT3DTEXTURE9 Texture_GaugeFrame[InkNum];
+	LPDIRECT3DTEXTURE9 Texture_InkGauge;
+	LPDIRECT3DTEXTURE9 Texture_GaugeFrame;
 
 	HRESULT MakeVertex_GaugeFrame(int InkValue);
 	HRESULT MakeVertex_InkGauge(int InkValue);

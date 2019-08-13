@@ -18,8 +18,9 @@ static std::vector<Effect3D*> Effect3DVector;
 //=====================================================================================================
 EffectManager::EffectManager()
 {
-	Effect::LoadTexture();
-	Effect3D::LoadTexture();
+	// ベクターメモリの確保
+	EffectVector.reserve(EffectMax);
+	EffectVector.reserve(EffectMax);
 }
 
 //=====================================================================================================
@@ -40,9 +41,6 @@ EffectManager::~EffectManager()
 	}
 	Effect3DVector.clear();
 	ReleaseVector(Effect3DVector);
-
-	Effect::ReleaseTexture();
-	Effect3D::ReleaseTexture();
 }
 
 //=====================================================================================================

@@ -7,14 +7,14 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
-#include "MyLibrary.h"
+//#include "MyLibrary.h"
+#include "ResourceManager.h"
 
 #define DecAlpha (0.1f)
 
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	Paint::D3DTexture = NULL;		// テクスチャへのポインタ
 float Paint::HalfSize = PAINT_WIDTH / 2;
 
 //=============================================================================
@@ -22,7 +22,7 @@ float Paint::HalfSize = PAINT_WIDTH / 2;
 //=============================================================================
 Paint::Paint(int Owner, int PaintColor)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Paint", &D3DTexture);
 
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -38,14 +38,6 @@ Paint::Paint(int Owner, int PaintColor)
 	this->Owner = Owner;
 	this->PaintColor = PaintColor;
 
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-			TEXTURE_PAINT,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
-
 	MakeVertex();
 }
 
@@ -56,11 +48,8 @@ Paint::~Paint()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
-}
 
-void Paint::ReleaseTexture(void)
-{
-	SAFE_RELEASE(Paint::D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================

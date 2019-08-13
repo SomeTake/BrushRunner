@@ -15,7 +15,6 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_ITEM			("data/TEXTURE/Item.png")
 #define ITEM_SIZE				D3DXVECTOR2(50.0f, 50.0f)
 #define ROULETTE_COUNTER		(10)						// 何フレームごとにルーレットを動かすか
 #define USE_COUNTER				(3)							// 何回ルーレットを動かしたらアイテムを確定させるか
@@ -48,7 +47,6 @@ private:
 	int rouletteCnt;						// ルーレットのカウンタ
 	int useCnt;								// ルーレットでアイテムのテクスチャも回すためのカウンタ
 	bool active;							// アイテム使用中
-	static 	LPDIRECT3DTEXTURE9	D3DTexture; // テクスチャのポインタ
 
 	HRESULT MakeVertex();
 	void SetTexture();

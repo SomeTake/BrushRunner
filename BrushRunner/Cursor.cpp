@@ -12,15 +12,15 @@
 #include "MyLibrary.h"
 #include "DebugWindow.h"
 #include "CharacterAI.h"
+#include "ResourceManager.h"
 
-LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
-
+//LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Cursor", &D3DTexture);
 
 	use = true;
 	pos = CURSOR_FIRST_POS;
@@ -37,14 +37,6 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 		this->AIptr = nullptr;
 	}
 
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-			CURSOR_TEXTURE,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリのポインタ
-	}
-
 	// 頂点情報の作成
 	MakeVertex();
 }
@@ -54,6 +46,7 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 //=============================================================================
 Cursor::~Cursor()
 {
+	D3DTexture = NULL;
 }
 
 //=============================================================================

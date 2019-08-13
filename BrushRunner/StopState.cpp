@@ -38,6 +38,7 @@ void StopState::Update(int AnimCurtID)
 	{
 		cnt = 0;
 		owner_->ChangeAnim(Running);
+		owner_->SetPlayable(true);
 		owner_->ChangeState(new RunningState(owner_));
 		return;
 	}

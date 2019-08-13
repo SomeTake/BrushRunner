@@ -18,7 +18,6 @@ class FieldItem :
 	public Billboard
 {
 private:
-	static LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
 	static LPDIRECT3DVERTEXBUFFER9	D3DVtxBuff;		// 頂点バッファインターフェースへのポインタ
 	int								texno;			// 使用するアイテムのテクスチャ番号
 	bool							use;

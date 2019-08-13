@@ -30,6 +30,8 @@ public:
 
 	void Update();
 	void Draw();
+
+	void LoadResource();
 };
 
 int GetScene();									// Œ»İ‚ÌƒQ[ƒ€ƒV[ƒ“‚ğæ“¾‚·‚é

@@ -58,7 +58,7 @@ public:
 	~SceneGame();
 	void Update(int SceneID);
 	void Draw();
-	static ResultData *GetResultData(int playerNo);
+	static ResultData *GetResultData(int rank);
 	static int GetTheLastPlayer(void) { return SceneGame::TheLastPlayer; };
 };
 
