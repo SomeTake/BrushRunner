@@ -24,16 +24,26 @@ enum eAIAction
 // 現在AIカーソルの状態
 enum eAIState
 {
-	ePaintPath,
-	eUseBlackPaint
+	ePaintPath,			// これからの道をペイントする
+	ePaintObjChip,		// オブジェクトチップをペイントする
+	eUseBlackPaint,		// 他のプレイヤーのペイントを削除する
 };
 
 // 現在AIペイントの状態
 enum eAIPaintState
 {
-	ePaintStart,
-	ePainting,
-	ePaintEnd,
+	ePaintStart,		// ペイントが始まる
+	ePainting,			// ペイント中
+	ePaintEnd,			// ペイント終了
+};				
+
+// 現在AIのインク残量の状態
+enum eAIInkState
+{
+	eInkValue_Full,		// 満タン
+	eInkValue_Many,		// 半分以上
+	eInkValue_Less,		// 半分以下
+	eInkValue_Few,		// 15%以下
 };
 
 //*****************************************************************************
@@ -47,39 +57,52 @@ private:
 	void DrawLine3D(D3DXVECTOR3 P1, D3DXVECTOR3 P2);
 #endif
 
-	D3DXVECTOR3	PaintStartPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3	PaintEndPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	GroupStruct *EnemyPaint;
-	int			Owner = 0;
-	int			Action = eNoAction;
-	int			CursorState = eNoAction;
-	int			PaintState = eNoAction;
-	int			InkType = ColorInk;
-	int			ItemType = 0;
-	bool		ChangeInk = false;
-	bool		HaveItem = false;
-	bool		UseItem = false;
-	bool		FindEdgeOver = false;
-	bool		RandomOver = false;
-	bool		FindEnemyPaint = false;
-	bool		ShotBullet = false;
+	D3DXVECTOR3	PaintStartPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ペイントの始点
+	D3DXVECTOR3	PaintEndPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ペイントの終点
+	GroupStruct *EnemyPaint;				// 削除するペイント
+	int			Owner = 0;					// AIの所有者
+	int			Action = eNoAction;			// AIの行動
+	int			CursorState = eNoAction;	// カーソル状態
+	int			PaintState = eNoAction;		// ペイント状態
+	int			InkType = ColorInk;			// インクの種類
+	int			InkState[InkNum];			// インク残量の状態
+	int			ItemType = 0;				// 持っているアイテムの種類
+	bool		ChangeInk = false;			// インクを変更するフラグ
+	bool		HaveItem = false;			// アイテムを持っているフラグ
+	bool		UseItem = false;			// アイテムを使用するフラグ
+	bool		UseSpike = false;			// スパイクブーツを使用するフラグ
+	bool		SpecialInk = false;			// スペシャルインクを使用するフラグ
+	bool		FindEdgeOver = false;		// プラットフォームのへりを探すフラグ
+	bool		FindObjChipOver = false;	// オブジェクトチップを探すフラグ
+	bool		RandomOver = false;			// ランダムで行動を決定するフラグ
+	bool		FindEnemyPaint = false;		// 削除するペイントを探すフラグ
+	bool		ShotBullet = false;			// バレットを撃つフラグ
 	static PaintGroup *paintGroup;
 
+	// マップチップの番号によって行動する
+	void MapChipAction(D3DXVECTOR3 Pos, int MapChipNo);
+	// 画面内の他人のペイントを探して、削除する
+	void PaintAction(void);
+	// アイテムを持っていたら、アイテムを使用する
+	void ItemAction(void);
 	// 向こうのプラットフォームを探す
 	void FindPlatform(D3DXVECTOR3 Pos);
-	void MapChipAction(D3DXVECTOR3 Pos, int MapChipNo);
-	void PaintAction(void);
-	void ItemAction(void);
+	// ペイントするオブジェクトチップを探す
+	void FindObjectChip(D3DXVECTOR3 Pos);
 
 public:
 	CharacterAI(int Owner);
 	~CharacterAI();
 	void Update(D3DXVECTOR3 Pos);
+# if _DEBUG
+	void Draw(void);
+#endif
 
 	void SetAIAction(int eAction) { this->Action = eAction; };
 	void SetCursorState(int eState) { this->CursorState = eState; };
 	void SetPaintState(int State) { this->PaintState = State; };
 	void SetInkType(int InkType) { this->InkType = InkType; };
+	void SetInkState(int InkType, int InkState) { this->InkState[InkType] = InkState; };
 	void SetItemType(int ItemType) { this->ItemType = ItemType; };
 	void SetAIChangeInk(bool Flag) { this->ChangeInk = Flag; };
 	void SetHaveItem(bool Flag) { this->HaveItem = Flag; };
@@ -97,10 +120,6 @@ public:
 	D3DXVECTOR3 GetPaintStartPos(void) { return this->PaintStartPos; };
 	D3DXVECTOR3 GetPaintEndPos(void) { return this->PaintEndPos; };
 	GroupStruct* GetEnemyPaint(void) { return this->EnemyPaint; };
-
-# if _DEBUG
-	void Draw(void);
-#endif
 };
 
 #endif

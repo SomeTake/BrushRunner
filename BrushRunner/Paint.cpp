@@ -7,7 +7,7 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
-//#include "MyLibrary.h"
+#include "MyLibrary.h"
 #include "ResourceManager.h"
 
 #define DecAlpha (0.1f)
@@ -69,7 +69,7 @@ void Paint::Update()
 		else
 		{
 			// “§–¾“x‚ğŒ¸Š’l‚É‡‚í‚¹‚Ä’Ç‰Á
-			//col.a -= DecAlpha;
+			col.a -= DecAlpha;
 
 			if (col.a <= 0.0f)
 			{

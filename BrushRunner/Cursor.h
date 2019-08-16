@@ -31,15 +31,15 @@ private:
 	float	vec = 0.0f;			// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
 	float	moveX = 0.0f;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
 	float	moveY = 0.0f;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
-	//static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
-	D3DXVECTOR3 oldPos;	// 画面外判定を行うための1f前の座標
+	//static LPDIRECT3DTEXTURE9 D3DTexture;					// テクスチャのポインタ
 
 	// AI用
 	CharacterAI		*AIptr = nullptr;
 	bool			AIUse = false;
 	D3DXVECTOR3		WorldPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	void PaintPath();					// インクで通れる道を作る
-	void DeletePath();					// 他のプレイヤーのペイントを削除
+	void PaintPath(void);					// インクで通れる道を作る
+	void DeletePath(void);					// 他のプレイヤーのペイントを削除
+	void PaintObjChip(void);				// オブジェクトチップをペイントする
 
 	HRESULT MakeVertex();				// 頂点の作成
 	void SetTexture();					// テクスチャ座標の設定
@@ -60,7 +60,7 @@ public:
 	// インクを切り替え
 	void ChangeInk();						
 	// テクスチャの開放
-	static void ReleaseTexture(void) { SAFE_RELEASE(Cursor::D3DTexture); };
+	//static void ReleaseTexture(void) { SAFE_RELEASE(Cursor::D3DTexture); };
 
 	// カーソルの座標を取得
 	D3DXVECTOR3 GetPos(void) { return this->pos; };

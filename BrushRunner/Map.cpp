@@ -13,13 +13,14 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
-#define OBJECT_FILE		("data/MAP/map_object.csv")
+//#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
+#define MAP_FILE		("data/MAP/map_ground_test.csv")		
+//#define OBJECT_FILE		("data/MAP/map_object.csv")
+#define OBJECT_FILE		("data/MAP/map_object_test.csv")
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-//D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 std::vector<std::vector<int>> Map::maptbl;
 std::vector<std::vector<int>> Map::objtbl;
 
@@ -292,6 +293,9 @@ int Map::GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection)
 	return GetMapTbl(x, y);
 }
 
+//=============================================================================
+// オブジェクトチップXYからオブジェクトテーブルの数値を取得する
+//=============================================================================
 int Map::GetObjTbl(int ObjX, int ObjY)
 {
 	if (ObjX < 0 ||
@@ -305,6 +309,32 @@ int Map::GetObjTbl(int ObjX, int ObjY)
 	{
 		return objtbl.at(ObjY).at(ObjX);
 	}
+}
+
+//=============================================================================
+// 座標からマップテーブルの数値を取得する
+//=============================================================================
+// □□□
+// □■□	■：CenterChip
+// □□□
+int Map::GetObjTbl(D3DXVECTOR3 Pos, int ChipDirection)
+{
+	int x = 0;
+	int y = 0;
+
+	GetMapChipXY(Pos, &x, &y);
+
+	switch (ChipDirection)
+	{
+	case eCenterUp:
+		// 中央の上のチップ
+		y--;
+		break;
+	default:
+		break;
+	}
+
+	return GetObjTbl(x, y);
 }
 
 void Map::SetObjTbl(int ObjX, int ObjY, int texnum)

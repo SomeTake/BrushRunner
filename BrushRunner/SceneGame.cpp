@@ -63,13 +63,13 @@ SceneGame::SceneGame()
 	//}
 
 #if _DEBUG
-	pPlayer[0] = new Player(0, false);
+	pPlayer[0] = new Player(0, true);
 	pPlayer[1] = new Player(1, true);
 	//pPlayer[1]->SetOnCamera(false);
 	pPlayer[2] = new Player(2, true);
-	pPlayer[2]->SetOnCamera(false);
+	//pPlayer[2]->SetOnCamera(false);
 	pPlayer[3] = new Player(3, true);
-	pPlayer[3]->SetOnCamera(false);
+	//pPlayer[3]->SetOnCamera(false);
 #endif
 
 	// 2DUIの初期化
@@ -111,7 +111,7 @@ SceneGame::~SceneGame()
 	SAFE_DELETE(paintGroup);
 
 	// ペイントテクスチャの削除
-	Paint::ReleaseTexture();
+	//Paint::ReleaseTexture();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)

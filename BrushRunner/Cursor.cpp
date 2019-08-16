@@ -15,6 +15,7 @@
 #include "ResourceManager.h"
 
 //LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -198,7 +199,6 @@ void Cursor::Move()
 	}
 	else
 	{
-		KeyMove();	// キーボード操作
 		if (AIptr->GetCursorState() == ePaintPath)
 		{
 			PaintPath();
@@ -207,6 +207,14 @@ void Cursor::Move()
 		{
 			DeletePath();
 		}
+		else if (AIptr->GetCursorState() == ePaintObjChip)
+		{
+			PaintObjChip();
+		}
+
+#if _DEBUG
+		KeyMove();	// キーボード操作
+#endif
 	}
 }
 
@@ -339,7 +347,6 @@ void Cursor::PaintPath()
 	// カーソルが始点までに移動していない
 	if (AIptr->GetPaintState() == eNoAction)
 	{
-		//PaintReady = false;
 		DestPos_World = AIptr->GetPaintStartPos();
 	}
 	// ペイントしている
@@ -386,7 +393,7 @@ void Cursor::PaintPath()
 //=============================================================================
 // 他のプレイヤーのペイントを削除
 //=============================================================================
-void Cursor::DeletePath()
+void Cursor::DeletePath(void)
 {
 	float Distance = 0.0f;
 	D3DXVECTOR2 DestPos_Screen;
@@ -394,7 +401,7 @@ void Cursor::DeletePath()
 	GroupStruct *EnemyPaint = AIptr->GetEnemyPaint();
 
 	// 削除が間に合わない
-	if (EnemyPaint->Count <= 5)
+	if (EnemyPaint->Count <= 5 || EnemyPaint->PaintPath.empty())
 	{
 		AIptr->SetCursorState(eNoAction);
 		AIptr->SetPaintState(ePaintEnd);
@@ -447,3 +454,63 @@ void Cursor::DeletePath()
 	}
 #endif
 }
+
+//=============================================================================
+// オブジェクトチップをペイントする
+//=============================================================================
+void Cursor::PaintObjChip(void)
+{
+	float Distance = 0.0f;
+	D3DXMATRIX WorldMtx, TransMtx;
+	D3DXVECTOR3 DestPos_World;
+	D3DXVECTOR2 DestPos_Screen;
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&WorldMtx);
+
+	// カーソルが始点までに移動していない
+	if (AIptr->GetPaintState() == eNoAction)
+	{
+		DestPos_World = AIptr->GetPaintStartPos();
+	}
+	// ペイントしている
+	else
+	{
+		DestPos_World = AIptr->GetPaintEndPos();
+	}
+
+	// 目標のスクリーン座標を計算する
+	D3DXMatrixTranslation(&TransMtx, DestPos_World.x, DestPos_World.y, DestPos_World.z);
+	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+	DestPos_Screen = WorldToScreenPos(WorldMtx);
+
+	// カーソルと目標の座標を計算する
+	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
+	Distance = D3DXVec2LengthSq(&Vec);
+
+	if (Distance > pow(20.0f, 2))
+	{
+		// カーソルが目標に移動する
+		float Angle = atan2f(Vec.y, Vec.x);
+		pos.x += cosf(Angle) * CURSOR_SPEED;
+		pos.y += sinf(Angle) * CURSOR_SPEED;
+	}
+	else
+	{
+		pos.x = DestPos_Screen.x;
+		pos.y = DestPos_Screen.y;
+
+		// ペイントが始まる
+		if (AIptr->GetPaintState() == eNoAction)
+		{
+			AIptr->SetPaintState(ePaintStart);
+		}
+		// ペイント終了
+		else
+		{
+			AIptr->SetCursorState(eNoAction);
+			AIptr->SetPaintState(ePaintEnd);
+		}
+	}
+}
+

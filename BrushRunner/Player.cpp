@@ -29,7 +29,8 @@
 #define PLAYER_ROT			D3DXVECTOR3(0.0f, D3DXToRadian(-90), 0.0f)	// 初期の向き
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define MOVE_SPEED			(2.0f)										// 動くスピード
-#define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+//#define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+#define DefaultPosition		D3DXVECTOR3(50.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
 #define OBJECT_HIT_COUNTER	(5)											// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
@@ -63,8 +64,8 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 	this->ChangeAnim(Idle);
 
 	// 位置・回転・スケールの初期設定
-	//pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
-	pos = DefaultPosition + D3DXVECTOR3(50.0f * _CtrlNum, 0.0f, 0.0f);
+	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
+	//pos = DefaultPosition + D3DXVECTOR3(50.0f * _CtrlNum, 0.0f, 0.0f);
 	rot = PLAYER_ROT;
 	scl = ModelScl[KouhaiModel];
 	hitGround = false;
@@ -196,7 +197,7 @@ void Player::Draw()
 			pDevice->SetMaterial(&matDef);
 		}
 
-		//// プレイヤーUIの描画
+		// プレイヤーUIの描画
 		//playerUI->Draw(onCamera, blind);
 
 		// ペイントの描画
@@ -206,9 +207,10 @@ void Player::Draw()
 		playerUI->Draw(onCamera, blind);
 
 	}
+	// プレイヤー死亡のUI
 	else
 	{
-		// プレイヤーUIの描画(プレイヤー死亡のUI)
+		// プレイヤーUIの描画()
 		playerUI->Draw(onCamera, blind);
 	}
 
@@ -252,7 +254,7 @@ void Player::Move()
 		{
 			if (!PowerBanana)
 			{
-				//pos.x += MOVE_SPEED * runSpd;
+				pos.x += MOVE_SPEED * runSpd;
 			}
 			else
 			{

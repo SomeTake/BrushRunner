@@ -114,7 +114,7 @@ void Item::Update()
 			}
 
 			//テクスチャ座標をセット
-			//SetTexture();
+			SetTexture();
 		}
 
 		// アイテム使用中

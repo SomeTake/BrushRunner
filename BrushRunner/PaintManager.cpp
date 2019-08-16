@@ -177,6 +177,9 @@ void PaintManager::Update()
 				PaintManager::paintGroup->Start(Owner);
 			}
 			AIptr->SetPaintState(ePainting);
+
+			// ペイントを設置する
+			SetPaint(InkType);
 		}
 		else if (AIptr->GetPaintState() == ePainting)
 		{
@@ -189,15 +192,42 @@ void PaintManager::Update()
 				if (!SpInk)
 				{
 					InkValue[InkType]--;
+
+					// AIのインク残量状態を更新
+					if (InkValue[InkType] >= INK_MAX)
+					{
+						// 満タン
+						AIptr->SetInkState(InkType, eInkValue_Full);
+					}
+					else if (InkValue[InkType] < INK_MAX && InkValue[InkType] >= INK_MAX / 2)
+					{
+						// 半分以上
+						AIptr->SetInkState(InkType, eInkValue_Many);
+					}
+					else if (InkValue[InkType] < INK_MAX / 2 && InkValue[InkType] >= INK_MAX * 0.15)
+					{
+						// 半分以下
+						AIptr->SetInkState(InkType, eInkValue_Less);
+					}
+					else if (InkValue[InkType] < INK_MAX * 0.15)
+					{
+						// 15%以下
+						AIptr->SetInkState(InkType, eInkValue_Few);
+					}
 				}
 			}
 			else
 			{
+				// インクの残量足りない、ペイント終了
 				AIptr->SetPaintState(ePaintEnd);
 			}
 		}
 		else if (AIptr->GetPaintState() == ePaintEnd)
 		{
+			// ペイントを設置する
+			//SetPaint(InkType);
+
+			// カラーインクなら、このペイントグループを記録する
 			if (InkType == ColorInk)
 			{
 				PaintManager::paintGroup->End(Owner);
@@ -390,5 +420,33 @@ void PaintManager::AutoHeal()
 	{
 		InkValue[ColorInk] = min(++InkValue[ColorInk], INK_MAX);
 		InkValue[BlackInk] = min(++InkValue[BlackInk], INK_MAX);
+
+		// AIのインク残量状態を更新
+		if (AIUse)
+		{
+			for (int i = 0; i < InkNum; i++)
+			{
+				if (InkValue[i] >= INK_MAX)
+				{
+					// 満タン
+					AIptr->SetInkState(i, eInkValue_Full);
+				}
+				else if (InkValue[i] < INK_MAX && InkValue[i] >= INK_MAX / 2)
+				{
+					// 半分以上
+					AIptr->SetInkState(i, eInkValue_Many);
+				}
+				else if (InkValue[i] < INK_MAX / 2 && InkValue[i] >= INK_MAX * 0.15)
+				{
+					// 半分以下
+					AIptr->SetInkState(i, eInkValue_Less);
+				}
+				else if (InkValue[i] < INK_MAX * 0.15)
+				{
+					// 15%以下
+					AIptr->SetInkState(i, eInkValue_Few);
+				}
+			}
+		}
 	}
 }

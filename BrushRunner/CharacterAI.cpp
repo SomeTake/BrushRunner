@@ -17,15 +17,19 @@
 //*****************************************************************************
 PaintGroup *CharacterAI::paintGroup = nullptr;
 
-#define ScanRange (10)		// プラットフォームのへりが探せる範囲
+#define ScanRange_Plat (10)		// プラットフォームのへりを探せる範囲
+#define ScanRange_ObjChip (3)	// オブジェクトチップを探せる範囲
 
 // CSV中の番号の事件
 enum e_ChipEvent
 {
+	eNoEventChip = -1,
 	eRandomChip = -2,		// ペイント、落下のどちらかランダムで決める
 	eJumpChip = -3,			// ジャンプする
-	ePaintChip = -4,		// ジャンプする
-	ePlatformEdge = -5		// 向こうのプラットフォームのへり
+	ePaintChip = -4,		// ペイントする
+	ePlatformEdge = -5,		// 向こうのプラットフォームのへり
+	ePaintObject = -6,		// 前方のオブジェクトチップをペイントする
+	ePlatformEdge_Item = -7,// プラットフォームのへり(アイテムあり)
 };
 
 #if _DEBUG
@@ -46,6 +50,8 @@ typedef struct
 CharacterAI::CharacterAI(int Owner)
 {
 	this->Owner = Owner;
+	this->InkState[ColorInk] = eInkValue_Full;
+	this->InkState[BlackInk] = eInkValue_Full;
 }
 
 //=====================================================================================================
@@ -70,8 +76,8 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 	// マップチップの番号によって行動する
 	MapChipAction(Pos, MapChipNo);
 
-	// 画面内のペイントを探して、ペイントする
-	if (CursorState != ePaintPath && GetKeyboardTrigger(DIK_V))
+	// 画面内の他人のペイントを探して、削除する
+	if (CursorState != ePaintPath)
 	{
 		PaintAction();
 	}
@@ -100,30 +106,28 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 void CharacterAI::MapChipAction(D3DXVECTOR3 Pos, int MapChipNo)
 {
 	// フラグの初期化
-	if (MapChipNo != eRandomChip)
+	if (MapChipNo == eNoEventChip)
 	{
 		RandomOver = false;
-		if (MapChipNo != ePaintChip)
-		{
-			FindEdgeOver = false;
-		}
+		FindEdgeOver = false;
+		FindObjChipOver = false;
 	}
 
 	if (MapChipNo == eRandomChip && !RandomOver)
 	{
-		int Random = rand() % (1 + 1);
+		int Random = rand() % (2 + 1);
 
-		// ペイント
+		// 落下
 		if (Random == 0)
+		{
+			this->FindPlatform(Pos);
+			;	// 何もしない
+		}
+		// ペイント
+		else
 		{
 			// プラットフォームのへりを探す
 			this->FindPlatform(Pos);
-		}
-		// 落下
-		else if (Random == 1)
-		{
-			int i = 0;
-			;	// 現在は何もしない
 		}
 
 		RandomOver = true;
@@ -138,6 +142,11 @@ void CharacterAI::MapChipAction(D3DXVECTOR3 Pos, int MapChipNo)
 		// プラットフォームのへりを探す
 		this->FindPlatform(Pos);
 	}
+	else if (MapChipNo == ePaintObject && CursorState != eUseBlackPaint)
+	{
+		// ペイントするオブジェクトチップを探す
+		this->FindObjectChip(Pos);
+	}
 }
 
 //=====================================================================================================
@@ -145,17 +154,51 @@ void CharacterAI::MapChipAction(D3DXVECTOR3 Pos, int MapChipNo)
 //=====================================================================================================
 void CharacterAI::PaintAction(void)
 {
+	bool Trigger = false;
+	static int Count = 0;
+	static int Bonus = 0;
+
 	if (!FindEnemyPaint)
 	{
-		if (CharacterAI::paintGroup->GetEnemyPaint(&EnemyPaint, Owner))
+		if (!SpecialInk)
 		{
-			CursorState = eUseBlackPaint;
-			if (InkType != BlackInk)
+			Count++;
+		}
+		else
+		{
+			// スペシャルインクを使用中するなら、判定速度が速くなる
+			Count += 2;
+		}
+
+		// 2秒ごとに判定する
+		if (Count % 120 == 0)
+		{
+			int Rand = rand() % (10 + 1);
+			if (Rand + Bonus > 6)
 			{
-				ChangeInk = true;
-				InkType = BlackInk;
+				Trigger = true;
+				Bonus = 0;
+				Count = 0;
 			}
-			FindEnemyPaint = true;
+			else
+			{
+				// 使用しないが、時間によって使用する確率が高くなる
+				Bonus++;
+			}
+		}
+
+		if (Trigger)
+		{
+			if (CharacterAI::paintGroup->GetEnemyPaint(&EnemyPaint, Owner))
+			{
+				CursorState = eUseBlackPaint;
+				if (InkType != BlackInk)
+				{
+					ChangeInk = true;
+					InkType = BlackInk;
+				}
+				FindEnemyPaint = true;
+			}
 		}
 	}
 }
@@ -201,6 +244,28 @@ void CharacterAI::ItemAction(void)
 		// スパイクブーツ
 	case NumSpike:
 
+		Count++;
+		// 2秒ごとに判定する
+		if (Count % 120 == 0)
+		{
+			int Rand = rand() % (10 + 1);
+			if (Rand + Bonus > 5)
+			{
+				// アイテムを使用する
+				ItemTrigger = true;
+			}
+			else
+			{
+				// 使用しないが、時間によって使用する確率が高くなる
+				Bonus++;
+			}
+		}
+
+		if (UseSpike)
+		{
+			// アイテムを使用する
+			ItemTrigger = true;
+		}
 		break;
 
 		// バナナの皮
@@ -238,10 +303,10 @@ void CharacterAI::ItemAction(void)
 	case NumGun:
 
 		Count++;
-		// 1.5秒ごとに判定する
-		if (Count % 90 == 0 || Bonus >= 10)
+		// 0.5秒ごとに判定する
+		if (Count % 30 == 0)
 		{
-			if (ShotBullet)
+			if (ShotBullet || Bonus >= 10)
 			{
 				// アイテムを使用する
 				ItemTrigger = true;
@@ -266,6 +331,12 @@ void CharacterAI::ItemAction(void)
 		UseItem = true;
 		Count = 0;
 		Bonus = 0;
+
+		// スペシャルインクを使用中
+		if (ItemType == NumSpInk)
+		{
+			SpecialInk = true;
+		}
 	}
 }
 
@@ -278,48 +349,167 @@ void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 	int PlayerChip_Y = 0;
 	Map::GetMapChipXY(Pos, &PlayerChip_X, &PlayerChip_Y);
 	std::vector<D3DXVECTOR3> TempPos;
+	bool Trigger = false;
 
-	if (FindEdgeOver)
+	if (FindObjChipOver || (InkState[ColorInk] == eInkValue_Few && !SpecialInk))
 	{
 		return;
 	}
 
 	// スキャンできる横幅の範囲
-	for (int i = PlayerChip_X + 1; i <= PlayerChip_X + ScanRange; i++)
+	for (int i = PlayerChip_X + 1; i <= PlayerChip_X + ScanRange_Plat; i++)
 	{
+		// 縦幅の範囲
 		for (int j = 0; j < MAP_SIZE_Y; j++)
 		{
 			int k = Map::GetMapTbl(i, j);
-			if (k == ePlatformEdge)
+			if (k == ePlatformEdge || k == ePlatformEdge_Item)
 			{
 				// 探したプラットフォームの座標
 				TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
-				// キャラクター下のチップの座標
-				PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
-				CursorState = ePaintPath;
-				if (InkType != ColorInk)
-				{
-					ChangeInk = true;
-					InkType = ColorInk;
-				}
-				FindEdgeOver = true;
 
-#if _DEBUG
-				DrawLineFlag = true;
-#endif
+				// 向こうにアイテムがあったら、行く確率が高くなる
+				if (k == ePlatformEdge_Item)
+				{
+					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
+					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
+				}
+
+				Trigger = true;
 			}
 		}
 	}
 
-	// もし複数のプラットフォームがあれば、ランダムで決める
-	if (TempPos.size() > 1)
+	if (Trigger)
 	{
-		int Random = rand() % TempPos.size();
-		PaintEndPos = TempPos.at(Random);
+		// キャラクター下のチップの座標(ペイントの始点)
+		PaintStartPos = Map::GetMapChipPos(PlayerChip_X + 1, PlayerChip_Y, eRightUp);
+		// カーソル状態を変わる
+		CursorState = ePaintPath;
+		// インク交換（必要があるなら）
+		if (InkType != ColorInk)
+		{
+			ChangeInk = true;
+			InkType = ColorInk;
+		}
+		FindEdgeOver = true;
+
+#if _DEBUG
+		DrawLineFlag = true;
+#endif
+
+		// もし複数のプラットフォームがあれば、ランダムで決める
+		if (TempPos.size() > 1)
+		{
+			int Random = rand() % TempPos.size();
+			PaintEndPos = TempPos.at(Random);
+		}
+		else if (TempPos.size() == 1)
+		{
+			PaintEndPos = TempPos.at(0);
+		}
 	}
-	else if (TempPos.size() == 1)
+}
+
+//=====================================================================================================
+// ペイントするオブジェクトチップを探す
+//=====================================================================================================
+void CharacterAI::FindObjectChip(D3DXVECTOR3 PlayerPos)
+{
+	int Chip_X = 0;
+	int Chip_Y = 0;
+	// プレイヤーの座標によって、チップのXY座標を取得
+	Map::GetMapChipXY(PlayerPos, &Chip_X, &Chip_Y);
+	bool FindStartChip = false;
+	int ChipType = 0;
+
+	if (FindObjChipOver || (InkState[BlackInk] == eInkValue_Few && !SpecialInk) || UseSpike)
 	{
-		PaintEndPos = TempPos.at(0);
+		return;
+	}
+
+	// 最初のオブジェクトチップの座標を探す
+	for (int i = 0; i < ScanRange_ObjChip; i++)
+	{
+		int TempChip_X = Chip_X + 1 + i;
+		for (int j = 0; j < ScanRange_ObjChip; j++)
+		{
+			int TempChip_Y = Chip_Y - (ScanRange_ObjChip / 2) + j;
+			// オブジェクトチップテーブルから、チップ種類を取得
+			ChipType = Map::GetObjTbl(TempChip_X, TempChip_Y);
+			if (ChipType == eObjSpddown || ChipType == eObjNuma || ChipType == eObjDrain)
+			{
+				// スパイクブーツを持っているなら、先に使う
+				if (HaveItem && ItemType == NumSpike)
+				{
+					UseSpike = true;
+					return;
+				}
+				else
+				{
+					// 最初のオブジェクトチップの座標
+					PaintStartPos = Map::GetMapChipPos(TempChip_X, TempChip_Y, eCenter);
+					// ペイントの終了座標を保存
+					PaintEndPos = Map::GetMapChipPos(TempChip_X, TempChip_Y, eCenter);
+					// 最初のオブジェクトチップを探した
+					FindStartChip = true;
+				}
+				break;
+			}
+		}
+
+		if (FindStartChip)
+		{
+			break;
+		}
+	}
+
+	// ペイントするオブジェクトチップの終点を探す
+	if (FindStartChip)
+	{
+		//  □
+		// ■□	■：PaintStartPos(起点)
+		//  □	□：オブジェクトチップを探す範囲
+		Map::GetMapChipXY(PaintStartPos, &Chip_X, &Chip_Y);
+		Chip_X++;
+
+		while (true)
+		{
+			int Count = 0;
+
+			for (int j = 0; j < 3; j++)
+			{
+				int TempChip_Y = Chip_Y - 1 + j;
+				// オブジェクトチップテーブルから、チップ種類を取得
+				int TempChipNo = Map::GetObjTbl(Chip_X, TempChip_Y);
+				// 探したチップと最初のチップは同じ種類
+				if (ChipType == TempChipNo)
+				{
+					// ペイントの終点座標を保存
+					PaintEndPos = Map::GetMapChipPos(Chip_X, TempChip_Y, eCenter);
+					Chip_X++;
+					Chip_Y = TempChip_Y;
+					break;
+				}
+				else
+				{
+					Count++;
+				}
+			}
+
+			// ループ終了
+			if (Count >= 3)
+			{
+				CursorState = ePaintObjChip;
+				// インク交換（必要があるなら）
+				if (InkType != BlackInk)
+				{
+					ChangeInk = true;
+					InkType = BlackInk;
+				}
+				break;
+			}
+		}
 	}
 }
 
@@ -331,7 +521,7 @@ void CharacterAI::Draw(void)
 {
 	if (this->DrawLineFlag)
 	{
-		DrawLine3D(this->PaintStartPos, this->PaintEndPos);
+		//DrawLine3D(this->PaintStartPos, this->PaintEndPos);
 	}
 }
 
