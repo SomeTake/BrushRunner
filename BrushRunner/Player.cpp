@@ -486,11 +486,6 @@ void Player::PaintCollider()
 //=====================================================================================================
 void Player::HorizonCollider()
 {
-	// ペイントにヒットしている状況ならすり抜けられる
-	if (hitPaint)
-		hitHorizon = false;
-		return;
-
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x, y;
 	Map::GetMapChipXY(pos, &x, &y);
