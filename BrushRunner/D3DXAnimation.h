@@ -27,32 +27,27 @@ private:
 	HRESULT SetupBoneMatrixPointers(LPD3DXFRAME pFrameBase, LPD3DXFRAME pFrameRoot);
 	void UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParentMatrix);
 
-protected:
-
+public:
 	vector<ANIMATIONSET>		AnimSet;
 	LPD3DXANIMATIONCONTROLLER	AnimController;		// アニメーションコントローラー
 
+	D3DXANIMATION();
+	virtual ~D3DXANIMATION();
+	// 純粋仮想関数
+	virtual void CreateAnimSet() = 0;
+
+	void ChangeAnim(UINT AnimID);
 	HRESULT Load_xFile(LPCTSTR filename, const char* ErrorSrc);
 	HRESULT SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetName);
 	void UpdateAnim(float Time);
 	void DrawAnim(LPD3DXMATRIX WorldMatrix);
 
 	D3DXMATRIX GetBoneMatrix(const char* BoneName);
-	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
 	int GetAnimCurtID(void) { return this->CurrentAnimID; };
+	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
 	int GetAnimCurtFrame(void);
 	int GetAnimPeriodFrame(void);
 	LPCSTR GetCurtAnimName(void) { return this->AnimSet.at(this->CurrentAnimID).GetSetName(); };
-
-	virtual void CreateAnimSet(void) = 0;
-public:
-	D3DXANIMATION();
-	virtual ~D3DXANIMATION();
-	// 純粋仮想関数
-	virtual void Update() = 0;
-	virtual void Draw() = 0;
-
-	void ChangeAnim(UINT AnimID);
 
 };
 

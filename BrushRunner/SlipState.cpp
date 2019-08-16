@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "SlipState.h"
+#include "IdleState.h"
 
 //=============================================================================
 // コンストラクタ
@@ -25,5 +26,10 @@ SlipState::~SlipState()
 //=============================================================================
 void SlipState::Update(int AnimCurtID)
 {
-
+	// アイドル状態にアニメーションが変わったらステータスも変更する
+	if (owner_->GetModel()->GetAnimCurtID() == Idle)
+	{
+		owner_->ChangeState(new IdleState(owner_));
+		owner_->SetPlayable(true);
+	}
 }

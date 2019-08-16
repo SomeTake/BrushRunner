@@ -30,6 +30,7 @@
     <ClInclude Include="Finish.h" />
     <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="MeshField.h" />
+    <ClInclude Include="Model3D.h" />
     <ClInclude Include="MyColor.h" />
     <ClInclude Include="Object3D.h" />
     <ClInclude Include="Particle.h" />
@@ -109,6 +110,7 @@
     <ClInclude Include="Title.h" />
     <ClInclude Include="Trophy.h" />
     <ClInclude Include="VictoryState.h" />
+    <ClInclude Include="VirtualModel.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +124,7 @@
     <ClCompile Include="Finish.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="MeshField.cpp" />
+    <ClCompile Include="Model3D.cpp" />
     <ClCompile Include="Object3D.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
@@ -195,6 +198,7 @@
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="VictoryState.cpp" />
+    <ClCompile Include="VirtualModel.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>

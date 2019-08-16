@@ -8,7 +8,6 @@
 #include "Player.h"
 #include "Input.h"
 #include "SceneGame.h"
-#include "D3DXAnimation.h"
 #include "Camera.h"
 #include "DebugWindow.h"
 #include "Map.h"
@@ -21,6 +20,7 @@
 #include "SlipState.h"
 #include "Item.h"
 #include "Timer.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -50,21 +50,16 @@ enum CallbackKeyType
 //=====================================================================================================
 Player::Player(int _CtrlNum) : state(nullptr)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// xFileを読み込む
-	this->Load_xFile(CharaModel[KouhaiModel], "Player");
-
-	// アニメーションセットを設置する
-	this->CreateAnimSet();
+	ResourceManager::Instance()->GetMesh("Player", &model);
 
 	// 現在のアニメーションをアイドル状態とする
-	this->ChangeAnim(Idle);
+	this->model->ChangeAnim(Idle);
 
 	// 位置・回転・スケールの初期設定
-	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
-	rot = PLAYER_ROT;
-	scl = ModelScl[KouhaiModel];
+	model->pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
+	model->rot = PLAYER_ROT;
+	model->scl = ModelScl[KouhaiModel];
 	hitGround = false;
 	hitPaint = false;
 	runSpd = 1.0f;
@@ -77,7 +72,7 @@ Player::Player(int _CtrlNum) : state(nullptr)
 	playable = false;
 	onCamera = true;
 	hitItem = false;
-	animSpd = 1.0f;
+	//animSpd = 1.0f;
 	hitObjCnt = 0;
 	jumpValue = 1.0f;
 
@@ -102,6 +97,7 @@ Player::~Player()
 	SAFE_DELETE(this->state);
 	SAFE_DELETE(this->itemManager);
 	SAFE_DELETE(this->playerUI);
+	model = nullptr;
 }
 
 //=====================================================================================================
@@ -115,19 +111,19 @@ void Player::Update()
 		Move();
 
 		// AIの更新処理
-		AI->Update(this->pos, this->PaintSystem);
+		AI->Update(this->model->pos, this->PaintSystem);
 
 		// ペイントシステムの更新処理
 		PaintSystem->Update();
 
 		// プレイヤーUIの更新処理
-		playerUI->Update(this->pos);
+		playerUI->Update(this->model->pos);
 
 		// アニメーションを更新
-		UpdateAnim(TIME_PER_FRAME * animSpd);
+		model->Update();
 
 		// 状態抽象インターフェースの更新
-		UpdateState(this->GetAnimCurtID());
+		UpdateState(this->model->GetAnimCurtID());
 
 		// カメラ内判定
 		CheckOnCamera();
@@ -149,36 +145,8 @@ void Player::Draw()
 	{
 		if (!blind)
 		{
-			LPDIRECT3DDEVICE9 pDevice = GetDevice();
-			D3DMATERIAL9 matDef;
-			D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
-
-			// ワールドマトリックスの初期化
-			D3DXMatrixIdentity(&WorldMtx);
-
-			// スケールを反映
-			D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
-			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
-
-			// 回転を反映
-			D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
-			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
-
-			// 移動を反映
-			D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
-			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-
-			// ワールドマトリックスの設定
-			pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
-
-			// 現在のマテリアルを取得
-			pDevice->GetMaterial(&matDef);
-
-			// レンダリング
-			this->DrawAnim(&WorldMtx);
-
-			// マテリアルをデフォルトに戻す
-			pDevice->SetMaterial(&matDef);
+			// モデルの描画
+			model->Draw();
 		}
 
 		// ペイントの描画
@@ -227,9 +195,9 @@ void Player::Move()
 	if (onCamera)
 	{
 		// オート移動
-		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip && GetAnimCurtID() != Stop)
+		if (!hitHorizon && playable && model->pos.x < GOAL_POS.x && model->GetAnimCurtID() != Slip && model->GetAnimCurtID() != Stop)
 		{
-			pos.x += MOVE_SPEED * runSpd;
+			model->pos.x += MOVE_SPEED * runSpd;
 		}
 	}
 		// 空中判定
@@ -241,16 +209,16 @@ void Player::Move()
 		switch (ctrlNum)
 		{
 		case 0:
-			pos.x += MOVE_SPEED;
+			model->pos.x += MOVE_SPEED;
 			break;
 		case 1:
-			pos.x += MOVE_SPEED * 0.8f;
+			model->pos.x += MOVE_SPEED * 0.8f;
 			break;
 		case 2:
-			pos.x += MOVE_SPEED * 0.5f;
+			model->pos.x += MOVE_SPEED * 0.5f;
 			break;
 		case 3:
-			pos.x += MOVE_SPEED * 0.2f;
+			model->pos.x += MOVE_SPEED * 0.2f;
 			break;
 		default:
 			break;
@@ -261,16 +229,16 @@ void Player::Move()
 		switch (ctrlNum)
 		{
 		case 0:
-			pos.x -= MOVE_SPEED;
+			model->pos.x -= MOVE_SPEED;
 			break;
 		case 1:
-			pos.x -= MOVE_SPEED * 0.8f;
+			model->pos.x -= MOVE_SPEED * 0.8f;
 			break;
 		case 2:
-			pos.x -= MOVE_SPEED * 0.5f;
+			model->pos.x -= MOVE_SPEED * 0.5f;
 			break;
 		case 3:
-			pos.x -= MOVE_SPEED * 0.2f;
+			model->pos.x -= MOVE_SPEED * 0.2f;
 			break;
 		default:
 			break;
@@ -284,7 +252,7 @@ void Player::Move()
 //=====================================================================================================
 void Player::JumpMove()
 {
-	pos.y += jumpSpd;
+	model->pos.y += jumpSpd;
 	// 落下最大速度よりも遅い場合、落下速度が重力加速度に合わせて加速する
 	if (jumpSpd > -FALL_VELOCITY_MAX)
 	{
@@ -302,93 +270,93 @@ void Player::JumpMove()
 	}
 }
 
-//=====================================================================================================
-// アニメーションのセット
-//=====================================================================================================
-void Player::CreateAnimSet()
-{
-	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
-	vector<KEYDATA>Keydata;
-	Keydata.reserve(Keydata_Max);
-
-	for (int Set_No = 0; Set_No < GetAnimSetNum(); Set_No++)
-	{
-		switch (Set_No)
-		{
-		case Idle:
-
-			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
-			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		case Running:
-
-			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
-			AnimationSet->SetData("Running", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		case Jump:
-
-			Keydata.push_back(KEYDATA{ 0.80f, e_MotionEnd });
-			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		case Victory:
-
-			AnimationSet->SetData("Victory", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		case Slip:
-
-			Keydata.push_back(KEYDATA{ 0.95f, e_MotionChange });
-			AnimationSet->SetData("Slip", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		case Stop:
-
-			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
-			break;
-
-		default:
-			break;
-		}
-
-		this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
-
-		AnimationSet->SetAnimSetPtr(this->AnimController);
-
-		this->AnimSet.push_back(*AnimationSet);
-
-		Keydata.clear();
-	}
-
-	SAFE_DELETE(AnimationSet);
-	ReleaseVector(Keydata);
-}
-
-//=====================================================================================================
-// アニメーションCallbackKeyの処理イベント
-//=====================================================================================================
-HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-{
-	int eventNo = (int)pCallbackData;
-
-	switch (eventNo)
-	{
-	case e_MotionEnd:
-		animSpd = 0.0f;
-		break;
-	case e_MotionChange:
-		playable = true;
-		ChangeAnim(Idle);
-		ChangeState(new IdleState(this));
-		break;
-	default:
-		break;
-	}
-
-	return S_OK;
-}
+////=====================================================================================================
+//// アニメーションのセット
+////=====================================================================================================
+//void Player::CreateAnimSet()
+//{
+//	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
+//	vector<KEYDATA>Keydata;
+//	Keydata.reserve(Keydata_Max);
+//
+//	for (int Set_No = 0; Set_No < GetAnimSetNum(); Set_No++)
+//	{
+//		switch (Set_No)
+//		{
+//		case Idle:
+//
+//			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+//			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		case Running:
+//
+//			//Keydata.push_back(KEYDATA{ 0.95f,e_MotionEnd });
+//			AnimationSet->SetData("Running", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		case Jump:
+//
+//			Keydata.push_back(KEYDATA{ 0.80f, e_MotionEnd });
+//			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		case Victory:
+//
+//			AnimationSet->SetData("Victory", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		case Slip:
+//
+//			Keydata.push_back(KEYDATA{ 0.95f, e_MotionChange });
+//			AnimationSet->SetData("Slip", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		case Stop:
+//
+//			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+//			break;
+//
+//		default:
+//			break;
+//		}
+//
+//		this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
+//
+//		AnimationSet->SetAnimSetPtr(this->AnimController);
+//
+//		this->AnimSet.push_back(*AnimationSet);
+//
+//		Keydata.clear();
+//	}
+//
+//	SAFE_DELETE(AnimationSet);
+//	ReleaseVector(Keydata);
+//}
+//
+////=====================================================================================================
+//// アニメーションCallbackKeyの処理イベント
+////=====================================================================================================
+//HRESULT CALLBACK Player::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+//{
+//	int eventNo = (int)pCallbackData;
+//
+//	switch (eventNo)
+//	{
+//	case e_MotionEnd:
+//		animSpd = 0.0f;
+//		break;
+//	case e_MotionChange:
+//		playable = true;
+//		ChangeAnim(Idle);
+//		ChangeState(new IdleState(this));
+//		break;
+//	default:
+//		break;
+//	}
+//
+//	return S_OK;
+//}
 
 //=====================================================================================================
 // カメラ内判定
@@ -398,7 +366,7 @@ void Player::CheckOnCamera()
 	CAMERA *camera = GetCamera();
 
 	// 縦
-	if (pos.x > camera->at.x - DRAW_RANGE.x)
+	if (model->pos.x > camera->at.x - DRAW_RANGE.x)
 	{
 		onCamera = true;
 	}
@@ -408,7 +376,7 @@ void Player::CheckOnCamera()
 		playerUI->SetPlayerDeadTexture();
 
 		// エフェクト発生
-		D3DXVECTOR3 setpos = pos;
+		D3DXVECTOR3 setpos = model->pos;
 		setpos.z -= 1.0f;
 		setpos.x += 150.0f;
 		std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
@@ -429,7 +397,7 @@ void Player::GroundCollider()
 	{
 		// キャラクターの座標からマップ配列の場所を調べる
 		int x, y;
-		Map::GetMapChipXY(pos, &x, &y);
+		Map::GetMapChipXY(model->pos, &x, &y);
 
 		D3DXVECTOR3 mappos = Map::GetMapChipPos(x, y, eCenterUp);
 
@@ -437,9 +405,9 @@ void Player::GroundCollider()
 		if (Map::GetMapTbl(x, y) >= 0)
 		{
 			// めり込みを修正
-			pos.y = max(mappos.y - 0.01f, pos.y);
+			model->pos.y = max(mappos.y - 0.01f, model->pos.y);
 			jumpSpd = 0.0f;
-			animSpd = 1.0f;
+			model->SetAnimSpd(1.0f);
 			hitGround = true;
 			return;
 		}
@@ -468,12 +436,12 @@ void Player::PaintCollider()
 				continue;
 
 			// ひとつひとつのペイントとプレイヤーの当たり判定を行う
-			if (HitSphere(pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
+			if (HitSphere(model->pos, Paint->GetPos(), PLAYER_COLLISION_SIZE.x * 0.5f, PAINT_WIDTH * 0.5f))
 			{
 				// 当たった場合、プレイヤーの座標を修正
-				pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, pos.y);
+				model->pos.y = max(Paint->GetPos().y + PAINT_WIDTH * 0.1f, model->pos.y);
 				jumpSpd = 0.0f;
-				animSpd = 1.0f;
+				model->SetAnimSpd(1.0f);
 				hitPaint = true;
 				return;
 			}
@@ -496,7 +464,7 @@ void Player::HorizonCollider()
 {
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x, y;
-	Map::GetMapChipXY(pos, &x, &y);
+	Map::GetMapChipXY(model->pos, &x, &y);
 
 	// 足元から見て右上なので
 	x++;
@@ -522,7 +490,7 @@ void Player::ObjectCollider()
 {
 	// キャラクターの座標からマップ配列の場所を調べる
 	int x, y;
-	Map::GetMapChipXY(pos, &x, &y);
+	Map::GetMapChipXY(model->pos, &x, &y);
 
 	int objType = Map::GetObjTbl(x, y);
 
@@ -539,7 +507,7 @@ void Player::ObjectItemCollider(Map *pMap)
 	if (hitItem)
 		return;
 
-	D3DXVECTOR3 colliderpos = pos;
+	D3DXVECTOR3 colliderpos = model->pos;
 	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
 
 	for (auto &Obj : pMap->GetObjectChip())
@@ -566,20 +534,20 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 {
 	for (auto &item : pFIManager->GetItem())
 	{
-		if (HitCheckBB(pos, item->GetPos(), PLAYER_COLLISION_SIZE, FIELDITEM_SIZE))
+		if (HitCheckBB(model->pos, item->GetPos(), PLAYER_COLLISION_SIZE, FIELDITEM_SIZE))
 		{
 			switch (item->GetTexNo())
 			{
 				// バナナの皮
 			case NumKawa:
 				playable = false;
-				ChangeAnim(Slip);
+				model->ChangeAnim(Slip);
 				ChangeState(new SlipState(this));
 				break;
 				// トリモチガン
 			case NumGun:
 				playable = false;
-				ChangeAnim(Stop);
+				model->ChangeAnim(Stop);
 				ChangeState(new StopState(this));
 				break;
 			default:
@@ -589,7 +557,7 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 
 			// エフェクトを発生
 			std::vector<Effect3D*> *Effect3DVector = GetEffect3DVector();
-			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
+			Effect3D *effect = new Effect3D(ExplosionEffect3D, model->pos, 1);
 			Effect3DVector->push_back(effect);
 
 			// PlaySound(アイテムヒット音)
@@ -649,7 +617,7 @@ void Player::HitObjectInfluence(int type)
 
 	case eObjJump:
 		jumpSpd = JUMP_SPEED * jumpValue;
-		ChangeAnim(Jump);
+		model->ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
@@ -722,16 +690,16 @@ void Player::Debug()
 	{
 		if (ImGui::TreeNode("Position"))
 		{
-			DebugText("Pos X:%.2f\nPos Y:%.2f\nPos Z:%.2f\n", pos.x, pos.y, pos.z);
+			DebugText("Pos X:%.2f\nPos Y:%.2f\nPos Z:%.2f\n", model->pos.x, model->pos.y, model->pos.z);
 			ImGui::TreePop();
 		}
 
-		DebugText("AnimSetName:%s\nCurrentFrame:%d / %d", this->GetCurtAnimName(), this->GetAnimCurtFrame(), this->GetAnimPeriodFrame());
+		DebugText("AnimSetName:%s\nCurrentFrame:%d / %d", this->model->GetCurtAnimName(), this->model->GetAnimCurtFrame(), this->model->GetAnimPeriodFrame());
 
 		int x = 0, y = 0;
-		Map::GetMapChipXY(pos, &x, &y);
+		Map::GetMapChipXY(model->pos, &x, &y);
 		DebugText("X : %d  Y : %d", x, y);
-		DebugText("MapTable : %d\nMapTable_Up : %d", Map::GetMapTbl(pos, eCenter), Map::GetMapTbl(pos, eCenterUp));
+		DebugText("MapTable : %d\nMapTable_Up : %d", Map::GetMapTbl(model->pos, eCenter), Map::GetMapTbl(model->pos, eCenterUp));
 
 		ImGui::TreePop();
 	}

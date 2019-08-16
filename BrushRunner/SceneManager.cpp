@@ -127,12 +127,15 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("FaceFrame", "data/texture/faceframe.png");
 	ResourceManager::Instance()->LoadTexture("MiniPlayer", "data/TEXTURE/MiniPlayer.png");
 	ResourceManager::Instance()->LoadTexture("Pop", "data/TEXTURE/pointer.png");
+	ResourceManager::Instance()->LoadMesh("Player", "data/MODEL/Kouhai/Kouhai.x");
 
 	// SceneResult
 	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");
 	ResourceManager::Instance()->LoadTexture("ResultRank", "data/TEXTURE/ResultPlayer.png");
 	ResourceManager::Instance()->LoadTexture("SkyBox", "data/TEXTURE/SkyBox.png");
 	ResourceManager::Instance()->LoadTexture("MeshField", "data/TEXTURE/Block.jpg");
+	ResourceManager::Instance()->LoadMesh("Podium", "data/MODEL/Podium/Podium.x");
+	ResourceManager::Instance()->LoadMesh("Trophy", "data/MODEL/Trophy.x");
 
 }
 

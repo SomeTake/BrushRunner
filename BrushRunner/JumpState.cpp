@@ -33,7 +33,7 @@ void JumpState::Update(int AnimCurtID)
 	// 地面に接触したらダッシュに移行
 	if (owner_->GetHitGround() || owner_->GetHitPaint())
 	{
-		owner_->ChangeAnim(Running);
+		owner_->GetModel()->ChangeAnim(Running);
 		owner_->ChangeState(new RunningState(owner_));
 		return;
 	}

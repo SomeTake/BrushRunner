@@ -1,25 +1,30 @@
 //=============================================================================
 //
-// トロフィー[Trophy.h]
+// 基底用仮想モデルクラス[VirtualModel.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _TROPHY_H_
-#define _TROPHY_H_
+#ifndef _VIRTUALMODEL_H_
+#define _VIRTUALMODEL_H_
 
-#include "VirtualModel.h"
+#include "Model3D.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Trophy :
-	public VirtualModel
+class VirtualModel
 {
-public:
-	Trophy();
-	~Trophy();
+protected:
+	Model3D *model;
 
-	void Update();
-	void Draw();
+public:
+	VirtualModel();
+	virtual ~VirtualModel();
+
+	virtual void Update() = 0;
+	virtual void Draw() = 0;
+
+	Model3D *GetModel() { return model; };
+
 };
 
 #endif

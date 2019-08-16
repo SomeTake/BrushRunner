@@ -7,7 +7,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-#include "D3DXAnimation.h"
+#include "VirtualModel.h"
 #include "CharacterAI.h"
 #include "PlayerUI.h"
 #include "PlayerState.h"
@@ -18,7 +18,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define PLAYER_MAX				(4)										// 操作するプレイヤーの数
+#define PLAYER_MAX				(1)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
@@ -57,34 +57,30 @@ enum CharaStateNum
 	Stop,
 	AnimMax,			// アニメーションの最大数
 };
-
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Player : public D3DXANIMATION
+class Player :
+	public VirtualModel
 {
 private:
 	// メンバ変数
+	//Model3D				*model;				// Xファイルを参照するモデル
 	PlayerState			*state;				// ステータス管理抽象クラス
 	FieldItemManager	*itemManager;		// フィールドアイテム管理クラス
 
-	D3DXVECTOR3			pos;				// モデルの位置
-	D3DXVECTOR3			rot;				// 現在の向き
-	D3DXVECTOR3			scl;				// モデルの大きさ(スケール)
 	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
 	PlayerUI			*playerUI;
 
 	// メンバ関数
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
-	void CreateAnimSet()override;
 	void Move();			// 移動
 	void CheckOnCamera();
 	void JumpMove();		// ジャンプ移動
 	void Debug();			// デバッグ
 
 	int					ctrlNum;			// 操作するコントローラ番号
-	float				animSpd;			// アニメーションの再生スピード
+	//float				animSpd;			// アニメーションの再生スピード
 	bool				playable;			// 操作可能
 	bool				onCamera;			// 画面内にいるとき
 
@@ -111,8 +107,8 @@ public:
 	// メンバ関数
 	Player(int _CtrlNum);
 	~Player();
-	void Update()override;
-	void Draw()override;
+	void Update();
+	void Draw();
 
 	// 状態抽象インターフェース
 	void UpdateState(int AnimCurtID);
@@ -129,8 +125,8 @@ public:
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
 	// ゲッター(なるべく使わない)
+	//Model3D *GetModel() { return model; };
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
-	D3DXVECTOR3	GetPos() { return pos; };
 	float GetJumpSpeed() { return jumpSpd; };
 	float GetJumpValue() { return jumpValue; };
 	PaintManager* GetPaintManager(void) { return this->PaintSystem; };
@@ -146,7 +142,6 @@ public:
 	bool GetBlind() { return blind; };
 
 	// セッター
-	void SetPos(D3DXVECTOR3 _pos) { pos = _pos; };
 	void SetJumpSpeed(float _JumpSpeed) { jumpSpd = _JumpSpeed; };
 	void SetPlayable(bool _playable) { playable = _playable; };
 	void SetHitItem(bool _hitItem) { hitItem = _hitItem; };
@@ -155,6 +150,7 @@ public:
 	void SetBlind(bool _blind){ blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
 	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
+	//void SetAnimSpd(float _animSpd) { animSpd = _animSpd; };
 };
 
 #endif

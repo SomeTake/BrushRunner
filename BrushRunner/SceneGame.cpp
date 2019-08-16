@@ -136,13 +136,13 @@ void SceneGame::Update(int SceneID)
 	std::vector<float> vec(PLAYER_MAX);
 	for (size_t i = 0; i < vec.size(); i++)
 	{
-		vec.at(i) = pPlayer[i]->GetPos().x;
+		vec.at(i) = pPlayer[i]->GetModel()->pos.x;
 	}
 	auto max = std::max_element(vec.begin(), vec.end());
 	size_t maxIdx = std::distance(vec.begin(), max);
 
 	// カメラの更新
-	UpdateCamera(pPlayer[(int)maxIdx]->GetPos());
+	UpdateCamera(pPlayer[(int)maxIdx]->GetModel()->pos);
 
 	// マップの更新
 	pMap->Update();
@@ -380,7 +380,7 @@ void SceneGame::InsertResult(int pNo)
 	}
 
 	// ゴール確認
-	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
+	if (pPlayer[pNo]->GetModel()->pos.x >= GOAL_POS.x)
 	{
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
