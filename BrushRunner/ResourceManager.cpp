@@ -61,9 +61,7 @@ void ResourceManager::LoadTexture(const char* tag, const char* path)
 
 	// ì«Ç›çûÇ›
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	D3DXCreateTextureFromFile(pDevice,
-		path,
-		&texturePool[tagStr]);
+	D3DXCreateTextureFromFile(pDevice, path, &texturePool[tagStr]);
 }
 
 //=============================================================================

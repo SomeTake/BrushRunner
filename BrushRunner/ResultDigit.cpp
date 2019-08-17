@@ -20,10 +20,10 @@
 //*****************************************************************************
 // 表示位置とサイズ（一番右の桁が基準）
 ResultStr ResultData[PLAYER_MAX] = {
-	D3DXVECTOR3(900.0f, 135.0f, 0.0f), D3DXVECTOR3(75.0f, 150.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 445.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 540.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 625.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(950.0f, 135.0f, 0.0f), D3DXVECTOR3(75.0f, 150.0f, 0.0f),
+	D3DXVECTOR3(800.0f, 445.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(800.0f, 540.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(800.0f, 635.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
 };
 
 //=============================================================================
@@ -38,6 +38,15 @@ ResultDigit::ResultDigit(DWORD _time, int _digit, int _rank) : Digit(_digit)
 	rank = _rank;
 	pos = ResultData[rank].pos;
 	pos.x -= _digit * ResultData[rank].size.x;
+	// ミリ秒と秒、秒と分の間に':'のスペースがある
+	if (_digit >= 2)
+	{
+		pos.x -= 20.0f;
+	}
+	if (_digit >= 4)
+	{
+		pos.x -= 20.0f;
+	}
 	size = ResultData[rank].size;
 
 	MakeVertex();
