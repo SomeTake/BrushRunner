@@ -38,7 +38,6 @@
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
 #define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
 #define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
-#define PowerBanana_VALUE	(2.0f)										// パワーバナナ使用時の上昇値
 
 enum CallbackKeyType
 {
@@ -246,19 +245,15 @@ void Player::JumpMove()
 		jumpSpd -= STANDARD_GRAVITY;
 	}
 
-	//// ジェットパック装備中はジャンプ力アップ
-	//if (jet)
-	//{
-	//	jumpValue = JETPACK_VALUE;
-	//}
-	//else if (PowerBanana)
-	//{
-	//	jumpValue = PowerBanana_VALUE;
-	//}
-	//else
-	//{
-	//	jumpValue = 1.0f;
-	//}
+	// ジェットパック装備中orパワーアップバナナ使用中はジャンプ力アップ
+	if (jet || PowerBanana)
+	{
+		jumpValue = JETPACK_VALUE;
+	}
+	else
+	{
+		jumpValue = 1.0f;
+	}
 }
 
 ////=====================================================================================================
@@ -689,16 +684,16 @@ void Player::Debug()
 			switch (ctrlNum)
 			{
 			case 0:
-				pos.x += MOVE_SPEED;
+				model->pos.x += MOVE_SPEED;
 				break;
 			case 1:
-				pos.x += MOVE_SPEED * 0.8f;
+				model->pos.x += MOVE_SPEED * 0.8f;
 				break;
 			case 2:
-				pos.x += MOVE_SPEED * 0.5f;
+				model->pos.x += MOVE_SPEED * 0.5f;
 				break;
 			case 3:
-				pos.x += MOVE_SPEED * 0.2f;
+				model->pos.x += MOVE_SPEED * 0.2f;
 				break;
 			default:
 				break;
@@ -709,16 +704,16 @@ void Player::Debug()
 			switch (ctrlNum)
 			{
 			case 0:
-				pos.x -= MOVE_SPEED;
+				model->pos.x -= MOVE_SPEED;
 				break;
 			case 1:
-				pos.x -= MOVE_SPEED * 0.8f;
+				model->pos.x -= MOVE_SPEED * 0.8f;
 				break;
 			case 2:
-				pos.x -= MOVE_SPEED * 0.5f;
+				model->pos.x -= MOVE_SPEED * 0.5f;
 				break;
 			case 3:
-				pos.x -= MOVE_SPEED * 0.2f;
+				model->pos.x -= MOVE_SPEED * 0.2f;
 				break;
 			default:
 				break;

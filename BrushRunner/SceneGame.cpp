@@ -163,7 +163,7 @@ void SceneGame::Update(int SceneID)
 			// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
 			if (pPlayer[i]->GetModel()->pos.x > MaxPosX)
 			{
-				MaxPosX = pPlayer[i]->GeModel()->pos.x;
+				MaxPosX = pPlayer[i]->GetModel()->pos.x;
 				FirstPlayer = i;
 			}
 
@@ -183,7 +183,7 @@ void SceneGame::Update(int SceneID)
 					if (i != j && pPlayer[j]->GetOnCamera())
 					{
 						// 現在のプレイヤーより右、かつ高さが同じぐらい
-						if (pPlayer[i]->GetModel()->pos.x < pPlayer[j]->GetModel->pos().x &&
+						if (pPlayer[i]->GetModel()->pos.x < pPlayer[j]->GetModel()->pos.x &&
 							fabsf(pPlayer[i]->GetModel()->pos.y - pPlayer[j]->GetModel()->pos.y) < 10.0f)
 						{
 							pPlayer[i]->GetAIPtr()->SetShotBullet(true);

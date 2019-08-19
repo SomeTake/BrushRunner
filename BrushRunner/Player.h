@@ -18,7 +18,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define PLAYER_MAX				(1)										// 操作するプレイヤーの数
+#define PLAYER_MAX				(4)										// 操作するプレイヤーの数
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
@@ -68,7 +68,6 @@ private:
 	//Model3D				*model;				// Xファイルを参照するモデル
 	PlayerState			*state;				// ステータス管理抽象クラス
 	FieldItemManager	*itemManager;		// フィールドアイテム管理クラス
-	CharacterAI			*AI;				// キャラクターAI
 	PaintManager		*PaintSystem;		// ペイントシステム
 	PlayerUI			*playerUI;
 
