@@ -86,10 +86,10 @@ HRESULT ResultRank::MakeVertex()
 	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
 
 	// rhw‚Ìİ’è
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// ”½ËŒõ‚Ìİ’è
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);

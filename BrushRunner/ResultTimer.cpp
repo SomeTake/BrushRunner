@@ -6,6 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "ResultTimer.h"
+#include "ResourceManager.h"
+
+// 後で要調整
+#define RESULTTIMER_POS		D3DXVECTOR3(SCREEN_CENTER_X - 2.0f, 132.0f, 0.0f)
+#define RESULTTIMER_SIZE	D3DXVECTOR3(256.0f, 60.0f, 0.0f)
 
 //=============================================================================
 // コンストラクタ
@@ -39,6 +44,13 @@ ResultTimer::ResultTimer(DWORD _time, int _rank)
 	{
 		time[i] = new ResultDigit(digit[i], i, _rank);
 	}
+
+	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
+	pos = RESULTTIMER_POS;
+	size = RESULTTIMER_SIZE;
+	use = true;
+
+	MakeVertex();
 }
 
 //=============================================================================
@@ -50,6 +62,8 @@ ResultTimer::~ResultTimer()
 	{
 		delete time[i];
 	}
+
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -69,9 +83,25 @@ void ResultTimer::Update()
 //=============================================================================
 void ResultTimer::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	if (use == true)
+	{
+		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		pDevice->SetTexture(0, D3DTexture);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+	}
+
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{
 		time[i]->Draw();
 	}
 }
+
