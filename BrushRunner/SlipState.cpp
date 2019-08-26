@@ -27,7 +27,7 @@ SlipState::~SlipState()
 void SlipState::Update(int AnimCurtID)
 {
 	// アイドル状態にアニメーションが変わったらステータスも変更する
-	if (owner_->GetModel()->GetAnimCurtID() == Idle)
+	if (owner_->GetAnimCurtID() == Idle)
 	{
 		owner_->ChangeState(new IdleState(owner_));
 		owner_->SetPlayable(true);

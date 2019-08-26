@@ -59,16 +59,16 @@ SceneGame::SceneGame()
 	// プレイヤーの初期化
 	//for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	//{
-	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
+	//	pPlayer[PlayerNo] = new Player(PlayerNo, false, "Player");
 	//}
 
 #if _DEBUG
-	pPlayer[0] = new Player(0, true);
-	pPlayer[1] = new Player(1, true);
+	pPlayer[0] = new Player(0, true, "Player");
+	pPlayer[1] = new Player(1, true, "Player");
 	//pPlayer[1]->SetOnCamera(false);
-	pPlayer[2] = new Player(2, true);
+	pPlayer[2] = new Player(2, true, "Player");
 	//pPlayer[2]->SetOnCamera(false);
-	pPlayer[3] = new Player(3, true);
+	pPlayer[3] = new Player(3, true, "Player");
 	//pPlayer[3]->SetOnCamera(false);
 #endif
 
@@ -161,16 +161,16 @@ void SceneGame::Update(int SceneID)
 		if (pPlayer[i]->GetOnCamera())
 		{
 			// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
-			if (pPlayer[i]->GetModel()->pos.x > MaxPosX)
+			if (pPlayer[i]->GetPos().x > MaxPosX)
 			{
-				MaxPosX = pPlayer[i]->GetModel()->pos.x;
+				MaxPosX = pPlayer[i]->GetPos().x;
 				FirstPlayer = i;
 			}
 
 			// プレイヤー座標の中でXが最も小さい
-			if (pPlayer[i]->GetModel()->pos.x < MinPosX)
+			if (pPlayer[i]->GetPos().x < MinPosX)
 			{
-				MinPosX = pPlayer[i]->GetModel()->pos.x;
+				MinPosX = pPlayer[i]->GetPos().x;
 				SceneGame::TheLastPlayer = i;
 			}
 
@@ -183,8 +183,8 @@ void SceneGame::Update(int SceneID)
 					if (i != j && pPlayer[j]->GetOnCamera())
 					{
 						// 現在のプレイヤーより右、かつ高さが同じぐらい
-						if (pPlayer[i]->GetModel()->pos.x < pPlayer[j]->GetModel()->pos.x &&
-							fabsf(pPlayer[i]->GetModel()->pos.y - pPlayer[j]->GetModel()->pos.y) < 10.0f)
+						if (pPlayer[i]->GetPos().x < pPlayer[j]->GetPos().x &&
+							fabsf(pPlayer[i]->GetPos().y - pPlayer[j]->GetPos().y) < 10.0f)
 						{
 							pPlayer[i]->GetAIPtr()->SetShotBullet(true);
 							break;
@@ -201,7 +201,7 @@ void SceneGame::Update(int SceneID)
 	}
 
 	// カメラの更新
-	UpdateCamera(pPlayer[FirstPlayer]->GetModel()->pos);
+	UpdateCamera(pPlayer[FirstPlayer]->GetPos());
 
 #if 0
 	std::vector<float> vec(PLAYER_MAX);
@@ -475,7 +475,7 @@ void SceneGame::InsertResult(int pNo)
 	}
 
 	// ゴール確認
-	if (pPlayer[pNo]->GetModel()->pos.x >= GOAL_POS.x)
+	if (pPlayer[pNo]->GetPos().x >= GOAL_POS.x)
 	{
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)

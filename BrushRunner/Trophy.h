@@ -7,19 +7,19 @@
 #ifndef _TROPHY_H_
 #define _TROPHY_H_
 
-#include "VirtualModel.h"
+#include "Model3D.h"
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************************************
 class Trophy :
-	public VirtualModel
+	public Model3D
 {
 public:
-	Trophy();
+	Trophy(const char* tag);
 	~Trophy();
 
 	void Update();
-	void Draw();
+	//void Draw();
 };
 
 #endif

@@ -7,19 +7,19 @@
 #ifndef _PODIUM_H_
 #define _PODIUM_H_
 
-#include "VirtualModel.h"
+#include "Model3D.h"
 //*****************************************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************************************
 class Podium :
-	public VirtualModel
+	public Model3D
 {
 public:
-	Podium();
+	Podium(const char* tag);
 	~Podium();
 
-	void Update();
-	void Draw();
+	//void Update();
+	//void Draw();
 };
 
 #endif

@@ -7,19 +7,39 @@
 #ifndef _D3DXANIMATION_H_
 #define _D3DXANIMATION_H_
 
-#include "AllocateHierarchy.h"
-#include "AnimationSet.h"
-
 #define Keydata_Max (15)
 
-class D3DXANIMATION : public ID3DXAnimationCallbackHandler
+// キャラクターのアニメーション番号と連動（CharaStateAnim）
+enum CharaStateNum
 {
+	Idle,
+	Running,
+	Jump,
+	Victory,
+	Slip,
+	Stop,
+	AnimMax,			// アニメーションの最大数
+};
+
+enum CallbackKeyType
+{
+	e_NoEvent = 0,
+	e_MotionEnd,				// モーション終了
+	e_MotionChange,				// モーションを変更する
+};
+
+#include "FromXFile.h"
+
+class D3DXAnimation : 
+	public ID3DXAnimationCallbackHandler
+{
+protected:
+	FromXFile * model;
+
 private:
-	// メンバ変数
-	AllocateHierarchy			*AllocateHier;		// x fileの各情報を保存する
-	LPD3DXFRAME					FrameRoot;			// ルートフレーム	
-	UINT						CurrentAnimID;		// 現在再生しているアニメーションの番号
-	UINT						PreventAnimID;		// 前再生していたアニメーションの番号
+	std::vector<ANIMATIONSET*>	AnimSet;		// アニメーションセットを保存
+	UINT		CurrentAnimID;					// 現在再生しているアニメーションの番号
+	UINT		PreventAnimID;					// 前再生していたアニメーションの番号
 
 	D3DXFRAME_DERIVED* SearchBoneFrame(const char* BoneName, D3DXFRAME* Frame);
 	void DrawMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBase, LPD3DXFRAME pFrameBase);
@@ -28,26 +48,21 @@ private:
 	void UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParentMatrix);
 
 public:
-	vector<ANIMATIONSET>		AnimSet;
-	LPD3DXANIMATIONCONTROLLER	AnimController;		// アニメーションコントローラー
-
-	D3DXANIMATION();
-	virtual ~D3DXANIMATION();
-	// 純粋仮想関数
-	virtual void CreateAnimSet() = 0;
+	D3DXAnimation(const char* tag);
+	virtual ~D3DXAnimation();
+	void CreateAnimSet();
 
 	void ChangeAnim(UINT AnimID);
-	HRESULT Load_xFile(LPCTSTR filename, const char* ErrorSrc);
 	HRESULT SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetName);
 	void UpdateAnim(float Time);
 	void DrawAnim(LPD3DXMATRIX WorldMatrix);
 
 	D3DXMATRIX GetBoneMatrix(const char* BoneName);
-	int GetAnimCurtID(void) { return this->CurrentAnimID; };
-	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
-	int GetAnimCurtFrame(void);
-	int GetAnimPeriodFrame(void);
-	LPCSTR GetCurtAnimName(void) { return this->AnimSet.at(this->CurrentAnimID).GetSetName(); };
+	int GetAnimCurtID() { return this->CurrentAnimID; };
+	int GetAnimSetNum() { return this->model->AnimController->GetMaxNumAnimationSets(); };
+	int GetAnimCurtFrame();
+	int GetAnimPeriodFrame();
+	LPCSTR GetCurtAnimName() { return this->AnimSet.at(this->CurrentAnimID)->GetSetName(); };
 
 };
 

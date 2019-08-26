@@ -16,13 +16,13 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Trophy::Trophy()
+Trophy::Trophy(const char* tag) : Model3D(tag)
 {
-	ResourceManager::Instance()->GetMesh("Trophy", &model);
+	ResourceManager::Instance()->GetMesh(tag, &model);
 
-	model->pos = TROPHY_POS;
-	model->rot = D3DXVECTOR3(0.0f, 0.0f, D3DXToRadian(30));
-	model->scl = D3DXVECTOR3(0.1f, 0.1f, 0.1f);
+	pos = TROPHY_POS;
+	rot = D3DXVECTOR3(0.0f, 0.0f, D3DXToRadian(30));
+	scl = D3DXVECTOR3(0.1f, 0.1f, 0.1f);
 }
 
 //=============================================================================
@@ -39,43 +39,17 @@ Trophy::~Trophy()
 void Trophy::Update()
 {
 	// 回転させる
-	model->rot += TROPHY_MOVE;
-	if (model->rot.y >= D3DX_PI)
+	rot += TROPHY_MOVE;
+	if (rot.y >= D3DX_PI)
 	{
-		model->rot.y = -D3DX_PI;
+		rot.y = -D3DX_PI;
 	}
 }
 
-//=============================================================================
-// 描画
-//=============================================================================
-void Trophy::Draw()
-{
-	model->Draw();
-}
-
 ////=============================================================================
-//// アニメーションセットの作成
+//// 描画
 ////=============================================================================
-//void Trophy::CreateAnimSet()
+//void Trophy::Draw()
 //{
-//	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
-//	vector<KEYDATA>Keydata;
-//	Keydata.reserve(Keydata_Max);
-//	AnimationSet->SetData("Idle", NULL, 1.0f, 0.1f, 0.0f);
-//	this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
-//	AnimationSet->SetAnimSetPtr(this->AnimController);
-//	this->AnimSet.push_back(*AnimationSet);
-//	Keydata.clear();
-//	SAFE_DELETE(AnimationSet);
-//	ReleaseVector(Keydata);
-//
-//}
-//
-////=====================================================================================================
-//// アニメーションCallbackKeyの処理イベント
-////=====================================================================================================
-//HRESULT CALLBACK Trophy::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
-//{
-//	return S_OK;
+//	Draw();
 //}

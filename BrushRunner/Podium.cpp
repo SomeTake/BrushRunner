@@ -14,13 +14,13 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Podium::Podium()
+Podium::Podium(const char* tag) : Model3D(tag)
 {
-	ResourceManager::Instance()->GetMesh("Podium", &model);
+	ResourceManager::Instance()->GetMesh(tag, &model);
 
-	model->pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	model->rot = PODIUM_ROT;
-	model->scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	rot = PODIUM_ROT;
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 
 }
 
@@ -32,43 +32,18 @@ Podium::~Podium()
 	model = NULL;
 }
 
-//=============================================================================
-// 更新
-//=============================================================================
-void Podium::Update()
-{
-
-}
-
-//=============================================================================
-// 描画
-//=============================================================================
-void Podium::Draw()
-{
-	model->Draw();
-}
-
 ////=============================================================================
-//// アニメーションセットの作成
+//// 更新
 ////=============================================================================
-//void Podium::CreateAnimSet()
+//void Podium::Update()
 //{
-//	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
-//	vector<KEYDATA>Keydata;
-//	Keydata.reserve(Keydata_Max);
-//	AnimationSet->SetData("Idle", NULL, 1.0f, 0.1f, 0.0f);
-//	this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
-//	AnimationSet->SetAnimSetPtr(this->AnimController);
-//	this->AnimSet.push_back(*AnimationSet);
-//	Keydata.clear();
-//	SAFE_DELETE(AnimationSet);
-//	ReleaseVector(Keydata);
+//
 //}
 //
-////=====================================================================================================
-//// アニメーションCallbackKeyの処理イベント
-////=====================================================================================================
-//HRESULT CALLBACK Podium::HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)
+////=============================================================================
+//// 描画
+////=============================================================================
+//void Podium::Draw()
 //{
-//	return S_OK;
+//	Draw();
 //}

@@ -12,26 +12,24 @@
 // クラス定義
 //*****************************************************************************
 class Model3D :
-	public D3DXANIMATION
+	public D3DXAnimation
 {
-private:
-	float animSpd;		// アニメーションの再生スピード
-
-	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)override;
-	void CreateAnimSet()override;
-
-public:
+protected:
 	D3DXVECTOR3 pos;
 	D3DXVECTOR3 scl;
 	D3DXVECTOR3 rot;
+	float		animSpd;
 
-	Model3D(const char* tag, const char* path);
-	~Model3D();
+	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData)override;
 
-	void Update();
-	void Draw();
+public:
+	Model3D(const char* tag);
+	virtual ~Model3D();
 
-	float GetAnimSpd() { return this->animSpd; };
+	virtual void Update();
+	virtual void Draw();
+
+	D3DXVECTOR3 GetPos() { return pos; };
 	void SetAnimSpd(float animSpd) { this->animSpd = animSpd; };
 };
 

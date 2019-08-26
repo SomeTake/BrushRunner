@@ -37,12 +37,12 @@ SceneResult::SceneResult()
 	}
 
 	// 3Dモデルのインスタンス作成
-	anim.push_back(new Podium());
-	anim.push_back(new Trophy());
+	anim.push_back(new Podium("Podium"));
+	anim.push_back(new Trophy("Trophy"));
 	// 1位から順に生成
 	for (int resultNo = 0; resultNo < PLAYER_MAX; resultNo++)
 	{
-		anim.push_back(new ResultPlayer(resultNo, SceneGame::GetResultData(resultNo)->playerNo));
+		anim.push_back(new ResultPlayer(resultNo, SceneGame::GetResultData(resultNo)->playerNo, "Player"));
 	}
 
 	// 3Dポリゴンのインスタンス作成

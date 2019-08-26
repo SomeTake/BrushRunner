@@ -28,6 +28,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CursorObj.h" />
     <ClInclude Include="Finish.h" />
+    <ClInclude Include="FromXFile.h" />
     <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="MeshField.h" />
     <ClInclude Include="Model3D.h" />
@@ -111,7 +112,6 @@
     <ClInclude Include="Title.h" />
     <ClInclude Include="Trophy.h" />
     <ClInclude Include="VictoryState.h" />
-    <ClInclude Include="VirtualModel.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +123,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CursorObj.cpp" />
     <ClCompile Include="Finish.cpp" />
+    <ClCompile Include="FromXFile.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="MeshField.cpp" />
     <ClCompile Include="Model3D.cpp" />
@@ -200,7 +201,6 @@
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="VictoryState.cpp" />
-    <ClCompile Include="VirtualModel.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>

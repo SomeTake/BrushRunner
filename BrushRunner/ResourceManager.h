@@ -9,7 +9,7 @@
 
 #include "BaseSingleton.h"
 
-class Model3D;
+class FromXFile;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -33,14 +33,14 @@ public:
 	void ReleaseTexture(const char* tag);
 
 	// 参照処理
-	bool GetMesh(const char* tag, Model3D **pOut);
+	bool GetMesh(const char* tag, FromXFile** pOut);
 	bool GetTexture(const char* tag, LPDIRECT3DTEXTURE9* pOut);
 
 	// 全リソース開放処理
 	void AllRelease();
 
 private:
-	std::map<std::string, Model3D*> modelPool;				// モデル情報を保存しておく場所
+	std::map<std::string, FromXFile*> modelPool;
 	std::map<std::string, LPDIRECT3DTEXTURE9> texturePool;	// テクスチャ情報を保存しておく場所
 };
 

@@ -36,7 +36,7 @@ void IdleState::Update(int AnimCurtID)
 		// 前方オブジェクトにあたっていない場合、ダッシュに移行
 		if (!owner_->GetHitHorizon())
 		{
-			owner_->GetModel()->ChangeAnim(Running);
+			owner_->ChangeAnim(Running);
 			owner_->ChangeState(new RunningState(owner_));
 			return;
 		}
@@ -48,7 +48,7 @@ void IdleState::Update(int AnimCurtID)
 			{
 				float value = owner_->GetJumpValue();
 				owner_->SetJumpSpeed(JUMP_SPEED * value);
-				owner_->GetModel()->ChangeAnim(Jump);
+				owner_->ChangeAnim(Jump);
 				owner_->ChangeState(new JumpState(owner_));
 
 				// PlaySound(ジャンプ音)

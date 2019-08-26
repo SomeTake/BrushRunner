@@ -1,16 +1,16 @@
 #ifndef _RESULTPLAYER_H_
 #define _RESULTPLAYER_H_
 
-#include "VirtualModel.h"
+#include "Model3D.h"
 class ResultPlayer :
-	public VirtualModel
+	public Model3D
 {
 public:
-	ResultPlayer(int rank, int owner);
+	ResultPlayer(int rank, int owner, const char* tag);
 	~ResultPlayer();
 
 	void Update()override;
-	void Draw()override;
+	//void Draw()override;
 };
 
 #endif

@@ -7,7 +7,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-#include "VirtualModel.h"
+#include "Model3D.h"
 #include "CharacterAI.h"
 #include "PlayerUI.h"
 #include "PlayerState.h"
@@ -46,26 +46,14 @@ static D3DXVECTOR3 ModelScl[MaxModel] =
 	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
 };
 
-// キャラクターのアニメーション番号と連動（CharaStateAnim）
-enum CharaStateNum
-{
-	Idle,
-	Running,
-	Jump,
-	Victory,
-	Slip,
-	Stop,
-	AnimMax,			// アニメーションの最大数
-};
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class Player :
-	public VirtualModel
+	public Model3D
 {
 private:
 	// メンバ変数
-	//Model3D				*model;				// Xファイルを参照するモデル
 	PlayerState			*state;				// ステータス管理抽象クラス
 	FieldItemManager	*itemManager;		// フィールドアイテム管理クラス
 	PaintManager		*PaintSystem;		// ペイントシステム
@@ -78,7 +66,6 @@ private:
 	void Debug();			// デバッグ
 
 	int					ctrlNum;			// 操作するコントローラ番号
-	//float				animSpd;			// アニメーションの再生スピード
 	bool				playable;			// 操作可能
 	bool				onCamera;			// 画面内にいるとき
 
@@ -108,7 +95,7 @@ private:
 
 public:
 	// メンバ関数
-	Player(int _CtrlNum, bool AIUse);
+	Player(int _CtrlNum, bool AIUse, const char* tag);
 	~Player();
 	void Update();
 	void Draw();
@@ -128,7 +115,6 @@ public:
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
 	// ゲッター(なるべく使わない)
-	//Model3D *GetModel() { return model; };
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
 	float GetJumpSpeed() { return jumpSpd; };
 	float GetJumpValue() { return jumpValue; };
@@ -156,11 +142,9 @@ public:
 	void SetJet(bool _jet) { jet = _jet; };
 	void SetPowerBanana(bool Flag) { this->PowerBanana = Flag; };
 	void SetSpike(bool _spike) { spike = _spike; };
-	//void SetGun(bool _gun) { gun = _gun; };
 	void SetBlind(bool _blind) { blind = _blind; };
 	void SetRunSpd(float _runSpd) { runSpd = _runSpd; };
 	void SetJumpValue(float _jumpValue) { jumpValue = _jumpValue; };
-	//void SetAnimSpd(float _animSpd) { animSpd = _animSpd; };
 };
 
 #endif

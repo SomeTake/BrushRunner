@@ -7,110 +7,66 @@
 #include "main.h"
 #include "D3DXAnimation.h"
 #include "AnimationSet.h"
-
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-
-
-//*****************************************************************************
-// プロトタイプ宣言
-//*****************************************************************************
-
-
-//*****************************************************************************
-// グローバル変数
-//*****************************************************************************
-
+#include "ResourceManager.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-D3DXANIMATION::D3DXANIMATION()
+D3DXAnimation::D3DXAnimation(const char* tag)
 {
+	// リソースの参照
+	ResourceManager::Instance()->GetMesh(tag, &model);
 
+	// アニメーションセットのメモリを確保
+	this->AnimSet.reserve(this->model->AnimController->GetMaxNumAnimationSets());
+
+	// ボーン用のポインタを作成
+	SetupBoneMatrixPointers(this->model->FrameRoot, this->model->FrameRoot);
+
+	// アニメーションセットを作成
+	this->CreateAnimSet();
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-D3DXANIMATION::~D3DXANIMATION()
+D3DXAnimation::~D3DXAnimation()
 {
-	SAFE_RELEASE(this->AnimController);
-
-	D3DXFrameDestroy(this->FrameRoot, this->AllocateHier);
-
-	this->AllocateHier->DestroyFrame(this->FrameRoot);
-
 	this->AnimSet.clear();
 	ReleaseVector(this->AnimSet);
 
-	SAFE_DELETE(this->AllocateHier);
-}
-
-//=============================================================================
-// Xファイルの読み込み
-//=============================================================================
-HRESULT D3DXANIMATION::Load_xFile(LPCTSTR filename, const char* ErrorSrc)
-{
-	char Message[64];
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-	this->AllocateHier = new AllocateHierarchy();
-
-	if (
-		FAILED(D3DXLoadMeshHierarchyFromX(filename,
-			D3DXMESH_MANAGED,
-			Device,
-			this->AllocateHier,
-			NULL,
-			&this->FrameRoot,
-			&this->AnimController))
-		)
-	{
-		sprintf_s(Message, "Load %s Model Failed！", ErrorSrc);
-		MessageBox(0, Message, "Error", 0);
-		return E_FAIL;
-	}
-
-	if (FAILED(SetupBoneMatrixPointers(this->FrameRoot, this->FrameRoot)))
-	{
-		return E_FAIL;
-	}
-
-	this->AnimSet.reserve(this->GetAnimSetNum());
-
-	return S_OK;
+	model = NULL;
 }
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void D3DXANIMATION::UpdateAnim(float Time)
+void D3DXAnimation::UpdateAnim(float Time)
 {
-	float CurWeightTime = this->AnimSet.at(this->CurrentAnimID).GetCurWeightTime();
-	float ShiftTime = this->AnimSet.at(this->CurrentAnimID).GetShiftTime();
+	float CurWeightTime = this->AnimSet.at(this->CurrentAnimID)->GetCurWeightTime();
+	float ShiftTime = this->AnimSet.at(this->CurrentAnimID)->GetShiftTime();
 
 	// 合成中か否かを判定
 	CurWeightTime += Time;
-	this->AnimSet.at(this->CurrentAnimID).SetCurWeightTime(CurWeightTime);
+	this->AnimSet.at(this->CurrentAnimID)->SetCurWeightTime(CurWeightTime);
 
 	if (CurWeightTime <= ShiftTime)
 	{
 		// 合成中。ウェイトを算出
 		float Weight = CurWeightTime / ShiftTime;
 		// ウェイトを登録
-		this->AnimController->SetTrackWeight(0, Weight);       // 現在のアニメーション
-		this->AnimController->SetTrackWeight(1, 1 - Weight);   // 前のアニメーション
+		this->model->AnimController->SetTrackWeight(0, Weight);       // 現在のアニメーション
+		this->model->AnimController->SetTrackWeight(1, 1 - Weight);   // 前のアニメーション
 	}
 	else
 	{
 		// 合成終了中。通常アニメーションをするTrack0のウェイトを最大値に
-		this->AnimController->SetTrackWeight(0, 1.0f);			// 現在のアニメーション
-		this->AnimController->SetTrackEnable(1, false);		// 前のアニメーションを無効にする
+		this->model->AnimController->SetTrackWeight(0, 1.0f);			// 現在のアニメーション
+		this->model->AnimController->SetTrackEnable(1, false);		// 前のアニメーションを無効にする
 	}
 
 	// 時間を更新
-	this->AnimController->AdvanceTime(Time, this);
+	this->model->AnimController->AdvanceTime(Time, this);
 
 	return;
 }
@@ -118,24 +74,126 @@ void D3DXANIMATION::UpdateAnim(float Time)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void D3DXANIMATION::DrawAnim(LPD3DXMATRIX WorldMatrix)
+void D3DXAnimation::DrawAnim(LPD3DXMATRIX WorldMatrix)
 {
-	UpdateFrameMatrices(this->FrameRoot, WorldMatrix);
+	UpdateFrameMatrices(this->model->FrameRoot, WorldMatrix);
 
-	DrawFrame(this->FrameRoot);
+	DrawFrame(this->model->FrameRoot);
 
 	return;
 }
 
 //=============================================================================
+// ボーン行列のポインタの準備
+//=============================================================================
+HRESULT D3DXAnimation::SetupBoneMatrixPointers(LPD3DXFRAME pFrameBase, LPD3DXFRAME pFrameRoot)
+{
+	if (pFrameBase->pMeshContainer != NULL)
+	{
+		D3DXFRAME_DERIVED* pFrame = NULL;
+		D3DXMESHCONTAINER_DERIVED* pMeshContainer = (D3DXMESHCONTAINER_DERIVED*)pFrameBase->pMeshContainer;
+
+		// if there is a skinmesh, then setup the bone matrices
+		if (pMeshContainer->pSkinInfo != NULL)
+		{
+			UINT cBones = pMeshContainer->pSkinInfo->GetNumBones();
+			pMeshContainer->ppBoneMatrix = new D3DXMATRIX*[cBones];
+			for (UINT iBone = 0; iBone < cBones; iBone++)
+			{
+				pFrame = (D3DXFRAME_DERIVED*)D3DXFrameFind(pFrameRoot, pMeshContainer->pSkinInfo->GetBoneName(iBone));
+				if (pFrame == NULL) return E_FAIL;
+
+				pMeshContainer->ppBoneMatrix[iBone] = &pFrame->CombinedTransformationMatrix;
+			}
+		}
+	}
+
+	if (pFrameBase->pFrameSibling != NULL)
+	{
+		if (FAILED(SetupBoneMatrixPointers(pFrameBase->pFrameSibling, pFrameRoot)))
+			return E_FAIL;
+	}
+
+	if (pFrameBase->pFrameFirstChild != NULL)
+	{
+		if (FAILED(SetupBoneMatrixPointers(pFrameBase->pFrameFirstChild, pFrameRoot)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+//=============================================================================
+// アニメーションセットの作成
+//=============================================================================
+void D3DXAnimation::CreateAnimSet()
+{
+	ANIMATIONSET *AnimationSet = new ANIMATIONSET();
+	vector<KEYDATA>Keydata;
+	Keydata.reserve(Keydata_Max);
+
+	for (int Set_No = 0; Set_No < GetAnimSetNum(); Set_No++)
+	{
+		switch (Set_No)
+		{
+		case Idle:
+
+			AnimationSet->SetData("Idle", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Running:
+
+			AnimationSet->SetData("Running", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Jump:
+
+			Keydata.push_back(KEYDATA{ 0.80f, e_MotionEnd });
+			AnimationSet->SetData("Jump", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Victory:
+
+			AnimationSet->SetData("Victory", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Slip:
+
+			Keydata.push_back(KEYDATA{ 0.95f, e_MotionChange });
+			AnimationSet->SetData("Slip", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Stop:
+
+			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		default:
+			break;
+		}
+
+		this->SetupCallbackKeys(&Keydata, AnimationSet->GetSetName());
+
+		AnimationSet->SetAnimSetPtr(this->model->AnimController);
+
+		this->AnimSet.push_back(AnimationSet);
+
+		Keydata.clear();
+	}
+
+	SAFE_DELETE(AnimationSet);
+	ReleaseVector(Keydata);
+}
+
+//=============================================================================
 // アニメーションを切り替え
 //=============================================================================
-void D3DXANIMATION::ChangeAnim(UINT AnimID)
+void D3DXAnimation::ChangeAnim(UINT AnimID)
 {
 	D3DXTRACK_DESC TD;   // トラックの能力
-	ID3DXAnimationSet* CurtAnimSet = this->AnimSet.at(this->CurrentAnimID).GetAnimSetPtr();
-	ID3DXAnimationSet* NextAnimSet = this->AnimSet.at(AnimID).GetAnimSetPtr();
-	float Speed = this->AnimSet.at(AnimID).GetSpeed();
+	ID3DXAnimationSet* CurtAnimSet = this->AnimSet.at(this->CurrentAnimID)->GetAnimSetPtr();
+	ID3DXAnimationSet* NextAnimSet = this->AnimSet.at(AnimID)->GetAnimSetPtr();
+	float Speed = this->AnimSet.at(AnimID)->GetSpeed();
 
 	// 指定のアニメーションIDの存在をチェック
 	if (AnimID > (UINT)this->GetAnimSetNum())
@@ -152,30 +210,30 @@ void D3DXANIMATION::ChangeAnim(UINT AnimID)
 	}
 
 	// 現在のアニメーションセットの設定値を取得
-	this->AnimController->GetTrackDesc(0, &TD);
+	this->model->AnimController->GetTrackDesc(0, &TD);
 
 	// 今のアニメーションをトラック1に移行し
 	// トラックの設定値も移行
-	this->AnimController->SetTrackAnimationSet(1, CurtAnimSet);
-	this->AnimController->SetTrackDesc(1, &TD);
-	this->AnimController->SetTrackSpeed(1, 0.0f);
+	this->model->AnimController->SetTrackAnimationSet(1, CurtAnimSet);
+	this->model->AnimController->SetTrackDesc(1, &TD);
+	this->model->AnimController->SetTrackSpeed(1, 0.0f);
 
 	// 新しいアニメーションセットをトラック0に設定
-	this->AnimController->SetTrackAnimationSet(0, NextAnimSet);
+	this->model->AnimController->SetTrackAnimationSet(0, NextAnimSet);
 
 	// トラック0のスピードの設定
-	this->AnimController->SetTrackSpeed(0, Speed);
+	this->model->AnimController->SetTrackSpeed(0, Speed);
 
 	// トラック0の位置は最初からに設定
-	this->AnimController->SetTrackPosition(0, 0.0f);
+	this->model->AnimController->SetTrackPosition(0, 0.0f);
 
 	// トラックの合成を許可
-	this->AnimController->SetTrackEnable(0, true);
-	this->AnimController->SetTrackEnable(1, true);
+	this->model->AnimController->SetTrackEnable(0, true);
+	this->model->AnimController->SetTrackEnable(1, true);
 
 	// ウェイト時間を初期化
-	this->AnimSet.at(AnimID).SetCurWeightTime(0.0f);
-	this->AnimController->ResetTime();
+	this->AnimSet.at(AnimID)->SetCurWeightTime(0.0f);
+	this->model->AnimController->ResetTime();
 
 	// 現在のアニメーション番号を切り替え
 	this->PreventAnimID = this->CurrentAnimID;
@@ -185,9 +243,9 @@ void D3DXANIMATION::ChangeAnim(UINT AnimID)
 }
 
 //=============================================================================
-// 特定なボーンを探す
+// 特定のボーンを探す
 //=============================================================================
-D3DXFRAME_DERIVED* D3DXANIMATION::SearchBoneFrame(const char* BoneName, D3DXFRAME* Frame)
+D3DXFRAME_DERIVED* D3DXAnimation::SearchBoneFrame(const char* BoneName, D3DXFRAME* Frame)
 {
 	D3DXFRAME_DERIVED* pFrame = NULL;
 
@@ -226,10 +284,10 @@ D3DXFRAME_DERIVED* D3DXANIMATION::SearchBoneFrame(const char* BoneName, D3DXFRAM
 //=============================================================================
 // 特定のボーンマトリックスを取得
 //=============================================================================
-D3DXMATRIX D3DXANIMATION::GetBoneMatrix(const char* BoneName)
+D3DXMATRIX D3DXAnimation::GetBoneMatrix(const char* BoneName)
 {
 	char Message[64];
-	D3DXFRAME_DERIVED* pFrame = SearchBoneFrame(BoneName, this->FrameRoot);
+	D3DXFRAME_DERIVED* pFrame = SearchBoneFrame(BoneName, this->model->FrameRoot);
 
 	// ボーンが見つかれば
 	if (pFrame != NULL && pFrame->Name != NULL && strcmp(pFrame->Name, BoneName) == 0)
@@ -250,7 +308,7 @@ D3DXMATRIX D3DXANIMATION::GetBoneMatrix(const char* BoneName)
 //=============================================================================
 // アニメーションセットのCallbackKeysを設置する
 //=============================================================================
-HRESULT D3DXANIMATION::SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetName)
+HRESULT D3DXAnimation::SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetName)
 {
 	// Keyframeを設置する予定のAnimationSet
 	ID3DXKeyframedAnimationSet* AnimSetTemp = NULL;
@@ -272,7 +330,7 @@ HRESULT D3DXANIMATION::SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetNam
 		goto FunctionExit;
 	}
 
-	if (FAILED(this->AnimController->GetAnimationSetByName(SetName, (ID3DXAnimationSet**)&AnimSetTemp)))
+	if (FAILED(this->model->AnimController->GetAnimationSetByName(SetName, (ID3DXAnimationSet**)&AnimSetTemp)))
 	{
 		sprintf_s(Message, "Setup Callbacks in %s AnimationSet Failed！", SetName);
 		goto FunctionExit;
@@ -312,10 +370,10 @@ HRESULT D3DXANIMATION::SetupCallbackKeys(vector<KEYDATA> *Keydata, LPCSTR SetNam
 		AnimSetTemp->GetPlaybackType(), CompressedInfo, CallbacksNum, Keys, &CompressedAnimSet);
 
 	// 古いアニメーションセット(圧縮されない)を削除する
-	this->AnimController->UnregisterAnimationSet(AnimSetTemp);
+	this->model->AnimController->UnregisterAnimationSet(AnimSetTemp);
 
 	// 新しいアニメーションセット(圧縮された)を追加する
-	this->AnimController->RegisterAnimationSet(CompressedAnimSet);
+	this->model->AnimController->RegisterAnimationSet(CompressedAnimSet);
 
 	// 終了処理
 FunctionExit:
@@ -336,51 +394,10 @@ FunctionExit:
 		return E_FAIL;
 	}
 }
-
-//=============================================================================
-// ボーン行列のポインタの準備
-//=============================================================================
-HRESULT D3DXANIMATION::SetupBoneMatrixPointers(LPD3DXFRAME pFrameBase, LPD3DXFRAME pFrameRoot)
-{
-	if (pFrameBase->pMeshContainer != NULL)
-	{
-		D3DXFRAME_DERIVED* pFrame = NULL;
-		D3DXMESHCONTAINER_DERIVED* pMeshContainer = (D3DXMESHCONTAINER_DERIVED*)pFrameBase->pMeshContainer;
-
-		// if there is a skinmesh, then setup the bone matrices
-		if (pMeshContainer->pSkinInfo != NULL)
-		{
-			UINT cBones = pMeshContainer->pSkinInfo->GetNumBones();
-			pMeshContainer->ppBoneMatrix = new D3DXMATRIX*[cBones];
-			for (UINT iBone = 0; iBone < cBones; iBone++)
-			{
-				pFrame = (D3DXFRAME_DERIVED*)D3DXFrameFind(pFrameRoot, pMeshContainer->pSkinInfo->GetBoneName(iBone));
-				if (pFrame == NULL) return E_FAIL;
-
-				pMeshContainer->ppBoneMatrix[iBone] = &pFrame->CombinedTransformationMatrix;
-			}
-		}
-	}
-
-	if (pFrameBase->pFrameSibling != NULL)
-	{
-		if (FAILED(SetupBoneMatrixPointers(pFrameBase->pFrameSibling, pFrameRoot)))
-			return E_FAIL;
-	}
-
-	if (pFrameBase->pFrameFirstChild != NULL)
-	{
-		if (FAILED(SetupBoneMatrixPointers(pFrameBase->pFrameFirstChild, pFrameRoot)))
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
 //=============================================================================
 // フレームの描画
 //=============================================================================
-void D3DXANIMATION::DrawFrame(LPD3DXFRAME pFrame)
+void D3DXAnimation::DrawFrame(LPD3DXFRAME pFrame)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 	LPD3DXMESHCONTAINER pMeshContainer;
@@ -404,7 +421,7 @@ void D3DXANIMATION::DrawFrame(LPD3DXFRAME pFrame)
 //=============================================================================
 // メッシュコンテナの描画
 //=============================================================================
-void D3DXANIMATION::DrawMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBase, LPD3DXFRAME pFrameBase)
+void D3DXAnimation::DrawMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBase, LPD3DXFRAME pFrameBase)
 {
 	D3DXMESHCONTAINER_DERIVED* pMeshContainer = (D3DXMESHCONTAINER_DERIVED*)pMeshContainerBase;
 	D3DXFRAME_DERIVED* pFrame = (D3DXFRAME_DERIVED*)pFrameBase;
@@ -484,7 +501,7 @@ void D3DXANIMATION::DrawMeshContainer(LPD3DXMESHCONTAINER pMeshContainerBase, LP
 //=============================================================================
 // フレーム行列の更新
 //=============================================================================
-void D3DXANIMATION::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParentMatrix)
+void D3DXAnimation::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pParentMatrix)
 {
 	D3DXFRAME_DERIVED* pFrame = (D3DXFRAME_DERIVED*)pFrameBase;
 	LPDIRECT3DDEVICE9 Device = GetDevice();
@@ -500,15 +517,15 @@ void D3DXANIMATION::UpdateFrameMatrices(LPD3DXFRAME pFrameBase, LPD3DXMATRIX pPa
 	UpdateFrameMatrices(pFrame->pFrameFirstChild, &pFrame->CombinedTransformationMatrix);
 }
 
-int D3DXANIMATION::GetAnimCurtFrame(void)
+int D3DXAnimation::GetAnimCurtFrame(void)
 {
 	// 60 FPS
-	double TrackTime = this->AnimController->GetTime() * 60;
+	double TrackTime = this->model->AnimController->GetTime() * 60;
 	double SetPeriod = GetAnimPeriodFrame();
 	return (int)(fmod(TrackTime, SetPeriod));
 }
 
-int D3DXANIMATION::GetAnimPeriodFrame(void)
+int D3DXAnimation::GetAnimPeriodFrame(void)
 {
-	return (int)(this->AnimSet.at(this->CurrentAnimID).GetPeriod() * 60);
+	return (int)(this->AnimSet.at(this->CurrentAnimID)->GetPeriod() * 60);
 }

@@ -6,7 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "ResourceManager.h"
-#include "Model3D.h"
+#include "FromXFile.h"
 
 //*****************************************************************************
 // 名前空間の確保
@@ -25,7 +25,8 @@ void ResourceManager::LoadMesh(const char* tag, const char* path)
 		SAFE_DELETE(modelPool[tagStr]);
 
 	// メッシュコンテナを生成してロード
-	modelPool[tagStr] = new Model3D(tag, path);
+	modelPool[tagStr] = new FromXFile();
+	modelPool[tagStr]->Load(tag, path);
 }
 
 //=============================================================================
@@ -46,7 +47,7 @@ void ResourceManager::ReleaseMesh(const char* tag)
 //=============================================================================
 // メッシュの取得
 //=============================================================================
-bool ResourceManager::GetMesh(const char* tag, Model3D** pOut)
+bool ResourceManager::GetMesh(const char* tag, FromXFile** pOut)
 {
 	string tagStr = string(tag);
 
@@ -111,6 +112,12 @@ bool ResourceManager::GetTexture(const char* tag, LPDIRECT3DTEXTURE9 *pOut)
 //=============================================================================
 void ResourceManager::AllRelease()
 {
+	for (auto &pool : modelPool)
+	{
+		SAFE_DELETE(pool.second)
+	}
+	modelPool.clear();
+
 	for (auto &pool : texturePool)
 	{
 		SAFE_RELEASE(pool.second)
