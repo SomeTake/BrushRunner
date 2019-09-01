@@ -21,9 +21,9 @@
 // 表示位置とサイズ（一番右の桁が基準）
 ResultStr ResultData[PLAYER_MAX] = {
 	D3DXVECTOR3(900.0f, 135.0f, 0.0f), D3DXVECTOR3(75.0f, 150.0f, 0.0f),
-	//D3DXVECTOR3(650.0f, 445.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	//D3DXVECTOR3(650.0f, 540.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	//D3DXVECTOR3(650.0f, 625.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(650.0f, 445.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(650.0f, 540.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
+	D3DXVECTOR3(650.0f, 625.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
 };
 
 //=============================================================================

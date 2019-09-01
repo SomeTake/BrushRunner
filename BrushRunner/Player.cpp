@@ -45,7 +45,7 @@
 Player::Player(int _CtrlNum, bool AIUse, const char* tag) : Model3D(tag)
 {
 	// xFileを読み込む
-	ResourceManager::Instance()->GetMesh(tag, &model);
+	//ResourceManager::Instance()->GetMesh(tag, &model);
 
 	// 現在のアニメーションをアイドル状態とする
 	this->ChangeAnim(Idle);
@@ -127,7 +127,7 @@ void Player::Update()
 		playerUI->Update(this->pos);
 
 		// アニメーションを更新
-		Update();
+		UpdateAnim(TIME_PER_FRAME * this->animSpd);
 
 		// 状態抽象インターフェースの更新
 		UpdateState(this->GetAnimCurtID());
@@ -140,7 +140,7 @@ void Player::Update()
 	}
 
 	// デバッグ表示＆操作
-	Debug();
+	//Debug();
 }
 
 //=====================================================================================================
@@ -153,7 +153,37 @@ void Player::Draw()
 		if (!blind)
 		{
 			// モデルの描画
-			Draw();
+
+			LPDIRECT3DDEVICE9 pDevice = GetDevice();
+			D3DMATERIAL9 matDef;
+			D3DXMATRIX WorldMtx, SclMtx, RotMtx, TransMtx;
+
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&WorldMtx);
+
+			// スケールを反映
+			D3DXMatrixScaling(&SclMtx, scl.x, scl.y, scl.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+
+			// 回転を反映
+			D3DXMatrixRotationYawPitchRoll(&SclMtx, rot.y, rot.x, rot.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &SclMtx);
+
+			// 移動を反映
+			D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
+			D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
+
+			// 現在のマテリアルを取得
+			pDevice->GetMaterial(&matDef);
+
+			// レンダリング
+			this->DrawAnim(&WorldMtx);
+
+			// マテリアルをデフォルトに戻す
+			pDevice->SetMaterial(&matDef);
 		}
 
 		// プレイヤーUIの描画
