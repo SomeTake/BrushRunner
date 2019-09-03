@@ -1,34 +1,31 @@
 //=============================================================================
 //
-// リザルト画面処理 [SceneGame.h]
+// リザルト画面での桁 [ResultDigit.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENERESULT_H_
-#define _SCENERESULT_H_
+#ifndef _RESULTDIGIT_H_
+#define _RESULTDIGIT_H_
 
-#include "Scene.h"
-#include "_2dobj.h"
-#include "Timer.h"
+#include "Digit.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneResult :
-	public Scene
+class ResultDigit :
+	public Digit
 {
 private:
-	std::vector<_2dobj*>	p2dObj;	// 2Dオブジェクト用のポインタ
-	ResultData*				data;	// ゲームシーンの結果を取得するポインタ
+	static LPDIRECT3DTEXTURE9 D3DTexture; // テクスチャのポインタ
 
-	void Debug();
+	int rank;
 
 public:
-	SceneResult();
-	~SceneResult();
+	ResultDigit(DWORD _time, int _digit, int _rank); // time = その桁の数字、digit = 何桁目か、rank = 順位
+	~ResultDigit();
 
-	void Update(int SceneID);
-	void Draw();
+	void Update()override;
+	void Draw()override;
 };
 
 #endif

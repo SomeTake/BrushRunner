@@ -9,19 +9,13 @@
 #include "Player.h"
 
 //*****************************************************************************
-// 構造体定義
+// 構造体データ入力
 //*****************************************************************************
-// 結果表示のデータ
-typedef struct {
-	D3DXVECTOR3 pos;
-	D3DXVECTOR3 size;
-}ResultStr;
-
-ResultStr Result[PLAYER_MAX] = {
+ResultStr Rank[PLAYER_MAX] = {
 	D3DXVECTOR3(250.0f, 70.0f, 0.0f), D3DXVECTOR3(300.0f, 150.0f, 0.0f),
 	D3DXVECTOR3(250.0f, 400.0f, 0.0f), D3DXVECTOR3(180.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(250.0f, 510.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
-	D3DXVECTOR3(250.0f, 590.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
+	D3DXVECTOR3(260.0f, 510.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
+	D3DXVECTOR3(260.0f, 590.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
 };
 
 //*****************************************************************************
@@ -38,8 +32,8 @@ ResultRank::ResultRank(int rank)
 
 	this->use = true;
 	this->rank = rank;
-	pos = Result[this->rank].pos;
-	size = Result[this->rank].size;
+	pos = Rank[this->rank].pos;
+	size = Rank[this->rank].size;
 
 	if (D3DTexture == NULL)
 	{

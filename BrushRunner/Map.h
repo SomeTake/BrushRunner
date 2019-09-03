@@ -18,6 +18,7 @@
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
 #define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
 #define GOAL_POS		D3DXVECTOR3(9500.0f, 0.0f, 0.0f)	// ゴール地点
+//#define GOAL_POS		D3DXVECTOR3(500.0f, 0.0f, 0.0f)	// ゴール地点
 
 // マップチップ座標を取得の種類
 enum e_ChipPosType

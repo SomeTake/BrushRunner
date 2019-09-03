@@ -1,34 +1,30 @@
 //=============================================================================
 //
-// リザルト画面処理 [SceneGame.h]
+// リザルト画面でのタイマー表示 [ResultTimer.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENERESULT_H_
-#define _SCENERESULT_H_
+#ifndef _RESULTTIMER_H_
+#define  RESULTTIMER_H_
 
-#include "Scene.h"
-#include "_2dobj.h"
 #include "Timer.h"
+#include "ResultDigit.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneResult :
-	public Scene
+class ResultTimer :
+	public Timer
 {
 private:
-	std::vector<_2dobj*>	p2dObj;	// 2Dオブジェクト用のポインタ
-	ResultData*				data;	// ゲームシーンの結果を取得するポインタ
-
-	void Debug();
+	ResultDigit * time[DIGIT_MAX];		// それぞれの桁を表示するオブジェクトのポインタ
 
 public:
-	SceneResult();
-	~SceneResult();
+	ResultTimer(DWORD _time, int _rank);
+	~ResultTimer();
 
-	void Update(int SceneID);
-	void Draw();
+	void Update()override;
+	void Draw()override;
 };
 
 #endif

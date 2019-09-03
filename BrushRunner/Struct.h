@@ -66,4 +66,10 @@ struct Float2D
 	}
 };
 
+// 結果表示のデータ
+typedef struct {
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 size;
+}ResultStr;
+
 #endif
