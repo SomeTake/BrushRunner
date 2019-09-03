@@ -25,7 +25,7 @@ bool IsOption;									// 選択肢フラグ
 SceneTitle::SceneTitle()
 {
 	
-	IsOption = false;							// 選択肢フラグ
+	IsOption = true;							// 選択肢フラグ
 	p2dObj[TitleLogo] = new TITLE(TitleLogo);
 	p2dObj[TitleRunner] = new TITLE(TitleRunner);
 	p2dObj[TitleMenu] = new TITLE(TitleMenu);
@@ -51,17 +51,17 @@ void SceneTitle::Update(int SceneID)
 	
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
-		if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
-		{
-			p2dObj[TitleArrows] = new TITLE(TITLE_POS04 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
-			IsOption = true;
-		}
+		//if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
+		//{
+		//	p2dObj[TitleArrows] = new TITLE(TITLE_POS04 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
+		//	IsOption = true;
+		//}
 
-		if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
-		{
-			p2dObj[TitleArrows] = new TITLE(TITLE_POS05 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
-			IsOption = false;
-		}
+		//if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
+		//{
+		//	p2dObj[TitleArrows] = new TITLE(TITLE_POS05 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
+		//	IsOption = false;
+		//}
 
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
