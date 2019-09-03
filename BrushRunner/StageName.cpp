@@ -1,63 +1,54 @@
 //=============================================================================
 //
-// リザルト画面 [Result.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ステージ名表示 [StageName.cpp]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Result.h"
+#include "StageName.h"
 #include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define RESULT_SIZE01			D3DXVECTOR3(SCREEN_WIDTH,SCREEN_HEIGHT,0.0f)	// テクスチャサイズ
-#define RESULT_POS01			D3DXVECTOR3(0.0f,0.0f,0.0f)						// テクスチャ座標
+#define STAGENAME_POS	D3DXVECTOR3(SCREEN_CENTER_X / 2, SCREEN_CENTER_Y + SCREEN_CENTER_Y / 2, 0.0f)
+#define STAGENAME_SIZE	D3DXVECTOR3(SCREEN_WIDTH / 2.5f, SCREEN_HEIGHT / 2.5f, 0.0f)
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-RESULT::RESULT()
+StageName::StageName()
 {
-	ResourceManager::Instance()->GetTexture("Result", &D3DTexture);
+	ResourceManager::Instance()->GetTexture("StageName", &D3DTexture);
 
-	use = true;
-	pos = RESULT_POS01;
-	size = RESULT_SIZE01;
-
+	pos = STAGENAME_POS;
+	size = STAGENAME_SIZE;
 	PatternAnim = 1;
+	use = true;
 
-	// 頂点情報の作成
 	MakeVertex();
-
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-RESULT::~RESULT()
+StageName::~StageName()
 {
 	D3DTexture = NULL;
 }
 
 //=============================================================================
-// 更新処理
+// 更新
 //=============================================================================
-void  RESULT::Update()
+void StageName::Update()
 {
 
-	if (use == true)
-	{
-		// テクスチャ座標をセット
-		SetTexture(PatternAnim);
-		SetVertex();
-	}
 }
 
 //=============================================================================
-// 描画処理
+// 描画
 //=============================================================================
-void RESULT::Draw()
+void StageName::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -66,8 +57,8 @@ void RESULT::Draw()
 
 	if (use == true)
 	{
-		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
-		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
@@ -77,14 +68,15 @@ void RESULT::Draw()
 }
 
 //=============================================================================
-// 頂点の作成
+// 頂点座標の作成
 //=============================================================================
-HRESULT RESULT::MakeVertex(void)
+void StageName::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	//頂点情報の設定
-	SetVertex();
+	// 頂点座標の設定
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
 
 	// rhwの設定
 	vertexWk[0].rhw =
@@ -104,38 +96,4 @@ HRESULT RESULT::MakeVertex(void)
 	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	return S_OK;
-
-}
-
-//=============================================================================
-// テクスチャ座標の設定
-//=============================================================================
-void RESULT::SetTexture(int cntPattern)
-{
-	int x = cntPattern;
-	int y = cntPattern;
-	float sizeX = 1.0f;
-	float sizeY = 1.0f;
-
-
-	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
-
-}
-
-//=============================================================================
-// 頂点座標の設定
-//=============================================================================
-void RESULT::SetVertex(void)
-{
-
-	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + size.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
 }

@@ -47,8 +47,8 @@ void SelectLogo::Update()
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
+		SetVertex();
 	}
-	SetVertex();
 }
 
 //=============================================================================
@@ -78,8 +78,6 @@ void SelectLogo::Draw()
 //=============================================================================
 HRESULT SelectLogo::MakeVertex(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// 頂点座標の設定
 	SetVertex();
 

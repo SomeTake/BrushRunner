@@ -42,6 +42,8 @@
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneExit.h" />
+    <ClInclude Include="SceneStageSelect.h" />
     <ClInclude Include="SelectLogo.h" />
     <ClInclude Include="CharacterAI.h" />
     <ClInclude Include="Chip.h" />
@@ -102,6 +104,9 @@
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SpikeState.h" />
     <ClInclude Include="SpInkState.h" />
+    <ClInclude Include="StageName.h" />
+    <ClInclude Include="StageSelectBG.h" />
+    <ClInclude Include="StageSelectCursor.h" />
     <ClInclude Include="StopState.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="Digit.h" />
@@ -132,6 +137,8 @@
     <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="ResultTimer.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneExit.cpp" />
+    <ClCompile Include="SceneStageSelect.cpp" />
     <ClCompile Include="SelectLogo.cpp" />
     <ClCompile Include="CharacterAI.cpp" />
     <ClCompile Include="Chip.cpp" />
@@ -189,6 +196,9 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SpikeState.cpp" />
     <ClCompile Include="SpInkState.cpp" />
+    <ClCompile Include="StageName.cpp" />
+    <ClCompile Include="StageSelectBG.cpp" />
+    <ClCompile Include="StageSelectCursor.cpp" />
     <ClCompile Include="StopState.cpp" />
     <ClCompile Include="Digit.cpp" />
     <ClCompile Include="Timer.cpp" />

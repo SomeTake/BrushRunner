@@ -10,22 +10,12 @@
 #include "Title.h"
 #include "Input.h"
 #include "SceneManager.h"
-#include "SceneCharacterSelect.h"
+#include "SceneStageSelect.h"
+#include "Player.h"
 
 //=============================================================================
 // グローバル変数
 //=============================================================================
-
-enum
-{	
-	TitleLogo,
-	TitleRunner,
-	TitleMenu,
-	TitleArrows,
-	UIMax,										// UI表示の最大数
-};
-
-
 static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
 bool IsOption;									// 選択肢フラグ
 
@@ -77,7 +67,7 @@ void SceneTitle::Update(int SceneID)
 		{
 			if (IsOption == true)
 			{
-				SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+				SetScene(new SceneStageSelect(), nSceneStageSelect);
 				return;
 			}
 			else
