@@ -6,11 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "Result.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_RESULT01		_T("data/texture/result.png")					// タイトルのテクスチャ
 #define RESULT_SIZE01			D3DXVECTOR3(SCREEN_WIDTH,SCREEN_HEIGHT,0.0f)	// テクスチャサイズ
 #define RESULT_POS01			D3DXVECTOR3(0.0f,0.0f,0.0f)						// テクスチャ座標
 
@@ -19,15 +19,8 @@
 //=============================================================================
 RESULT::RESULT()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	ResourceManager::Instance()->GetTexture("Result", &D3DTexture);
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
-		TEXTURE_RESULT01,				// ファイルの名前
-		&D3DTexture);		// 読み込むメモリのポインタ
-
-//*************************************************************************
-// タイトルの初期化
 	use = true;
 	pos = RESULT_POS01;
 	size = RESULT_SIZE01;
@@ -36,7 +29,6 @@ RESULT::RESULT()
 
 	// 頂点情報の作成
 	MakeVertex();
-	//*************************************************************************
 
 }
 
@@ -45,11 +37,7 @@ RESULT::RESULT()
 //=============================================================================
 RESULT::~RESULT()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -62,9 +50,8 @@ void  RESULT::Update()
 	{
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
-
+		SetVertex();
 	}
-	SetVertex();
 }
 
 //=============================================================================
@@ -72,20 +59,20 @@ void  RESULT::Update()
 //=============================================================================
 void RESULT::Draw()
 {
-	//LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	//// 頂点フォーマットの設定
-	//pDevice->SetFVF(FVF_VERTEX_2D);
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	//if (use == true)
-	//{
-	//	// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
-	//	// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
-	//	pDevice->SetTexture(0, D3DTexture);
+	if (use == true)
+	{
+		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		pDevice->SetTexture(0, D3DTexture);
 
-	//	// ポリゴンの描画
-	//	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
-	//}
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+	}
 
 }
 

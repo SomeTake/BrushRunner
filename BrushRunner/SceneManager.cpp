@@ -145,6 +145,7 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("ResultRank", "data/TEXTURE/ResultPlayer.png");
 	ResourceManager::Instance()->LoadTexture("SkyBox", "data/TEXTURE/SkyBox.png");
 	ResourceManager::Instance()->LoadTexture("MeshField", "data/TEXTURE/Block.jpg");
+	ResourceManager::Instance()->LoadTexture("Result", "data/TEXTURE/Result.png");
 
 }
 

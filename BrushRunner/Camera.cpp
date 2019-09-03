@@ -14,7 +14,7 @@
 // マクロ定義
 //*****************************************************************************
 #define	CAMERA_POS		D3DXVECTOR3(0.0f, 10.0f, -500.0f)				// カメラの初期位置
-#define CAMERA_POS_RESULT	D3DXVECTOR3(0.0f, -50.0f, -450.0f)			// リザルト画面でのカメラの初期位置
+#define CAMERA_POS_RESULT	D3DXVECTOR3(0.0f, -100.0f, -450.0f)			// リザルト画面でのカメラの初期位置
 #define CAMERA_AT		D3DXVECTOR3(0.0f, 0.0f, 0.0f)					// カメラの注視点
 #define CAMERA_AT_RESULT	D3DXVECTOR3(0.0f, 300.0f, 0.0f)
 
