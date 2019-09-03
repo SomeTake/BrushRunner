@@ -10,7 +10,7 @@
 #include "Title.h"
 #include "Input.h"
 #include "SceneManager.h"
-#include "SceneStageSelect.h"
+#include "SceneTutorial.h"
 #include "Player.h"
 
 //=============================================================================
@@ -65,7 +65,7 @@ void SceneTitle::Update(int SceneID)
 		{
 			if (IsOption == true)
 			{
-				SetScene(new SceneStageSelect(), nSceneStageSelect);
+				SetScene(new SceneTutorial(), nSceneTutorial);
 				return;
 			}
 			else

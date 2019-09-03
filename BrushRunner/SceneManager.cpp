@@ -15,6 +15,7 @@
 #include "SceneResult.h"
 #include "SceneExit.h"
 #include "SceneStageSelect.h"
+#include "SceneTutorial.h"
 #include "ResourceManager.h"
 
 //*****************************************************************************
@@ -40,6 +41,9 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	{
 	case nSceneTitle:
 		scene = new SceneTitle();
+		break;
+	case nSceneTutorial:
+		scene = new SceneTutorial();
 		break;
 	case nSceneStageSelect:
 		scene = new SceneStageSelect();

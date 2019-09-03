@@ -13,6 +13,7 @@
 enum SceneNum
 {
 	nSceneTitle,			// タイトル
+	nSceneTutorial,			// チュートリアル
 	nSceneStageSelect,		// ステージセレクト
 	nSceneCharacterSelect,	// キャラクターセレクト
 	nSceneGame,				// ゲーム

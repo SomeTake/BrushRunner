@@ -44,6 +44,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneExit.h" />
     <ClInclude Include="SceneStageSelect.h" />
+    <ClInclude Include="SceneTutorial.h" />
     <ClInclude Include="SelectLogo.h" />
     <ClInclude Include="CharacterAI.h" />
     <ClInclude Include="Chip.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneExit.cpp" />
     <ClCompile Include="SceneStageSelect.cpp" />
+    <ClCompile Include="SceneTutorial.cpp" />
     <ClCompile Include="SelectLogo.cpp" />
     <ClCompile Include="CharacterAI.cpp" />
     <ClCompile Include="Chip.cpp" />
