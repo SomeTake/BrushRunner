@@ -108,6 +108,7 @@ void SceneManager::LoadResource()
 
 	// SceneStageSelect
 	ResourceManager::Instance()->LoadTexture("StageSelectBG", "data/TEXTURE/StageSelectBG.png");
+	ResourceManager::Instance()->LoadTexture("StageName", "data/TEXTURE/StageName.png");
 
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");

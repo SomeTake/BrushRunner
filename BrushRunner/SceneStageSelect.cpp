@@ -11,6 +11,8 @@
 #include "Input.h"
 
 #include "StageSelectBG.h"
+#include "StageName.h"
+#include "StageSelectCursor.h"
 
 //=============================================================================
 // コンストラクタ
@@ -20,9 +22,9 @@ SceneStageSelect::SceneStageSelect()
 	// 背景
 	obj.push_back(new StageSelectBG());
 	// カーソル
-
+	obj.push_back(new StageSelectCursor());
 	// ステージ名
-
+	obj.push_back(new StageName());
 }
 
 //=============================================================================
