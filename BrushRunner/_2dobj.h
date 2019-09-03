@@ -24,7 +24,6 @@ protected:
 	D3DXVECTOR3			size;						// サイズ
 	int					PatternAnim;				// アニメーションパターン
 	bool				use;						// 使用フラグ
-//	Character			*pChara;					// 参照したいキャラクタークラスのポインタ
 
 public:
 	// メンバ関数

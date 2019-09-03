@@ -13,6 +13,8 @@
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
 #include "SceneResult.h"
+#include "SceneExit.h"
+#include "SceneStageSelect.h"
 #include "ResourceManager.h"
 
 //*****************************************************************************
@@ -33,10 +35,14 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	// リソースの読み込み
 	LoadResource();
 
+	// 開始位置に合わせて読み込み
 	switch (eScene)
 	{
 	case nSceneTitle:
 		scene = new SceneTitle();
+		break;
+	case nSceneStageSelect:
+		scene = new SceneStageSelect();
 		break;
 	case nSceneCharacterSelect:
 		scene = new SceneCharacterSelect();
@@ -47,6 +53,8 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	case nSceneResult:
 		scene = new SceneResult();
 		break;
+	case nSceneExit:
+		scene = new SceneExit();
 	default:
 		break;
 	}
@@ -97,6 +105,9 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("TitleLogo", "data/TEXTURE/Logo.png");
 	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");
 	ResourceManager::Instance()->LoadTexture("TitleMenu", "data/TEXTURE/TitleLogo.png");
+
+	// SceneStageSelect
+	ResourceManager::Instance()->LoadTexture("StageSelectBG", "data/TEXTURE/StageSelectBG.png");
 
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");

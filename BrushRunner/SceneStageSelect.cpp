@@ -1,73 +1,75 @@
 //=============================================================================
 //
-// タイトル画面処理 [SceneTitle.cpp]
+// ステージセレクト [SceneStageSelect.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "SceneTitle.h"
-#include "_2dobj.h"
-#include "Title.h"
-#include "Input.h"
-#include "SceneManager.h"
 #include "SceneStageSelect.h"
-#include "Player.h"
+#include "SceneManager.h"
+#include "SceneCharacterSelect.h"
+#include "Input.h"
 
-//=============================================================================
-// グローバル変数
-//=============================================================================
-static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
+#include "StageSelectBG.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-SceneTitle::SceneTitle()
+SceneStageSelect::SceneStageSelect()
 {
-	p2dObj[TitleLogo] = new TITLE(TitleLogo);
-	p2dObj[TitleRunner] = new TITLE(TitleRunner);
-	p2dObj[TitleMenu] = new TITLE(TitleMenu);
+	// 背景
+	obj.push_back(new StageSelectBG());
+	// カーソル
+
+	// ステージ名
 
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-SceneTitle::~SceneTitle()
+SceneStageSelect::~SceneStageSelect()
 {
-	for (int i = 0; i < UIMax; i++)
+	// 2Dオブジェクトの削除
+	for (auto &UI : obj)
 	{
-		delete p2dObj[i];
+		SAFE_DELETE(UI);
 	}
+	obj.clear();
+	ReleaseVector(obj);
+
 }
 
 //=============================================================================
 // 更新
 //=============================================================================
-void SceneTitle::Update(int SceneID)
+void SceneStageSelect::Update(int SceneID)
 {
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	// シーン遷移
+	for (int playerNo = 0; playerNo < GAMEPAD_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
-			SetScene(new SceneStageSelect(), nSceneStageSelect);
+			SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
 			return;
 		}
 	}
 
-	for (int i = 0; i < UIMax; i++)
+	// 2Dオブジェクトの更新
+	for (auto & UI : obj)
 	{
-		p2dObj[i]->Update();
+		UI->Update();
 	}
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void SceneTitle::Draw()
+void SceneStageSelect::Draw()
 {
-	for (int i = 0; i < UIMax; i++)
+	// 2Dオブジェクトの描画
+	for (auto & UI : obj)
 	{
-		p2dObj[i]->Draw();
+		UI->Draw();
 	}
-
 }
