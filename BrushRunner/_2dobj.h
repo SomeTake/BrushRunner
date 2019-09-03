@@ -29,7 +29,7 @@ protected:
 public:
 	// ƒƒ“ƒoŠÖ”
 	_2dobj();
-	~_2dobj();
+	virtual ~_2dobj();
 		
 
 	// ‰¼‘zŠÖ”

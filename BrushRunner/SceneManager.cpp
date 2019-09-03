@@ -13,6 +13,7 @@
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
 #include "SceneResult.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // グローバル変数
@@ -29,10 +30,9 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	InitCamera();
 	InitLight();
 
-	//title = new SceneTitle();
-	//scene = new SceneCharacterSelect();
-	//game = new SceneGame();
-	//result = new SceneResult();
+	// リソースの読み込み
+	LoadResource();
+
 	switch (eScene)
 	{
 	case nSceneTitle:
@@ -58,12 +58,10 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 //=============================================================================
 SceneManager::~SceneManager()
 {
-	//delete title;
-	//delete charaselect;
-	//delete game;
-	//delete result;
-
 	delete scene;
+
+	// リソースの削除
+	ResourceManager::Instance()->AllRelease();
 
 	UninitInput();
 }
@@ -75,24 +73,6 @@ void SceneManager::Update()
 {
 	UpdateInput();
 
-	//switch (eScene)
-	//{
-	//case nSceneTitle:
-	//	title->Update();
-	//	break;
-	//case nSceneCharacterSelect:
-	//	charaselect->Update();
-	//	break;
-	//case nSceneGame:
-	//	game->Update();
-	//	break;
-	//case nSceneResult:
-	//	result->Update();
-	//	break;
-	//default:
-	//	break;
-	//}
-
 	scene->Update(eScene);
 }
 
@@ -103,25 +83,57 @@ void SceneManager::Draw()
 {
 	SetCamera();
 
-	//switch (eScene)
-	//{
-	//case nSceneTitle:
-	//	title->Draw();
-	//	break;
-	//case nSceneCharacterSelect:
-	//	charaselect->Draw();
-	//	break;
-	//case nSceneGame:
-	//	game->Draw();
-	//	break;
-	//case nSceneResult:
-	//	result->Draw();
-	//	break;
-	//default:
-	//	break;
-	//}
-
 	scene->Draw();
+}
+
+//=============================================================================
+// リソースの読み込み
+//=============================================================================
+void SceneManager::LoadResource()
+{
+	// リソース作成
+	// 引数1:識別のためのタグ名(呼び出し先と合わせる) 引数2:ファイルのパス
+	// SceneTitle
+	ResourceManager::Instance()->LoadTexture("TitleLogo", "data/TEXTURE/Logo.png");
+	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");
+	ResourceManager::Instance()->LoadTexture("TitleMenu", "data/TEXTURE/TitleLogo.png");
+
+	// SceneCharacterSelect
+	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");
+	ResourceManager::Instance()->LoadTexture("SelectCursor", "data/TEXTURE/CharSelectCursor.png");	// SceneGameのFaceにも使う
+
+	// SceneGame
+	ResourceManager::Instance()->LoadTexture("UIFrame", "data/texture/frame000.png");
+	ResourceManager::Instance()->LoadTexture("CountDown", "data/TEXTURE/countdown.png");
+	ResourceManager::Instance()->LoadTexture("Item", "data/TEXTURE/Item.png");
+	ResourceManager::Instance()->LoadTexture("Finish", "data/TEXTURE/Finish.png");
+	ResourceManager::Instance()->LoadTexture("Sky", "data/MAP/BG000.png");
+	ResourceManager::Instance()->LoadTexture("GoalFlag", "data/TEXTURE/GoalFlag.png");
+	ResourceManager::Instance()->LoadTexture("Digit", "data/TEXTURE/Digit.png");					// SceneResultのResultDigitにも使う
+	ResourceManager::Instance()->LoadTexture("MapChip", "data/MAP/tilea5.png");
+	ResourceManager::Instance()->LoadTexture("ObjectChip", "data/MAP/mapchip_object.png");
+	ResourceManager::Instance()->LoadTexture("HitEffect", "data/EFFECT/anmef000.png");
+	ResourceManager::Instance()->LoadTexture("DeadEffect", "data/EFFECT/anmef001.png");
+	ResourceManager::Instance()->LoadTexture("RunEffect", "data/EFFECT/anmef002.png");
+	ResourceManager::Instance()->LoadTexture("ExplosionEffect", "data/EFFECT/explo000.png");
+	ResourceManager::Instance()->LoadTexture("ItemEffect", "data/EFFECT/ief001.png");
+	ResourceManager::Instance()->LoadTexture("Item1Ettect", "data/EFFECT/ief000.png");
+	ResourceManager::Instance()->LoadTexture("ChargeEffect", "data/EFFECT/Charge.png");
+	ResourceManager::Instance()->LoadTexture("Paint", "data/TEXTURE/paint.png");
+	ResourceManager::Instance()->LoadTexture("Cursor", "data/TEXTURE/brush.png");
+	ResourceManager::Instance()->LoadTexture("InkGauge", "data/texture/InkGauge.png");
+	ResourceManager::Instance()->LoadTexture("ColorInkFrame", "data/texture/colorinkframe.png");
+	ResourceManager::Instance()->LoadTexture("BlackInkFrame", "data/texture/blackinkframe.png");
+	ResourceManager::Instance()->LoadTexture("FaceFrame", "data/texture/faceframe.png");
+	ResourceManager::Instance()->LoadTexture("MiniPlayer", "data/TEXTURE/MiniPlayer.png");
+	ResourceManager::Instance()->LoadTexture("Pop", "data/TEXTURE/pointer.png");
+
+	// SceneResult
+	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");
+	ResourceManager::Instance()->LoadTexture("ResultRank", "data/TEXTURE/ResultPlayer.png");
+	ResourceManager::Instance()->LoadTexture("SkyBox", "data/TEXTURE/SkyBox.png");
+	ResourceManager::Instance()->LoadTexture("MeshField", "data/TEXTURE/Block.jpg");
+
 }
 
 //=====================================================================================================

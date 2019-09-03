@@ -10,35 +10,13 @@
 #include "_2dobj.h"
 
 //*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-#define TEXTURE_TITLE01 _T("data/texture/Runner.png")										// タイトルのテクスチャ
-#define TITLE_SIZE01			D3DXVECTOR3(SCREEN_WIDTH,SCREEN_HEIGHT,0.0f)				// テクスチャサイズ
-#define TITLE_POS01				D3DXVECTOR3(SCREEN_CENTER_X,SCREEN_CENTER_Y,0.0f)			// テクスチャ座標
-
-#define TEXTURE_TITLE02 _T("data/texture/Logo.png")											// タイトルのテクスチャ
-#define TITLE_SIZE02			D3DXVECTOR3(SCREEN_CENTER_X*1.5,SCREEN_CENTER_Y*1.5,0.0f)	// テクスチャサイズ
-#define TITLE_POS02				D3DXVECTOR3(SCREEN_CENTER_X,SCREEN_CENTER_Y*0.75,0.0f)		// テクスチャ座標
-
-#define TEXTURE_TITLE03 _T("data/texture/TitleOption.png")									// タイトルのテクスチャ
-#define TITLE_SIZE03			D3DXVECTOR3(SCREEN_CENTER_X/2,SCREEN_CENTER_Y/2,0.0f)		// テクスチャサイズ
-#define TITLE_POS03				D3DXVECTOR3(SCREEN_CENTER_X,SCREEN_CENTER_Y*1.6,0.0f)		// テクスチャ座標
-
-#define TEXTURE_TITLE04 _T("data/texture/Arrows.png")										// タイトルのテクスチャ
-#define TITLE_SIZE04			D3DXVECTOR3(SCREEN_CENTER_X/2,SCREEN_CENTER_Y/2,0.0f)		// テクスチャサイズ
-#define ARROWS_POS_X			(240)														// →微調整
-#define ARROWS_POS_Y			(80)														// →微調整
-#define TITLE_POS04				D3DXVECTOR3(SCREEN_CENTER_X-ARROWS_POS_X,SCREEN_CENTER_Y*1.5,0.0f)		// テクスチャ座標
-#define TITLE_POS05				D3DXVECTOR3(SCREEN_CENTER_X-ARROWS_POS_X,SCREEN_CENTER_Y*1.5+ARROWS_POS_Y,0.0f)		// テクスチャ座標
-
-//*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class TITLE :
 	public _2dobj
 {
 public:
-	TITLE(D3DXVECTOR3 _pos,D3DXVECTOR3 _size,const char *texno);
+	TITLE(int num);
 	~TITLE();
 
 

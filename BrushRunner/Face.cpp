@@ -7,34 +7,28 @@
 #include "Main.h"
 #include "Face.h"
 #include "CursorObj.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
 #define FACE_POS		D3DXVECTOR3(31.0f, 30.5f, 0.0f)
-#define FACE_SLIDE_SIZE	(318.5f)
+#define FACE_SPACE		(318.5f)							// 表示間隔
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Face::Face(int playerNo, int charNo)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_CURSOROBJ,					// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
+	ResourceManager::Instance()->GetTexture("SelectCursor", &D3DTexture);
 
 	this->playerNo = playerNo;
 	this->charNo = charNo;
 
 	use = true;
 	pos = FACE_POS;
-	pos.x += this->playerNo * FACE_SLIDE_SIZE;
+	pos.x += this->playerNo * FACE_SPACE;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -45,11 +39,7 @@ Face::Face(int playerNo, int charNo)
 //=============================================================================
 Face::~Face()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 }
 
 //=============================================================================

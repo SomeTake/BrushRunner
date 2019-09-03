@@ -16,7 +16,8 @@
 #include "Player.h"
 #include "PaintManager.h"
 #include "EffectManager.h"
-#include "Sky.h"
+#include "Object3D.h"
+#include "Timer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,14 +31,17 @@ class SceneGame :
 	public Scene
 {
 private:
-	std::vector<_2dobj*> UIObject;			// UI
-	Map		*pMap;							// マップ
-	Player	*pPlayer[PLAYER_MAX];			// プレイヤー
-	QUADTREE *Quadtree = nullptr;			// 四分木
-	EffectManager *pEffectManager;			// 2Dエフェクト管理
-	Sky		*pSky;							// 空
-	int		startframe;						// 開始カウントダウン
-	bool	result;							// 終了フラグ
+	std::vector<_2dobj*>		UIObject;	// UI
+	std::vector < Object3D*>	object3d;	// 3Dオブジェクト
+	Map				*pMap;					// マップ
+	Player			*pPlayer[PLAYER_MAX];	// プレイヤー
+	QUADTREE		*Quadtree = nullptr;	// 四分木
+	EffectManager	*pEffectManager;		// 2Dエフェクト管理
+	Timer			*pTimer;				// タイマー
+
+	int				startframe;				// 開始カウントダウン
+	bool			result;					// 終了フラグ
+	static ResultData data[PLAYER_MAX];		// 結果
 
 	void Start();
 	void Collision();
@@ -52,8 +56,7 @@ public:
 	void Update(int SceneID);
 	void Draw();
 
+	static ResultData *GetResultData(int rank);
+
 };
-
-int *GetResultRank(int no);					// 順位結果を取得
-
 #endif

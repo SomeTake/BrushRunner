@@ -20,6 +20,7 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Timer.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,36 +31,12 @@
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(10)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
 #define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
 #define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
-
-// 読み込むキャラクターモデル
-static const char* CharaModel[] =
-{
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
-};
-
-// キャラクターモデルの番号
-enum CharaModelNum
-{
-	ShachikuModel,
-	KouhaiModel,
-
-	// モデルの種類
-	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] =
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
-};
 
 enum CallbackKeyType
 {
@@ -204,11 +181,12 @@ void Player::Draw()
 			pDevice->SetMaterial(&matDef);
 		}
 
-		// プレイヤーUIの描画
-		playerUI->Draw(onCamera,blind);
-
 		// ペイントの描画
 		PaintSystem->Draw();
+
+		// プレイヤーUIの描画
+		playerUI->Draw(onCamera, blind);
+
 	}
 	else
 	{
@@ -317,6 +295,10 @@ void Player::JumpMove()
 	if (jet)
 	{
 		jumpValue = JETPACK_VALUE;
+	}
+	else
+	{
+		jumpValue = 1.0f;
 	}
 }
 
@@ -703,7 +685,7 @@ void Player::HitObjectInfluence(int type)
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(min(++ink, INK_MAX), ColorInk);
 
-				// インクが回復する音
+				// PlaySound(インクが回復する音)
 			}
 		}
 

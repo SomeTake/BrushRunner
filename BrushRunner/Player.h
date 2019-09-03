@@ -22,6 +22,30 @@
 #define PLAYER_COLLISION_SIZE	D3DXVECTOR2(5.0f, 5.0f)					// 当たり判定を有効にするサイズ（足元のみ）
 #define JUMP_SPEED				(12.0f)									// ジャンプの初速
 
+// 読み込むキャラクターモデル
+static const char* CharaModel[] =
+{
+	"data/MODEL/Shachiku/Shachiku.x",
+	"data/MODEL/Kouhai/Kouhai.x",
+};
+
+// キャラクターモデルの番号
+enum CharaModelNum
+{
+	ShachikuModel,
+	KouhaiModel,
+
+	// モデルの種類
+	MaxModel
+};
+
+// モデルの大きさ設定
+static D3DXVECTOR3 ModelScl[MaxModel] =
+{
+	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
+	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
+};
+
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
 enum CharaStateNum
 {
@@ -53,7 +77,7 @@ private:
 
 	// メンバ関数
 	HRESULT CALLBACK HandleCallback(THIS_ UINT Track, LPVOID pCallbackData);
-	void CreateAnimSet(void);
+	void CreateAnimSet()override;
 	void Move();			// 移動
 	void CheckOnCamera();
 	void JumpMove();		// ジャンプ移動
@@ -87,8 +111,8 @@ public:
 	// メンバ関数
 	Player(int _CtrlNum);
 	~Player();
-	void Update();
-	void Draw();
+	void Update()override;
+	void Draw()override;
 
 	// 状態抽象インターフェース
 	void UpdateState(int AnimCurtID);

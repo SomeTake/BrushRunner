@@ -14,23 +14,33 @@
 #include "DebugWindow.h"
 #include "SceneResult.h"
 
-//2d obj
+// 2d obj
 #include "Frame01.h"
 #include "Face.h"
 #include "CountDown.h"
 #include "Item.h"
+#include "Finish.h"
 
-static int ResultRank[PLAYER_MAX];
+// 3d obj
+#include "Sky.h"
+#include "GoalFlag.h"
+
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
+ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneGame::SceneGame()
 {
+	// ゲームの結果を初期化
 	startframe = 0;
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		ResultRank[i] = -1;
+		data[i].playerNo = -1;
+		data[i].time = 0;
 	}
 	result = false;
 
@@ -63,8 +73,12 @@ SceneGame::SceneGame()
 	// エフェクトマネージャ
 	pEffectManager = new EffectManager();
 
-	// 空
-	pSky = new Sky();
+	// 3Dオブジェクト
+	object3d.push_back(new Sky());
+	object3d.push_back(new GoalFlag());
+
+	// タイマー
+	pTimer = new Timer();
 }
 
 //=============================================================================
@@ -77,9 +91,6 @@ SceneGame::~SceneGame()
 
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
-
-	// ペイントテクスチャの削除
-	Paint::ReleaseTexture();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -98,8 +109,16 @@ SceneGame::~SceneGame()
 	// エフェクトマネージャの削除
 	delete pEffectManager;
 
-	// 空の削除
-	delete pSky;
+	// 3Dオブジェクトの削除
+	for (auto &Obj3D : object3d)
+	{
+		SAFE_DELETE(Obj3D);
+	}
+	object3d.clear();
+	ReleaseVector(object3d);
+
+	// タイマーの削除
+	delete pTimer;
 }
 
 //=============================================================================
@@ -107,6 +126,7 @@ SceneGame::~SceneGame()
 //=============================================================================
 void SceneGame::Update(int SceneID)
 {
+	// 開始処理
 	if (startframe < START_FRAME)
 	{
 		Start();
@@ -145,12 +165,19 @@ void SceneGame::Update(int SceneID)
 	// エフェクトマネージャの更新
 	pEffectManager->Update();
 
-	// 空の更新
-	pSky->Update();
+	// 3Dオブジェクトの更新
+	for (auto &Obj3D : object3d)
+	{
+		Obj3D->Update();
+	}
+
+	// タイマーの更新
+	pTimer->Update();
 
 	// リザルト画面へ遷移していいか確認
 	CheckResult();
 
+	// デバッグ
 	Debug();
 }
 
@@ -159,14 +186,14 @@ void SceneGame::Update(int SceneID)
 //=============================================================================
 void SceneGame::Draw()
 {
-	// 空の描画
-	pSky->Draw();
-
 	// マップの描画
 	pMap->Draw();
 
-	// エフェクトマネージャの描画
-	pEffectManager->Draw();
+	// 3Dオブジェクトの描画
+	for (auto &Obj3D : object3d)
+	{
+		Obj3D->Draw();
+	}
 
 	// プレイヤーの描画
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -174,12 +201,17 @@ void SceneGame::Draw()
 		pPlayer[i]->Draw();
 	}
 
+	// エフェクトマネージャの描画
+	pEffectManager->Draw();
+
 	// 2Dオブジェクトの描画
 	for (auto &Object : UIObject)
 	{
 		Object->Draw();
 	}
 
+	// タイマーの描画
+	pTimer->Draw();
 }
 
 //=============================================================================
@@ -253,6 +285,8 @@ void SceneGame::Start()
 		{
 			pPlayer[i]->SetPlayable(true);
 		}
+
+		pTimer->Start();
 	}
 }
 
@@ -264,6 +298,9 @@ void SceneGame::CheckResult()
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{
+		// タイマーストップ
+		pTimer->Stop();
+
 		for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
@@ -273,12 +310,14 @@ void SceneGame::CheckResult()
 				return;
 			}
 		}
+
+		return;	// 全員ゴールしていたらここから先の処理はしない
 	}
 
 	// 全員がゴールorゲームオーバーになったか確認
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (ResultRank[i] != -1)
+		if (data[i].playerNo != -1)
 		{
 			result = true;
 		}
@@ -289,13 +328,19 @@ void SceneGame::CheckResult()
 		}
 	}
 
+	// 全員ゴールした瞬間のみ
+	if (result)
+	{
+		UIObject.push_back(new Finish());
+	}
+
 	for (int pNo = 0; pNo < PLAYER_MAX; pNo++)
 	{
 		bool hit = false;
 		// すでにそのプレイヤーの結果がリザルト順位配列に登録されているか確認
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (ResultRank[rNo] != pNo)
+			if (data[rNo].playerNo != pNo)
 			{
 				hit = false;
 			}
@@ -325,9 +370,10 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の後ろから入れていく
 		for (int rNo = PLAYER_MAX - 1; rNo > 0; rNo--)
 		{
-			if (ResultRank[rNo] == -1)
+			if (data[rNo].playerNo == -1)
 			{
-				ResultRank[rNo] = pNo;
+				data[rNo].playerNo = pNo;
+				data[rNo].time = 359999;
 				break;
 			}
 		}
@@ -339,9 +385,10 @@ void SceneGame::InsertResult(int pNo)
 		// リザルト順位配列の前から入れていく
 		for (int rNo = 0; rNo < PLAYER_MAX; rNo++)
 		{
-			if (ResultRank[rNo] == -1)
+			if (data[rNo].playerNo == -1)
 			{
-				ResultRank[rNo] = pNo;
+				data[rNo].playerNo = pNo;
+				data[rNo].time = pTimer->Check();
 				break;
 			}
 		}
@@ -357,7 +404,8 @@ void SceneGame::Debug()
 	BeginDebugWindow("Result");
 
 	DebugText("All Goal or Gameover : %s", result ? "True" : "False");
-	DebugText("No1:%d No2:%d No3:%d No4:%d", ResultRank[0], ResultRank[1], ResultRank[2], ResultRank[3]);
+	DebugText("No1:%d No2:%d No3:%d No4:%d", data[0].playerNo, data[1].playerNo, data[2].playerNo, data[3].playerNo);
+	DebugText("ResultTime\nNo1:%d No2:%d No3:%d No4:%d", data[0].time, data[1].time, data[2].time, data[3].time);
 
 	EndDebugWindow("Result");
 
@@ -365,9 +413,9 @@ void SceneGame::Debug()
 }
 
 //=============================================================================
-// 順位結果のゲッター
+// 結果のゲッター
 //=============================================================================
-int *GetResultRank(int no)
+ResultData *SceneGame::GetResultData(int rank)
 {
-	return &ResultRank[no];
+	return &data[rank];
 }

@@ -17,21 +17,14 @@
 #include "SpInkState.h"
 #include "DebugWindow.h"
 #include "EffectManager.h"
+#include "ResourceManager.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_ITEM,						// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
+	ResourceManager::Instance()->GetTexture("Item", &D3DTexture);
 
 	pPlayer = ptr;
 	use = false;
@@ -60,11 +53,7 @@ Item::Item(D3DXVECTOR3 _pos, Player *ptr)
 //=============================================================================
 Item::~Item()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	D3DTexture = NULL;
 
 	// ステートパターンの削除
 	for (int i = 0; i < NumItemMax; i++)
@@ -92,18 +81,21 @@ void Item::Update()
 	if (use)
 	{
 		// アイテムを使用する
-		if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
+		if (pPlayer->GetOnCamera())
 		{
-			// エフェクトを発生させる
-			std::vector<Effect*> *EffectVector = GetEffectVector();
-			effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
-			EffectVector->push_back(effect);
+			if (GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D))
+			{
+				// エフェクトを発生させる
+				std::vector<Effect*> *EffectVector = GetEffectVector();
+				effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
+				EffectVector->push_back(effect);
 
-			use = false;
-			active = true;
-			state[PatternAnim]->Start();
+				use = false;
+				active = true;
+				state[PatternAnim]->Start();
 
-			// PlaySound(アイテム使用)
+				// PlaySound(アイテム使用)
+			}
 		}
 
 		//テクスチャ座標をセット

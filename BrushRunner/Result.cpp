@@ -1,24 +1,36 @@
+//=============================================================================
+//
+// リザルト画面 [Result.cpp]
+// Author : HAL東京 GP11B341 17 染谷武志
+//
+//=============================================================================
 #include "Main.h"
 #include "Result.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define TEXTURE_RESULT01		_T("data/texture/result.png")					// タイトルのテクスチャ
+#define RESULT_SIZE01			D3DXVECTOR3(SCREEN_WIDTH,SCREEN_HEIGHT,0.0f)	// テクスチャサイズ
+#define RESULT_POS01			D3DXVECTOR3(0.0f,0.0f,0.0f)						// テクスチャ座標
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-RESULT::RESULT(D3DXVECTOR3 _pos, D3DXVECTOR3 _size, const char *texno)
+RESULT::RESULT()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
-		texno,				// ファイルの名前
+		TEXTURE_RESULT01,				// ファイルの名前
 		&D3DTexture);		// 読み込むメモリのポインタ
 
 //*************************************************************************
 // タイトルの初期化
 	use = true;
-	pos = _pos;
-	size = _size;
+	pos = RESULT_POS01;
+	size = RESULT_SIZE01;
 
 	PatternAnim = 1;
 
@@ -60,20 +72,20 @@ void  RESULT::Update()
 //=============================================================================
 void RESULT::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	//LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
+	//// 頂点フォーマットの設定
+	//pDevice->SetFVF(FVF_VERTEX_2D);
 
-	if (use == true)
-	{
-		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
-		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
-		pDevice->SetTexture(0, D3DTexture);
+	//if (use == true)
+	//{
+	//	// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
+	//	// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+	//	pDevice->SetTexture(0, D3DTexture);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
-	}
+	//	// ポリゴンの描画
+	//	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+	//}
 
 }
 

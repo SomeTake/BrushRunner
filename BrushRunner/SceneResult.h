@@ -8,6 +8,11 @@
 #define _SCENERESULT_H_
 
 #include "Scene.h"
+#include "_2dobj.h"
+#include "Timer.h"
+#include "D3DXAnimation.h"
+#include "Object3D.h"
+#include "ParticleManager.h"
 
 //*****************************************************************************
 // クラス定義
@@ -16,7 +21,10 @@ class SceneResult :
 	public Scene
 {
 private:
-	int *ResultRank;	// ゲームシーンの順位を取得するポインタ
+	std::vector<_2dobj*>		Obj2d;		// 2Dオブジェクト用のポインタ
+	std::vector<D3DXANIMATION*> anim;		// 3Dモデル用のポインタ（Xファイル）
+	std::vector < Object3D*>	Obj3d;		// 3Dポリゴン用のポインタ
+	ParticleManager*			particleManager;	// パーティクルマネージャ
 
 	void Debug();
 

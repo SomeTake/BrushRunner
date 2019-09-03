@@ -34,13 +34,13 @@ bool IsOption;									// 選択肢フラグ
 //=============================================================================
 SceneTitle::SceneTitle()
 {
-	p2dObj[TitleRunner] = new TITLE(TITLE_POS01 - TITLE_SIZE01/2,TITLE_SIZE01,TEXTURE_TITLE01);
-	p2dObj[TitleLogo] = new TITLE(TITLE_POS02 - TITLE_SIZE02/2, TITLE_SIZE02, TEXTURE_TITLE02);
-	p2dObj[TitleMenu] = new TITLE(TITLE_POS03 - TITLE_SIZE03/2, TITLE_SIZE03, TEXTURE_TITLE03);
-	p2dObj[TitleArrows] = new TITLE(TITLE_POS04 - TITLE_SIZE04/2, TITLE_SIZE04, TEXTURE_TITLE04);
 	
 	IsOption = false;							// 選択肢フラグ
-}	
+	p2dObj[TitleLogo] = new TITLE(TitleLogo);
+	p2dObj[TitleRunner] = new TITLE(TitleRunner);
+	p2dObj[TitleMenu] = new TITLE(TitleMenu);
+
+}
 
 //=============================================================================
 // デストラクタ

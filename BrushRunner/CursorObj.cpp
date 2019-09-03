@@ -9,37 +9,28 @@
 #include "Player.h"
 #include "Input.h"
 #include "MyLibrary.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define CURSOROBJ_SIZE		D3DXVECTOR3(114.0f, 114.0f, 0.0f)	// テクスチャサイズ
 #define CURSOROBJ_POS		D3DXVECTOR3(350.0f, 100.0f, 0.0f)
-#define CURSOROBJ_SLIDE_SIZE D3DXVECTOR3(150.0f, 150.0f, 0.0f)
-
-LPDIRECT3DTEXTURE9	CursorObj::D3DTexture = NULL;				// テクスチャのポインタ
+#define CURSOROBJ_SPACE		D3DXVECTOR3(150.0f, 150.0f, 0.0f)	// 表示間隔
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 CursorObj::CursorObj(int playerNo, int cursorNo)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_CURSOROBJ,					// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
+	ResourceManager::Instance()->GetTexture("SelectCursor", &D3DTexture);
 
 	this->playerNo = playerNo;
 	this->cursorNo = cursorNo;
 	this->selectNo = cursorNo;
 	use = true;
-	pos.x = cursorNo * CURSOROBJ_SLIDE_SIZE.x + CURSOROBJ_POS.x;
-	pos.y = playerNo * CURSOROBJ_SLIDE_SIZE.y + CURSOROBJ_POS.y;
+	pos.x = cursorNo * CURSOROBJ_SPACE.x + CURSOROBJ_POS.x;
+	pos.y = playerNo * CURSOROBJ_SPACE.y + CURSOROBJ_POS.y;
 	pos.z = 0.0f;
 	
 	// 頂点情報の作成
@@ -52,11 +43,8 @@ CursorObj::CursorObj(int playerNo, int cursorNo)
 //=============================================================================
 CursorObj::~CursorObj()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// リソースの開放はリソースマネージャに任せるので、参照をやめるだけ
+	D3DTexture = NULL;
 }
 
 //=============================================================================
