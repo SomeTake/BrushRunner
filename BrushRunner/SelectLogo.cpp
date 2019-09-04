@@ -94,10 +94,7 @@ HRESULT SelectLogo::MakeVertex(void)
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture(PatternAnim);
 
 	return S_OK;
 }

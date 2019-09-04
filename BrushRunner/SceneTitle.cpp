@@ -12,6 +12,7 @@
 #include "SceneManager.h"
 #include "SceneTutorial.h"
 #include "Player.h"
+#include "CircleSceneChanger.h"
 
 //=============================================================================
 // グローバル変数
@@ -28,6 +29,8 @@ SceneTitle::SceneTitle()
 	p2dObj[TitleRunner] = new TITLE(TitleRunner);
 	p2dObj[TitleMenu] = new TITLE(TitleMenu);
 
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -65,7 +68,10 @@ void SceneTitle::Update(int SceneID)
 		{
 			if (IsOption == true)
 			{
-				SetScene(new SceneTutorial(), nSceneTutorial);
+				CircleSceneChanger::Instance()->SetChanger(true, []()
+				{
+					SetScene(new SceneTutorial(), nSceneTutorial);
+				});
 				return;
 			}
 			else

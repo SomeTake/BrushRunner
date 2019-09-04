@@ -17,6 +17,7 @@
 #include "SceneStageSelect.h"
 #include "SceneTutorial.h"
 #include "ResourceManager.h"
+#include "CircleSceneChanger.h"
 
 //*****************************************************************************
 // グローバル変数
@@ -83,9 +84,14 @@ SceneManager::~SceneManager()
 //=============================================================================
 void SceneManager::Update()
 {
-	UpdateInput();
+	if (!CircleSceneChanger::Instance()->GetUseMask())
+	{
+		UpdateInput();
+	}
 
 	scene->Update(eScene);
+
+	CircleSceneChanger::Instance()->Update();
 }
 
 //=============================================================================
@@ -95,7 +101,14 @@ void SceneManager::Draw()
 {
 	SetCamera();
 
+	// ステンシルマスクの描画
+	CircleSceneChanger::Instance()->DrawMask();
+
 	scene->Draw();
+
+	// シーンチェンジャーの描画
+	CircleSceneChanger::Instance()->DrawChanger();
+
 }
 
 //=============================================================================
@@ -105,6 +118,12 @@ void SceneManager::LoadResource()
 {
 	// リソース作成
 	// 引数1:識別のためのタグ名(呼び出し先と合わせる) 引数2:ファイルのパス
+	// SceneChanger
+	ResourceManager::Instance()->LoadTexture("Mask", "data/TEXTURE/Circle.png");
+	ResourceManager::Instance()->LoadTexture("Changer", "data/TEXTURE/Load.png");
+	CircleSceneChanger::Instance()->LoadMaskTexture();
+	CircleSceneChanger::Instance()->LoadChangeTexture();
+
 	// SceneTitle
 	ResourceManager::Instance()->LoadTexture("TitleLogo", "data/TEXTURE/Logo.png");
 	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");

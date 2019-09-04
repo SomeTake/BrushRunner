@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "SceneCharacterSelect.h"
 #include "Input.h"
+#include "CircleSceneChanger.h"
 
 #include "StageSelectBG.h"
 #include "StageName.h"
@@ -25,6 +26,9 @@ SceneStageSelect::SceneStageSelect()
 	obj.push_back(new StageSelectCursor());
 	// ステージ名
 	obj.push_back(new StageName());
+
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -52,7 +56,10 @@ void SceneStageSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
-			SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+			CircleSceneChanger::Instance()->SetChanger(true, []() 
+			{
+				SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+			});
 			return;
 		}
 	}

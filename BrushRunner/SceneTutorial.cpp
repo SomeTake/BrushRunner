@@ -9,12 +9,16 @@
 #include "SceneManager.h"
 #include "SceneStageSelect.h"
 #include "Input.h"
+#include "CircleSceneChanger.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneTutorial::SceneTutorial()
 {
+
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -34,7 +38,10 @@ void SceneTutorial::Update(int SceneID)
 	{
 		if (IsButtonTriggered(padNo, BUTTON_C) || GetKeyboardTrigger(DIK_RETURN))
 		{
-			SetScene(new SceneStageSelect(), nSceneStageSelect);
+			CircleSceneChanger::Instance()->SetChanger(true, []() 
+			{
+				SetScene(new SceneStageSelect(), nSceneStageSelect);
+			});
 			break;
 		}
 

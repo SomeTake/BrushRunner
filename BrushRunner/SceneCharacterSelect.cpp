@@ -7,11 +7,13 @@
 #include "Main.h"
 #include "SceneCharacterSelect.h"
 #include "Input.h"
+#include "SceneManager.h"
+#include "SceneGame.h"
+#include "CircleSceneChanger.h"
+
 //2d obje
 #include "_2dobj.h"
 #include "SelectLogo.h"
-#include "SceneManager.h"
-#include "SceneGame.h"
 
 static int SelectCharacter[PLAYER_MAX];
 
@@ -31,6 +33,9 @@ SceneCharacterSelect::SceneCharacterSelect()
 			pCursor[playerNo][cursorNo] = new CursorObj(playerNo, cursorNo);
 		}
 	}
+
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -65,7 +70,10 @@ void SceneCharacterSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
-			SetScene(new SceneGame(), nSceneGame);
+			CircleSceneChanger::Instance()->SetChanger(true, []()
+			{
+				SetScene(new SceneGame(), nSceneGame);
+			});
 			return;
 		}
 	}

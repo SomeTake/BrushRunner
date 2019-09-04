@@ -13,6 +13,7 @@
 #include "Input.h"
 #include "DebugWindow.h"
 #include "SceneResult.h"
+#include "CircleSceneChanger.h"
 
 // 2d obj
 #include "Frame01.h"
@@ -79,6 +80,9 @@ SceneGame::SceneGame()
 
 	// タイマー
 	pTimer = new Timer();
+
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -305,8 +309,11 @@ void SceneGame::CheckResult()
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
-				SetScene(new SceneResult(), nSceneResult);
-				InitCamera();
+				CircleSceneChanger::Instance()->SetChanger(true, []() 
+				{
+					SetScene(new SceneResult(), nSceneResult);
+					InitCamera();
+				});
 				return;
 			}
 		}

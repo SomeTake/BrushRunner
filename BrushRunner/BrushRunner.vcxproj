@@ -26,6 +26,7 @@
     <ClInclude Include="Billboard.h" />
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CircleSceneChanger.h" />
     <ClInclude Include="CursorObj.h" />
     <ClInclude Include="Finish.h" />
     <ClInclude Include="GoalFlag.h" />
@@ -42,6 +43,7 @@
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneChanger.h" />
     <ClInclude Include="SceneExit.h" />
     <ClInclude Include="SceneStageSelect.h" />
     <ClInclude Include="SceneTutorial.h" />
@@ -124,6 +126,7 @@
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CircleSceneChanger.cpp" />
     <ClCompile Include="CursorObj.cpp" />
     <ClCompile Include="Finish.cpp" />
     <ClCompile Include="GoalFlag.cpp" />
@@ -138,6 +141,7 @@
     <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="ResultTimer.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneChanger.cpp" />
     <ClCompile Include="SceneExit.cpp" />
     <ClCompile Include="SceneStageSelect.cpp" />
     <ClCompile Include="SceneTutorial.cpp" />
