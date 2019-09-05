@@ -1,29 +1,31 @@
 //=============================================================================
 //
-// チュートリアルシーン [SceneTutorial.h]
+// チュートリアル画面のロゴ [TitleLogo.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _SCENETUTORIAL_H_
-#define _SCENETUTORIAL_H_
+#ifndef _TUTORIALLOGO_H_
+#define _TUTORIALLOGO_H_
 
-#include "Scene.h"
 #include "_2dobj.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class SceneTutorial :
-	public Scene
+class TutorialLogo :
+	public _2dobj
 {
 private:
-	std::vector<_2dobj*> obj;
+	int cntFlash;
+	bool flash;		// 点滅させるフラグ(true = 表示)
+
+	void MakeVertex();
 
 public:
-	SceneTutorial();
-	~SceneTutorial();
+	TutorialLogo();
+	~TutorialLogo();
 
-	void Update(int SceneID);
-	void Draw();
+	void Update()override;
+	void Draw()override;
 };
 
 #endif
