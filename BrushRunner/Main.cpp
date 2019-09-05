@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "SceneManager.h"
 #include "DebugWindow.h"
+#include "Icon.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -62,12 +63,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		0,											// 予備メモリ
 		0,											// ウインドウオブジェクト作成時に確保されるメモリサイズ
 		hInstance,									// インスタンスハンドル
-		NULL,										// アプリのショートカットなどで使用（アイコンの設定）
+		LoadIcon(hInstance, (LPCTSTR)IDI_ICON1),	// アプリのショートカットなどで使用（アイコンの設定）
 		LoadCursor(NULL, IDC_ARROW),				// ウインドウのクライアント上のマウスカーソル
 		(HBRUSH)(COLOR_WINDOW + 1),					// ウインドウのクライアント領域の背景色
 		NULL,										// メニュー名
 		CLASS_NAME,									// ウインドウクラスの名前
-		NULL										// ウインドウのアイコン
+		LoadIcon(hInstance, (LPCTSTR)IDI_ICON1)		// ウインドウのアイコン
 	};
 	MSG msg;										// ウインドウプロシージャに渡すメッセージ
 
