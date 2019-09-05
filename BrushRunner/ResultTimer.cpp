@@ -6,6 +6,11 @@
 //=============================================================================
 #include "Main.h"
 #include "ResultTimer.h"
+#include "ResourceManager.h"
+
+// 後で要調整
+#define RESULTTIMER_POS		D3DXVECTOR3(SCREEN_CENTER_X - 2.0f, 132.0f, 0.0f)
+#define RESULTTIMER_SIZE	D3DXVECTOR3(256.0f, 60.0f, 0.0f)
 
 LPD3DXFONT ResultTimer::Font[2] = { nullptr, nullptr };
 
@@ -44,12 +49,21 @@ ResultTimer::ResultTimer(DWORD _time, int _rank)
 		time[i] = new ResultDigit(digit[i], i, _rank);
 	}
 
+<<<<<<< HEAD
 	// 情報表示用フォントの設定
 	D3DXCreateFont(Device, 108, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[0]);
 
 	D3DXCreateFont(Device, 72, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[1]);
+=======
+	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
+	pos = RESULTTIMER_POS;
+	size = RESULTTIMER_SIZE;
+	use = true;
+
+	MakeVertex();
+>>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -62,8 +76,12 @@ ResultTimer::~ResultTimer()
 		SAFE_DELETE(time[i]);
 	}
 
+<<<<<<< HEAD
 	SAFE_RELEASE(Font[0]);
 	SAFE_RELEASE(Font[1]);
+=======
+	D3DTexture = NULL;
+>>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -83,6 +101,7 @@ void ResultTimer::Update()
 //=============================================================================
 void ResultTimer::Draw()
 {
+<<<<<<< HEAD
 	if (Rank == 0)
 	{
 		// 分と秒間の':'
@@ -114,6 +133,21 @@ void ResultTimer::Draw()
 
 		Font[1]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
 		Font[1]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+=======
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	if (use == true)
+	{
+		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		pDevice->SetTexture(0, D3DTexture);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+>>>>>>> parent of 946c023... ResourceManager Revert
 	}
 
 	// ひとけたずつ描画
@@ -122,3 +156,4 @@ void ResultTimer::Draw()
 		time[i]->Draw();
 	}
 }
+

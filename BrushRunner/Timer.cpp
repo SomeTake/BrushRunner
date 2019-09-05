@@ -7,6 +7,10 @@
 #include "Main.h"
 #include "Timer.h"
 #include "DebugWindow.h"
+#include "ResourceManager.h"
+
+#define TIMER_POS	D3DXVECTOR3(SCREEN_CENTER_X - 2.0f, 132.0f, 0.0f)
+#define TIMER_SIZE	D3DXVECTOR3(256.0f, 60.0f, 0.0f)
 
 //=============================================================================
 // コンストラクタ
@@ -30,9 +34,18 @@ Timer::Timer()
 		time[i] = new Digit(i);
 	}
 
+<<<<<<< HEAD
 	// 情報表示用フォントの設定
 	D3DXCreateFont(Device, 54, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font);
+=======
+	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
+	pos = TIMER_POS;
+	size = TIMER_SIZE;
+	use = true;
+
+	MakeVertex();
+>>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -45,7 +58,11 @@ Timer::~Timer()
 		SAFE_DELETE(time[i]);
 	}
 
+<<<<<<< HEAD
 	SAFE_RELEASE(Font);
+=======
+	D3DTexture = NULL;
+>>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -85,10 +102,27 @@ void Timer::Update()
 //=============================================================================
 void Timer::Draw()
 {
+<<<<<<< HEAD
 	RECT rect = { 660, 105, 725, 155 };
 	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
 	rect = { 560, 105, 625, 155 };
 	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+=======
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+
+	if (use == true)
+	{
+		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		pDevice->SetTexture(0, D3DTexture);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+	}
+>>>>>>> parent of 946c023... ResourceManager Revert
 
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)
@@ -120,6 +154,37 @@ void Timer::Stop()
 DWORD Timer::Check()
 {
 	return elapsedTime;
+}
+
+//=============================================================================
+// 頂点情報の作成
+//=============================================================================
+void Timer::MakeVertex()
+{
+	// 頂点座標の設定
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
+
+	// rhwの設定
+	vertexWk[0].rhw =
+		vertexWk[1].rhw =
+		vertexWk[2].rhw =
+		vertexWk[3].rhw = 1.0f;
+
+	// 反射光の設定
+	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+
+	// テクスチャ座標の設定
+	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
 }
 
 //=============================================================================

@@ -7,6 +7,7 @@
 #include "main.h"
 #include "Quadtree.h"
 #include "Input.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -15,7 +16,7 @@
 #define MAX_LEVEL (9)
 #define MAX_OBJECTS (20)
 
-bool RemoveCondition(Paint *Object) { return Object->GetUse() == false; }
+bool RemoveCondition(Paint *Object) { return !Object->GetUse(); }
 
 //=====================================================================================================
 // コンストラクタ
@@ -48,6 +49,9 @@ QUADTREE::~QUADTREE()
 	this->Clear();
 }
 
+//=====================================================================================================
+// 更新処理
+//=====================================================================================================
 void QUADTREE::Update()
 {
 	if (this->RightUpNode)
@@ -75,19 +79,6 @@ void QUADTREE::Update()
 	if (GetKeyboardTrigger(DIK_L))
 	{
 		this->Objects.clear();
-	}
-
-	if (!this->Objects.empty())
-	{
-		//PrintDebugProc("Quadtree Level：%d\n", this->Level);
-		for (auto &Paint : this->Objects)
-		{
-			//PrintDebugProc("Object Pos x：%f, y：%f Color：%d ID：%d\n",
-			//	Paint->GetScreenPos().x,
-			//	Paint->GetScreenPos().y,
-			//	Paint->GetPaintColor(),
-			//	Paint->GetNodeID());
-		}
 	}
 #endif
 }
