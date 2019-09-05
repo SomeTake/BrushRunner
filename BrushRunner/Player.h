@@ -7,7 +7,7 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-#include "VirtualModel.h"
+#include "D3DXAnimation.h"
 #include "CharacterAI.h"
 #include "PlayerUI.h"
 #include "PlayerState.h"
@@ -61,7 +61,7 @@ enum CharaStateNum
 // クラス定義
 //*****************************************************************************
 class Player :
-	public VirtualModel
+	public D3DXANIMATION
 {
 private:
 	// メンバ変数
@@ -78,7 +78,7 @@ private:
 	void Debug();			// デバッグ
 
 	int					ctrlNum;			// 操作するコントローラ番号
-	//float				animSpd;			// アニメーションの再生スピード
+	float				animSpd;			// アニメーションの再生スピード
 	bool				playable;			// 操作可能
 	bool				onCamera;			// 画面内にいるとき
 
