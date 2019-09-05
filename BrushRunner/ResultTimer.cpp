@@ -49,21 +49,18 @@ ResultTimer::ResultTimer(DWORD _time, int _rank)
 		time[i] = new ResultDigit(digit[i], i, _rank);
 	}
 
-<<<<<<< HEAD
 	// 情報表示用フォントの設定
 	D3DXCreateFont(Device, 108, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[0]);
 
 	D3DXCreateFont(Device, 72, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[1]);
-=======
 	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
 	pos = RESULTTIMER_POS;
 	size = RESULTTIMER_SIZE;
 	use = true;
 
 	MakeVertex();
->>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -76,12 +73,9 @@ ResultTimer::~ResultTimer()
 		SAFE_DELETE(time[i]);
 	}
 
-<<<<<<< HEAD
 	SAFE_RELEASE(Font[0]);
 	SAFE_RELEASE(Font[1]);
-=======
 	D3DTexture = NULL;
->>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -101,7 +95,6 @@ void ResultTimer::Update()
 //=============================================================================
 void ResultTimer::Draw()
 {
-<<<<<<< HEAD
 	if (Rank == 0)
 	{
 		// 分と秒間の':'
@@ -133,7 +126,8 @@ void ResultTimer::Draw()
 
 		Font[1]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
 		Font[1]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-=======
+	}
+	
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
@@ -147,7 +141,6 @@ void ResultTimer::Draw()
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
->>>>>>> parent of 946c023... ResourceManager Revert
 	}
 
 	// ひとけたずつ描画

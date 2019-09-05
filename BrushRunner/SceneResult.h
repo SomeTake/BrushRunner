@@ -10,9 +10,9 @@
 #include "Scene.h"
 #include "_2dobj.h"
 #include "Timer.h"
-#include "VirtualModel.h"
 #include "Object3D.h"
 #include "ParticleManager.h"
+#include "D3DXAnimation.h"
 
 //*****************************************************************************
 // クラス定義
@@ -22,7 +22,7 @@ class SceneResult :
 {
 private:
 	std::vector<_2dobj*>		Obj2d;		// 2Dオブジェクト用のポインタ
-	std::vector<VirtualModel*>	anim;		// 3Dモデル用のポインタ（Xファイル）
+	std::vector<D3DXANIMATION*>	anim;		// 3Dモデル用のポインタ（Xファイル）
 	std::vector < Object3D*>	Obj3d;		// 3Dポリゴン用のポインタ
 	ParticleManager*			particleManager;	// パーティクルマネージャ
 

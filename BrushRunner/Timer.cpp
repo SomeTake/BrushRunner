@@ -34,18 +34,16 @@ Timer::Timer()
 		time[i] = new Digit(i);
 	}
 
-<<<<<<< HEAD
 	// 情報表示用フォントの設定
 	D3DXCreateFont(Device, 54, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
 		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font);
-=======
+
 	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
 	pos = TIMER_POS;
 	size = TIMER_SIZE;
 	use = true;
 
 	MakeVertex();
->>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -58,11 +56,8 @@ Timer::~Timer()
 		SAFE_DELETE(time[i]);
 	}
 
-<<<<<<< HEAD
 	SAFE_RELEASE(Font);
-=======
 	D3DTexture = NULL;
->>>>>>> parent of 946c023... ResourceManager Revert
 }
 
 //=============================================================================
@@ -102,12 +97,10 @@ void Timer::Update()
 //=============================================================================
 void Timer::Draw()
 {
-<<<<<<< HEAD
 	RECT rect = { 660, 105, 725, 155 };
 	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
 	rect = { 560, 105, 625, 155 };
 	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-=======
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
@@ -122,7 +115,6 @@ void Timer::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
->>>>>>> parent of 946c023... ResourceManager Revert
 
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)

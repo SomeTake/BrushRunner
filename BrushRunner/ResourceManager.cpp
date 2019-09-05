@@ -6,58 +6,57 @@
 //=============================================================================
 #include "Main.h"
 #include "ResourceManager.h"
-#include "Model3D.h"
 
 //*****************************************************************************
 // 名前空間の確保
 //*****************************************************************************
 using namespace std;
 
-//=============================================================================
-// メッシュの読み込み
-//=============================================================================
-void ResourceManager::LoadMesh(const char* tag, const char* path)
-{
-	string tagStr = string(tag);
-
-	// タグの重複確認
-	if (modelPool.count(tagStr) != NULL)
-		SAFE_DELETE(modelPool[tagStr]);
-
-	// メッシュコンテナを生成してロード
-	modelPool[tagStr] = new Model3D(tag, path);
-}
-
-//=============================================================================
-// メッシュの開放
-//=============================================================================
-void ResourceManager::ReleaseMesh(const char* tag)
-{
-	string tagStr = string(tag);
-
-	// タグの登録確認
-	if (modelPool.count(tagStr) == NULL)
-		return;
-
-	// メッシュコンテナを削除
-	SAFE_DELETE(modelPool[tagStr]);
-}
-
-//=============================================================================
-// メッシュの取得
-//=============================================================================
-bool ResourceManager::GetMesh(const char* tag, Model3D** pOut)
-{
-	string tagStr = string(tag);
-
-	// 登録確認
-	if (modelPool.count(tagStr) == NULL)
-		return false;
-
-	// メッシュへの参照を格納
-	*pOut = modelPool[tagStr];
-	return true;
-}
+////=============================================================================
+//// メッシュの読み込み
+////=============================================================================
+//void ResourceManager::LoadMesh(const char* tag, const char* path)
+//{
+//	string tagStr = string(tag);
+//
+//	// タグの重複確認
+//	if (modelPool.count(tagStr) != NULL)
+//		SAFE_DELETE(modelPool[tagStr]);
+//
+//	// メッシュコンテナを生成してロード
+//	modelPool[tagStr] = new Model3D(tag, path);
+//}
+//
+////=============================================================================
+//// メッシュの開放
+////=============================================================================
+//void ResourceManager::ReleaseMesh(const char* tag)
+//{
+//	string tagStr = string(tag);
+//
+//	// タグの登録確認
+//	if (modelPool.count(tagStr) == NULL)
+//		return;
+//
+//	// メッシュコンテナを削除
+//	SAFE_DELETE(modelPool[tagStr]);
+//}
+//
+////=============================================================================
+//// メッシュの取得
+////=============================================================================
+//bool ResourceManager::GetMesh(const char* tag, Model3D** pOut)
+//{
+//	string tagStr = string(tag);
+//
+//	// 登録確認
+//	if (modelPool.count(tagStr) == NULL)
+//		return false;
+//
+//	// メッシュへの参照を格納
+//	*pOut = modelPool[tagStr];
+//	return true;
+//}
 
 //=============================================================================
 // テクスチャの読み込み

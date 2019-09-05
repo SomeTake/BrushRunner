@@ -37,7 +37,7 @@ void StopState::Update(int AnimCurtID)
 	if (cnt == ACTIVE_TIME)
 	{
 		cnt = 0;
-		owner_->GetModel()->ChangeAnim(Running);
+		owner_->ChangeAnim(Running);
 		owner_->SetPlayable(true);
 		owner_->ChangeState(new RunningState(owner_));
 		return;

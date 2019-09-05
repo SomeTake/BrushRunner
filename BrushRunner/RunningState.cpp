@@ -33,9 +33,9 @@ void RunningState::Update(int AnimCurtID)
 {	
 	// 状態変化
 	// ゴールに到達したのでガッツポーズ
-	if (owner_->GetModel()->pos.x >= GOAL_POS.x)
+	if (owner_->GetPos().x >= GOAL_POS.x)
 	{
-		owner_->GetModel()->ChangeAnim(Victory);
+		owner_->ChangeAnim(Victory);
 		owner_->ChangeState(new VictoryState(owner_));
 		return;
 	}
@@ -46,7 +46,7 @@ void RunningState::Update(int AnimCurtID)
 	{
 		float value = owner_->GetJumpValue();
 		owner_->SetJumpSpeed(JUMP_SPEED * value);
-		owner_->GetModel()->ChangeAnim(Jump);
+		owner_->ChangeAnim(Jump);
 		owner_->ChangeState(new JumpState(owner_));
 
 		// PlaySound(ジャンプ音)
@@ -56,7 +56,7 @@ void RunningState::Update(int AnimCurtID)
 	// 前方オブジェクトにヒットしているので待機状態へ
 	if (owner_->GetHitHorizon())
 	{
-		owner_->GetModel()->ChangeAnim(Idle);
+		owner_->ChangeAnim(Idle);
 		owner_->ChangeState(new IdleState(owner_));
 		return;
 	}
