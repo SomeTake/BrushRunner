@@ -8,11 +8,10 @@
 #include "ResultTimer.h"
 #include "ResourceManager.h"
 
-// 後で要調整
-#define RESULTTIMER_POS		D3DXVECTOR3(SCREEN_CENTER_X - 2.0f, 132.0f, 0.0f)
-#define RESULTTIMER_SIZE	D3DXVECTOR3(256.0f, 60.0f, 0.0f)
+#define FONT_SIZE		(72)
+#define FONT_INTERVAL	(80)
 
-LPD3DXFONT ResultTimer::Font[2] = { nullptr, nullptr };
+LPD3DXFONT ResultTimer::Font = { nullptr };
 
 //=============================================================================
 // コンストラクタ
@@ -50,17 +49,9 @@ ResultTimer::ResultTimer(DWORD _time, int _rank)
 	}
 
 	// 情報表示用フォントの設定
-	D3DXCreateFont(Device, 108, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[0]);
+	D3DXCreateFont(Device, FONT_SIZE, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font);
 
-	D3DXCreateFont(Device, 72, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
-		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[1]);
-	ResourceManager::Instance()->GetTexture("Timer", &D3DTexture);
-	pos = RESULTTIMER_POS;
-	size = RESULTTIMER_SIZE;
-	use = true;
-
-	MakeVertex();
 }
 
 //=============================================================================
@@ -73,9 +64,7 @@ ResultTimer::~ResultTimer()
 		SAFE_DELETE(time[i]);
 	}
 
-	SAFE_RELEASE(Font[0]);
-	SAFE_RELEASE(Font[1]);
-	D3DTexture = NULL;
+	SAFE_RELEASE(Font);
 }
 
 //=============================================================================
@@ -95,54 +84,13 @@ void ResultTimer::Update()
 //=============================================================================
 void ResultTimer::Draw()
 {
-	if (Rank == 0)
-	{
-		// 分と秒間の':'
-		RECT Min_Sec = { 620, 55, 715, 205 };
-		// 秒とミリ秒間の':'
-		RECT Sec_ms = { 790, 55, 885, 205 };
-		Font[0]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-		Font[0]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-	}
-	else
-	{
-		RECT Min_Sec;
-		RECT Sec_ms;
-		if (Rank == 1)
-		{
-			Min_Sec = { 585, 395, 650, 485 };
-			Sec_ms = { 695, 395, 760, 485 };
-		}
-		else if (Rank == 2)
-		{
-			Min_Sec = { 585, 490, 650, 580 };
-			Sec_ms = { 695, 490, 760, 580 };
-		}
-		else if (Rank == 3)
-		{
-			Min_Sec = { 585, 585, 650, 675 };
-			Sec_ms = { 695, 585, 760, 675 };
-		}
-
-		Font[1]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-		Font[1]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
-	}
+	// 分と秒間の':'
+	RECT Min_Sec = { 238, 95 + this->Rank * FONT_INTERVAL, 333, 245 + this->Rank * FONT_INTERVAL };
+	// 秒とミリ秒間の':'
+	RECT Sec_ms = { 338, 95 + this->Rank * FONT_INTERVAL, 433, 245 + this->Rank * FONT_INTERVAL };
+	Font->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+	Font->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
 	
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	if (use == true)
-	{
-		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
-		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
-		pDevice->SetTexture(0, D3DTexture);
-
-		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
-	}
-
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{

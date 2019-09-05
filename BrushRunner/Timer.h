@@ -38,8 +38,6 @@ public:
 	void Stop();			// タイマーストップ
 	DWORD Check();			// 経過時間の確認
 
-	void MakeVertex();
-
 };
 
 #endif
