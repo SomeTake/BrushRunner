@@ -96,6 +96,7 @@ SceneGame::SceneGame()
 	// タイマー
 	pTimer = new Timer();
 
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }

@@ -10,13 +10,23 @@
 #include "SceneStageSelect.h"
 #include "Input.h"
 #include "CircleSceneChanger.h"
+#include "TutorialLogo.h"
+#include "Arrow.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneTutorial::SceneTutorial()
 {
+	// ロゴ
+	obj.push_back(new TutorialLogo());
 
+	// 左右選択矢印
+	obj.push_back(new Arrow(true));
+	obj.push_back(new Arrow(false));
+
+
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
@@ -26,6 +36,12 @@ SceneTutorial::SceneTutorial()
 //=============================================================================
 SceneTutorial::~SceneTutorial()
 {
+	for (auto &Object : obj)
+	{
+		SAFE_DELETE(Object);
+	}
+	obj.clear();
+	ReleaseVector(obj);
 }
 
 //=============================================================================
@@ -44,7 +60,12 @@ void SceneTutorial::Update(int SceneID)
 			});
 			break;
 		}
+	}
 
+	// 2Dオブジェクトの更新
+	for (auto Object : obj)
+	{
+		Object->Update();
 	}
 }
 
@@ -53,5 +74,9 @@ void SceneTutorial::Update(int SceneID)
 //=============================================================================
 void SceneTutorial::Draw()
 {
-
+	// 2Dオブジェクトの描画
+	for (auto Object : obj)
+	{
+		Object->Draw();
+	}
 }

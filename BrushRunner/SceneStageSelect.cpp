@@ -27,6 +27,7 @@ SceneStageSelect::SceneStageSelect()
 	// ステージ名
 	obj.push_back(new StageName());
 
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }

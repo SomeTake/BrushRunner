@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="AllocateHierarchy.h" />
     <ClInclude Include="AnimationSet.h" />
+    <ClInclude Include="Arrow.h" />
     <ClInclude Include="BanananoKawaState.h" />
     <ClInclude Include="BaseSingleton.h" />
     <ClInclude Include="Billboard.h" />
@@ -30,6 +31,7 @@
     <ClInclude Include="CursorObj.h" />
     <ClInclude Include="Finish.h" />
     <ClInclude Include="GoalFlag.h" />
+    <ClInclude Include="Icon.h" />
     <ClInclude Include="MeshField.h" />
     <ClInclude Include="MyColor.h" />
     <ClInclude Include="Object3D.h" />
@@ -117,12 +119,14 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Trophy.h" />
+    <ClInclude Include="TutorialLogo.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AllocateHierarchy.cpp" />
     <ClCompile Include="AnimationSet.cpp" />
+    <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="BanananoKawaState.cpp" />
     <ClCompile Include="Billboard.cpp" />
     <ClCompile Include="BlindState.cpp" />
@@ -212,11 +216,13 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Trophy.cpp" />
+    <ClCompile Include="TutorialLogo.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BrushRunner.rc" />
+    <ResourceCompile Include="Icon.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -29,6 +29,7 @@ SceneTitle::SceneTitle()
 	p2dObj[TitleRunner] = new TITLE(TitleRunner);
 	p2dObj[TitleMenu] = new TITLE(TitleMenu);
 
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }

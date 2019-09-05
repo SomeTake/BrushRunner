@@ -129,6 +129,11 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");
 	ResourceManager::Instance()->LoadTexture("TitleMenu", "data/TEXTURE/TitleLogo.png");
 
+	// SceneTutorial
+	ResourceManager::Instance()->LoadTexture("TutorialLogo", "data/TEXTURE/TutorialLogo.png");
+	ResourceManager::Instance()->LoadTexture("TutorialBG", "data/TEXTURE/Tutorial.png");
+	ResourceManager::Instance()->LoadTexture("Arrow", "data/TEXTURE/Arrow.png");
+
 	// SceneStageSelect
 	ResourceManager::Instance()->LoadTexture("StageSelectBG", "data/TEXTURE/StageSelectBG.png");
 	ResourceManager::Instance()->LoadTexture("StageName", "data/TEXTURE/StageName.png");

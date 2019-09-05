@@ -53,6 +53,7 @@ SceneResult::SceneResult()
 	// パーティクルマネージャのインスタンス作成
 	particleManager = new ParticleManager();
 
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
