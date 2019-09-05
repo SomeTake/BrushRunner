@@ -40,7 +40,7 @@ void RunningState::Update(int AnimCurtID)
 		return;
 	}
 	// 上キーを押してジャンプ
-	if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B))
+	if (GetKeyboardTrigger(DIK_U) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B))
 	{
 		float value = owner_->GetJumpValue();
 		owner_->SetJumpSpeed(JUMP_SPEED * value);
