@@ -18,7 +18,7 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int eScene = nSceneGame;				// ゲームの開始位置&シーン遷移
+static int eScene = nSceneTitle;	// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
@@ -128,7 +128,6 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("MiniPlayer", "data/TEXTURE/MiniPlayer.png");
 	ResourceManager::Instance()->LoadTexture("Pop", "data/TEXTURE/pointer.png");
 	ResourceManager::Instance()->LoadMesh("Player", "data/MODEL/Kouhai/Kouhai.x");
-	ResourceManager::Instance()->LoadTexture("Timer", "data/TEXTURE/Colon.png");
 
 	// SceneResult
 	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");

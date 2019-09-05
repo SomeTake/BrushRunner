@@ -34,6 +34,7 @@ void BanananoKawaState::Update()
 		owner_->GetPlayer()->GetFieldItemManager()->Set(NumKawa, setpos, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 		// アイテムを使用
 		owner_->Reset();
+
 		// PlaySound(アイテム使用)
 	}
 }

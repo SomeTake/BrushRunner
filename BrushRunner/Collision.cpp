@@ -45,34 +45,49 @@ bool HitSphere(D3DXVECTOR3 Pos1, D3DXVECTOR3 Pos2, float Radius1, float Radius2)
 
 //=============================================================================
 // ペイントシステム同士の当たり判定
+// pSysBlack : 黒インク用ペイントシステムのポインタ
 //=============================================================================
-void HitCheckSToS(std::vector<Paint*> *CollisionList, int PlayerNo)
+void HitCheckSToS(QUADTREE *Quadtree, int NodeID)
 {
-	for (auto &BlackPaint : (*CollisionList))
-	{
-		// 使用している、色が黒、所有者が現在のプレイヤー
-		if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor ||
-			BlackPaint->GetOwner() != PlayerNo)
-		{
-			continue;
-		}
+	std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt(NodeID);
 
-		for (auto &ColorPaint : (*CollisionList))
+	// 現在のノードはオブジェクトがない
+	if (CollisionList.empty())
+	{
+		return;
+	}
+
+	// プレイヤー
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		std::vector<Paint*> BlackList;
+		std::vector<Paint*> ColorList;
+
+		for (auto &BlackPaint : CollisionList)
 		{
-			// 使用している、色がカラー、所有者が現在のプレイヤーじゃない
-			if (!ColorPaint->GetUse() || ColorPaint->GetPaintColor() == BlackInkColor ||
-				ColorPaint->GetOwner() == PlayerNo)
+			// 使用している、カラーが黒、所有者が現在のプレイヤーを探す
+			if (!BlackPaint->GetUse() || BlackPaint->GetPaintColor() != BlackInkColor ||
+				BlackPaint->GetOwner() != PlayerNo)
 			{
 				continue;
 			}
 
-			// 二つのペイントを判定する
-			if (HitSphere(BlackPaint->GetPos(), ColorPaint->GetPos(), Paint::GetPaintRadius(), Paint::GetPaintRadius()))
+			for (auto &ColorPaint : CollisionList)
 			{
-				// ヒットした場合そのペイントを消す
-				BlackPaint->SetUse(false);
-				ColorPaint->SetUse(false);
-				break;
+				if (!ColorPaint->GetUse() || ColorPaint->GetPaintColor() == BlackInkColor ||
+					ColorPaint->GetOwner() == PlayerNo)
+				{
+					continue;
+				}
+
+				// 二つのペイントを判定する
+				if (HitSphere(BlackPaint->GetPos(), ColorPaint->GetPos(), Paint::GetPaintRadius(), Paint::GetPaintRadius()))
+				{
+					// ヒットした場合そのペイントを消す
+					BlackPaint->SetUse(false);
+					ColorPaint->SetUse(false);
+					break;
+				}
 			}
 		}
 	}

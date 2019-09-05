@@ -83,7 +83,6 @@
     <ClInclude Include="MyLibrary.h" />
     <ClInclude Include="ObjectChip.h" />
     <ClInclude Include="Paint.h" />
-    <ClInclude Include="PaintGroup.h" />
     <ClInclude Include="PaintManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerState.h" />
@@ -173,7 +172,6 @@
     <ClCompile Include="MiniPlayer.cpp" />
     <ClCompile Include="MyLibrary.cpp" />
     <ClCompile Include="Paint.cpp" />
-    <ClCompile Include="PaintGroup.cpp" />
     <ClCompile Include="PaintManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerState.cpp" />

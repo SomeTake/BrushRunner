@@ -12,7 +12,6 @@
 //=============================================================================
 D3DXVECTOR3* CalcScreenToWorld(D3DXVECTOR3* pout, int Sx, int Sy, float fZ, 
 	int Screen_w, int Screen_h, D3DXMATRIX* View, D3DXMATRIX* Proj);	// スクリーン座標をワールド座標へ変換
-D3DXVECTOR2 WorldToScreenPos(D3DXMATRIX WorldMatrix);
 
 int CmpDescendf(const void *p, const void *q);		// floatの比較（降順）
 int CmpAscendf(const void *p, const void *q);		// floatの比較（昇順）

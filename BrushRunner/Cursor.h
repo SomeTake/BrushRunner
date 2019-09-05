@@ -9,7 +9,6 @@
 #define _CURSOR_H_
 
 #include "_2dobj.h"
-#include "CharacterAI.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -27,19 +26,15 @@
 class Cursor : public _2dobj
 {
 private:
-	int		ctrlNum;			// 操作するコントローラ番号
-	float	vec = 0.0f;			// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
-	float	moveX = 0.0f;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
-	float	moveY = 0.0f;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
-	//static LPDIRECT3DTEXTURE9 D3DTexture;					// テクスチャのポインタ
+	int		ctrlNum;	// 操作するコントローラ番号
+	float	vec;		// ジョイスティックのベクトルを1/1000にして保存(1.0f-0.0f)
+	float	moveX;		// ジョイスティックのX値を1/1000にして保存(1.0f-0.0f)
+	float	moveY;		// ジョイスティックのY値を1/1000にして保存(1.0f-0.0f)
+	D3DXVECTOR3 oldPos;	// 画面外判定を行うための1f前の座標
 
-	// AI用
-	CharacterAI		*AIptr = nullptr;
-	bool			AIUse = false;
-	D3DXVECTOR3		WorldPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	void PaintPath(void);					// インクで通れる道を作る
-	void DeletePath(void);					// 他のプレイヤーのペイントを削除
-	void PaintObjChip(void);				// オブジェクトチップをペイントする
+	// AI用変数
+	bool	AIFlag;
+	D3DXVECTOR3 DestPos;
 
 	HRESULT MakeVertex();				// 頂点の作成
 	void SetTexture();					// テクスチャ座標の設定
@@ -47,24 +42,20 @@ private:
 	void KeyMove();						// キーボード操作
 	void PadMove();						// コントローラ操作
 	void Move();						// 操作
-	void CalWorldPos();
+	void Change();						// 切り替え
+	void AIMove();						// AIがカーソルを移動する
 
 public:
-	Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr);
+	Cursor(int PlayerNo, bool AIFlag);
 	~Cursor();
 
-	// 更新
-	void Update();
-	// 描画
-	void Draw();	
-	// インクを切り替え
-	void ChangeInk();						
-	// テクスチャの開放
-	//static void ReleaseTexture(void) { SAFE_RELEASE(Cursor::D3DTexture); };
+	// オーバーライド関数
+	void Update();						// 更新
+	void Draw();						// 描画
+	void SetDestPos(D3DXVECTOR3 DestPos) { this->DestPos = DestPos; };
 
-	// カーソルの座標を取得
-	D3DXVECTOR3 GetPos(void) { return this->pos; };
-	D3DXVECTOR3 GetWorldPos(void) { return this->WorldPos; };
+	// カーソルの筆先の座標を取得
+	D3DXVECTOR3 GetPenPoint();
 };
 
 #endif

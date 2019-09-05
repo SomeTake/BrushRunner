@@ -6,37 +6,24 @@
 //=============================================================================
 #include "Main.h"
 #include "Cursor.h"
-#include "Camera.h"
 #include "Input.h"
-#include "Collision.h"
 #include "MyLibrary.h"
-#include "DebugWindow.h"
-#include "CharacterAI.h"
 #include "ResourceManager.h"
-
-//LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
+Cursor::Cursor(int PlayerNo, bool AIFlag)
 {
 	ResourceManager::Instance()->GetTexture("Cursor", &D3DTexture);
 
 	use = true;
+	this->AIFlag = AIFlag;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
-	//this->PaintReady = false;
-	if (AIUse)
-	{
-		this->AIUse = true;
-		this->AIptr = AIptr;
-	}
-	else
-	{
-		this->AIUse = false;
-		this->AIptr = nullptr;
-	}
+	vec = 0.0f;
+	moveX = 0.0f;
+	moveY = 0.0f;
 
 	// 頂点情報の作成
 	MakeVertex();
@@ -55,44 +42,20 @@ Cursor::~Cursor()
 //=============================================================================
 void Cursor::Update()
 {
-	if (use)
+	if (use == true)
 	{
 		// 操作
 		Move();
 
-		// スクリーン座標からワールド座標に変換
-		CalWorldPos();
+		if (GetKeyboardTrigger(DIK_P))
+		{
+			// テクスチャの切り替え
+			Change();
+		}
 
 		// 頂点座標の設定
 		SetVertex();
 	}
-
-#if 0
-#if _DEBUG
-	ImGui::SetNextWindowPos(ImVec2(5, 300), ImGuiSetCond_Once);
-
-	BeginDebugWindow("Cursor");
-
-	ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
-	if (ImGui::TreeNode("Cursor Postion"))
-	{
-		if (ImGui::TreeNode("ScreenPos"))
-		{
-			DebugText("Pos X:%.2f\nPos Y:%.2f\n", pos.x, pos.y);
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("WorldPos"))
-		{
-			DebugText("X:%.2f\nY:%.2f\nZ:%.2f\n", WorldPos.x, WorldPos.y, WorldPos.z);
-			ImGui::TreePop();
-		}
-		ImGui::TreePop();
-	}
-
-	EndDebugWindow("Cursor");
-
-#endif
-#endif
 }
 
 //=============================================================================
@@ -181,10 +144,10 @@ void Cursor::SetTexture()
 void Cursor::SetVertex()
 {
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y - CURSOR_SIZE.y, 0.0f);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y - CURSOR_SIZE.y, 0.0f);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y, 0.0f);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y, 0.0f);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + CURSOR_SIZE.x, pos.y + CURSOR_SIZE.y, pos.z);
 }
 
 //=============================================================================
@@ -192,36 +155,21 @@ void Cursor::SetVertex()
 //=============================================================================
 void Cursor::Move()
 {
-	if (!AIUse)
-	{
+	//if (!AIFlag)
+	//{
 		KeyMove();	// キーボード操作
 		PadMove();	// コントローラ操作
-	}
-	else
-	{
-		if (AIptr->GetCursorState() == ePaintPath)
-		{
-			PaintPath();
-		}
-		else if (AIptr->GetCursorState() == eUseBlackPaint)
-		{
-			DeletePath();
-		}
-		else if (AIptr->GetCursorState() == ePaintObjChip)
-		{
-			PaintObjChip();
-		}
-
-#if _DEBUG
-		KeyMove();	// キーボード操作
-#endif
-	}
+	//}
+	//else
+	//{
+		AIMove();
+	//}
 }
 
 //=============================================================================
 // カーソルの切り替え
 //=============================================================================
-void Cursor::ChangeInk()
+void Cursor::Change()
 {
 	// テクスチャとプレイヤーのインクの切り替え
 	// カラー→黒
@@ -250,14 +198,15 @@ void Cursor::KeyMove()
 		pos.y -= CURSOR_SPEED;
 
 		// 画面外判定
-		pos.y = max(pos.y, 0.0f + CURSOR_SIZE.y);
+		pos.y = max(pos.y, 0.0f);
 	}
 	else if (GetKeyboardPress(DIK_S))
 	{
 		pos.y += CURSOR_SPEED;
 
 		// 画面外判定
-		pos.y = min(pos.y, SCREEN_HEIGHT);
+		pos.y = min(pos.y, SCREEN_HEIGHT - CURSOR_SIZE.y);
+
 	}
 
 	// 左右
@@ -290,227 +239,19 @@ void Cursor::PadMove()
 	pos.y += vec * moveY * CURSOR_SPEED;
 
 	// 画面外に出た場合、古い座標に戻す
-	//pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
-	//pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 	pos.x = clamp(pos.x, 0.0f, SCREEN_WIDTH - CURSOR_SIZE.x);
-	pos.y = clamp(pos.y, CURSOR_SIZE.y, (float)SCREEN_HEIGHT);
+	pos.y = clamp(pos.y, 0.0f, SCREEN_HEIGHT - CURSOR_SIZE.y);
 }
 
 //=============================================================================
-// ワールド座標を計算する
+// カーソルの筆先の座標を取得
 //=============================================================================
-void Cursor::CalWorldPos()
+D3DXVECTOR3 Cursor::GetPenPoint()
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-	CAMERA *camerawk = GetCamera();
-	D3DXMATRIX ViewMtx, ProjMtx;
-
-	Device->GetTransform(D3DTS_VIEW, &ViewMtx);
-	Device->GetTransform(D3DTS_PROJECTION, &ProjMtx);
-
-	// カーソルのスクリーン座標をワールド座標へ変換して座標をセット
-	// スクリーン座標とXZ平面のワールド座標交点算出
-	D3DXVECTOR3 OutPos1, OutPos2, SetPos;
-	CalcScreenToWorld(&OutPos1, (int)pos.x, (int)pos.y, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-	CalcScreenToWorld(&OutPos2, (int)pos.x, (int)pos.y, 1.0f, SCREEN_WIDTH, SCREEN_HEIGHT, &ViewMtx, &ProjMtx);
-
-	// 判定用三角形ポリゴン
-	TriangleStr triPos1, triPos2;
-	triPos1 = { camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-		camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-		camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-	triPos2 = { camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f),
-		camerawk->at + D3DXVECTOR3(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f),
-		camerawk->at + D3DXVECTOR3(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0f) };
-
-	// 2点を使って当たった場所をセットする場所とする
-	if (!hitCheck(&this->WorldPos, triPos1, OutPos1, OutPos2))
-	{
-		hitCheck(&this->WorldPos, triPos2, OutPos1, OutPos2);
-	}
+	return D3DXVECTOR3(pos.x, pos.y + CURSOR_SIZE.y, 0.0f);
 }
 
-//=============================================================================
-// インクで通れる道を作る
-//=============================================================================
-void Cursor::PaintPath()
+void Cursor::AIMove()
 {
-	float Distance = 0.0f;
-	D3DXMATRIX WorldMtx, TransMtx;
-	D3DXVECTOR3 DestPos_World;
-	D3DXVECTOR2 DestPos_Screen;
 
-	// ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&WorldMtx);
-
-	// カーソルが始点までに移動していない
-	if (AIptr->GetPaintState() == eNoAction)
-	{
-		DestPos_World = AIptr->GetPaintStartPos();
-	}
-	// ペイントしている
-	else
-	{
-		DestPos_World = AIptr->GetPaintEndPos();
-	}
-
-	// 目標のスクリーン座標を計算する
-	D3DXMatrixTranslation(&TransMtx, DestPos_World.x, DestPos_World.y, DestPos_World.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-	DestPos_Screen = WorldToScreenPos(WorldMtx);
-
-	// カーソルと目標の座標を計算する
-	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
-	Distance = D3DXVec2LengthSq(&Vec);
-
-	if (Distance > pow(20.0f, 2))
-	{
-		// カーソルが目標に移動する
-		float Angle = atan2f(Vec.y, Vec.x);
-		pos.x += cosf(Angle) * CURSOR_SPEED;
-		pos.y += sinf(Angle) * CURSOR_SPEED;
-	}
-	else
-	{
-		pos.x = DestPos_Screen.x;
-		pos.y = DestPos_Screen.y;
-
-		// ペイントが始まる
-		if (AIptr->GetPaintState() == eNoAction)
-		{
-			AIptr->SetPaintState(ePaintStart);
-		}
-		// ペイント終了
-		else
-		{
-			AIptr->SetCursorState(eNoAction);
-			AIptr->SetPaintState(ePaintEnd);
-		}
-	}
 }
-
-//=============================================================================
-// 他のプレイヤーのペイントを削除
-//=============================================================================
-void Cursor::DeletePath(void)
-{
-	float Distance = 0.0f;
-	D3DXVECTOR2 DestPos_Screen;
-	D3DXMATRIX WorldMtx, TransMtx;
-	GroupStruct *EnemyPaint = AIptr->GetEnemyPaint();
-
-	// 削除が間に合わない
-	if (EnemyPaint->Count <= 5 || EnemyPaint->PaintPath.empty())
-	{
-		AIptr->SetCursorState(eNoAction);
-		AIptr->SetPaintState(ePaintEnd);
-		AIptr->SetFindEnemyPaint(false);
-		return;
-	}
-
-#if 1
-	// 目標のスクリーン座標を計算する
-	D3DXMatrixTranslation(&TransMtx, EnemyPaint->PaintPath.at(0).x, EnemyPaint->PaintPath.at(0).y, EnemyPaint->PaintPath.at(0).z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-	DestPos_Screen = WorldToScreenPos(WorldMtx);
-
-	// カーソルと目標の座標を計算する
-	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
-	Distance = D3DXVec2LengthSq(&Vec);
-
-	if (AIptr->GetPaintState() == eNoAction)
-	{
-		if (Distance > pow(20.0f, 2))
-		{
-			// カーソルが目標に移動する
-			float Angle = atan2f(Vec.y, Vec.x);
-			pos.x += cosf(Angle) * CURSOR_SPEED;
-			pos.y += sinf(Angle) * CURSOR_SPEED;
-		}
-		else
-		{
-			// ペイントが始まる
-			AIptr->SetPaintState(ePaintStart);
-		}
-	}
-	// ペイントしている
-	else
-	{
-		pos.x = DestPos_Screen.x;
-		pos.y = DestPos_Screen.y;
-
-		// Vectorの一番目の座標を消す
-		EnemyPaint->PaintPath.erase(EnemyPaint->PaintPath.begin());
-
-		// ペイント終了
-		if (EnemyPaint->PaintPath.empty())
-		{
-			AIptr->SetCursorState(eNoAction);
-			AIptr->SetPaintState(ePaintEnd);
-			AIptr->SetFindEnemyPaint(false);
-			EnemyPaint->Count = 0;
-		}
-	}
-#endif
-}
-
-//=============================================================================
-// オブジェクトチップをペイントする
-//=============================================================================
-void Cursor::PaintObjChip(void)
-{
-	float Distance = 0.0f;
-	D3DXMATRIX WorldMtx, TransMtx;
-	D3DXVECTOR3 DestPos_World;
-	D3DXVECTOR2 DestPos_Screen;
-
-	// ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&WorldMtx);
-
-	// カーソルが始点までに移動していない
-	if (AIptr->GetPaintState() == eNoAction)
-	{
-		DestPos_World = AIptr->GetPaintStartPos();
-	}
-	// ペイントしている
-	else
-	{
-		DestPos_World = AIptr->GetPaintEndPos();
-	}
-
-	// 目標のスクリーン座標を計算する
-	D3DXMatrixTranslation(&TransMtx, DestPos_World.x, DestPos_World.y, DestPos_World.z);
-	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
-	DestPos_Screen = WorldToScreenPos(WorldMtx);
-
-	// カーソルと目標の座標を計算する
-	D3DXVECTOR2 Vec = D3DXVECTOR2(DestPos_Screen - (D3DXVECTOR2)pos);
-	Distance = D3DXVec2LengthSq(&Vec);
-
-	if (Distance > pow(20.0f, 2))
-	{
-		// カーソルが目標に移動する
-		float Angle = atan2f(Vec.y, Vec.x);
-		pos.x += cosf(Angle) * CURSOR_SPEED;
-		pos.y += sinf(Angle) * CURSOR_SPEED;
-	}
-	else
-	{
-		pos.x = DestPos_Screen.x;
-		pos.y = DestPos_Screen.y;
-
-		// ペイントが始まる
-		if (AIptr->GetPaintState() == eNoAction)
-		{
-			AIptr->SetPaintState(ePaintStart);
-		}
-		// ペイント終了
-		else
-		{
-			AIptr->SetCursorState(eNoAction);
-			AIptr->SetPaintState(ePaintEnd);
-		}
-	}
-}
-

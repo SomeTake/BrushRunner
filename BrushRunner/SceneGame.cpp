@@ -29,7 +29,6 @@
 // メンバ変数の初期化
 //*****************************************************************************
 ResultData SceneGame::data[PLAYER_MAX] = { NULL };		// 結果
-int SceneGame::TheLastPlayer = 0;		// 結果
 
 //=============================================================================
 // コンストラクタ
@@ -45,32 +44,18 @@ SceneGame::SceneGame()
 	}
 	result = false;
 
+	// プレイヤーの初期化
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo);
+	}
+
 	// マップの初期化
 	pMap = new Map();
 
 	// 四分木の初期化
 	Quadtree = new QUADTREE(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 	PaintManager::SetQuadtreePtr(Quadtree);
-
-	// ペイントグループの初期化
-	paintGroup = new PaintGroup();
-	PaintManager::SetPaintGroupPtr(paintGroup);
-
-	// プレイヤーの初期化
-	//for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
-	//{
-	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
-	//}
-
-#if _DEBUG
-	pPlayer[0] = new Player(0, true);
-	pPlayer[1] = new Player(1, true);
-	//pPlayer[1]->SetOnCamera(false);
-	pPlayer[2] = new Player(2, true);
-	//pPlayer[2]->SetOnCamera(false);
-	pPlayer[3] = new Player(3, true);
-	//pPlayer[3]->SetOnCamera(false);
-#endif
 
 	// 2DUIの初期化
 	// フレーム
@@ -79,7 +64,7 @@ SceneGame::SceneGame()
 	// アイテム表示の初期化
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		UIObject.push_back(new Item(pPlayer[i]));
+		UIObject.push_back(new Item(ItemPos[i], pPlayer[i]));
 	}
 
 	// カウントダウンの初期化
@@ -106,12 +91,6 @@ SceneGame::~SceneGame()
 
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
-
-	// ペイントグループの削除
-	SAFE_DELETE(paintGroup);
-
-	// ペイントテクスチャの削除
-	//Paint::ReleaseTexture();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -153,6 +132,7 @@ void SceneGame::Update(int SceneID)
 		Start();
 	}
 
+<<<<<<< HEAD
 	float MaxPosX = 0.0f;
 	float MinPosX = 100000.0f;
 	int FirstPlayer = 0;
@@ -204,23 +184,19 @@ void SceneGame::Update(int SceneID)
 	UpdateCamera(pPlayer[FirstPlayer]->GetModel()->pos);
 
 #if 0
+=======
+	// プレイヤー座標の中でXが最も大きいものをカメラ注視点とする
+>>>>>>> parent of 3c4f28c... Merge branch 'Develop' into SomeTake
 	std::vector<float> vec(PLAYER_MAX);
 	for (size_t i = 0; i < vec.size(); i++)
 	{
-		if (pPlayer[i]->GetOnCamera())
-		{
-			vec.at(i) = pPlayer[i]->GetModel()->pos.x;
-		}
+		vec.at(i) = pPlayer[i]->GetModel()->pos.x;
 	}
 	auto max = std::max_element(vec.begin(), vec.end());
 	size_t maxIdx = std::distance(vec.begin(), max);
 
-	auto min = std::min_element(vec.begin(), vec.end());
-	SceneGame::TheLastPlayer = (int)std::distance(vec.begin(), min);
-
 	// カメラの更新
 	UpdateCamera(pPlayer[(int)maxIdx]->GetModel()->pos);
-#endif
 
 	// マップの更新
 	pMap->Update();
@@ -233,9 +209,6 @@ void SceneGame::Update(int SceneID)
 
 	// 当たり判定の更新
 	Collision();
-
-	// ペイントグループの更新
-	paintGroup->Update();
 
 	// 2Dオブジェクトの更新
 	for (auto &Object : UIObject)
@@ -300,19 +273,19 @@ void SceneGame::Draw()
 //=============================================================================
 void SceneGame::Collision()
 {
+	// プレイヤーとマップの当たり判定
 	for (int i = 0; i < PLAYER_MAX; i++)
 	{
-		if (pPlayer[i]->GetOnCamera())
-		{
-			// プレイヤーとマップの当たり判定
-			pPlayer[i]->GroundCollider();
-			pPlayer[i]->HorizonCollider();
-			pPlayer[i]->ObjectCollider();
-			pPlayer[i]->ObjectItemCollider(pMap);
+		pPlayer[i]->GroundCollider();
+		pPlayer[i]->HorizonCollider();
+		pPlayer[i]->ObjectCollider();
+		pPlayer[i]->ObjectItemCollider(pMap);
+	}
 
-			// プレイヤーとペイントマネージャの当たり判定
-			pPlayer[i]->PaintCollider();
-		}
+	// プレイヤーとペイントマネージャの当たり判定
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		pPlayer[i]->PaintCollider();
 	}
 
 	// ペイントマネージャ同士の当たり判定
@@ -320,22 +293,8 @@ void SceneGame::Collision()
 	{
 		for (int OneDigit = 1; OneDigit <= 4; OneDigit++)
 		{
-			std::vector<Paint*> CollisionList = Quadtree->GetObjectsAt((TenDigit * 10 + OneDigit));
-
-			// 現在のノードはオブジェクトがない
-			if (CollisionList.empty())
-			{
-				continue;
-			}
-
-			for (int i = 0; i < PLAYER_MAX; i++)
-			{
-				if (pPlayer[i]->GetOnCamera())
-				{
-					// 画面を16分割、それぞれのオブジェクトを判定する
-					HitCheckSToS(&CollisionList, i);
-				}
-			}
+			// 画面を16分割、それぞれのオブジェクトを判定する
+			HitCheckSToS(Quadtree, (TenDigit * 10 + OneDigit));
 		}
 	}
 
@@ -373,7 +332,7 @@ void SceneGame::Start()
 {
 	// スタートタイマー更新
 	startframe++;
-
+	
 	if (startframe == START_FRAME)
 	{
 		for (int i = 0; i < PLAYER_MAX; i++)

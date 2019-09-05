@@ -8,17 +8,14 @@
 #define _PAINTSYSTEM_H_
 
 #include "Paint.h"
-#include "PaintGroup.h"
 #include "Cursor.h"
 #include "Quadtree.h"
 #include "InkGauge.h"
-#include "CharacterAI.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define INK_MAX	(50)	// インクの最大量
-
 
 //*****************************************************************************
 // クラス定義
@@ -34,28 +31,26 @@ private:
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool					SpInk;					// trueのときインクが減らない
+	bool					AIFlag;
 	int						HealCnt;				// 自動回復カウント
 
-	// AI用
-	bool					PressPaint = false;
-	bool					AIUse = false;
-	CharacterAI				*AIptr = nullptr;
-
 	static QUADTREE			*Quadtree;
-	static PaintGroup		*paintGroup;
+#if _DEBUG
+	static bool				PressMode;
+#endif
 
 	void SetPaint(int InkType);
 	void CheckPaintUse(void);
 	void AutoHeal();
 
 public:
-	PaintManager(int PlayerNo, bool AIUse, CharacterAI *AIptr);
+	PaintManager(int PlayerNo, bool AIFlag);
 	~PaintManager();
 
 	void Update();
 	void Draw();
+	void CursorMove(D3DXVECTOR3 DestPos);
 	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
-	static void SetPaintGroupPtr(PaintGroup *Ptr) { if (!PaintManager::paintGroup) { PaintManager::paintGroup = Ptr; } };
 
 	// ゲッター
 	bool GetSpInk() { return SpInk; };

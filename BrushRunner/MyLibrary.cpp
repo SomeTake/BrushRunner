@@ -39,29 +39,6 @@ D3DXVECTOR3* CalcScreenToWorld(
 }
 
 //=============================================================================
-// ワールド座標からスクリーン座標に変換する
-//=============================================================================
-D3DXVECTOR2 WorldToScreenPos(D3DXMATRIX WorldMatrix)
-{
-	D3DXMATRIX ViewMatrix, ProjMatrix;
-	D3DXMATRIX WVP;
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-
-	Device->GetTransform(D3DTS_VIEW, &ViewMatrix);
-	Device->GetTransform(D3DTS_PROJECTION, &ProjMatrix);
-	WVP = WorldMatrix * ViewMatrix * ProjMatrix;
-
-	D3DXVECTOR3 ScreenCoord = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVec3TransformCoord(&ScreenCoord, &ScreenCoord, &WVP);
-
-	ScreenCoord.x = ((ScreenCoord.x + 1.0f) / 2.0f) * SCREEN_WIDTH;
-	ScreenCoord.y = ((-ScreenCoord.y + 1.0f) / 2.0f) * SCREEN_HEIGHT;
-
-	return (D3DXVECTOR2)ScreenCoord;
-}
-
-
-//=============================================================================
 // 比較関数(降順)float用
 // qsort関数の第4引数に入れて使う
 //=============================================================================
