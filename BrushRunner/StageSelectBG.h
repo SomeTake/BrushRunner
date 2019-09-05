@@ -20,12 +20,16 @@ private:
 	void SetTexture();
 	void SetVertex();
 
+	static int PatternAnim;
+
 public:
 	StageSelectBG();
 	~StageSelectBG();
 
 	void Update()override;
 	void Draw()override;
+
+	static int GetStageSelect() { return PatternAnim; };
 };
 
 #endif
