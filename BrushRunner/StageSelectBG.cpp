@@ -1,63 +1,78 @@
 //=============================================================================
 //
-// リザルト画面 [Result.cpp]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ステージセレクト画面の背景 [StageSelectBG.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Result.h"
+#include "StageSelectBG.h"
 #include "ResourceManager.h"
+#include "MyLibrary.h"
+#include "Input.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define RESULT_SIZE01			D3DXVECTOR3(SCREEN_WIDTH,SCREEN_HEIGHT,0.0f)	// テクスチャサイズ
-#define RESULT_POS01			D3DXVECTOR3(0.0f,0.0f,0.0f)						// テクスチャ座標
+#define STAGESELECTBG_DIVIDE_X	(1)
+#define STAGESELECTBG_DIVIDE_Y	(3)
+
+int StageSelectBG::PatternAnim = 0;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-RESULT::RESULT()
+StageSelectBG::StageSelectBG()
 {
-	ResourceManager::Instance()->GetTexture("Result", &D3DTexture);
+	ResourceManager::Instance()->GetTexture("StageSelectBG", &D3DTexture);
 
+	pos = D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y, 0.0f);
+	size = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+	PatternAnim = 0;
 	use = true;
-	pos = RESULT_POS01;
-	size = RESULT_SIZE01;
 
-	PatternAnim = 1;
-
-	// 頂点情報の作成
 	MakeVertex();
-
 }
 
 //=============================================================================
 // デストラクタ
 //=============================================================================
-RESULT::~RESULT()
+StageSelectBG::~StageSelectBG()
 {
 	D3DTexture = NULL;
 }
 
 //=============================================================================
-// 更新処理
+// 更新
 //=============================================================================
-void  RESULT::Update()
+void StageSelectBG::Update()
 {
-
 	if (use == true)
 	{
-		// テクスチャ座標をセット
-		SetTexture(PatternAnim);
+		// ステージ切り替え操作
+		for (int playerNo = 0; playerNo < GAMEPAD_MAX; playerNo++)
+		{
+			if (GetKeyboardRepeat(DIK_DOWN) || IsButtonRepeated(playerNo, STICK_DOWN))
+			{
+				PatternAnim = LoopCountUp(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
+				break;
+			}
+			else if (GetKeyboardRepeat(DIK_UP) || IsButtonRepeated(playerNo, STICK_UP))
+			{
+				PatternAnim = LoopCountDown(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
+				break;
+			}
+		}
+
+		SetTexture();
+
 		SetVertex();
 	}
 }
 
 //=============================================================================
-// 描画処理
+// 描画
 //=============================================================================
-void RESULT::Draw()
+void StageSelectBG::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -66,24 +81,21 @@ void RESULT::Draw()
 
 	if (use == true)
 	{
-		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
-		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何も貼らないことを指定するpDevice->SetTexture(0,NULL);
+		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
+		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
-
 }
 
 //=============================================================================
-// 頂点の作成
+// 頂点情報の作成
 //=============================================================================
-HRESULT RESULT::MakeVertex(void)
+void StageSelectBG::MakeVertex()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	//頂点情報の設定
+	// 頂点座標の設定
 	SetVertex();
 
 	// rhwの設定
@@ -99,43 +111,34 @@ HRESULT RESULT::MakeVertex(void)
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-
-	return S_OK;
-
+	SetTexture();
 }
 
 //=============================================================================
-// テクスチャ座標の設定
+// テクスチャ座標のセット
 //=============================================================================
-void RESULT::SetTexture(int cntPattern)
+void StageSelectBG::SetTexture()
 {
-	int x = cntPattern;
-	int y = cntPattern;
-	float sizeX = 1.0f;
-	float sizeY = 1.0f;
-
+	int x = PatternAnim % STAGESELECTBG_DIVIDE_X;
+	int y = PatternAnim / STAGESELECTBG_DIVIDE_X;
+	float sizeX = 1.0f / STAGESELECTBG_DIVIDE_X;
+	float sizeY = 1.0f / STAGESELECTBG_DIVIDE_Y;
 
 	// テクスチャ座標の設定
 	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
 	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
 	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
-
 }
 
 //=============================================================================
-// 頂点座標の設定
+// 頂点座標のセット
 //=============================================================================
-void RESULT::SetVertex(void)
+void StageSelectBG::SetVertex()
 {
-
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + size.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
 }

@@ -1,32 +1,30 @@
 //=============================================================================
 //
-// タイトル表示処理 [Title.h]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ステージセレクト [SceneStageSelect.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _TITLE_H_
-#define _TITLE_H_
+#ifndef _SCENESTAGESELECT_H_
+#define _SCENESTAGESELECT_H_
+
+#include "Scene.h"
 
 #include "_2dobj.h"
-
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class TITLE :
-	public _2dobj
+class SceneStageSelect :
+	public Scene
 {
+private:
+	std::vector<_2dobj*> obj;
+
 public:
-	TITLE(int num);
-	~TITLE();
+	SceneStageSelect();
+	~SceneStageSelect();
 
-
-	// オーバーライド関数
-	void Update();
-	void Draw();
-	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex(void);
-	void SetVertexMove(D3DXVECTOR3 pos);
+	void Update(int SceneID)override;
+	void Draw()override;
 };
 
 #endif

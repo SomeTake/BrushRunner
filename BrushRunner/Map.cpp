@@ -9,14 +9,23 @@
 #include "Input.h"
 #include "MyLibrary.h"
 #include "Collision.h"
+#include "StageSelectBG.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-//#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
-#define MAP_FILE		("data/MAP/map_ground_test.csv")		
-//#define OBJECT_FILE		("data/MAP/map_object.csv")
-#define OBJECT_FILE		("data/MAP/map_object_test.csv")
+// マップデータ
+const char* MapFile[] = {
+	("data/MAP/Gourmet_ground.csv"),
+	("data/MAP/Ice_ground.csv"),
+	("data/MAP/Lava_ground.csv")
+};
+
+const char* ObjectFile[] = {
+	("data/MAP/Gourmet_object.csv"),
+	("data/MAP/Ice_object.csv"),
+	("data/MAP/Lava_object.csv")
+};
 
 //*****************************************************************************
 // グローバル変数
@@ -46,8 +55,8 @@ Map::Map()
 	}
 
 	// csvデータ読み込み
-	ReadCsv(MAP_FILE, &this->maptbl);
-	ReadCsv(OBJECT_FILE, &this->objtbl);
+	ReadCsv(MapFile[StageSelectBG::GetStageSelect()], &this->maptbl);
+	ReadCsv(ObjectFile[StageSelectBG::GetStageSelect()], &this->objtbl);
 
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{

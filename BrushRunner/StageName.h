@@ -1,32 +1,28 @@
 //=============================================================================
 //
-// タイトル表示処理 [Title.h]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ステージ名表示 [StageName.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _TITLE_H_
-#define _TITLE_H_
+#ifndef _STAGENAME_H_
+#define _STAGENAME_H_
 
 #include "_2dobj.h"
-
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class TITLE :
+class StageName :
 	public _2dobj
 {
+private:
+	void MakeVertex();
+
 public:
-	TITLE(int num);
-	~TITLE();
+	StageName();
+	~StageName();
 
-
-	// オーバーライド関数
-	void Update();
-	void Draw();
-	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex(void);
-	void SetVertexMove(D3DXVECTOR3 pos);
+	void Update()override;
+	void Draw()override;
 };
 
 #endif

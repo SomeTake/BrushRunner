@@ -1,32 +1,25 @@
 //=============================================================================
 //
-// タイトル表示処理 [Title.h]
-// Author : HAL東京 GP11B341 17 染谷武志
+// ゲーム終了処理 [SceneExit.h]
+// Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _TITLE_H_
-#define _TITLE_H_
+#ifndef _SCENEEXIT_H_
+#define _SCENEEXIT_H_
 
-#include "_2dobj.h"
-
+#include "Scene.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class TITLE :
-	public _2dobj
+class SceneExit :
+	public Scene
 {
 public:
-	TITLE(int num);
-	~TITLE();
+	SceneExit();
+	~SceneExit();
 
-
-	// オーバーライド関数
-	void Update();
-	void Draw();
-	HRESULT MakeVertex();
-	void SetTexture(int cntPattern);
-	void SetVertex(void);
-	void SetVertexMove(D3DXVECTOR3 pos);
+	void Update(int SceneID)override;
+	void Draw()override;
 };
 
 #endif

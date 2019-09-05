@@ -25,7 +25,7 @@ SkyBox::SkyBox()
 	ResourceManager::Instance()->GetTexture("SkyBox", &D3DTexture);
 
 	// 位置・回転・スケールの初期設定
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);;
+	pos = D3DXVECTOR3(0.0f, -500.0f, 0.0f);;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 
