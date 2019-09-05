@@ -7,15 +7,19 @@
 #include "Main.h"
 #include "ResultTimer.h"
 
+LPD3DXFONT ResultTimer::Font[2] = { nullptr, nullptr };
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 ResultTimer::ResultTimer(DWORD _time, int _rank)
 {
+	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	startTime = 0;
 	currentTime = 0;
 	elapsedTime = _time;
+	this->Rank = _rank;
 
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{
@@ -39,6 +43,13 @@ ResultTimer::ResultTimer(DWORD _time, int _rank)
 	{
 		time[i] = new ResultDigit(digit[i], i, _rank);
 	}
+
+	// 情報表示用フォントの設定
+	D3DXCreateFont(Device, 108, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[0]);
+
+	D3DXCreateFont(Device, 72, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font[1]);
 }
 
 //=============================================================================
@@ -48,8 +59,11 @@ ResultTimer::~ResultTimer()
 {
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{
-		delete time[i];
+		SAFE_DELETE(time[i]);
 	}
+
+	SAFE_RELEASE(Font[0]);
+	SAFE_RELEASE(Font[1]);
 }
 
 //=============================================================================
@@ -69,6 +83,39 @@ void ResultTimer::Update()
 //=============================================================================
 void ResultTimer::Draw()
 {
+	if (Rank == 0)
+	{
+		// 分と秒間の':'
+		RECT Min_Sec = { 620, 55, 715, 205 };
+		// 秒とミリ秒間の':'
+		RECT Sec_ms = { 790, 55, 885, 205 };
+		Font[0]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+		Font[0]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+	}
+	else
+	{
+		RECT Min_Sec;
+		RECT Sec_ms;
+		if (Rank == 1)
+		{
+			Min_Sec = { 585, 395, 650, 485 };
+			Sec_ms = { 695, 395, 760, 485 };
+		}
+		else if (Rank == 2)
+		{
+			Min_Sec = { 585, 490, 650, 580 };
+			Sec_ms = { 695, 490, 760, 580 };
+		}
+		else if (Rank == 3)
+		{
+			Min_Sec = { 585, 585, 650, 675 };
+			Sec_ms = { 695, 585, 760, 675 };
+		}
+
+		Font[1]->DrawText(NULL, ":", -1, &Min_Sec, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+		Font[1]->DrawText(NULL, ":", -1, &Sec_ms, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+	}
+
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{

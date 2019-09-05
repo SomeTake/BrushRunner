@@ -137,7 +137,7 @@ void UpdateCamera()
 		z = cameraWk.distance * cosf(cameraWk.rot.y);
 	}
 
-	DebugCamera();
+	//DebugCamera();
 #endif
 
 	cameraWk.pos = cameraWk.at + D3DXVECTOR3(x, y, z);	// カメラの位置（視点）

@@ -125,7 +125,9 @@ void SceneResult::Update(int SceneID)
 	// パーティクルマネージャの更新
 	particleManager->Update();
 
-	Debug();
+#if _DEBUG
+	//Debug();
+#endif
 }
 
 //=============================================================================
