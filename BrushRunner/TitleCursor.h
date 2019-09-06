@@ -1,23 +1,24 @@
 //=============================================================================
 //
-// タイトル表示処理 [Title.h]
-// Author : HAL東京 GP11B341 17 染谷武志
+// タイトル表示処理 [TitleCursor.h]
+// Author : HAL東京 GP12B312 11 小松将吉
 //
 //=============================================================================
-#ifndef _TITLE_H_
-#define _TITLE_H_
+#ifndef _TITLECURSOR_H_
+#define _TITLECURSOR_H_
 
 #include "_2dobj.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class TITLE :
+
+class TITLECURSOR :
 	public _2dobj
 {
 public:
-	TITLE(int num);
-	~TITLE();
+	TITLECURSOR();
+	~TITLECURSOR();
 
 	// オーバーライド関数
 	void Update();
@@ -26,6 +27,7 @@ public:
 	void SetTexture(int cntPattern);
 	void SetVertex(void);
 	void SetVertexMove(D3DXVECTOR3 pos);
+
 };
 
-#endif
+#endif 
