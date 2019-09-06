@@ -129,7 +129,7 @@ DWORD Timer::Check()
 //=============================================================================
 void Timer::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG_
 	BeginDebugWindow("Timer");
 
 	DebugText("Start:%d Current:%d Elapsed:%d", startTime, currentTime, elapsedTime);

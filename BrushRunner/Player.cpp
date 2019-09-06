@@ -703,7 +703,6 @@ void Player::HitObjectInfluence(int type)
 void Player::Debug()
 {
 #if _DEBUG
-
 	if (!AIUse)
 	{
 		if (GetKeyboardPress(DIK_RIGHT))
@@ -772,7 +771,6 @@ void Player::Debug()
 	}
 
 	EndDebugWindow("Player");
-
 #endif
 
 }

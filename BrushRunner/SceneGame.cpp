@@ -58,19 +58,19 @@ SceneGame::SceneGame()
 	PaintManager::SetPaintGroupPtr(paintGroup);
 
 	// プレイヤーの初期化
-	//for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
-	//{
-	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
-	//}
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo, false);
+	}
 
 #if _DEBUG
 	pPlayer[0] = new Player(0, false);
-	pPlayer[1] = new Player(1, false);
+	pPlayer[1] = new Player(1, true);
 	//pPlayer[1]->SetOnCamera(false);
 	pPlayer[2] = new Player(2, false);
-	//pPlayer[2]->SetOnCamera(false);
+	pPlayer[2]->SetOnCamera(false);
 	pPlayer[3] = new Player(3, false);
-	//pPlayer[3]->SetOnCamera(false);
+	pPlayer[3]->SetOnCamera(false);
 #endif
 
 	// 2DUIの初期化
@@ -96,8 +96,8 @@ SceneGame::SceneGame()
 	// タイマー
 	pTimer = new Timer();
 
-/*****************************************************************************/
-	// シーンチェンジの終了
+	/*****************************************************************************/
+		// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -111,12 +111,11 @@ SceneGame::~SceneGame()
 
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
+	PaintManager::ReleaseQuadtreePtr();
 
 	// ペイントグループの削除
 	SAFE_DELETE(paintGroup);
-
-	// ペイントテクスチャの削除
-	//Paint::ReleaseTexture();
+	PaintManager::ReleasePaintGroupPtr();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
@@ -405,7 +404,7 @@ void SceneGame::CheckResult()
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
-				CircleSceneChanger::Instance()->SetChanger(true, []() 
+				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
 					SetScene(new SceneResult(), nSceneResult);
 					InitCamera();
@@ -503,7 +502,7 @@ void SceneGame::InsertResult(int pNo)
 //=============================================================================
 void SceneGame::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG_
 	BeginDebugWindow("Result");
 
 	DebugText("All Goal or Gameover : %s", result ? "True" : "False");

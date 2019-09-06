@@ -35,7 +35,7 @@ enum eAIPaintState
 	ePaintStart,		// ペイントが始まる
 	ePainting,			// ペイント中
 	ePaintEnd,			// ペイント終了
-};				
+};
 
 // 現在AIのインク残量の状態
 enum eAIInkState
@@ -110,6 +110,7 @@ public:
 	void SetFindEnemyPaint(bool Flag) { this->FindEnemyPaint = Flag; };
 	void SetShotBullet(bool Flag) { this->ShotBullet = Flag; };
 	static void SetPaintGroupPtr(PaintGroup *Ptr) { if (!CharacterAI::paintGroup) { CharacterAI::paintGroup = Ptr; } };
+	static void ReleasePaintGroupPtr(void) { CharacterAI::paintGroup = nullptr; };
 
 	int GetAIAction(void) { return this->Action; };
 	int GetCursorState(void) { return this->CursorState; };

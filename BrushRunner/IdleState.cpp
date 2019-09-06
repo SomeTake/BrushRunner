@@ -42,7 +42,7 @@ void IdleState::Update(int AnimCurtID)
 		}
 		else
 		{
-			// 上キーを押してジャンプ
+			// Uキーを押してジャンプ
 			if (GetKeyboardTrigger(DIK_U) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B) 
 				|| owner_->GetAIAction() == eActJump)
 			{
