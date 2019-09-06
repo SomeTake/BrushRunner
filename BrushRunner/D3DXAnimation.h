@@ -39,7 +39,6 @@ protected:
 
 	D3DXMATRIX GetBoneMatrix(const char* BoneName);
 	int GetAnimSetNum(void) { return this->AnimController->GetMaxNumAnimationSets(); };
-	int GetAnimCurtID(void) { return this->CurrentAnimID; };
 	int GetAnimCurtFrame(void);
 	int GetAnimPeriodFrame(void);
 	LPCSTR GetCurtAnimName(void) { return this->AnimSet.at(this->CurrentAnimID).GetSetName(); };
@@ -53,6 +52,7 @@ public:
 	virtual void Draw() = 0;
 
 	void ChangeAnim(UINT AnimID);
+	int GetAnimCurtID(void) { return this->CurrentAnimID; };
 
 };
 

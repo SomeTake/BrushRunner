@@ -85,8 +85,8 @@ using namespace std;
 
 // デストラクタ
 #define SAFE_FREE(object)			{if(object){free (object);			(object) = NULL;}}
-#define SAFE_DELETE(object)			{if(object){delete (object);		(object) = NULL;}}
-#define SAFE_DELETE_ARRAY(object)	{if(object){delete[] (object);		(object) = NULL;}}
+#define SAFE_DELETE(object)			{if(object){delete(object);			object = NULL;}}
+#define SAFE_DELETE_ARRAY(object)	{if(object){delete[](object);		object = NULL;}}
 #define SAFE_RELEASE(object)		{if(object){(object)->Release();	(object) = NULL;}}
 
 #define GetMonitorRect(rc) SystemParametersInfo(SPI_GETWORKAREA, 0, rc, 0)	// モニター矩形

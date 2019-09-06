@@ -21,6 +21,7 @@
 #include "ResultPlayer.h"
 #include "SkyBox.h"
 #include "MeshField.h"
+#include "CircleSceneChanger.h"
 
 //=============================================================================
 // コンストラクタ
@@ -51,6 +52,10 @@ SceneResult::SceneResult()
 
 	// パーティクルマネージャのインスタンス作成
 	particleManager = new ParticleManager();
+
+/*****************************************************************************/
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -99,7 +104,10 @@ void SceneResult::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
 		{
-			SetScene(new SceneTitle(), nSceneTitle);
+			CircleSceneChanger::Instance()->SetChanger(true, [] 
+			{
+				SetScene(new SceneTitle(), nSceneTitle);
+			});
 			return;
 		}
 	}
@@ -125,7 +133,9 @@ void SceneResult::Update(int SceneID)
 	// パーティクルマネージャの更新
 	particleManager->Update();
 
-	Debug();
+#if _DEBUG
+	//Debug();
+#endif
 }
 
 //=============================================================================

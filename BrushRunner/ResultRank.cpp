@@ -10,14 +10,11 @@
 #include "ResourceManager.h"
 
 //*****************************************************************************
-// 構造体データ入力
+// マクロ定義
 //*****************************************************************************
-ResultStr Rank[PLAYER_MAX] = {
-	D3DXVECTOR3(250.0f, 70.0f, 0.0f), D3DXVECTOR3(300.0f, 150.0f, 0.0f),
-	D3DXVECTOR3(250.0f, 400.0f, 0.0f), D3DXVECTOR3(180.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(260.0f, 510.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
-	D3DXVECTOR3(260.0f, 590.0f, 0.0f), D3DXVECTOR3(140.0f, 70.0f, 0.0f),
-};
+#define RESULTRANK_POS	D3DXVECTOR3(130.0f, 180.0f, 0.0f)	// 1位を基準
+#define RESULTRANK_SIZE	D3DXVECTOR3(170.0f, 85.0f, 0.0f)
+#define RESULTRANK_INTERVAL	(80.0f)
 
 //=============================================================================
 // コンストラクタ
@@ -29,8 +26,8 @@ ResultRank::ResultRank(int rank, int owner)
 	this->use = true;
 	this->rank = rank;
 	this->owner = owner;
-	pos = Rank[this->rank].pos;
-	size = Rank[this->rank].size;
+	pos = RESULTRANK_POS + D3DXVECTOR3(0.0f, RESULTRANK_INTERVAL * rank, 0.0f);
+	size = RESULTRANK_SIZE;
 
 	MakeVertex();
 }
@@ -80,16 +77,16 @@ HRESULT ResultRank::MakeVertex()
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	//頂点情報の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + size.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x, pos.y + size.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
 
 	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// 反射光の設定
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);

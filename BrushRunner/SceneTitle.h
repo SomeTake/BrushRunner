@@ -20,13 +20,17 @@ enum TitleUINum
 	TitleCursor,
 	UIMax,										// UI表示の最大数
 };
-
+class _2dobj;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class SceneTitle :
 	public Scene
 {
+private:
+	_2dobj *p2dObj[UIMax];		// 2Dオブジェクト用のポインタ
+	bool IsOption;				// 選択肢フラグ
+
 public:
 	SceneTitle();
 	~SceneTitle();

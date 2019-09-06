@@ -8,7 +8,6 @@
 #include "Player.h"
 #include "Input.h"
 #include "SceneGame.h"
-#include "D3DXAnimation.h"
 #include "Camera.h"
 #include "DebugWindow.h"
 #include "Map.h"
@@ -21,6 +20,7 @@
 #include "SlipState.h"
 #include "Item.h"
 #include "Timer.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,8 +30,9 @@
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+//#define DefaultPosition		D3DXVECTOR3(50.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define OBJECT_HIT_COUNTER	(5)											// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
@@ -48,10 +49,8 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum) : state(nullptr)
+Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// xFileを読み込む
 	this->Load_xFile(CharaModel[KouhaiModel], "Player");
 
@@ -70,14 +69,24 @@ Player::Player(int _CtrlNum) : state(nullptr)
 	runSpd = 1.0f;
 	jumpSpd = 0.0f;
 	ctrlNum = _CtrlNum;
-	this->AI = new CharacterAI(true);
-	this->PaintSystem = new PaintManager(ctrlNum, true);
+	if (AIUse)
+	{
+		this->AI = new CharacterAI(ctrlNum);
+		this->AIUse = true;
+		this->PaintSystem = new PaintManager(ctrlNum, true, this->AI);
+	}
+	else
+	{
+		this->AI = nullptr;
+		this->AIUse = false;
+		this->PaintSystem = new PaintManager(ctrlNum, false, nullptr);
+	}
 	this->playerUI = new PlayerUI(ctrlNum);
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
 	hitItem = false;
-	animSpd = 1.0f;
+	//animSpd = 1.0f;
 	hitObjCnt = 0;
 	jumpValue = 1.0f;
 
@@ -115,7 +124,10 @@ void Player::Update()
 		Move();
 
 		// AIの更新処理
-		AI->Update(this->pos, this->PaintSystem);
+		if (AIUse)
+		{
+			AI->Update(this->pos);
+		}
 
 		// ペイントシステムの更新処理
 		PaintSystem->Update();
@@ -188,9 +200,10 @@ void Player::Draw()
 		playerUI->Draw(onCamera, blind);
 
 	}
+	// プレイヤー死亡のUI
 	else
 	{
-		// プレイヤーUIの描画(プレイヤー死亡のUI)
+		// プレイヤーUIの描画()
 		playerUI->Draw(onCamera, blind);
 	}
 
@@ -198,7 +211,10 @@ void Player::Draw()
 	itemManager->Draw();
 
 #if _DEBUG
-	this->AI->Draw();
+	if (this->AI != nullptr)
+	{
+		AI->Draw();
+	}
 #endif
 }
 
@@ -229,54 +245,19 @@ void Player::Move()
 		// オート移動
 		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip && GetAnimCurtID() != Stop)
 		{
-			pos.x += MOVE_SPEED * runSpd;
+			if (!PowerBanana)
+			{
+				pos.x += MOVE_SPEED * runSpd;
+			}
+			else
+			{
+				pos.x += MOVE_SPEED * 2.0f;
+			}
 		}
 	}
-		// 空中判定
-		JumpMove();
 
-#if _DEBUG
-	if (GetKeyboardPress(DIK_RIGHT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x += MOVE_SPEED;
-			break;
-		case 1:
-			pos.x += MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x += MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x += MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-	if (GetKeyboardPress(DIK_LEFT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x -= MOVE_SPEED;
-			break;
-		case 1:
-			pos.x -= MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x -= MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x -= MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-#endif
+	// 空中判定
+	JumpMove();
 }
 
 //=====================================================================================================
@@ -291,8 +272,8 @@ void Player::JumpMove()
 		jumpSpd -= STANDARD_GRAVITY;
 	}
 
-	// ジェットパック装備中はジャンプ力アップ
-	if (jet)
+	// ジェットパック装備中orパワーアップバナナ使用中はジャンプ力アップ
+	if (jet || PowerBanana)
 	{
 		jumpValue = JETPACK_VALUE;
 	}
@@ -527,7 +508,6 @@ void Player::ObjectCollider()
 	int objType = Map::GetObjTbl(x, y);
 
 	HitObjectInfluence(objType);
-
 }
 
 //=====================================================================================================
@@ -537,7 +517,9 @@ void Player::ObjectItemCollider(Map *pMap)
 {
 	// アイテムを取得している状態なら判定しない
 	if (hitItem)
+	{
 		return;
+	}
 
 	D3DXVECTOR3 colliderpos = pos;
 	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
@@ -545,7 +527,9 @@ void Player::ObjectItemCollider(Map *pMap)
 	for (auto &Obj : pMap->GetObjectChip())
 	{
 		if (Obj->GetTextureNum() != eObjItem)
+		{
 			continue;
+		}
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
@@ -615,6 +599,7 @@ void Player::HitObjectInfluence(int type)
 	switch (type)
 	{
 	case eObjSpdup:
+
 		if (!spike)
 		{
 			runSpd = 2.0f;
@@ -626,6 +611,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjSpddown:
+
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -637,6 +623,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjNuma:
+
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -648,11 +635,13 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjJump:
+
 		jumpSpd = JUMP_SPEED * jumpValue;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
+
 		// 時間経過でインク減少
 		if (!spike)
 		{
@@ -674,6 +663,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjHeal:
+
 		// 時間経過でインク増加
 		if (!spike)
 		{
@@ -695,15 +685,16 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjItem:
+
 		// 他のステータスはリセット
 		hitObjCnt = 0;
 		runSpd = 1.0f;
 		jumpValue = 1.0f;
 		break;
+
 	default:
 		break;
 	}
-
 }
 
 //=====================================================================================================
@@ -711,7 +702,51 @@ void Player::HitObjectInfluence(int type)
 //=====================================================================================================
 void Player::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG
+
+	if (!AIUse)
+	{
+		if (GetKeyboardPress(DIK_RIGHT))
+		{
+			switch (ctrlNum)
+			{
+			case 0:
+				pos.x += MOVE_SPEED;
+				break;
+			case 1:
+				pos.x += MOVE_SPEED * 0.8f;
+				break;
+			case 2:
+				pos.x += MOVE_SPEED * 0.5f;
+				break;
+			case 3:
+				pos.x += MOVE_SPEED * 0.2f;
+				break;
+			default:
+				break;
+			}
+		}
+		if (GetKeyboardPress(DIK_LEFT))
+		{
+			switch (ctrlNum)
+			{
+			case 0:
+				pos.x -= MOVE_SPEED;
+				break;
+			case 1:
+				pos.x -= MOVE_SPEED * 0.8f;
+				break;
+			case 2:
+				pos.x -= MOVE_SPEED * 0.5f;
+				break;
+			case 3:
+				pos.x -= MOVE_SPEED * 0.2f;
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
 	ImGui::SetNextWindowPos(ImVec2(5, 120), ImGuiSetCond_Once);
 

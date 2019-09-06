@@ -19,8 +19,8 @@ class ResourceManager :
 	friend class BaseSingleton<ResourceManager>;
 
 public:
-	ResourceManager() {}
-	~ResourceManager() {}
+	ResourceManager() {};
+	~ResourceManager() {};
 
 	// 読み込み、開放処理
 	// メッシュコンテナ
@@ -32,13 +32,14 @@ public:
 	void ReleaseTexture(const char* tag);
 
 	// 参照処理
-	//bool GetMesh(const char* tag);
+	//bool GetMesh(const char* tag, Model3D **pOut);
 	bool GetTexture(const char* tag, LPDIRECT3DTEXTURE9* pOut);
 
 	// 全リソース開放処理
 	void AllRelease();
 
 private:
+	//std::map<std::string, Model3D*> modelPool;				// モデル情報を保存しておく場所
 	std::map<std::string, LPDIRECT3DTEXTURE9> texturePool;	// テクスチャ情報を保存しておく場所
 };
 

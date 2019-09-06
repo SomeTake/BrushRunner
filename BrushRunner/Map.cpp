@@ -9,17 +9,27 @@
 #include "Input.h"
 #include "MyLibrary.h"
 #include "Collision.h"
+#include "StageSelectBG.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
-#define OBJECT_FILE		("data/MAP/map_object.csv")
+// マップデータ
+const char* MapFile[] = {
+	("data/MAP/Gourmet_ground.csv"),
+	("data/MAP/Ice_ground.csv"),
+	("data/MAP/Lava_ground.csv")
+};
+
+const char* ObjectFile[] = {
+	("data/MAP/Gourmet_object.csv"),
+	("data/MAP/Ice_object.csv"),
+	("data/MAP/Lava_object.csv")
+};
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-//D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 std::vector<std::vector<int>> Map::maptbl;
 std::vector<std::vector<int>> Map::objtbl;
 
@@ -45,8 +55,8 @@ Map::Map()
 	}
 
 	// csvデータ読み込み
-	ReadCsv(MAP_FILE, &this->maptbl);
-	ReadCsv(OBJECT_FILE, &this->objtbl);
+	ReadCsv(MapFile[StageSelectBG::GetStageSelect()], &this->maptbl);
+	ReadCsv(ObjectFile[StageSelectBG::GetStageSelect()], &this->objtbl);
 
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
@@ -292,6 +302,9 @@ int Map::GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection)
 	return GetMapTbl(x, y);
 }
 
+//=============================================================================
+// オブジェクトチップXYからオブジェクトテーブルの数値を取得する
+//=============================================================================
 int Map::GetObjTbl(int ObjX, int ObjY)
 {
 	if (ObjX < 0 ||
@@ -305,6 +318,32 @@ int Map::GetObjTbl(int ObjX, int ObjY)
 	{
 		return objtbl.at(ObjY).at(ObjX);
 	}
+}
+
+//=============================================================================
+// 座標からマップテーブルの数値を取得する
+//=============================================================================
+// □□□
+// □■□	■：CenterChip
+// □□□
+int Map::GetObjTbl(D3DXVECTOR3 Pos, int ChipDirection)
+{
+	int x = 0;
+	int y = 0;
+
+	GetMapChipXY(Pos, &x, &y);
+
+	switch (ChipDirection)
+	{
+	case eCenterUp:
+		// 中央の上のチップ
+		y--;
+		break;
+	default:
+		break;
+	}
+
+	return GetObjTbl(x, y);
 }
 
 void Map::SetObjTbl(int ObjX, int ObjY, int texnum)

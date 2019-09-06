@@ -13,18 +13,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define DIGIT_SPACE	(1.0f)
-
-//*****************************************************************************
-// データ定義
-//*****************************************************************************
-// 表示位置とサイズ（一番右の桁が基準）
-ResultStr ResultData[PLAYER_MAX] = {
-	D3DXVECTOR3(900.0f, 135.0f, 0.0f), D3DXVECTOR3(75.0f, 150.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 445.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 540.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-	D3DXVECTOR3(650.0f, 625.0f, 0.0f), D3DXVECTOR3(45.0f, 90.0f, 0.0f),
-};
+#define RESULTDIGIT_POS			D3DXVECTOR3(450.0f, 178.0f, 0.0f)
+#define RESULTDIGIT_SIZE		D3DXVECTOR3(40.0f, 85.0f, 0.0f)
+#define RESULTDIGIT_INTERVAL	(80.0f)
 
 //=============================================================================
 // コンストラクタ
@@ -36,9 +27,18 @@ ResultDigit::ResultDigit(DWORD _time, int _digit, int _rank) : Digit(_digit)
 	time = _time;
 	use = true;
 	rank = _rank;
-	pos = ResultData[rank].pos;
-	pos.x -= _digit * ResultData[rank].size.x;
-	size = ResultData[rank].size;
+	pos = RESULTDIGIT_POS + D3DXVECTOR3(0.0f, RESULTDIGIT_INTERVAL * rank, 0.0f);
+	size = RESULTDIGIT_SIZE;
+	pos.x -= _digit * size.x;
+	// ミリ秒と秒、秒と分の間に':'のスペースがある
+	if (_digit >= 2)
+	{
+		pos.x -= 20.0f;
+	}
+	if (_digit >= 4)
+	{
+		pos.x -= 20.0f;
+	}
 
 	MakeVertex();
 }
