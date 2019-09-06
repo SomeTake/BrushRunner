@@ -394,16 +394,6 @@ void SceneGame::Start()
 //=============================================================================
 void SceneGame::CheckResult()
 {
-	if (GetKeyboardTrigger(DIK_N))
-	{
-		CircleSceneChanger::Instance()->SetChanger(true, []()
-		{
-			SetScene(new SceneResult(), nSceneResult);
-			InitCamera();
-		});
-		return;
-	}
-
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{
