@@ -15,13 +15,7 @@
 #include "SceneTutorial.h"
 #include "Player.h"
 #include "CircleSceneChanger.h"
-
-//=============================================================================
-// グローバル変数
-//=============================================================================
-
-static _2dobj *p2dObj[UIMax];					// 2Dオブジェクト用のポインタ
-static bool IsOption;							// 選択肢フラグ
+#include "SceneExit.h"
 
 //=============================================================================
 // コンストラクタ
@@ -30,10 +24,10 @@ SceneTitle::SceneTitle()
 {
 	
 	IsOption = true;							// 選択肢フラグオン
-	p2dObj[TitleLogo] = new TITLE(TitleLogo);
-	p2dObj[TitleRunner] = new TITLE(TitleRunner);
-	p2dObj[TitleMenu] = new TITLE(TitleMenu);
-	p2dObj[TitleCursor] = new TITLECURSOR();
+	p2dObj.push_back(new TITLE(TitleLogo));
+	p2dObj.push_back(new TITLE(TitleRunner));
+	p2dObj.push_back(new TITLE(TitleMenu));
+	p2dObj.push_back(new TITLECURSOR());
 
 /*****************************************************************************/
 	// シーンチェンジの終了
@@ -45,10 +39,12 @@ SceneTitle::SceneTitle()
 //=============================================================================
 SceneTitle::~SceneTitle()
 {
-	for (int i = 0; i < UIMax; i++)
+	for (auto &UI : p2dObj)
 	{
-		delete p2dObj[i];
+		SAFE_DELETE(UI);
 	}
+	p2dObj.clear();
+	ReleaseVector(p2dObj);
 }
 
 //=============================================================================
@@ -59,25 +55,16 @@ void SceneTitle::Update(int SceneID)
 	
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
-		if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
+		if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
 		{
 			IsOption = true;
+			break;
 		}
-		else if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
+		else if (GetKeyboardTrigger(DIK_S) || IsButtonTriggered(playerNo, STICK_DOWN))
 		{
 			IsOption = false;
+			break;
 		}
-		//if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
-		//{
-		//	p2dObj[TitleArrows] = new TITLE(TITLE_POS04 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
-		//	IsOption = true;
-		//}
-
-		//if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
-		//{
-		//	p2dObj[TitleArrows] = new TITLE(TITLE_POS05 - TITLE_SIZE04 / 2, TITLE_SIZE04, TEXTURE_TITLE04);
-		//	IsOption = false;
-		//}
 
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
@@ -91,9 +78,12 @@ void SceneTitle::Update(int SceneID)
 			}
 			else
 			{
-				// 追加予定
 				//SetScene(new SceneExit(), nSceneExit);
 
+				CircleSceneChanger::Instance()->SetChanger(true, []()
+				{
+					SetScene(new SceneExit(), nSceneExit);
+				});
 				return;
 			}
 		}
@@ -101,9 +91,9 @@ void SceneTitle::Update(int SceneID)
 
 	}
 
-	for (int i = 0; i < UIMax; i++)
+	for (auto &UI : p2dObj)
 	{
-		p2dObj[i]->Update();
+		UI->Update();
 	}
 }
 
@@ -112,9 +102,8 @@ void SceneTitle::Update(int SceneID)
 //=============================================================================
 void SceneTitle::Draw()
 {
-	for (int i = 0; i < UIMax; i++)
+	for (auto &UI : p2dObj)
 	{
-		p2dObj[i]->Draw();
+		UI->Draw();
 	}
-
 }

@@ -145,13 +145,13 @@ void CursorObj::SetVertex()
 void CursorObj::Move()
 {
 	// ‰E‚ÉˆÚ“®
-	if (GetKeyboardRepeat(DIK_RIGHT) || IsButtonRepeated(this->playerNo, STICK_RIGHT))
+	if (GetKeyboardRepeat(DIK_D) || IsButtonRepeated(this->playerNo, STICK_RIGHT))
 	{
 		this->selectNo = LoopCountDown(this->selectNo, 0, CURSOROBJ_MAX - 1);
 	}
 
 	// ¶‚ÉˆÚ“®
-	if (GetKeyboardRepeat(DIK_LEFT) || IsButtonRepeated(this->playerNo, STICK_LEFT))
+	if (GetKeyboardRepeat(DIK_A) || IsButtonRepeated(this->playerNo, STICK_LEFT))
 	{
 		this->selectNo = LoopCountUp(this->selectNo, 0, CURSOROBJ_MAX - 1);
 	}

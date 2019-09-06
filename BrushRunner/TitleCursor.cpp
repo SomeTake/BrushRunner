@@ -57,13 +57,13 @@ void  TITLECURSOR::Update()
 
 		for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 		{
-			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
+			if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
 			{
 
 				SetVertex();
 
 			}
-			if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
+			if (GetKeyboardTrigger(DIK_S) || IsButtonTriggered(playerNo, STICK_DOWN))
 			{
 				SetVertexMove(TITLE_CURSOR_POS_EXIT);
 			}

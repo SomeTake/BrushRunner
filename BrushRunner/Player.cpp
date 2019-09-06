@@ -251,7 +251,7 @@ void Player::Move()
 			}
 			else
 			{
-				pos.x += MOVE_SPEED * 2.0f;
+				pos.x += MOVE_SPEED * 1.3f;
 			}
 		}
 	}

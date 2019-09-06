@@ -15,6 +15,8 @@
 #define ARROW_SIZE	D3DXVECTOR3(128.0f, 128.0f, 0.0f)
 #define ARROW_POS	D3DXVECTOR3((float)SCREEN_WIDTH - ARROW_SIZE.x / 2, (float)SCREEN_CENTER_Y, 0.0f)
 #define ARROW_REVERSE_POS	D3DXVECTOR3(ARROW_SIZE.x / 2, (float)SCREEN_CENTER_Y, 0.0f)
+#define FLASH_TIME			(45)
+#define DELETE_TIME			(30)
 
 //=============================================================================
 // コンストラクタ
@@ -48,6 +50,7 @@ void Arrow::Update()
 	if (!use)
 		return;
 
+	// 表示しているスライドが、左右の表示限界なら、矢印を出さない
 	if (reverse)
 	{
 		if (Tutorial::GetSlideNo() == 0)
@@ -70,6 +73,23 @@ void Arrow::Update()
 			draw = true;
 		}
 	}
+
+	// 点滅処理
+	cntFlash++;
+
+	// 表示中に一定フレーム経過で消滅
+	if (flash && cntFlash == FLASH_TIME)
+	{
+		flash = false;
+		cntFlash = 0;
+	}
+	// 消滅中に一定フレーム経過で表示
+	else if (!flash && cntFlash == DELETE_TIME)
+	{
+		flash = true;
+		cntFlash = 0;
+	}
+
 }
 
 //=============================================================================
@@ -77,7 +97,7 @@ void Arrow::Update()
 //=============================================================================
 void Arrow::Draw()
 {
-	if (!use || !draw)
+	if (!use || !draw || !flash)
 		return;
 
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();

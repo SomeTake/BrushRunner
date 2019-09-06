@@ -42,12 +42,12 @@ void StageSelectCursor::Update()
 	{
 		for (int ctrNo = 0; ctrNo < GAMEPAD_MAX; ctrNo++)
 		{
-			if (GetKeyboardRepeat(DIK_DOWN) || IsButtonRepeated(ctrNo, STICK_DOWN))
+			if (GetKeyboardRepeat(DIK_S) || IsButtonRepeated(ctrNo, STICK_DOWN))
 			{
 				pos.y == MAXPOS_Y ? pos.y = STAGESELECTCURSOR_POS.y : pos.y += CURSOR_MOVE_VALUE;
 				break;
 			}
-			else if (GetKeyboardRepeat(DIK_UP) || IsButtonRepeated(ctrNo, STICK_UP))
+			else if (GetKeyboardRepeat(DIK_W) || IsButtonRepeated(ctrNo, STICK_UP))
 			{
 				pos.y == STAGESELECTCURSOR_POS.y ? pos.y = MAXPOS_Y : pos.y -= CURSOR_MOVE_VALUE;
 				break;

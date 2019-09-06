@@ -17,6 +17,8 @@ class Arrow :
 private:
 	bool reverse;
 	bool draw;
+	int cntFlash;
+	bool flash;		// 点滅させるフラグ(true = 表示)
 
 	void MakeVertex();
 

@@ -51,12 +51,12 @@ void StageSelectBG::Update()
 		// ステージ切り替え操作
 		for (int playerNo = 0; playerNo < GAMEPAD_MAX; playerNo++)
 		{
-			if (GetKeyboardRepeat(DIK_DOWN) || IsButtonRepeated(playerNo, STICK_DOWN))
+			if (GetKeyboardRepeat(DIK_S) || IsButtonRepeated(playerNo, STICK_DOWN))
 			{
 				PatternAnim = LoopCountUp(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
 				break;
 			}
-			else if (GetKeyboardRepeat(DIK_UP) || IsButtonRepeated(playerNo, STICK_UP))
+			else if (GetKeyboardRepeat(DIK_W) || IsButtonRepeated(playerNo, STICK_UP))
 			{
 				PatternAnim = LoopCountDown(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
 				break;
