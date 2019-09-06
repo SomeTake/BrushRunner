@@ -9,6 +9,7 @@
 #include "Input.h"
 #include "SceneManager.h"
 #include "DebugWindow.h"
+#include "MyLibrary.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -17,6 +18,7 @@
 #define CAMERA_POS_RESULT	D3DXVECTOR3(0.0f, -100.0f, -450.0f)			// リザルト画面でのカメラの初期位置
 #define CAMERA_AT		D3DXVECTOR3(0.0f, 0.0f, 0.0f)					// カメラの注視点
 #define CAMERA_AT_RESULT	D3DXVECTOR3(0.0f, 300.0f, 0.0f)
+#define CAMERA_AT_TITLE		D3DXVECTOR3(100.0f, -100.0f, 0.0f)
 
 #define	VALUE_MOVE_CAMERA	(2.0f)										// カメラの移動量
 #define	VALUE_ROTATE_CAMERA	(D3DX_PI * 0.002f)							// カメラの回転量
@@ -44,6 +46,11 @@ void InitCamera(void)
 	{
 		cameraWk.at = CAMERA_AT_RESULT;
 		cameraWk.pos = cameraWk.at + CAMERA_POS_RESULT;
+	}
+	else if (GetScene() == nSceneTitle)
+	{
+		cameraWk.at = CAMERA_AT_TITLE;
+		cameraWk.pos = cameraWk.at + CAMERA_POS;
 	}
 	cameraWk.up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	cameraWk.rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
@@ -144,6 +151,19 @@ void UpdateCamera()
 	cameraWk.at = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// カメラの注視点＝ワールドの中心点
 	cameraWk.up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 3D空間の上方向はどちら？＝Yが＋方向が上
 
+}
+
+//=============================================================================
+// タイトル画面でのカメラの更新
+//=============================================================================
+void UpdateTitleCamera()
+{
+	if (cameraWk.at.x < 9800.0f)
+	{
+		cameraWk.at.x += 1.0f;
+		cameraWk.at.y -= 0.1f;
+	}
+	cameraWk.pos = cameraWk.at + CAMERA_POS;
 }
 
 //=============================================================================

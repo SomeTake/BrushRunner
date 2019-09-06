@@ -16,6 +16,9 @@
 #include "Player.h"
 #include "CircleSceneChanger.h"
 #include "SceneExit.h"
+#include "Sky.h"
+#include "Camera.h"
+#include "Runner.h"
 
 //=============================================================================
 // コンストラクタ
@@ -24,10 +27,18 @@ SceneTitle::SceneTitle()
 {
 	
 	IsOption = true;							// 選択肢フラグオン
+
+	// UIオブジェクト
 	p2dObj.push_back(new TITLE(TitleLogo));
-	p2dObj.push_back(new TITLE(TitleRunner));
 	p2dObj.push_back(new TITLE(TitleMenu));
+	p2dObj.push_back(new Runner());
 	p2dObj.push_back(new TITLECURSOR());
+
+	// マップ
+	map = new Map();
+
+	// 3Dオブジェクト
+	object3d.push_back(new Sky());
 
 /*****************************************************************************/
 	// シーンチェンジの終了
@@ -45,6 +56,15 @@ SceneTitle::~SceneTitle()
 	}
 	p2dObj.clear();
 	ReleaseVector(p2dObj);
+
+	SAFE_DELETE(map);
+
+	for (auto &obj : object3d)
+	{
+		SAFE_DELETE(obj);
+	}
+	object3d.clear();
+	ReleaseVector(object3d);
 }
 
 //=============================================================================
@@ -91,10 +111,20 @@ void SceneTitle::Update(int SceneID)
 
 	}
 
+	UpdateTitleCamera();
+
 	for (auto &UI : p2dObj)
 	{
 		UI->Update();
 	}
+
+	map->Update();
+
+	for (auto &obj : object3d)
+	{
+		obj->Update();
+	}
+
 }
 
 //=============================================================================
@@ -102,6 +132,13 @@ void SceneTitle::Update(int SceneID)
 //=============================================================================
 void SceneTitle::Draw()
 {
+	map->Draw();
+
+	for (auto &obj : object3d)
+	{
+		obj->Draw();
+	}
+
 	for (auto &UI : p2dObj)
 	{
 		UI->Draw();

@@ -9,6 +9,8 @@
 
 #include "Scene.h"
 class _2dobj;
+class Map;
+class Object3D;
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -17,6 +19,8 @@ class SceneTitle :
 {
 private:
 	std::vector<_2dobj*> p2dObj;	// 2Dオブジェクト用のポインタ
+	std::vector <Object3D*>		object3d;	// 3Dオブジェクト
+	Map* map;						// マップ
 	bool IsOption;					// 選択肢フラグ
 
 public:

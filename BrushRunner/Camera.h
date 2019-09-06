@@ -32,6 +32,7 @@ typedef struct {
 void InitCamera();
 void UpdateCamera(D3DXVECTOR3 _at);	// SceneGame—p
 void UpdateCamera();				// SceneResult—p
+void UpdateTitleCamera();
 CAMERA *GetCamera();
 void SetCamera();
 

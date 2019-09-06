@@ -15,9 +15,6 @@
 #define LOGO_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
 #define LOGO_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
 
-#define RUNNER_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
-#define RUNNER_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
-
 #define MENU_SIZE			D3DXVECTOR3(702.0f * 0.45f, 515.0f * 0.45f, 0.0f)				// テクスチャサイズ
 #define MENU_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 1.65f, 0.0f)		// テクスチャ座標
 
@@ -32,11 +29,6 @@ TITLE::TITLE(int num)
 		ResourceManager::Instance()->GetTexture("TitleLogo", &D3DTexture);
 		size = LOGO_SIZE;
 		pos = LOGO_POS;
-		break;
-	case TitleRunner:
-		ResourceManager::Instance()->GetTexture("TitleRunner", &D3DTexture);
-		size = RUNNER_SIZE;
-		pos = RUNNER_POS;
 		break;
 	case TitleMenu:
 		ResourceManager::Instance()->GetTexture("TitleMenu", &D3DTexture);

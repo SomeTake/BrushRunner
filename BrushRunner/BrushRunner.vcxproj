@@ -44,6 +44,7 @@
     <ClInclude Include="ResultPlayer.h" />
     <ClInclude Include="ResultRank.h" />
     <ClInclude Include="ResultTimer.h" />
+    <ClInclude Include="Runner.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneChanger.h" />
     <ClInclude Include="SceneExit.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="ResultPlayer.cpp" />
     <ClCompile Include="ResultRank.cpp" />
     <ClCompile Include="ResultTimer.cpp" />
+    <ClCompile Include="Runner.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneChanger.cpp" />
     <ClCompile Include="SceneExit.cpp" />

@@ -10,6 +10,7 @@
 #include "MyLibrary.h"
 #include "Collision.h"
 #include "StageSelectBG.h"
+#include "SceneManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -28,7 +29,7 @@ const char* ObjectFile[] = {
 };
 
 //*****************************************************************************
-// グローバル変数
+// メンバ変数の初期化
 //*****************************************************************************
 std::vector<std::vector<int>> Map::maptbl;
 std::vector<std::vector<int>> Map::objtbl;
@@ -55,8 +56,18 @@ Map::Map()
 	}
 
 	// csvデータ読み込み
-	ReadCsv(MapFile[StageSelectBG::GetStageSelect()], &this->maptbl);
-	ReadCsv(ObjectFile[StageSelectBG::GetStageSelect()], &this->objtbl);
+	if (GetScene() == nSceneGame)
+	{
+		ReadCsv(MapFile[StageSelectBG::GetStageSelect()], &this->maptbl);
+		ReadCsv(ObjectFile[StageSelectBG::GetStageSelect()], &this->objtbl);
+	}
+	else if (GetScene() == nSceneTitle)
+	{
+		int r = rand() % 3;
+
+		ReadCsv(MapFile[r], &this->maptbl);
+		ReadCsv(ObjectFile[r], &this->objtbl);
+	}
 
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
