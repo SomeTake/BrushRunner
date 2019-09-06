@@ -1,46 +1,31 @@
+//=============================================================================
+//
+// タイトル画面処理 [TitleCursor.cpp]
+// Author : HAL東京 GP12B312 11 小松将吉
+//
+//=============================================================================
+#include "TitleCursor.h"
 #include "Main.h"
-#include "Title.h"
 #include "ResourceManager.h"
 #include "SceneTitle.h"
+#include "Input.h"
+#include "Player.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define LOGO_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
-#define LOGO_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
-
-#define RUNNER_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
-#define RUNNER_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
-
-#define MENU_SIZE			D3DXVECTOR3(702.0f * 0.45f, 515.0f * 0.45f, 0.0f)				// テクスチャサイズ
-#define MENU_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 1.65f, 0.0f)		// テクスチャ座標
+#define TITLE_CURSOR_SIZE			D3DXVECTOR3(400.0f * 0.75f, SCREEN_CENTER_Y*0.50f, 0.0f)// テクスチャサイズ
+#define TITLE_CURSOR_POS_START		D3DXVECTOR3(400.0f, SCREEN_CENTER_Y * 1.50f, 0.0f)		// テクスチャ座標
+#define TITLE_CURSOR_POS_EXIT		D3DXVECTOR3(250.0f, SCREEN_CENTER_Y * 1.55f, 0.0f)		// テクスチャ座標
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-TITLE::TITLE(int num)
+TITLECURSOR::TITLECURSOR()
 {
-	switch (num)
-	{
-	case TitleLogo:
-		ResourceManager::Instance()->GetTexture("TitleLogo", &D3DTexture);
-		size = LOGO_SIZE;
-		pos = LOGO_POS;
-		break;
-	case TitleRunner:
-		ResourceManager::Instance()->GetTexture("TitleRunner", &D3DTexture);
-		size = RUNNER_SIZE;
-		pos = RUNNER_POS;
-		break;
-	case TitleMenu:
-		ResourceManager::Instance()->GetTexture("TitleMenu", &D3DTexture);
-		size = MENU_SIZE;
-		pos = MENU_POS;
-		break;
-
-	default:
-		break;
-	}
+	ResourceManager::Instance()->GetTexture("TitleCursor", &D3DTexture);
+	size = TITLE_CURSOR_SIZE;
+	pos = TITLE_CURSOR_POS_START;
 
 	use = true;
 	PatternAnim = 1;
@@ -53,16 +38,16 @@ TITLE::TITLE(int num)
 //=============================================================================
 // デストラクタ
 //=============================================================================
-TITLE::~TITLE()
+TITLECURSOR::~TITLECURSOR()
 {
 	// リソースの開放はリソースマネージャに任せるため、参照をやめるだけ
 	D3DTexture = NULL;
-}
 
+}
 //=============================================================================
 // 更新処理
 //=============================================================================
-void  TITLE::Update()
+void  TITLECURSOR::Update()
 {
 
 	if (use == true)
@@ -70,20 +55,33 @@ void  TITLE::Update()
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
-		SetVertex();
+		for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+		{
+			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(playerNo, STICK_UP))
+			{
+
+				SetVertex();
+
+			}
+			if (GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(playerNo, STICK_DOWN))
+			{
+				SetVertexMove(TITLE_CURSOR_POS_EXIT);
+			}
+
+		}
 	}
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void TITLE::Draw()
+void TITLECURSOR::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
-	
+
 	if (use == true)
 	{
 		// テクスチャの設定（ポリゴンの描画前に読み込んだテクスチャのセットを行う）
@@ -99,7 +97,7 @@ void TITLE::Draw()
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT TITLE::MakeVertex(void)
+HRESULT TITLECURSOR::MakeVertex(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
@@ -131,7 +129,7 @@ HRESULT TITLE::MakeVertex(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void TITLE::SetTexture(int cntPattern)
+void TITLECURSOR::SetTexture(int cntPattern)
 {
 	int x = cntPattern;
 	int y = cntPattern;
@@ -150,7 +148,7 @@ void TITLE::SetTexture(int cntPattern)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void TITLE::SetVertex(void)
+void TITLECURSOR::SetVertex(void)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
@@ -162,7 +160,7 @@ void TITLE::SetVertex(void)
 //=============================================================================
 // 頂点座標の移動
 //=============================================================================
-void TITLE::SetVertexMove(D3DXVECTOR3 pos)
+void TITLECURSOR::SetVertexMove(D3DXVECTOR3 pos)
 {
 	// 頂点座標の設定
 	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);

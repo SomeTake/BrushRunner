@@ -17,6 +17,7 @@ enum TitleUINum
 	TitleLogo,
 	TitleRunner,
 	TitleMenu,
+	TitleCursor,
 	UIMax,										// UI•\¦‚ÌÅ‘å”
 };
 

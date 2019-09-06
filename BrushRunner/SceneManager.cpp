@@ -97,6 +97,7 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("TitleLogo", "data/TEXTURE/Logo.png");
 	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");
 	ResourceManager::Instance()->LoadTexture("TitleMenu", "data/TEXTURE/TitleLogo.png");
+	ResourceManager::Instance()->LoadTexture("TitleCursor", "data/TEXTURE/TitleCursor.png");
 
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");
