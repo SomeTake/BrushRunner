@@ -119,6 +119,7 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Trophy.h" />
+    <ClInclude Include="Tutorial.h" />
     <ClInclude Include="TutorialLogo.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="Trophy.cpp" />
+    <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="TutorialLogo.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />

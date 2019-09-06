@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "Arrow.h"
 #include "ResourceManager.h"
+#include "Tutorial.h"
 
 //*****************************************************************************
 // É}ÉNÉçíËã`
@@ -47,7 +48,28 @@ void Arrow::Update()
 	if (!use)
 		return;
 
-
+	if (reverse)
+	{
+		if (Tutorial::GetSlideNo() == 0)
+		{
+			draw = false;
+		}
+		else
+		{
+			draw = true;
+		}
+	}
+	else
+	{
+		if (Tutorial::GetSlideNo() == 2)
+		{
+			draw = false;
+		}
+		else
+		{
+			draw = true;
+		}
+	}
 }
 
 //=============================================================================

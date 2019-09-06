@@ -131,7 +131,7 @@ void SceneManager::LoadResource()
 
 	// SceneTutorial
 	ResourceManager::Instance()->LoadTexture("TutorialLogo", "data/TEXTURE/TutorialLogo.png");
-	ResourceManager::Instance()->LoadTexture("TutorialBG", "data/TEXTURE/Tutorial.png");
+	ResourceManager::Instance()->LoadTexture("Tutorial", "data/TEXTURE/Tutorial.png");
 	ResourceManager::Instance()->LoadTexture("Arrow", "data/TEXTURE/Arrow.png");
 
 	// SceneStageSelect

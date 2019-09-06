@@ -12,12 +12,16 @@
 #include "CircleSceneChanger.h"
 #include "TutorialLogo.h"
 #include "Arrow.h"
+#include "Tutorial.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SceneTutorial::SceneTutorial()
 {
+	// 説明
+	obj.push_back(new Tutorial());
+
 	// ロゴ
 	obj.push_back(new TutorialLogo());
 
