@@ -47,7 +47,7 @@ void ParticleManager::Update()
 		Particle->Update();
 	}
 
-#ifndef _DEBUG_
+#if _DEBUG_
 	//Debug();
 #endif
 }

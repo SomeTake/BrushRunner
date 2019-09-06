@@ -58,10 +58,10 @@ SceneGame::SceneGame()
 	PaintManager::SetPaintGroupPtr(paintGroup);
 
 	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»
-	//for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
-	//{
-	//	pPlayer[PlayerNo] = new Player(PlayerNo, false);
-	//}
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
+	{
+		pPlayer[PlayerNo] = new Player(PlayerNo, false);
+	}
 
 #if _DEBUG
 	pPlayer[0] = new Player(0, false);
@@ -502,7 +502,7 @@ void SceneGame::InsertResult(int pNo)
 //=============================================================================
 void SceneGame::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG_
 	BeginDebugWindow("Result");
 
 	DebugText("All Goal or Gameover : %s", result ? "True" : "False");

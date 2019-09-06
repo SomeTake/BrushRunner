@@ -170,7 +170,7 @@ void SceneResult::Draw()
 //=============================================================================
 void SceneResult::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG_
 	BeginDebugWindow("Result");
 
 	DebugText("No1:%d No2:%d No3:%d No4:%d", SceneGame::GetResultData(0)->playerNo, SceneGame::GetResultData(1)->playerNo, SceneGame::GetResultData(2)->playerNo, SceneGame::GetResultData(3)->playerNo);

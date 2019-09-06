@@ -89,7 +89,9 @@ void Tutorial::Update()
 	SetTexture();
 	SetVertex();
 
+#if _DEBUG
 	Debug();
+#endif
 }
 
 //=============================================================================

@@ -119,7 +119,9 @@ void Item::Update()
 			ActiveState(PatternAnim);
 		}
 
+#if _DEBUG
 		Debug();
+#endif
 	}
 }
 
@@ -287,7 +289,6 @@ void Item::Reset()
 //=============================================================================
 void Item::Debug()
 {
-#if _DEBUG
 	if (GetKeyboardTrigger(DIK_NUMPAD0))
 	{
 		use = true;
@@ -380,5 +381,4 @@ void Item::Debug()
 	EndDebugWindow("Item");
 #endif
 
-#endif
 }
