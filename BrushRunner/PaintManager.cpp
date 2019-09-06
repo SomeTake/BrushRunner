@@ -70,6 +70,8 @@ PaintManager::~PaintManager()
 	// ƒƒ‚ƒŠƒŠƒŠ[ƒX
 	SAFE_DELETE(this->pCursor);
 
+
+
 	for (auto &Object : this->inkGauge)
 	{
 		SAFE_DELETE(Object);
