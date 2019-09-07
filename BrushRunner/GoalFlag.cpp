@@ -9,12 +9,20 @@
 #include "Map.h"
 #include "Camera.h"
 #include "ResourceManager.h"
+#include "StageSelectBG.h"
+#include "DebugWindow.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define GOAL_SIZE		D3DXVECTOR3(12.8f, 12.8f, 0.0f)
 #define FLAG_POS		D3DXVECTOR3(GOAL_POS.x, -88.0f, -10.0f)
+
+D3DXVECTOR3 GoalFlagPos[] = {
+	D3DXVECTOR3(GOAL_POS.x, -530.0f, 0.0f),
+	D3DXVECTOR3(GOAL_POS.x, -270.0f, 0.0f),
+	D3DXVECTOR3(GOAL_POS.x, -470.0f, 0.0f),
+};
 
 //=============================================================================
 // コンストラクタ
@@ -23,7 +31,7 @@ GoalFlag::GoalFlag()
 {
 	ResourceManager::Instance()->GetTexture("GoalFlag", &D3DTexture);
 
-	pos = FLAG_POS;
+	pos = GoalFlagPos[StageSelectBG::GetStageSelect()];
 	scl = GOAL_SIZE;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
