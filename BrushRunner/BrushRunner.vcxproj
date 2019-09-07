@@ -54,7 +54,6 @@
     <ClInclude Include="CharacterAI.h" />
     <ClInclude Include="Chip.h" />
     <ClInclude Include="Collision.h" />
-    <ClInclude Include="colorinkline.h" />
     <ClInclude Include="CountDown.h" />
     <ClInclude Include="Cursor.h" />
     <ClInclude Include="D3DXAnimation.h" />
@@ -158,7 +157,6 @@
     <ClCompile Include="CharacterAI.cpp" />
     <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="colorinkline.cpp" />
     <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />

@@ -50,6 +50,7 @@ SceneTitle::SceneTitle()
 //=============================================================================
 SceneTitle::~SceneTitle()
 {
+	// 2Dオブジェクトの開放
 	for (auto &UI : p2dObj)
 	{
 		SAFE_DELETE(UI);
@@ -57,8 +58,10 @@ SceneTitle::~SceneTitle()
 	p2dObj.clear();
 	ReleaseVector(p2dObj);
 
+	// マップの開放
 	SAFE_DELETE(map);
 
+	// 3Dオブジェクトの開放
 	for (auto &obj : object3d)
 	{
 		SAFE_DELETE(obj);
@@ -72,7 +75,7 @@ SceneTitle::~SceneTitle()
 //=============================================================================
 void SceneTitle::Update(int SceneID)
 {
-	
+	// モード選択
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
@@ -112,15 +115,19 @@ void SceneTitle::Update(int SceneID)
 
 	}
 
+	// カメラの更新
 	UpdateTitleCamera();
 
+	// 2Dオブジェクトの更新
 	for (auto &UI : p2dObj)
 	{
 		UI->Update();
 	}
 
+	// マップの更新
 	map->Update();
 
+	// 3Dオブジェクトの更新
 	for (auto &obj : object3d)
 	{
 		obj->Update();
@@ -133,13 +140,16 @@ void SceneTitle::Update(int SceneID)
 //=============================================================================
 void SceneTitle::Draw()
 {
+	// マップの描画
 	map->Draw();
 
+	// 3Dオブジェクトの描画
 	for (auto &obj : object3d)
 	{
 		obj->Draw();
 	}
 
+	// 2Dオブジェクトの描画
 	for (auto &UI : p2dObj)
 	{
 		UI->Draw();

@@ -141,17 +141,9 @@ MeshField::MeshField()
 //=============================================================================
 MeshField::~MeshField()
 {
-	if (D3DVtxBuff)
-	{// 頂点バッファの開放
-		D3DVtxBuff->Release();
-		D3DVtxBuff = NULL;
-	}
 
-	if (D3DIdxBuff)
-	{// インデックスバッファの開放
-		D3DIdxBuff->Release();
-		D3DIdxBuff = NULL;
-	}
+	SAFE_RELEASE(D3DVtxBuff);
+	SAFE_RELEASE(D3DIdxBuff);
 
 	D3DTexture = NULL;
 }

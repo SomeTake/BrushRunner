@@ -40,6 +40,7 @@ SceneTutorial::SceneTutorial()
 //=============================================================================
 SceneTutorial::~SceneTutorial()
 {
+	// 2Dオブジェクトの開放
 	for (auto &Object : obj)
 	{
 		SAFE_DELETE(Object);

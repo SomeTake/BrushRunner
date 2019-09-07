@@ -59,6 +59,8 @@ Item::Item(Player *ptr)
 Item::~Item()
 {
 	D3DTexture = NULL;
+	
+	pPlayer = nullptr;
 
 	// ステートパターンの削除
 	for (int i = 0; i < NumItemMax; i++)

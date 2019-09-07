@@ -39,11 +39,7 @@ SkyBox::SkyBox()
 //*****************************************************************************
 SkyBox::~SkyBox()
 {
-	if (D3DVtxBuff)
-	{// 頂点バッファの開放
-		D3DVtxBuff->Release();
-		D3DVtxBuff = NULL;
-	}
+	SAFE_RELEASE(D3DVtxBuff);
 
 	D3DTexture = NULL;
 }
