@@ -92,7 +92,7 @@ void SceneTitle::Update(int SceneID)
 			{
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
-					SetScene(new SceneTutorial(), nSceneTutorial);
+					SetScene(nSceneTutorial);
 					InitCamera();
 				});
 				return;
@@ -103,7 +103,7 @@ void SceneTitle::Update(int SceneID)
 
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
-					SetScene(new SceneExit(), nSceneExit);
+					SetScene( nSceneExit);
 				});
 				return;
 			}

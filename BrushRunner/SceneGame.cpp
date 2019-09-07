@@ -406,7 +406,7 @@ void SceneGame::CheckResult()
 			{
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
-					SetScene(new SceneResult(), nSceneResult);
+					SetScene(nSceneResult);
 					InitCamera();
 				});
 				return;

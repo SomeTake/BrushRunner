@@ -182,11 +182,37 @@ void SceneManager::LoadResource()
 //=====================================================================================================
 // ÉVÅ[ÉìëJà⁄
 //=====================================================================================================
-void SetScene(Scene *NewScene, int _scene)
+void SetScene(int _scene)
 {
 	eScene = _scene;
-	delete scene;
-	scene = NewScene;
+	SAFE_DELETE(scene)
+
+	switch (_scene)
+	{
+	case nSceneTitle:
+		scene = new SceneTitle();
+		break;
+	case nSceneTutorial:
+		scene = new SceneTutorial();
+		break;
+	case nSceneStageSelect:
+		scene = new SceneStageSelect();
+		break;
+	case nSceneCharacterSelect:
+		scene = new SceneCharacterSelect();
+		break;
+	case nSceneGame:
+		scene = new SceneGame();
+		break;
+	case nSceneResult:
+		scene = new SceneResult();
+		break;
+	case nSceneExit:
+		scene = new SceneExit();
+		break;
+	default:
+		break;
+	}
 }
 
 //=====================================================================================================

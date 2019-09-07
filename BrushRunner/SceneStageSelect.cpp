@@ -59,7 +59,7 @@ void SceneStageSelect::Update(int SceneID)
 		{
 			CircleSceneChanger::Instance()->SetChanger(true, []() 
 			{
-				SetScene(new SceneCharacterSelect(), nSceneCharacterSelect);
+				SetScene(nSceneCharacterSelect);
 			});
 			return;
 		}

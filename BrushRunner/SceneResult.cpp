@@ -106,7 +106,7 @@ void SceneResult::Update(int SceneID)
 		{
 			CircleSceneChanger::Instance()->SetChanger(true, [] 
 			{
-				SetScene(new SceneTitle(), nSceneTitle);
+				SetScene(nSceneTitle);
 			});
 			return;
 		}

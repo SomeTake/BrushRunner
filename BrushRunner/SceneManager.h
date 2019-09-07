@@ -37,6 +37,7 @@ public:
 };
 
 int GetScene();									// 現在のゲームシーンを取得する
-void SetScene(Scene *NewScene, int _scene);		// ゲームシーンを変更する
+//void SetScene(Scene *NewScene, int _scene);		// ゲームシーンを変更する
+void SetScene(int _scene);		// ゲームシーンを変更する
 
 #endif

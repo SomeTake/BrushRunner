@@ -60,7 +60,7 @@ void SceneTutorial::Update(int SceneID)
 		{
 			CircleSceneChanger::Instance()->SetChanger(true, []() 
 			{
-				SetScene(new SceneStageSelect(), nSceneStageSelect);
+				SetScene(nSceneStageSelect);
 			});
 			break;
 		}
