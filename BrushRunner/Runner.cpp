@@ -7,13 +7,15 @@
 #include "Main.h"
 #include "Runner.h"
 #include "ResourceManager.h"
+#include "ParticleManager.h"
+#include "MyLibrary.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define RUNNER_SIZE			D3DXVECTOR3(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 0.75f, 0.0f)	// テクスチャサイズ
-#define RUNNER_FIRST_POS	D3DXVECTOR3(-SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)
-#define RUNNER_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.75f, 0.0f)		// テクスチャ座標
+#define RUNNER_SIZE			D3DXVECTOR3(380.0f, 380.0f, 0.0f)	// テクスチャサイズ
+#define RUNNER_FIRST_POS	D3DXVECTOR3(-SCREEN_CENTER_X, SCREEN_CENTER_Y * 0.9f, 0.0f)
+#define RUNNER_POS			D3DXVECTOR3(SCREEN_CENTER_X * 1.4f, SCREEN_CENTER_Y * 0.9f, 0.0f)		// テクスチャ座標
 #define RUNNER_MOVE_VALUE	(50.0f)
 
 //=============================================================================
@@ -53,7 +55,16 @@ void Runner::Update()
 		if (pos.x >= RUNNER_POS.x)
 		{
 			// エフェクト発生
+			std::vector<UIParticle*> *particle = ParticleManager::GetUIParticle();
 
+			D3DXVECTOR3 move;
+
+			for (int i = 0; i < 100; i++)
+			{
+				move.x = RandomRange(-30.0f, 30.0f);
+				move.y = RandomRange(-30.0f, 30.0f);
+				particle->push_back(new UIParticle(pos, move, MyColor[nWhite], D3DXVECTOR3(10.0f, 10.0f, 0.0f), 120));
+			}
 		}
 	}
 

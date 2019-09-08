@@ -133,8 +133,7 @@ void SceneResult::Update(int SceneID)
 	}
 
 	// 毎フレームパーティクルを発生させる
-	std::vector<Confetti*> *confetti = ParticleManager::GetConfettiVector();
-	confetti->push_back(new Confetti());
+	particleManager->SetConfetti();
 
 	// パーティクルマネージャの更新
 	particleManager->Update();

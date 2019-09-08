@@ -122,6 +122,7 @@
     <ClInclude Include="Trophy.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="TutorialLogo.h" />
+    <ClInclude Include="UIParticle.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
@@ -221,6 +222,7 @@
     <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="TutorialLogo.cpp" />
+    <ClCompile Include="UIParticle.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>

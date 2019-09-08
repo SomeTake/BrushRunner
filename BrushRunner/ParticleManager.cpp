@@ -8,7 +8,7 @@
 #include "ParticleManager.h"
 #include "DebugWindow.h"
 
-std::vector<Confetti*> ParticleManager::confettiVector;	// 紙吹雪
+std::vector<UIParticle*> ParticleManager::uiparticleVector;
 
 //=============================================================================
 // コンストラクタ
@@ -17,6 +17,7 @@ ParticleManager::ParticleManager()
 {
 	// メモリ確保
 	confettiVector.reserve(500);
+	uiparticleVector.reserve(500);
 }
 
 //=============================================================================
@@ -31,6 +32,13 @@ ParticleManager::~ParticleManager()
 	}
 	confettiVector.clear();
 	ReleaseVector(confettiVector);
+
+	for (auto &Particle : uiparticleVector)
+	{
+		SAFE_DELETE(Particle);
+	}
+	uiparticleVector.clear();
+	ReleaseVector(uiparticleVector);
 }
 
 //=============================================================================
@@ -46,6 +54,11 @@ void ParticleManager::Update()
 		Confetti->Update();
 	}
 
+	for (auto &Particle : uiparticleVector)
+	{
+		Particle->Update();
+	}
+
 #if _DEBUG_
 	//Debug();
 #endif
@@ -59,6 +72,11 @@ void ParticleManager::Draw()
 	for (auto &Confetti : confettiVector)
 	{
 		Confetti->Draw();
+	}
+
+	for (auto &Particle : uiparticleVector)
+	{
+		Particle->Draw();
 	}
 }
 
@@ -79,6 +97,20 @@ void ParticleManager::Check()
 			Confetti++;
 		}
 	}
+
+	for (auto Particle = uiparticleVector.begin(); Particle != uiparticleVector.end();)
+	{
+		if ((*Particle)->GetUse() == false)
+		{
+			SAFE_DELETE((*Particle));
+			Particle = uiparticleVector.erase(Particle);
+		}
+		else
+		{
+			Particle++;
+		}
+	}
+
 }
 
 //=============================================================================
@@ -100,9 +132,17 @@ void ParticleManager::Debug()
 }
 
 //=============================================================================
-// ゲッター
+// 紙吹雪のセット
 //=============================================================================
-std::vector<Confetti*>*ParticleManager::GetConfettiVector()
+void ParticleManager::SetConfetti()
 {
-	return &confettiVector;
+	confettiVector.push_back(new Confetti());
+}
+
+//=============================================================================
+// UI用パーティクルベクターのゲット
+//=============================================================================
+std::vector<UIParticle*> *ParticleManager::GetUIParticle()
+{
+	return &uiparticleVector;
 }
