@@ -19,6 +19,7 @@
 #include "Sky.h"
 #include "Camera.h"
 #include "Runner.h"
+#include "ParticleManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -39,6 +40,9 @@ SceneTitle::SceneTitle()
 
 	// 3Dオブジェクト
 	object3d.push_back(new Sky());
+
+	// パーティクルマネージャ
+	particleManager = new ParticleManager();
 
 /*****************************************************************************/
 	// シーンチェンジの終了
@@ -68,6 +72,9 @@ SceneTitle::~SceneTitle()
 	}
 	object3d.clear();
 	ReleaseVector(object3d);
+
+	// パーティクルマネージャの開放
+	SAFE_DELETE(particleManager);
 }
 
 //=============================================================================
@@ -133,6 +140,8 @@ void SceneTitle::Update(int SceneID)
 		obj->Update();
 	}
 
+	// パーティクルマネージャの更新
+	particleManager->Update();
 }
 
 //=============================================================================
@@ -154,4 +163,7 @@ void SceneTitle::Draw()
 	{
 		UI->Draw();
 	}
+
+	// パーティクルマネージャの描画
+	particleManager->Draw();
 }

@@ -8,13 +8,16 @@
 #include "ParticleManager.h"
 #include "DebugWindow.h"
 
+std::vector<UIParticle*> ParticleManager::uiparticleVector;
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 ParticleManager::ParticleManager()
 {
 	// メモリ確保
-	particle.reserve(500);
+	confettiVector.reserve(500);
+	uiparticleVector.reserve(500);
 }
 
 //=============================================================================
@@ -23,12 +26,19 @@ ParticleManager::ParticleManager()
 ParticleManager::~ParticleManager()
 {
 	// ベクターの削除
-	for (auto &Particle : particle)
+	for (auto &Particle : confettiVector)
 	{
 		SAFE_DELETE(Particle);
 	}
-	particle.clear();
-	ReleaseVector(particle);
+	confettiVector.clear();
+	ReleaseVector(confettiVector);
+
+	for (auto &Particle : uiparticleVector)
+	{
+		SAFE_DELETE(Particle);
+	}
+	uiparticleVector.clear();
+	ReleaseVector(uiparticleVector);
 }
 
 //=============================================================================
@@ -36,13 +46,15 @@ ParticleManager::~ParticleManager()
 //=============================================================================
 void ParticleManager::Update()
 {
-	// 一定時間ごとにパーティクルを発生させる
-	particle.push_back(new Particle());
-
 	// 使用確認
 	Check();
 
-	for (auto &Particle : particle)
+	for (auto &Confetti : confettiVector)
+	{
+		Confetti->Update();
+	}
+
+	for (auto &Particle : uiparticleVector)
 	{
 		Particle->Update();
 	}
@@ -57,7 +69,12 @@ void ParticleManager::Update()
 //=============================================================================
 void ParticleManager::Draw()
 {
-	for (auto &Particle : particle)
+	for (auto &Confetti : confettiVector)
+	{
+		Confetti->Draw();
+	}
+
+	for (auto &Particle : uiparticleVector)
 	{
 		Particle->Draw();
 	}
@@ -68,18 +85,32 @@ void ParticleManager::Draw()
 //=============================================================================
 void ParticleManager::Check()
 {
-	for (auto Particle = particle.begin(); Particle != particle.end();)
+	for (auto Confetti = confettiVector.begin(); Confetti != confettiVector.end();)
+	{
+		if ((*Confetti)->GetUse() == false)
+		{
+			SAFE_DELETE((*Confetti));
+			Confetti = confettiVector.erase(Confetti);
+		}
+		else
+		{
+			Confetti++;
+		}
+	}
+
+	for (auto Particle = uiparticleVector.begin(); Particle != uiparticleVector.end();)
 	{
 		if ((*Particle)->GetUse() == false)
 		{
 			SAFE_DELETE((*Particle));
-			Particle = particle.erase(Particle);
+			Particle = uiparticleVector.erase(Particle);
 		}
 		else
 		{
 			Particle++;
 		}
 	}
+
 }
 
 //=============================================================================
@@ -88,7 +119,7 @@ void ParticleManager::Check()
 void ParticleManager::Debug()
 {
 	int count = 0;
-	for (auto &p : particle)
+	for (auto &p : confettiVector)
 	{
 		count++;
 	}
@@ -98,4 +129,20 @@ void ParticleManager::Debug()
 	DebugText("Count:%d", count);
 
 	EndDebugWindow("Particle");
+}
+
+//=============================================================================
+// 紙吹雪のセット
+//=============================================================================
+void ParticleManager::SetConfetti()
+{
+	confettiVector.push_back(new Confetti());
+}
+
+//=============================================================================
+// UI用パーティクルベクターのゲット
+//=============================================================================
+std::vector<UIParticle*> *ParticleManager::GetUIParticle()
+{
+	return &uiparticleVector;
 }

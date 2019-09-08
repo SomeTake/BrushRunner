@@ -7,16 +7,16 @@
 #ifndef _PARTICLEMANAGER_H_
 #define _PARTICLEMANAGER_H_
 
-#include "Particle.h"
-
+#include "Confetti.h"
+#include "UIParticle.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
 class ParticleManager
 {
 private:
-	std::vector<Particle*> particle;
-
+	std::vector<Confetti*> confettiVector;		// 紙吹雪
+	static std::vector<UIParticle*> uiparticleVector;	// UI用パーティクル
 	void Check();
 	void Debug();
 
@@ -26,6 +26,9 @@ public:
 
 	void Update();
 	void Draw();
+
+	void SetConfetti();
+	static std::vector<UIParticle*> *GetUIParticle();
 };
 
 #endif

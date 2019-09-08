@@ -35,7 +35,7 @@
     <ClInclude Include="MeshField.h" />
     <ClInclude Include="MyColor.h" />
     <ClInclude Include="Object3D.h" />
-    <ClInclude Include="Particle.h" />
+    <ClInclude Include="Confetti.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Podium.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -122,6 +122,7 @@
     <ClInclude Include="Trophy.h" />
     <ClInclude Include="Tutorial.h" />
     <ClInclude Include="TutorialLogo.h" />
+    <ClInclude Include="UIParticle.h" />
     <ClInclude Include="VictoryState.h" />
     <ClInclude Include="_2dobj.h" />
   </ItemGroup>
@@ -139,7 +140,7 @@
     <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="MeshField.cpp" />
     <ClCompile Include="Object3D.cpp" />
-    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="Confetti.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Podium.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="Trophy.cpp" />
     <ClCompile Include="Tutorial.cpp" />
     <ClCompile Include="TutorialLogo.cpp" />
+    <ClCompile Include="UIParticle.cpp" />
     <ClCompile Include="VictoryState.cpp" />
     <ClCompile Include="_2dobj.cpp" />
   </ItemGroup>
