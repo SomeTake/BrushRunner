@@ -7,7 +7,7 @@
 #ifndef _PARTICLEMANAGER_H_
 #define _PARTICLEMANAGER_H_
 
-#include "Particle.h"
+#include "Confetti.h"
 
 //*****************************************************************************
 // ÉNÉâÉXíËã`
@@ -15,7 +15,7 @@
 class ParticleManager
 {
 private:
-	std::vector<Particle*> particle;
+	static std::vector<Confetti*> confettiVector;	// éÜêÅê·
 
 	void Check();
 	void Debug();
@@ -26,6 +26,8 @@ public:
 
 	void Update();
 	void Draw();
+
+	static std::vector<Confetti*> *GetConfettiVector();
 };
 
 #endif

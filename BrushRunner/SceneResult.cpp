@@ -22,6 +22,7 @@
 #include "SkyBox.h"
 #include "MeshField.h"
 #include "CircleSceneChanger.h"
+#include "Confetti.h"
 
 //=============================================================================
 // コンストラクタ
@@ -130,6 +131,10 @@ void SceneResult::Update(int SceneID)
 	{
 		Obj->Update();
 	}
+
+	// 毎フレームパーティクルを発生させる
+	std::vector<Confetti*> *confetti = ParticleManager::GetConfettiVector();
+	confetti->push_back(new Confetti());
 
 	// パーティクルマネージャの更新
 	particleManager->Update();

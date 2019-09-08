@@ -5,7 +5,7 @@
 //
 //=============================================================================
 #include "Main.h"
-#include "Particle.h"
+#include "Confetti.h"
 #include "Camera.h"
 #include "MyLibrary.h"
 #include "ResourceManager.h"
@@ -26,7 +26,7 @@
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Particle::Particle()
+Confetti::Confetti()
 {
 	ResourceManager::Instance()->GetTexture("Confetti", &D3DTexture);
 
@@ -52,7 +52,7 @@ Particle::Particle()
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Particle::~Particle()
+Confetti::~Confetti()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
@@ -63,7 +63,7 @@ Particle::~Particle()
 //=============================================================================
 // 更新
 //=============================================================================
-void Particle::Update()
+void Confetti::Update()
 {
 	// 使用しているもののみ更新
 	if (use)
@@ -90,7 +90,7 @@ void Particle::Update()
 //=============================================================================
 // 描画
 //=============================================================================
-void Particle::Draw()
+void Confetti::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 	CAMERA *cameraWk = GetCamera();
@@ -163,7 +163,7 @@ void Particle::Draw()
 		Device->SetFVF(FVF_VERTEX_3D);
 
 		// テクスチャの設定
-		Device->SetTexture(0, Particle::D3DTexture);
+		Device->SetTexture(0, Confetti::D3DTexture);
 
 		// ポリゴンの描画
 		Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
@@ -190,7 +190,7 @@ void Particle::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT Particle::MakeVertex()
+HRESULT Confetti::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 

@@ -49,6 +49,12 @@ void Runner::Update()
 	if (pos.x < RUNNER_POS.x)
 	{
 		pos.x += RUNNER_MOVE_VALUE;
+
+		if (pos.x >= RUNNER_POS.x)
+		{
+			// エフェクト発生
+
+		}
 	}
 
 	SetVertex();

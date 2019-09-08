@@ -1,18 +1,18 @@
 //=============================================================================
 //
-// パーティクル [Particle.h]
+// 紙吹雪 [Confetti.h]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
-#ifndef _PARTICLE_H_
-#define _PARTICLE_H_
+#ifndef _CONFETTI_H_
+#define _CONFETTI_H_
 
 #include "Billboard.h"
 
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Particle :
+class Confetti :
 	public Billboard
 {
 private:
@@ -22,8 +22,8 @@ private:
 	HRESULT MakeVertex();
 
 public:
-	Particle();
-	~Particle();
+	Confetti();
+	~Confetti();
 
 	void Update();
 	void Draw();
