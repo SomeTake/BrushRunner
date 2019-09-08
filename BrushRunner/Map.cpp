@@ -19,13 +19,13 @@
 const char* MapFile[] = {
 	("data/MAP/Gourmet_ground.csv"),
 	("data/MAP/Ice_ground.csv"),
-	("data/MAP/Lava_ground.csv")
+	("data/MAP/Lava_ground.csv"),
 };
 
 const char* ObjectFile[] = {
 	("data/MAP/Gourmet_object.csv"),
 	("data/MAP/Ice_object.csv"),
-	("data/MAP/Lava_object.csv")
+	("data/MAP/Lava_object.csv"),
 };
 
 //*****************************************************************************
@@ -84,26 +84,6 @@ Map::Map()
 			}
 		}
 	}
-
-#if 0
-	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
-	{
-		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
-		{
-			pChip[cntY][cntX] = new Chip(cntX, cntY, maptbl.at(cntY).at(cntX));
-			if (maptbl.at(cntY).at(cntX) >= 0)
-			{
-				this->MapChipVector.push_back(pChip[cntY][cntX]);
-			}
-
-			pObjChip[cntY][cntX] = new ObjectChip(cntX, cntY, objtbl[cntY][cntX]);
-			if (objtbl[cntY][cntX] >= 0)
-			{
-				this->ObjectChipVector.push_back(pObjChip[cntY][cntX]);
-			}
-		}
-	}
-#endif
 }
 
 //=============================================================================
@@ -201,33 +181,6 @@ void Map::PaintCollider(QUADTREE *Quadtree, int NodeID)
 				break;
 			}
 		}
-
-		//for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
-		//{
-		//	for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
-		//	{
-		//		// 存在している、かつ反転していないものを探す
-		//		if (objtbl[cntY][cntX] = -1 || pObjChip[cntY][cntX]->GetReverse() ||
-		//			!pObjChip[cntY][cntX]->GetUse())
-		//			continue;
-
-		//		// 中身の確認
-		//		if (!(objtbl[cntY][cntX] == OBJ_NUM_SPDUP || objtbl[cntY][cntX] == OBJ_NUM_SPDDOWN ||
-		//			objtbl[cntY][cntX] == OBJ_NUM_DRAIN || objtbl[cntY][cntX] == OBJ_NUM_HEAL))
-		//			continue;
-
-		//		// ペイントとフィールドオブジェクトを判定する
-		//		if (HitSphere(BlackPaint->GetPos(), pObjChip[cntY][cntX]->GetPos(), Paint::GetPaintRadius(), CHIP_SIZE))
-		//		{
-		//			// ヒットした場合そのペイントを消す
-		//			BlackPaint->SetUse(false);
-		//			// フィールドオブジェクトを反転させる
-		//			pObjChip[cntY][cntX]->SetReverse(true);
-		//			pObjChip[cntY][cntX]->ReverseTexture();
-		//			break;
-		//		}
-		//	}
-		//}
 	}
 }
 
@@ -252,6 +205,9 @@ D3DXVECTOR3 Map::GetMapChipPos(int x, int y, int PosType)
 	{
 	case eLeftUp:
 		Pos = D3DXVECTOR3(x * CHIP_SIZE - CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
+		break;
+	case eLeftCenter:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE - CHIP_SIZE / 2, -(y * CHIP_SIZE), 0.0f);
 		break;
 	case eRightUp:
 		Pos = D3DXVECTOR3(x * CHIP_SIZE + CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);

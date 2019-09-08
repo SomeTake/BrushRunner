@@ -58,13 +58,13 @@ SceneGame::SceneGame()
 	PaintManager::SetPaintGroupPtr(paintGroup);
 
 #if _DEBUG
-	pPlayer[0] = new Player(0, false);
+	pPlayer[0] = new Player(0, true);
 	pPlayer[1] = new Player(1, true);
 	//pPlayer[1]->SetOnCamera(false);
 	pPlayer[2] = new Player(2, true);
-	//pPlayer[2]->SetOnCamera(false);
+	pPlayer[2]->SetOnCamera(false);
 	pPlayer[3] = new Player(3, true);
-	//pPlayer[3]->SetOnCamera(false);
+	pPlayer[3]->SetOnCamera(false);
 #else
 	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
