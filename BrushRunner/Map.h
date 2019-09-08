@@ -23,6 +23,7 @@
 enum e_ChipPosType
 {
 	eLeftUp,	// マップチップの左上の座標 
+	eLeftCenter,// マップチップの左中央の座標 
 	eRightUp,	// マップチップの右上の座標 
 	eCenter,	// マップチップの中心の座標 
 	eCenterUp,	// マップチップの中央の上の座標

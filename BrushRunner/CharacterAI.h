@@ -59,6 +59,7 @@ private:
 
 	D3DXVECTOR3	PaintStartPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ペイントの始点
 	D3DXVECTOR3	PaintEndPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	// ペイントの終点
+	D3DXVECTOR3 PrePos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);			// 前のフレームの座標
 	GroupStruct *EnemyPaint;				// 削除するペイント
 	int			Owner = 0;					// AIの所有者
 	int			Action = eNoAction;			// AIの行動
@@ -67,6 +68,7 @@ private:
 	int			InkType = ColorInk;			// インクの種類
 	int			InkState[InkNum];			// インク残量の状態
 	int			ItemType = 0;				// 持っているアイテムの種類
+	int			StopCount = 0;				// 動けないカウント
 	bool		ChangeInk = false;			// インクを変更するフラグ
 	bool		HaveItem = false;			// アイテムを持っているフラグ
 	bool		UseItem = false;			// アイテムを使用するフラグ

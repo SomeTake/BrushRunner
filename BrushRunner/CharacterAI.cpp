@@ -28,8 +28,8 @@ enum e_ChipEvent
 	eJumpChip = -3,			// ジャンプする
 	ePaintChip = -4,		// ペイントする
 	ePlatformEdge = -5,		// 向こうのプラットフォームのへり
-	ePaintObject = -6,		// 前方のオブジェクトチップをペイントする
-	ePlatformEdge_Item = -7,// プラットフォームのへり(アイテムあり)
+	ePlatformEdge_Item = -6,// プラットフォームのへり(アイテムあり)
+	ePaintObject = -7,		// 前方のオブジェクトチップをペイントする
 };
 
 #if _DEBUG
@@ -73,6 +73,23 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 	this->DrawLineFlag = false;
 #endif
 
+	// 暫くプレイヤーが動けないなら
+	if (Pos == PrePos)
+	{
+		StopCount++;
+		if (StopCount >= 30)
+		{
+			// ジャンプする
+			this->Action = eActJump;
+			StopCount = 0;
+		}
+	}
+	else
+	{
+		StopCount = 0;
+	}
+
+
 	// マップチップの番号によって行動する
 	MapChipAction(Pos, MapChipNo);
 
@@ -87,6 +104,9 @@ void CharacterAI::Update(D3DXVECTOR3 Pos)
 	{
 		ItemAction();
 	}
+
+	// 1フレーム前の座標を保存する
+	PrePos = Pos;
 
 #if _DEBUG
 	ImGui::SetNextWindowPos(ImVec2(5, 330), ImGuiSetCond_Once);
@@ -120,7 +140,6 @@ void CharacterAI::MapChipAction(D3DXVECTOR3 Pos, int MapChipNo)
 		// 落下
 		if (Random == 0)
 		{
-			this->FindPlatform(Pos);
 			;	// 何もしない
 		}
 		// ペイント
@@ -366,13 +385,13 @@ void CharacterAI::FindPlatform(D3DXVECTOR3 Pos)
 			if (k == ePlatformEdge || k == ePlatformEdge_Item)
 			{
 				// 探したプラットフォームの座標
-				TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
+				TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftCenter));
 
 				// 向こうにアイテムがあったら、行く確率が高くなる
 				if (k == ePlatformEdge_Item)
 				{
-					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
-					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftUp));
+					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftCenter));
+					TempPos.push_back(Map::GetMapChipPos(i, j + 1, eLeftCenter));
 				}
 
 				Trigger = true;
