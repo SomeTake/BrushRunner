@@ -20,7 +20,7 @@ LPDIRECT3DVERTEXBUFFER9	FieldItem::D3DVtxBuff = NULL;
 //=============================================================================
 FieldItem::FieldItem(int _texno, D3DXVECTOR3 _pos, D3DXVECTOR3 _move)
 {
-	ResourceManager::Instance()->GetTexture("Item", &D3DTexture);
+	ResourceManager::Instance()->GetTexture("FieldItem", &D3DTexture);
 
 	pos = _pos;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);

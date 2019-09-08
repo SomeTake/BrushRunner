@@ -71,6 +71,7 @@ SceneGame::SceneGame()
 	{
 		pPlayer[PlayerNo] = new Player(PlayerNo, false);
 	}
+#endif
 
 	// 2DUI‚Ì‰Šú‰»
 	// ƒtƒŒ[ƒ€

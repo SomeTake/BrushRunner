@@ -168,7 +168,7 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("FaceFrame", "data/texture/faceframe.png");
 	ResourceManager::Instance()->LoadTexture("MiniPlayer", "data/TEXTURE/MiniPlayer.png");
 	ResourceManager::Instance()->LoadTexture("Pop", "data/TEXTURE/pointer.png");
-	ResourceManager::Instance()->LoadTexture("Timer", "data/TEXTURE/Colon.png");
+	ResourceManager::Instance()->LoadTexture("FieldItem", "data/TEXTURE/FieldItem.png");
 
 	// SceneResult
 	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");
