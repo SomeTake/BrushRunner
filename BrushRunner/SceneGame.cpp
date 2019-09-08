@@ -57,21 +57,20 @@ SceneGame::SceneGame()
 	paintGroup = new PaintGroup();
 	PaintManager::SetPaintGroupPtr(paintGroup);
 
+#if _DEBUG
+	pPlayer[0] = new Player(0, false);
+	pPlayer[1] = new Player(1, true);
+	//pPlayer[1]->SetOnCamera(false);
+	pPlayer[2] = new Player(2, true);
+	//pPlayer[2]->SetOnCamera(false);
+	pPlayer[3] = new Player(3, true);
+	//pPlayer[3]->SetOnCamera(false);
+#else
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
 		pPlayer[PlayerNo] = new Player(PlayerNo, false);
 	}
-
-#if _DEBUG
-	pPlayer[0] = new Player(0, false);
-	pPlayer[1] = new Player(1, false);
-	//pPlayer[1]->SetOnCamera(false);
-	pPlayer[2] = new Player(2, false);
-	//pPlayer[2]->SetOnCamera(false);
-	pPlayer[3] = new Player(3, false);
-	//pPlayer[3]->SetOnCamera(false);
-#endif
 
 	// 2DUIの初期化
 	// フレーム
@@ -394,6 +393,18 @@ void SceneGame::Start()
 //=============================================================================
 void SceneGame::CheckResult()
 {
+#if _DEBUG
+	if (GetKeyboardTrigger(DIK_N))
+	{
+		CircleSceneChanger::Instance()->SetChanger(true, []()
+		{
+			SetScene(nSceneResult);
+			InitCamera();
+		});
+		return;
+	}
+#endif
+
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{
