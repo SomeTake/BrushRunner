@@ -15,7 +15,7 @@
 #include "_2dobj.h"
 #include "SelectLogo.h"
 
-static int SelectCharacter[PLAYER_MAX];
+int SceneCharacterSelect::SelectCharacter[PLAYER_MAX];
 
 //=============================================================================
 // コンストラクタ
@@ -34,6 +34,13 @@ SceneCharacterSelect::SceneCharacterSelect()
 		}
 	}
 
+	// 選択結果の初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		SelectCharacter[i] = 0;
+	}
+
+/*****************************************************************************/
 	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
@@ -66,6 +73,7 @@ SceneCharacterSelect::~SceneCharacterSelect()
 //=============================================================================
 void SceneCharacterSelect::Update(int SceneID)
 {
+	// シーンチェンジ
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
@@ -124,7 +132,7 @@ void SceneCharacterSelect::Draw()
 //=============================================================================
 // キャラクターセレクト番号のゲッター
 //=============================================================================
-int *GetSelectCharacter(int no)
+int SceneCharacterSelect::GetSelectCharacter(int playerNo)
 {
-	return &SelectCharacter[no];
+	return SelectCharacter[playerNo];
 }

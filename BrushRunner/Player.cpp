@@ -21,6 +21,7 @@
 #include "Item.h"
 #include "Timer.h"
 #include "ResourceManager.h"
+#include "SceneCharacterSelect.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -52,7 +53,7 @@ enum CallbackKeyType
 Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 {
 	// xFileを読み込む
-	this->Load_xFile(CharaModel[KouhaiModel], "Player");
+	this->Load_xFile(CharaModel[SceneCharacterSelect::GetSelectCharacter(_CtrlNum)], "Player");
 
 	// アニメーションセットを設置する
 	this->CreateAnimSet();
@@ -63,7 +64,7 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 	// 位置・回転・スケールの初期設定
 	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
 	rot = PLAYER_ROT;
-	scl = ModelScl[KouhaiModel];
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	hitGround = false;
 	hitPaint = false;
 	runSpd = 1.0f;
@@ -328,6 +329,16 @@ void Player::CreateAnimSet()
 		case Stop:
 
 			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Lose:
+
+			AnimationSet->SetData("Lose", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Clapping:
+
+			AnimationSet->SetData("Clapping", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
 		default:

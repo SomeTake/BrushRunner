@@ -8,6 +8,7 @@
 #include "ResultPlayer.h"
 #include "Player.h"
 #include "ResourceManager.h"
+#include "SceneCharacterSelect.h"
 
 //*****************************************************************************
 // データ定義
@@ -25,24 +26,31 @@ D3DXVECTOR3 ResultPos[PLAYER_MAX] = {
 ResultPlayer::ResultPlayer(int rank, int owner)
 {
 	// xFileを読み込む
-	this->Load_xFile(CharaModel[KouhaiModel], "Player");
+	this->Load_xFile(CharaModel[SceneCharacterSelect::GetSelectCharacter(owner)], "Player");
 
 	// アニメーションセットを設置する
 	this->CreateAnimSet();
 
 	// 現在のアニメーションを順位によって決定する
-	if (rank == 0)
+	switch (rank)
 	{
+	case 0:
 		this->ChangeAnim(Victory);
-	}
-	else
-	{
-		this->ChangeAnim(Idle);
+		break;
+	case 1:
+	case 2:
+		this->ChangeAnim(Clapping);
+		break;
+	case 3:
+		this->ChangeAnim(Lose);
+		break;
+	default:
+		break;
 	}
 
 	pos = ResultPos[rank];
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	scl = ModelScl[KouhaiModel];
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 }
 
 //=============================================================================
@@ -150,6 +158,16 @@ void ResultPlayer::CreateAnimSet()
 		case Stop:
 
 			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Lose:
+
+			AnimationSet->SetData("Lose", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Clapping:
+
+			AnimationSet->SetData("Clapping", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
 		default:
