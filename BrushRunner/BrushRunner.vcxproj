@@ -188,7 +188,9 @@
     <ClInclude Include="PowerUpBananaState.h" />
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="Result.h" />
+    <ClInclude Include="ResultDigit.h" />
     <ClInclude Include="ResultRank.h" />
+    <ClInclude Include="ResultTimer.h" />
     <ClInclude Include="RunningState.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneCharacterSelect.h" />
@@ -262,7 +264,9 @@
     <ClCompile Include="PowerUpBananaState.cpp" />
     <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="Result.cpp" />
+    <ClCompile Include="ResultDigit.cpp" />
     <ClCompile Include="ResultRank.cpp" />
+    <ClCompile Include="ResultTimer.cpp" />
     <ClCompile Include="RunningState.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneCharacterSelect.cpp" />

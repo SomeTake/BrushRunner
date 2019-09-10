@@ -13,6 +13,7 @@
 // マクロ定義
 //*****************************************************************************
 #define TEXTURE_CURSOROBJ	("data/TEXTURE/CharSelectCursor.png")		// フレーム用画像
+#define TEXTURE_CURSOROBJ2	("data/TEXTURE/CpuLogo.png")				// フレーム用画像
 #define CURSOROBJ_DIVIDE_X	(4)											// 分割数
 #define CURSOROBJ_MAX		(4)											// 1プレイヤーあたりのカーソル数
 
@@ -24,10 +25,14 @@ class CursorObj :
 {
 private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;	// テクスチャのポインタ
+	static LPDIRECT3DTEXTURE9	D3DTexture2;	// テクスチャのポインタ
 
 	HRESULT MakeVertex();
+	HRESULT MakeVert();
 	void SetTexture();
+	void SetTex();
 	void SetVertex();
+	void SetVert();
 
 	void Move();	// カーソルの移動
 
@@ -42,6 +47,7 @@ public:
 	// オーバーライド関数
 	void Update();
 	void Draw();
+	void Draw2();
 
 	int GetCursorNo() { return cursorNo; };
 	int GetSelectNo() { return selectNo; };
