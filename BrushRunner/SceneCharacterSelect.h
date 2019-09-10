@@ -31,7 +31,7 @@ public:
 	void Draw();
 
 	static int GetSelectCharacter(int no);		// 選択したキャラクターの番号
-
+	static bool GetAI(int no);
 };
 
 #endif

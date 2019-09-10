@@ -225,3 +225,10 @@ int SceneCharacterSelect::GetSelectCharacter(int playerNo)
 {
 	return SelectCharacter[playerNo];
 }
+//=============================================================================
+// ÉQÉbÉ^Å[
+//=============================================================================
+bool SceneCharacterSelect::GetAI(int playerNo)
+{
+	return cpu[playerNo];
+}
