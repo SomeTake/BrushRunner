@@ -193,6 +193,7 @@
     <ClInclude Include="Paint.h" />
     <ClInclude Include="PaintGroup.h" />
     <ClInclude Include="PaintManager.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerState.h" />
@@ -229,6 +230,7 @@
     <ClInclude Include="StageName.h" />
     <ClInclude Include="StageSelectBG.h" />
     <ClInclude Include="StageSelectCursor.h" />
+    <ClInclude Include="StageSelectLogo.h" />
     <ClInclude Include="StopState.h" />
     <ClInclude Include="Struct.h" />
     <ClInclude Include="Timer.h" />
@@ -296,6 +298,7 @@
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="PaintGroup.cpp" />
     <ClCompile Include="PaintManager.cpp" />
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerState.cpp" />
@@ -332,6 +335,7 @@
     <ClCompile Include="StageName.cpp" />
     <ClCompile Include="StageSelectBG.cpp" />
     <ClCompile Include="StageSelectCursor.cpp" />
+    <ClCompile Include="StageSelectLogo.cpp" />
     <ClCompile Include="StopState.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Title.cpp" />
