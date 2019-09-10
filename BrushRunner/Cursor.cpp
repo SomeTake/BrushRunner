@@ -14,7 +14,14 @@
 #include "CharacterAI.h"
 #include "ResourceManager.h"
 
-//LPDIRECT3DTEXTURE9	Cursor::D3DTexture = NULL;	// テクスチャのポインタ
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define CURSOR_SIZE D3DXVECTOR3(75.0f, 75.0f, 0.0f)				// サイズ
+#define CURSOR_DIVIDE_X	(4)										// 横分割
+#define CURSOR_DIVIDE_Y	(2)										// 縦分割
+#define CURSOR_FIRST_POS	D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f)
+#define CURSOR_SPEED	(30.0f)									// 動くスピード
 
 //=============================================================================
 // コンストラクタ
@@ -26,6 +33,7 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 	use = true;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
+	// AIポインタの設定
 	if (AIUse)
 	{
 		this->AIUse = true;
@@ -101,9 +109,6 @@ void Cursor::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
-	// Zテスト
-	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-
 	// αテストを有効に
 	Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	Device->SetRenderState(D3DRS_ALPHAREF, TRUE);
@@ -124,9 +129,6 @@ void Cursor::Draw()
 
 	// αテストを無効に
 	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
-	// Z比較あり
-	//Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 }
 
 //=============================================================================
@@ -198,14 +200,17 @@ void Cursor::Move()
 	}
 	else
 	{
+		// ペイントルートを描く
 		if (AIptr->GetCursorState() == ePaintPath)
 		{
 			PaintPath();
 		}
+		// 他のプレイヤーのルートを消す
 		else if (AIptr->GetCursorState() == eUseBlackPaint)
 		{
 			DeletePath();
 		}
+		// オブジェクトチップを反転させる
 		else if (AIptr->GetCursorState() == ePaintObjChip)
 		{
 			PaintObjChip();
@@ -365,7 +370,7 @@ void Cursor::PaintPath()
 
 	if (Distance > pow(20.0f, 2))
 	{
-		// カーソルが目標に移動する
+		// カーソルが目的地に移動する
 		float Angle = atan2f(Vec.y, Vec.x);
 		pos.x += cosf(Angle) * CURSOR_SPEED;
 		pos.y += sinf(Angle) * CURSOR_SPEED;
@@ -408,7 +413,6 @@ void Cursor::DeletePath(void)
 		return;
 	}
 
-#if 1
 	// 目標のスクリーン座標を計算する
 	D3DXMatrixTranslation(&TransMtx, EnemyPaint->PaintPath.at(0).x, EnemyPaint->PaintPath.at(0).y, EnemyPaint->PaintPath.at(0).z);
 	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
@@ -451,7 +455,6 @@ void Cursor::DeletePath(void)
 			EnemyPaint->Count = 0;
 		}
 	}
-#endif
 }
 
 //=============================================================================

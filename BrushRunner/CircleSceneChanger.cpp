@@ -67,5 +67,4 @@ void CircleSceneChanger::SetChanger(bool isStart, std::function<void(void)> func
 	useMask = true;
 	useChanger = true;
 	isChangerOut = !isStart;
-
 }

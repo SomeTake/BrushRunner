@@ -70,8 +70,6 @@ PaintManager::~PaintManager()
 	// メモリリリース
 	SAFE_DELETE(this->pCursor);
 
-
-
 	for (auto &Object : this->inkGauge)
 	{
 		SAFE_DELETE(Object);
@@ -226,9 +224,6 @@ void PaintManager::Update()
 		}
 		else if (AIptr->GetPaintState() == ePaintEnd)
 		{
-			// ペイントを設置する
-			//SetPaint(InkType);
-
 			// カラーインクなら、このペイントグループを記録する
 			if (InkType == ColorInk)
 			{

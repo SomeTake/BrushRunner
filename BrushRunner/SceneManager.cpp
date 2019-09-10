@@ -22,7 +22,7 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int eScene = nSceneResult;				// ゲームの開始位置&シーン遷移
+static int eScene = nSceneTitle;			// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
@@ -63,7 +63,6 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	default:
 		break;
 	}
-
 }
 
 //=============================================================================
@@ -71,7 +70,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 //=============================================================================
 SceneManager::~SceneManager()
 {
-	delete scene;
+	SAFE_DELETE(scene);
 
 	// リソースの削除
 	ResourceManager::Instance()->AllRelease();

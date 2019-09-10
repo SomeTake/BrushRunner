@@ -208,6 +208,7 @@ void CharacterAI::PaintAction(void)
 
 		if (Trigger)
 		{
+			// 画面中のペイントを取得する
 			if (CharacterAI::paintGroup->GetEnemyPaint(&EnemyPaint, Owner))
 			{
 				CursorState = eUseBlackPaint;
@@ -487,8 +488,8 @@ void CharacterAI::FindObjectChip(D3DXVECTOR3 PlayerPos)
 	if (FindStartChip)
 	{
 		//  □
-		// ■□	■：PaintStartPos(起点)
-		//  □	□：オブジェクトチップを探す範囲
+		// ■□			■：PaintStartPos(起点)
+		//  □			□：オブジェクトチップを探す範囲
 		Map::GetMapChipXY(PaintStartPos, &Chip_X, &Chip_Y);
 		Chip_X++;
 

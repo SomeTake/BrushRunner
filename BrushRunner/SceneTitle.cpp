@@ -99,10 +99,7 @@ void SceneTitle::Update(int SceneID)
 			}
 			else
 			{
-				CircleSceneChanger::Instance()->SetChanger(true, []()
-				{
-					SetScene(nSceneExit);
-				});
+				CircleSceneChanger::Instance()->SetChanger(true, []() {SetScene(nSceneExit); });
 				return;
 			}
 		}

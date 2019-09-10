@@ -14,10 +14,10 @@
 //*****************************************************************************
 #define TEXTURE_INKLINEBLUE		_T("data/texture/inkline.blue.png")			// フレーム用画像
 #define TEXTURE_INKLINERED		_T("data/texture/inkline.red.png")			// フレーム用画像
-#define TEXTURE_INKLINEYELLOW	_T("data/texture/inkline.yellow.png")			// フレーム用画像
-#define TEXTURE_INKLINEGREEN	_T("data/texture/inkline.green.png")			// フレーム用画像
+#define TEXTURE_INKLINEYELLOW	_T("data/texture/inkline.yellow.png")		// フレーム用画像
+#define TEXTURE_INKLINEGREEN	_T("data/texture/inkline.green.png")		// フレーム用画像
 #define TEXTURE_COLORINKFRAME   _T("data/texture/colorinkframe.png")
-#define COLORINKLINE_SIZE		D3DXVECTOR3(100.0f, 30.0f, 0.0f)		// テクスチャサイズ
+#define COLORINKLINE_SIZE		D3DXVECTOR3(100.0f, 30.0f, 0.0f)			// テクスチャサイズ
 
 #define INKLINEBLUE_POS     D3DXVECTOR3(0.0f, 0.0f, 0.0f)
 #define INKLINERED_POS      D3DXVECTOR3(318.0f, 0.0f, 0.0f)

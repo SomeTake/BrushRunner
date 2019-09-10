@@ -70,10 +70,7 @@ void SceneCharacterSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
-			CircleSceneChanger::Instance()->SetChanger(true, []()
-			{
-				SetScene(nSceneGame);
-			});
+			CircleSceneChanger::Instance()->SetChanger(true, []() {SetScene(nSceneGame); });
 			return;
 		}
 	}

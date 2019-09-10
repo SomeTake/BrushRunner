@@ -98,14 +98,6 @@ void Chip::Draw()
 		// ワールドマトリックスの初期化
 		D3DXMatrixIdentity(&mtxWorld);
 
-		// スケールを反映
-		//D3DXMatrixScaling(&mtxScl, scl.x, scl.y, scl.z);
-		//D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
-
-		// 回転を反映
-		//D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
-		//D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
-
 		// 移動を反映
 		D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
 		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
@@ -305,7 +297,6 @@ void Chip::ReverseTexture()
 	case eObjHeal:
 		texnum = eObjDrain;
 		break;
-
 	default:
 		break;
 	}

@@ -25,7 +25,6 @@ public:
 	CircleSceneChanger() { cntFrame = 0; }
 	void Update()override;
 	void SetChanger(bool isStart, std::function<void(void)> func = NULL);
-
 };
 
 #endif

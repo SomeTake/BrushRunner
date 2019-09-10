@@ -111,8 +111,7 @@ public:
 	void SetUseItem(bool Flag) { this->UseItem = Flag; };
 	void SetFindEnemyPaint(bool Flag) { this->FindEnemyPaint = Flag; };
 	void SetShotBullet(bool Flag) { this->ShotBullet = Flag; };
-	static void SetPaintGroupPtr(PaintGroup *Ptr) { if (!CharacterAI::paintGroup) { CharacterAI::paintGroup = Ptr; } };
-	static void ReleasePaintGroupPtr(void) { CharacterAI::paintGroup = nullptr; };
+	static void SetPaintGroupPtr(PaintGroup *Ptr) { CharacterAI::paintGroup = Ptr; };
 
 	int GetAIAction(void) { return this->Action; };
 	int GetCursorState(void) { return this->CursorState; };

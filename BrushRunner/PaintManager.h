@@ -54,10 +54,8 @@ public:
 
 	void Update();
 	void Draw();
-	static void SetQuadtreePtr(QUADTREE *Quadtree) { if (!PaintManager::Quadtree) { PaintManager::Quadtree = Quadtree; } };
-	static void ReleaseQuadtreePtr(void) { PaintManager::Quadtree = nullptr; };
-	static void SetPaintGroupPtr(PaintGroup *Ptr) { if (!PaintManager::paintGroup) { PaintManager::paintGroup = Ptr; } };
-	static void ReleasePaintGroupPtr(void) { PaintManager::paintGroup = nullptr; };
+	static void SetQuadtreePtr(QUADTREE *Quadtree) { PaintManager::Quadtree = Quadtree; };
+	static void SetPaintGroupPtr(PaintGroup *Ptr) { PaintManager::paintGroup = Ptr; };
 
 	// ÉQÉbÉ^Å[
 	bool GetSpInk() { return SpInk; };

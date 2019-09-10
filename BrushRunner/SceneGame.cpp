@@ -97,7 +97,7 @@ SceneGame::SceneGame()
 	pTimer = new Timer();
 
 	/*****************************************************************************/
-		// シーンチェンジの終了
+	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -111,11 +111,9 @@ SceneGame::~SceneGame()
 
 	// 四分木の削除
 	SAFE_DELETE(Quadtree);
-	PaintManager::ReleaseQuadtreePtr();
 
 	// ペイントグループの削除
 	SAFE_DELETE(paintGroup);
-	PaintManager::ReleasePaintGroupPtr();
 
 	// プレイヤーの削除
 	for (int i = 0; i < PLAYER_MAX; i++)
