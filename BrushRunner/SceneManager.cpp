@@ -129,7 +129,6 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("TitleRunner", "data/TEXTURE/Runner.png");
 	ResourceManager::Instance()->LoadTexture("TitleMenu", "data/TEXTURE/TitleLogo.png");
 	ResourceManager::Instance()->LoadTexture("TitleCursor", "data/TEXTURE/TitleCursor.png");
-	ResourceManager::Instance()->LoadTexture("Particle", "data/TEXTURE/Particle.png");
 
 	// SceneTutorial
 	ResourceManager::Instance()->LoadTexture("TutorialLogo", "data/TEXTURE/TutorialLogo.png");
@@ -139,6 +138,7 @@ void SceneManager::LoadResource()
 	// SceneStageSelect
 	ResourceManager::Instance()->LoadTexture("StageSelectBG", "data/TEXTURE/StageSelectBG.png");
 	ResourceManager::Instance()->LoadTexture("StageName", "data/TEXTURE/StageName.png");
+	ResourceManager::Instance()->LoadTexture("StageSelectLogo", "data/TEXTURE/StageSelectLogo.png");
 
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");
@@ -172,7 +172,6 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("FieldItem", "data/TEXTURE/FieldItem.png");
 
 	// SceneResult
-	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");
 	ResourceManager::Instance()->LoadTexture("ResultRank", "data/TEXTURE/ResultPlayer.png");
 	ResourceManager::Instance()->LoadTexture("SkyBox", "data/TEXTURE/SkyBox.png");
 	ResourceManager::Instance()->LoadTexture("MeshField", "data/TEXTURE/Block.jpg");

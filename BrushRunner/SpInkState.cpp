@@ -41,6 +41,10 @@ void SpInkState::Update()
 		owner_->Reset();
 		owner_->GetPlayer()->GetPaintManager()->SetSpInk(false);
 	}
+
+	// プレイヤーにエフェクト発生
+	owner_->GetPlayer()->PowwrUpEffect();
+
 }
 
 //=============================================================================

@@ -25,6 +25,8 @@ private:
 	int time;
 	float decAlpha;
 
+	static LPDIRECT3DTEXTURE9 D3DTexture;
+
 public:
 	UIParticle(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, D3DXVECTOR3 size, int time);
 	~UIParticle();
@@ -33,6 +35,8 @@ public:
 	void Draw()override;
 
 	bool GetUse() { return use; };
+
+	static void ReleaseTexture() { SAFE_RELEASE(D3DTexture); };
 };
 
 #endif

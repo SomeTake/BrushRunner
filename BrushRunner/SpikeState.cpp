@@ -41,6 +41,10 @@ void SpikeState::Update()
 		owner_->GetPlayer()->SetSpike(false);
 		owner_->Reset();
 	}
+
+	// プレイヤーにエフェクト発生
+	owner_->GetPlayer()->PowwrUpEffect();
+
 }
 
 //=============================================================================

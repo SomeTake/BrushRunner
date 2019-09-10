@@ -7,10 +7,14 @@
 #include "Main.h"
 #include "StageSelectCursor.h"
 #include "Input.h"
+#include "ResourceManager.h"
 
-#define STAGESELECTCURSOR_POS	D3DXVECTOR3(SCREEN_CENTER_X / 2, 447.0f, 0.0f)
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define STAGESELECTCURSOR_POS	D3DXVECTOR3(60.0f, 447.0f, 0.0f)
 #define CURSOR_MOVE_VALUE		(93.0f)
-#define CURSOR_SIZE				D3DXVECTOR3(480.0f, 90.0f, 0.0f)
+#define CURSOR_SIZE				D3DXVECTOR3(150.0f, 150.0f, 0.0f)
 #define MAXPOS_Y				(STAGESELECTCURSOR_POS.y + CURSOR_MOVE_VALUE * 2)
 
 //=============================================================================
@@ -18,6 +22,8 @@
 //=============================================================================
 StageSelectCursor::StageSelectCursor()
 {
+	ResourceManager::Instance()->GetTexture("TitleCursor", &D3DTexture);
+
 	pos = STAGESELECTCURSOR_POS;
 	size = CURSOR_SIZE;
 	use = true;
@@ -87,18 +93,17 @@ void StageSelectCursor::MakeVertex()
 	// 頂点座標の設定
 	SetVertex();
 
-	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	for (int i = 0; i < NUM_VERTEX; i++)
+	{
+		vertexWk[i].rhw = 1.0f;
+		vertexWk[i].diffuse = D3DXCOLOR(1.00f, 1.00f, 1.00f, 1.00f);
+	}
 
-	// 反射光の設定
-	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 0, 0, 255);
-	vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 0, 0, 255);
-	vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 0, 0, 255);
-	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 0, 0, 255);
-
+	// テクスチャ座標の設定
+	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 }
 
 //=============================================================================

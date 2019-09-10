@@ -129,6 +129,11 @@ public:
 
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
+	// エフェクトの発生
+	void PowwrUpEffect();
+	void RunningEffect();
+	void ItemGetEffect(D3DXVECTOR3 pos);
+
 	// ゲッター(なるべく使わない)
 	D3DXVECTOR3 GetPos() { return pos; };
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
@@ -144,6 +149,8 @@ public:
 	bool GetHitItem() { return hitItem; };
 	bool GetSpike() { return spike; };
 	bool GetBlind() { return blind; };
+	bool GetBanana() { return PowerBanana; };
+	bool GetJet() { return jet; };
 
 	// AI用
 	bool GetAIUse(void) { return this->AIUse; };

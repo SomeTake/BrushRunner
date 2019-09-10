@@ -62,9 +62,9 @@ SceneGame::SceneGame()
 	pPlayer[1] = new Player(1, true);
 	//pPlayer[1]->SetOnCamera(false);
 	pPlayer[2] = new Player(2, true);
-	pPlayer[2]->SetOnCamera(false);
+	//pPlayer[2]->SetOnCamera(false);
 	pPlayer[3] = new Player(3, true);
-	pPlayer[3]->SetOnCamera(false);
+	//pPlayer[3]->SetOnCamera(false);
 #else
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
@@ -95,6 +95,9 @@ SceneGame::SceneGame()
 
 	// タイマー
 	pTimer = new Timer();
+
+	// パーティクルマネージャ
+	particleManager = new ParticleManager();
 
 	/*****************************************************************************/
 		// シーンチェンジの終了
@@ -132,7 +135,7 @@ SceneGame::~SceneGame()
 	ReleaseVector(UIObject);
 
 	// エフェクトマネージャの削除
-	delete pEffectManager;
+	SAFE_DELETE(pEffectManager);
 
 	// 3Dオブジェクトの削除
 	for (auto &Obj3D : object3d)
@@ -143,7 +146,10 @@ SceneGame::~SceneGame()
 	ReleaseVector(object3d);
 
 	// タイマーの削除
-	delete pTimer;
+	SAFE_DELETE(pTimer);
+
+	// パーティクルマネージャの削除
+	SAFE_DELETE(particleManager);
 }
 
 //=============================================================================
@@ -259,6 +265,9 @@ void SceneGame::Update(int SceneID)
 	// タイマーの更新
 	pTimer->Update();
 
+	// パーティクルマネージャの更新
+	particleManager->Update();
+
 	// リザルト画面へ遷移していいか確認
 	CheckResult();
 
@@ -294,6 +303,9 @@ void SceneGame::Draw()
 	{
 		Object->Draw();
 	}
+
+	// パーティクルマネージャの描画
+	particleManager->Draw();
 
 	// タイマーの描画
 	pTimer->Draw();
