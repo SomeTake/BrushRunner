@@ -26,7 +26,6 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 	use = true;
 	pos = CURSOR_FIRST_POS;
 	PatternAnim = ctrlNum = PlayerNo;
-	//this->PaintReady = false;
 	if (AIUse)
 	{
 		this->AIUse = true;

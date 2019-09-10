@@ -39,6 +39,7 @@ std::vector<std::vector<int>> Map::objtbl;
 //=============================================================================
 Map::Map()
 {
+	// メモリ確保
 	this->maptbl.reserve(MAP_SIZE_Y);
 	for (int i = 0; i < MAP_SIZE_Y; i++)
 	{
@@ -69,6 +70,7 @@ Map::Map()
 		ReadCsv(ObjectFile[r], &this->objtbl);
 	}
 
+	// 使うチップを保存する
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
 		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)

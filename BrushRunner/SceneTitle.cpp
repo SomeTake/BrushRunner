@@ -25,7 +25,7 @@
 //=============================================================================
 SceneTitle::SceneTitle()
 {
-	
+
 	IsOption = true;							// 選択肢フラグオン
 
 	// UIオブジェクト
@@ -40,8 +40,8 @@ SceneTitle::SceneTitle()
 	// 3Dオブジェクト
 	object3d.push_back(new Sky());
 
-/*****************************************************************************/
-	// シーンチェンジの終了
+	/*****************************************************************************/
+		// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -72,7 +72,7 @@ SceneTitle::~SceneTitle()
 //=============================================================================
 void SceneTitle::Update(int SceneID)
 {
-	
+
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
@@ -99,16 +99,13 @@ void SceneTitle::Update(int SceneID)
 			}
 			else
 			{
-				//SetScene(new SceneExit(), nSceneExit);
-
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
-					SetScene( nSceneExit);
+					SetScene(nSceneExit);
 				});
 				return;
 			}
 		}
-
 
 	}
 

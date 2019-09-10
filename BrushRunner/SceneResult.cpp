@@ -144,11 +144,17 @@ void SceneResult::Update(int SceneID)
 //=============================================================================
 void SceneResult::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	pDevice->SetRenderState(D3DRS_LIGHTING, false);
+
 	// 3Dƒ‚ƒfƒ‹‚Ì•`‰æ
 	for (auto &Anim : anim)
 	{
 		Anim->Draw();
 	}
+
+	pDevice->SetRenderState(D3DRS_LIGHTING, true);
 
 	// 3Dƒ|ƒŠƒSƒ“‚Ì•`‰æ
 	for (auto &Obj : Obj3d)

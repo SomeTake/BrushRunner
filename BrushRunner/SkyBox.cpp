@@ -81,6 +81,9 @@ void SkyBox::Draw()
 	D3DXMatrixTranslation(&TransMtx, pos.x, pos.y, pos.z);
 	D3DXMatrixMultiply(&WorldMtx, &WorldMtx, &TransMtx);
 
+	// ライトの影響を消す
+	pDevice->SetRenderState(D3DRS_LIGHTING, false);
+
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &WorldMtx);
 
@@ -98,6 +101,9 @@ void SkyBox::Draw()
 	{
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4 * i, NUM_POLYGON);
 	}
+
+	// ライトが有効になる
+	pDevice->SetRenderState(D3DRS_LIGHTING, true);
 }
 
 //=============================================================================
