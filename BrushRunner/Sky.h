@@ -7,31 +7,22 @@
 #ifndef _SKY_H_
 #define _SKY_H_
 
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
-#define SKY_TEXTURE	("data/MAP/BG000.png")
-#define SKY_NUM_X		(13)						// 横に並べる数
-#define SKY_NUM_Y		(3)							// 縦に並べる数
-
+#include "Object3D.h"
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
-class Sky
+class Sky :
+	public Object3D
 {
 private:
-	LPDIRECT3DVERTEXBUFFER9 D3DVtxBuff;	// 頂点バッファへのポインタ
-	LPDIRECT3DTEXTURE9		D3DTexture;	// テクスチャへのポインタ
-	D3DXVECTOR3				pos;
-
 	HRESULT MakeVertex();
 
 public:
 	Sky();
 	~Sky();
 
-	void Update();
-	void Draw();
+	void Update()override;
+	void Draw()override;
 };
 
 #endif

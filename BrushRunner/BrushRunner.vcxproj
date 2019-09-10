@@ -221,8 +221,6 @@
     <ClCompile Include="CharacterAI.cpp" />
     <ClCompile Include="Chip.cpp" />
     <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="colorinkline.cpp" />
-    <ClCompile Include="CountDown.cpp" />
     <ClCompile Include="Cursor.cpp" />
     <ClCompile Include="CursorObj.cpp" />
     <ClCompile Include="D3DXAnimation.cpp" />

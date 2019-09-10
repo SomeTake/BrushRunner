@@ -8,11 +8,11 @@
 #include "FieldItem.h"
 #include "Item.h"
 #include "Camera.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		FieldItem::D3DTexture = NULL;
 LPDIRECT3DVERTEXBUFFER9	FieldItem::D3DVtxBuff = NULL;
 
 //=============================================================================
@@ -20,7 +20,7 @@ LPDIRECT3DVERTEXBUFFER9	FieldItem::D3DVtxBuff = NULL;
 //=============================================================================
 FieldItem::FieldItem(int _texno, D3DXVECTOR3 _pos, D3DXVECTOR3 _move)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("FieldItem", &D3DTexture);
 
 	pos = _pos;
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -31,14 +31,6 @@ FieldItem::FieldItem(int _texno, D3DXVECTOR3 _pos, D3DXVECTOR3 _move)
 	height = FIELDITEM_SIZE.y;
 	texno = _texno;
 	use = false;
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-			TEXTURE_ITEM,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
 
 	MakeVertex();
 
@@ -51,8 +43,7 @@ FieldItem::~FieldItem()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(D3DVtxBuff);
-	SAFE_RELEASE(D3DTexture);
-
+	D3DTexture = NULL;
 }
 
 //=============================================================================

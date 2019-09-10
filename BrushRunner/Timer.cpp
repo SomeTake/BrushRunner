@@ -7,12 +7,15 @@
 #include "Main.h"
 #include "Timer.h"
 #include "DebugWindow.h"
+#include "ResourceManager.h"
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Timer::Timer()
 {
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
 	startTime = 0;
 	currentTime = 0;
 	elapsedTime = 0;
@@ -27,6 +30,11 @@ Timer::Timer()
 	{
 		time[i] = new Digit(i);
 	}
+
+	// 情報表示用フォントの設定
+	D3DXCreateFont(Device, 54, 0, 0, 0, FALSE, SHIFTJIS_CHARSET,
+		OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, _T("Consolas"), &Font);
+
 }
 
 //=============================================================================
@@ -36,8 +44,10 @@ Timer::~Timer()
 {
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{
-		delete time[i];
+		SAFE_DELETE(time[i]);
 	}
+
+	SAFE_RELEASE(Font);
 }
 
 //=============================================================================
@@ -77,6 +87,11 @@ void Timer::Update()
 //=============================================================================
 void Timer::Draw()
 {
+	RECT rect = { 660, 105, 725, 155 };
+	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+	rect = { 560, 105, 625, 155 };
+	Font->DrawText(NULL, ":", -1, &rect, DT_CENTER | DT_VCENTER, D3DCOLOR_RGBA(255, 0, 0, 255));
+
 	// ひとけたずつ描画
 	for (int i = 0; i < DIGIT_MAX; i++)
 	{
@@ -114,7 +129,7 @@ DWORD Timer::Check()
 //=============================================================================
 void Timer::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG_
 	BeginDebugWindow("Timer");
 
 	DebugText("Start:%d Current:%d Elapsed:%d", startTime, currentTime, elapsedTime);

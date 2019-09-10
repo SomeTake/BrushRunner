@@ -39,17 +39,12 @@
 class FaceFrame : public _2dobj 
 {
 private:
-	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
-
 	HRESULT MakeVertex(void);
 	void SetVertex(void);
 
 public:
 	FaceFrame(int PlayerNo);
 	~FaceFrame();
-	static void ReleaseTexture(void);
-
-	int fc;
 
 	// オーバーライド関数
 	void Update();

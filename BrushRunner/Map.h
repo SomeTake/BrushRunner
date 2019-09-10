@@ -17,13 +17,14 @@
 #define MAP_SIZE_X		(500)								// マップの横の枚数
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
 #define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
-#define GOAL_POS		D3DXVECTOR3(9500.0f, 0.0f, 0.0f)	// ゴール地点
 //#define GOAL_POS		D3DXVECTOR3(500.0f, 0.0f, 0.0f)	// ゴール地点
+#define GOAL_POS		D3DXVECTOR3(9800.0f, 0.0f, 0.0f)		// ゴール地点
 
 // マップチップ座標を取得の種類
 enum e_ChipPosType
 {
 	eLeftUp,	// マップチップの左上の座標 
+	eLeftCenter,// マップチップの左中央の座標 
 	eRightUp,	// マップチップの右上の座標 
 	eCenter,	// マップチップの中心の座標 
 	eCenterUp,	// マップチップの中央の上の座標
@@ -64,9 +65,10 @@ public:
 
 	static int GetMapTbl(int MapX, int MapY);
 	static int GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection);
-	static int GetObjTbl(int ObjX, int ObjY);
 	static void GetMapChipXY(D3DXVECTOR3 Pos, int *MapX, int *MapY);
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
+	static int GetObjTbl(int ObjX, int ObjY);
+	static int GetObjTbl(D3DXVECTOR3 Pos, int ChipDirection);
 
 	static void SetObjTbl(int ObjX, int ObjY, int texnum);
 	std::vector<Chip*> GetObjectChip() { return ObjectChipVector; };

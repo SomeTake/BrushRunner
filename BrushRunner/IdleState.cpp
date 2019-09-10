@@ -23,6 +23,7 @@ IdleState::IdleState(Player* owner) : owner_(owner)
 //=============================================================================
 IdleState::~IdleState()
 {
+	owner_ = nullptr;
 }
 
 //=============================================================================
@@ -42,8 +43,9 @@ void IdleState::Update(int AnimCurtID)
 		}
 		else
 		{
-			// 上キーを押してジャンプ
-			if (GetKeyboardTrigger(DIK_UP) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B))
+			// Uキーを押してジャンプ
+			if (GetKeyboardTrigger(DIK_U) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B) 
+				|| owner_->GetAIAction() == eActJump)
 			{
 				float value = owner_->GetJumpValue();
 				owner_->SetJumpSpeed(JUMP_SPEED * value);

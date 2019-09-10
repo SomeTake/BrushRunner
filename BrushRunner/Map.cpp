@@ -9,17 +9,28 @@
 #include "Input.h"
 #include "MyLibrary.h"
 #include "Collision.h"
+#include "StageSelectBG.h"
+#include "SceneManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAP_FILE		("data/MAP/map_ground.csv")				// 読み込むマップデータ
-#define OBJECT_FILE		("data/MAP/map_object.csv")
+// マップデータ
+const char* MapFile[] = {
+	("data/MAP/Gourmet_ground.csv"),
+	("data/MAP/Ice_ground.csv"),
+	("data/MAP/Lava_ground.csv"),
+};
+
+const char* ObjectFile[] = {
+	("data/MAP/Gourmet_object.csv"),
+	("data/MAP/Ice_object.csv"),
+	("data/MAP/Lava_object.csv"),
+};
 
 //*****************************************************************************
-// グローバル変数
+// メンバ変数の初期化
 //*****************************************************************************
-//D3DXVECTOR3 MapCenterPos;	// 表示されているマップの中心座標
 std::vector<std::vector<int>> Map::maptbl;
 std::vector<std::vector<int>> Map::objtbl;
 
@@ -45,8 +56,18 @@ Map::Map()
 	}
 
 	// csvデータ読み込み
-	ReadCsv(MAP_FILE, &this->maptbl);
-	ReadCsv(OBJECT_FILE, &this->objtbl);
+	if (GetScene() == nSceneGame)
+	{
+		ReadCsv(MapFile[StageSelectBG::GetStageSelect()], &this->maptbl);
+		ReadCsv(ObjectFile[StageSelectBG::GetStageSelect()], &this->objtbl);
+	}
+	else if (GetScene() == nSceneTitle)
+	{
+		int r = rand() % 3;
+
+		ReadCsv(MapFile[r], &this->maptbl);
+		ReadCsv(ObjectFile[r], &this->objtbl);
+	}
 
 	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
 	{
@@ -63,26 +84,6 @@ Map::Map()
 			}
 		}
 	}
-
-#if 0
-	for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
-	{
-		for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
-		{
-			pChip[cntY][cntX] = new Chip(cntX, cntY, maptbl.at(cntY).at(cntX));
-			if (maptbl.at(cntY).at(cntX) >= 0)
-			{
-				this->MapChipVector.push_back(pChip[cntY][cntX]);
-			}
-
-			pObjChip[cntY][cntX] = new ObjectChip(cntX, cntY, objtbl[cntY][cntX]);
-			if (objtbl[cntY][cntX] >= 0)
-			{
-				this->ObjectChipVector.push_back(pObjChip[cntY][cntX]);
-			}
-		}
-	}
-#endif
 }
 
 //=============================================================================
@@ -97,9 +98,6 @@ Map::~Map()
 	// オブジェクトテーブルクリア
 	objtbl.clear();
 	ReleaseVector(objtbl);
-
-	// チップテクスチャリリース
-	Chip::ReleaseTexture();
 
 	// マップチップベクトルクリア
 	for (auto &MapChip : this->MapChipVector)
@@ -183,33 +181,6 @@ void Map::PaintCollider(QUADTREE *Quadtree, int NodeID)
 				break;
 			}
 		}
-
-		//for (int cntY = 0; cntY < MAP_SIZE_Y; cntY++)
-		//{
-		//	for (int cntX = 0; cntX < MAP_SIZE_X; cntX++)
-		//	{
-		//		// 存在している、かつ反転していないものを探す
-		//		if (objtbl[cntY][cntX] = -1 || pObjChip[cntY][cntX]->GetReverse() ||
-		//			!pObjChip[cntY][cntX]->GetUse())
-		//			continue;
-
-		//		// 中身の確認
-		//		if (!(objtbl[cntY][cntX] == OBJ_NUM_SPDUP || objtbl[cntY][cntX] == OBJ_NUM_SPDDOWN ||
-		//			objtbl[cntY][cntX] == OBJ_NUM_DRAIN || objtbl[cntY][cntX] == OBJ_NUM_HEAL))
-		//			continue;
-
-		//		// ペイントとフィールドオブジェクトを判定する
-		//		if (HitSphere(BlackPaint->GetPos(), pObjChip[cntY][cntX]->GetPos(), Paint::GetPaintRadius(), CHIP_SIZE))
-		//		{
-		//			// ヒットした場合そのペイントを消す
-		//			BlackPaint->SetUse(false);
-		//			// フィールドオブジェクトを反転させる
-		//			pObjChip[cntY][cntX]->SetReverse(true);
-		//			pObjChip[cntY][cntX]->ReverseTexture();
-		//			break;
-		//		}
-		//	}
-		//}
 	}
 }
 
@@ -234,6 +205,9 @@ D3DXVECTOR3 Map::GetMapChipPos(int x, int y, int PosType)
 	{
 	case eLeftUp:
 		Pos = D3DXVECTOR3(x * CHIP_SIZE - CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
+		break;
+	case eLeftCenter:
+		Pos = D3DXVECTOR3(x * CHIP_SIZE - CHIP_SIZE / 2, -(y * CHIP_SIZE), 0.0f);
 		break;
 	case eRightUp:
 		Pos = D3DXVECTOR3(x * CHIP_SIZE + CHIP_SIZE / 2, -(y * CHIP_SIZE - CHIP_SIZE / 2), 0.0f);
@@ -295,6 +269,9 @@ int Map::GetMapTbl(D3DXVECTOR3 Pos, int ChipDirection)
 	return GetMapTbl(x, y);
 }
 
+//=============================================================================
+// オブジェクトチップXYからオブジェクトテーブルの数値を取得する
+//=============================================================================
 int Map::GetObjTbl(int ObjX, int ObjY)
 {
 	if (ObjX < 0 ||
@@ -308,6 +285,32 @@ int Map::GetObjTbl(int ObjX, int ObjY)
 	{
 		return objtbl.at(ObjY).at(ObjX);
 	}
+}
+
+//=============================================================================
+// 座標からマップテーブルの数値を取得する
+//=============================================================================
+// □□□
+// □■□	■：CenterChip
+// □□□
+int Map::GetObjTbl(D3DXVECTOR3 Pos, int ChipDirection)
+{
+	int x = 0;
+	int y = 0;
+
+	GetMapChipXY(Pos, &x, &y);
+
+	switch (ChipDirection)
+	{
+	case eCenterUp:
+		// 中央の上のチップ
+		y--;
+		break;
+	default:
+		break;
+	}
+
+	return GetObjTbl(x, y);
 }
 
 void Map::SetObjTbl(int ObjX, int ObjY, int texnum)

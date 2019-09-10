@@ -31,7 +31,6 @@ class Effect3D :
 	public Billboard
 {
 private:
-	static LPDIRECT3DTEXTURE9	D3DTexture[EffectMax3D];// テクスチャへのポインタ
 	bool						use;
 	int							CountAnim;
 	int							PatternAnim;			// アニメーションパターン
@@ -55,13 +54,8 @@ public:
 	void Update()override;
 	void Draw()override;
 
-	void Update(D3DXVECTOR3 _pos); // （座標を更新し続けるため）
-
 	bool GetUse() { return this->use; };
 	void SetUse(bool use) { this->use = use; };
-
-	static void LoadTexture();
-	static void ReleaseTexture();
 };
 
 #endif

@@ -12,9 +12,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define RESULTRANK_TEXTURE	("data/TEXTURE/ResultPlayer.png")
 #define RESULTRANK_DIVIDE_X	(1)
 #define RESULTRANK_DIVIDE_Y	(4)
+
 //*****************************************************************************
 // クラス定義
 //*****************************************************************************
@@ -22,13 +22,12 @@ class ResultRank :
 	public _2dobj
 {
 private:
-	static LPDIRECT3DTEXTURE9	D3DTexture;					// テクスチャのポインタ
 	int rank;	// 順位
-
+	int owner;	// プレイヤー番号
 	HRESULT MakeVertex();
 
 public:
-	ResultRank(int rank);
+	ResultRank(int rank, int owner);
 	~ResultRank();
 
 	void Update();

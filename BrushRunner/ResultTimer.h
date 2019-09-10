@@ -16,7 +16,9 @@ class ResultTimer :
 	public Timer
 {
 private:
-	ResultDigit * time[DIGIT_MAX];		// それぞれの桁を表示するオブジェクトのポインタ
+	ResultDigit*		time[DIGIT_MAX];	// それぞれの桁を表示するオブジェクトのポインタ
+	int					Rank;				// ランク
+	static LPD3DXFONT	Font;				// テキスト用フォント
 
 public:
 	ResultTimer(DWORD _time, int _rank);

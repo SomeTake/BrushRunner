@@ -23,6 +23,7 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 #define DIRECTINPUT_VERSION (0x0800)	// 警告対策
 #include "dinput.h"
@@ -38,7 +39,11 @@
 #include "imgui\imgui_impl_win32.h"
 
 #include "Struct.h"
+#include "MyColor.h"
 
+//*****************************************************************************
+// 名前空間の確保
+//*****************************************************************************
 using namespace std;
 
 //*****************************************************************************
@@ -80,8 +85,8 @@ using namespace std;
 
 // デストラクタ
 #define SAFE_FREE(object)			{if(object){free (object);			(object) = NULL;}}
-#define SAFE_DELETE(object)			{if(object){delete (object);		(object) = NULL;}}
-#define SAFE_DELETE_ARRAY(object)	{if(object){delete[] (object);		(object) = NULL;}}
+#define SAFE_DELETE(object)			{if(object){delete(object);			object = NULL;}}
+#define SAFE_DELETE_ARRAY(object)	{if(object){delete[](object);		object = NULL;}}
 #define SAFE_RELEASE(object)		{if(object){(object)->Release();	(object) = NULL;}}
 
 #define GetMonitorRect(rc) SystemParametersInfo(SPI_GETWORKAREA, 0, rc, 0)	// モニター矩形

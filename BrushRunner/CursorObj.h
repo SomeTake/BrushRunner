@@ -11,7 +11,6 @@
 
 //*****************************************************************************
 // マクロ定義
-//*****************************************************************************
 #define TEXTURE_CURSOROBJ	("data/TEXTURE/CharSelectCursor.png")		// フレーム用画像
 #define TEXTURE_CURSOROBJ2	("data/TEXTURE/CpuLogo.png")				// フレーム用画像
 #define CURSOROBJ_DIVIDE_X	(4)											// 分割数
@@ -27,6 +26,10 @@ private:
 	static LPDIRECT3DTEXTURE9	D3DTexture;	// テクスチャのポインタ
 	static LPDIRECT3DTEXTURE9	D3DTexture2;	// テクスチャのポインタ
 
+	int playerNo;	// 参照するプレイヤー番号
+	int cursorNo;	// 座標を参照する番号
+	int selectNo;	// 選択したキャラクターの番号
+	
 	HRESULT MakeVertex();
 	HRESULT MakeVert();
 	void SetTexture();
@@ -37,10 +40,6 @@ private:
 	void Move();	// カーソルの移動
 
 public:
-	int playerNo;	// 参照するプレイヤー番号
-	int cursorNo;	// 座標を参照する番号
-	int selectNo;	// 選択したキャラクターの番号
-
 	CursorObj(int playerNo, int cursorNo);
 	~CursorObj();
 

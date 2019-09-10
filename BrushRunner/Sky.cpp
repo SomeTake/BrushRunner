@@ -6,24 +6,23 @@
 //=============================================================================
 #include "Main.h"
 #include "Sky.h"
+#include "ResourceManager.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define SKY_NUM_X		(13)						// 横に並べる数
+#define SKY_NUM_Y		(3)							// 縦に並べる数
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Sky::Sky()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	ResourceManager::Instance()->GetTexture("Sky", &D3DTexture);
 
 	// 位置・回転・スケールの初期設定
 	pos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-			SKY_TEXTURE,					// ファイルの名前
-			&D3DTexture);				// 読み込むメモリー
-	}
 
 	MakeVertex();
 
@@ -37,9 +36,8 @@ Sky::~Sky()
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
 
-	// テクスチャの開放
-	SAFE_RELEASE(this->D3DTexture);
-
+	// テクスチャの参照を終了
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -61,9 +59,9 @@ void Sky::Draw()
 	D3DXVECTOR3 oldpos = pos;
 
 	// αテストを有効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	//pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
+	//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	for (int cntY = 0; cntY < SKY_NUM_Y; cntY++)
 	{
@@ -100,7 +98,7 @@ void Sky::Draw()
 	pos = oldpos;
 
 	// αテストを無効に
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 }
 

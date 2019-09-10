@@ -7,27 +7,25 @@
 #include "Main.h"
 #include "carslobj.h"
 #include "SelectLogo.h"
+#include "ResourceManager.h"
+
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define SELECTLOGO_SIZE		D3DXVECTOR3(1280.0f, 114.0f, 0.0f)		// テクスチャサイズ
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 SelectLogo::SelectLogo()
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-		TEXTURE_SELECTLOGO,				// ファイルの名前
-		&D3DTexture);				// 読み込むメモリのポインタ
-
+	ResourceManager::Instance()->GetTexture("SelectLogo", &D3DTexture);
 
 	use = true;
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	PatternAnim = 1;
 	// 頂点情報の作成
 	MakeVertex();
-
-
 }
 
 //=============================================================================
@@ -35,11 +33,8 @@ SelectLogo::SelectLogo()
 //=============================================================================
 SelectLogo::~SelectLogo()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// リソースの開放はリソースマネージャに任せるので、参照をやめるだけ
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -53,8 +48,8 @@ void SelectLogo::Update()
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
+		SetVertex();
 	}
-	SetVertex();
 }
 
 //=============================================================================
@@ -84,8 +79,6 @@ void SelectLogo::Draw()
 //=============================================================================
 HRESULT SelectLogo::MakeVertex(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// 頂点座標の設定
 	SetVertex();
 
@@ -102,10 +95,7 @@ HRESULT SelectLogo::MakeVertex(void)
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture(PatternAnim);
 
 	return S_OK;
 }

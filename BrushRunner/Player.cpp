@@ -8,7 +8,6 @@
 #include "Player.h"
 #include "Input.h"
 #include "SceneGame.h"
-#include "D3DXAnimation.h"
 #include "Camera.h"
 #include "DebugWindow.h"
 #include "Map.h"
@@ -22,6 +21,9 @@
 #include "Item.h"
 #include "Sound.h"
 #include "Timer.h"
+#include "ResourceManager.h"
+#include "SceneCharacterSelect.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -30,37 +32,14 @@
 #define PLAYER_SCL			D3DXVECTOR3(1.0f, 1.0f, 1.0f)
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define DefaultPosition		D3DXVECTOR3(145.0f, 0.0f, 0.0f)				// プレイヤー初期位置
+//#define DefaultPosition		D3DXVECTOR3(50.0f, 0.0f, 0.0f)				// プレイヤー初期位置
 // 特に調整が必要そうなの
-#define OBJECT_HIT_COUNTER	(5)										// オブジェクトにヒットしたとき有効になるまでのフレーム数
+#define OBJECT_HIT_COUNTER	(5)											// オブジェクトにヒットしたとき有効になるまでのフレーム数
 #define MOVE_SPEED			(2.0f)										// 動くスピード
 #define FALL_VELOCITY_MAX	(20.0f)										// 最大の落下速度
 #define STANDARD_GRAVITY	(0.98f)										// 重力加速度
 #define OBJECT_HIT_SIZE		D3DXVECTOR2(20.0f, 60.0f)					// 当たり判定を取得するサイズ
 #define JETPACK_VALUE		(1.5f)										// ジェットパック装備時の上昇値
-
-// 読み込むキャラクターモデル
-static const char* CharaModel[] =
-{
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
-};
-
-// キャラクターモデルの番号
-enum CharaModelNum
-{
-	ShachikuModel,
-	KouhaiModel,
-
-	// モデルの種類
-	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] =
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
-};
 
 enum CallbackKeyType
 {
@@ -72,12 +51,10 @@ enum CallbackKeyType
 //=====================================================================================================
 // コンストラクタ
 //=====================================================================================================
-Player::Player(int _CtrlNum) : state(nullptr)
+Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
 	// xFileを読み込む
-	this->Load_xFile(CharaModel[KouhaiModel], "Player");
+	this->Load_xFile(CharaModel[SceneCharacterSelect::GetSelectCharacter(_CtrlNum)], "Player");
 
 	// アニメーションセットを設置する
 	this->CreateAnimSet();
@@ -88,20 +65,30 @@ Player::Player(int _CtrlNum) : state(nullptr)
 	// 位置・回転・スケールの初期設定
 	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
 	rot = PLAYER_ROT;
-	scl = ModelScl[KouhaiModel];
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	hitGround = false;
 	hitPaint = false;
 	runSpd = 1.0f;
 	jumpSpd = 0.0f;
 	ctrlNum = _CtrlNum;
-	this->AI = new CharacterAI(true);
-	this->PaintSystem = new PaintManager(ctrlNum, true);
+	if (AIUse)
+	{
+		this->AI = new CharacterAI(ctrlNum);
+		this->AIUse = true;
+		this->PaintSystem = new PaintManager(ctrlNum, true, this->AI);
+	}
+	else
+	{
+		this->AI = nullptr;
+		this->AIUse = false;
+		this->PaintSystem = new PaintManager(ctrlNum, false, nullptr);
+	}
 	this->playerUI = new PlayerUI(ctrlNum);
 	hitHorizon = false;
 	playable = false;
 	onCamera = true;
 	hitItem = false;
-	animSpd = 1.0f;
+	//animSpd = 1.0f;
 	hitObjCnt = 0;
 	jumpValue = 1.0f;
 
@@ -139,7 +126,10 @@ void Player::Update()
 		Move();
 
 		// AIの更新処理
-		AI->Update(this->pos, this->PaintSystem);
+		if (AIUse)
+		{
+			AI->Update(this->pos);
+		}
 
 		// ペイントシステムの更新処理
 		PaintSystem->Update();
@@ -205,15 +195,17 @@ void Player::Draw()
 			pDevice->SetMaterial(&matDef);
 		}
 
-		// プレイヤーUIの描画
-		playerUI->Draw(onCamera,blind);
-
 		// ペイントの描画
 		PaintSystem->Draw();
+
+		// プレイヤーUIの描画
+		playerUI->Draw(onCamera, blind);
+
 	}
+	// プレイヤー死亡のUI
 	else
 	{
-		// プレイヤーUIの描画(プレイヤー死亡のUI)
+		// プレイヤーUIの描画()
 		playerUI->Draw(onCamera, blind);
 	}
 
@@ -221,7 +213,10 @@ void Player::Draw()
 	itemManager->Draw();
 
 #if _DEBUG
-	this->AI->Draw();
+	if (this->AI != nullptr)
+	{
+		AI->Draw();
+	}
 #endif
 }
 
@@ -252,54 +247,19 @@ void Player::Move()
 		// オート移動
 		if (!hitHorizon && playable && pos.x < GOAL_POS.x && GetAnimCurtID() != Slip && GetAnimCurtID() != Stop)
 		{
-			pos.x += MOVE_SPEED * runSpd;
+			if (!PowerBanana)
+			{
+				pos.x += MOVE_SPEED * runSpd;
+			}
+			else
+			{
+				pos.x += MOVE_SPEED * 1.3f;
+			}
 		}
 	}
-		// 空中判定
-		JumpMove();
 
-#if _DEBUG
-	if (GetKeyboardPress(DIK_RIGHT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x += MOVE_SPEED;
-			break;
-		case 1:
-			pos.x += MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x += MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x += MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-	if (GetKeyboardPress(DIK_LEFT))
-	{
-		switch (ctrlNum)
-		{
-		case 0:
-			pos.x -= MOVE_SPEED;
-			break;
-		case 1:
-			pos.x -= MOVE_SPEED * 0.8f;
-			break;
-		case 2:
-			pos.x -= MOVE_SPEED * 0.5f;
-			break;
-		case 3:
-			pos.x -= MOVE_SPEED * 0.2f;
-			break;
-		default:
-			break;
-		}
-	}
-#endif
+	// 空中判定
+	JumpMove();
 }
 
 //=====================================================================================================
@@ -314,10 +274,14 @@ void Player::JumpMove()
 		jumpSpd -= STANDARD_GRAVITY;
 	}
 
-	// ジェットパック装備中はジャンプ力アップ
-	if (jet)
+	// ジェットパック装備中orパワーアップバナナ使用中はジャンプ力アップ
+	if (jet || PowerBanana)
 	{
 		jumpValue = JETPACK_VALUE;
+	}
+	else
+	{
+		jumpValue = 1.0f;
 	}
 }
 
@@ -366,6 +330,16 @@ void Player::CreateAnimSet()
 		case Stop:
 
 			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Lose:
+
+			AnimationSet->SetData("Lose", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Clapping:
+
+			AnimationSet->SetData("Clapping", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
 		default:
@@ -546,7 +520,6 @@ void Player::ObjectCollider()
 	int objType = Map::GetObjTbl(x, y);
 
 	HitObjectInfluence(objType);
-
 }
 
 //=====================================================================================================
@@ -565,7 +538,9 @@ void Player::ObjectItemCollider(Map *pMap)
 	for (auto &Obj : pMap->GetObjectChip())
 	{
 		if (Obj->GetTextureNum() != eObjItem)
+		{
 			continue;
+		}
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
@@ -635,6 +610,7 @@ void Player::HitObjectInfluence(int type)
 	switch (type)
 	{
 	case eObjSpdup:
+
 		if (!spike)
 		{
 			runSpd = 2.0f;
@@ -646,6 +622,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjSpddown:
+
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -657,6 +634,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjNuma:
+
 		if (!spike)
 		{
 			runSpd = 0.5f;
@@ -668,11 +646,13 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjJump:
+
 		jumpSpd = JUMP_SPEED * jumpValue;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));
 
 	case eObjDrain:
+
 		// 時間経過でインク減少
 		if (!spike)
 		{
@@ -694,6 +674,7 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjHeal:
+
 		// 時間経過でインク増加
 		if (!spike)
 		{
@@ -715,15 +696,16 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjItem:
+
 		// 他のステータスはリセット
 		hitObjCnt = 0;
 		runSpd = 1.0f;
 		jumpValue = 1.0f;
 		break;
+
 	default:
 		break;
 	}
-
 }
 
 //=====================================================================================================
@@ -731,7 +713,50 @@ void Player::HitObjectInfluence(int type)
 //=====================================================================================================
 void Player::Debug()
 {
-#ifndef _DEBUG_
+#if _DEBUG
+	if (!AIUse)
+	{
+		if (GetKeyboardPress(DIK_RIGHT))
+		{
+			switch (ctrlNum)
+			{
+			case 0:
+				pos.x += MOVE_SPEED;
+				break;
+			case 1:
+				pos.x += MOVE_SPEED * 0.8f;
+				break;
+			case 2:
+				pos.x += MOVE_SPEED * 0.5f;
+				break;
+			case 3:
+				pos.x += MOVE_SPEED * 0.2f;
+				break;
+			default:
+				break;
+			}
+		}
+		if (GetKeyboardPress(DIK_LEFT))
+		{
+			switch (ctrlNum)
+			{
+			case 0:
+				pos.x -= MOVE_SPEED;
+				break;
+			case 1:
+				pos.x -= MOVE_SPEED * 0.8f;
+				break;
+			case 2:
+				pos.x -= MOVE_SPEED * 0.5f;
+				break;
+			case 3:
+				pos.x -= MOVE_SPEED * 0.2f;
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
 	ImGui::SetNextWindowPos(ImVec2(5, 120), ImGuiSetCond_Once);
 
@@ -757,7 +782,6 @@ void Player::Debug()
 	}
 
 	EndDebugWindow("Player");
-
 #endif
 
 }

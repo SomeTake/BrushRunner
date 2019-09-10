@@ -13,6 +13,8 @@ int pnum=0;
 bool canch = false;
 #include "MyLibrary.h"
 #include "Sound.h"
+#include "ResourceManager.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -43,6 +45,7 @@ CursorObj::CursorObj(int playerNo, int cursorNo)
 			TEXTURE_CURSOROBJ2,					// ファイルの名前
 			&D3DTexture2);						// 読み込むメモリのポインタ
 	}
+	ResourceManager::Instance()->GetTexture("SelectCursor", &D3DTexture);
 
 	this->playerNo = playerNo;
 	this->cursorNo = cursorNo;
@@ -62,11 +65,8 @@ CursorObj::CursorObj(int playerNo, int cursorNo)
 //=============================================================================
 CursorObj::~CursorObj()
 {
-	if (D3DTexture != NULL)
-	{	// テクスチャの開放
-		D3DTexture->Release();
-		D3DTexture = NULL;
-	}
+	// リソースの開放はリソースマネージャに任せるので、参照をやめるだけ
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -149,10 +149,7 @@ HRESULT CursorObj::MakeVertex(void)
 	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2(0.125f, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2(0.125f, 1.0f);
+	SetTexture();
 
 	return S_OK;
 }
@@ -239,14 +236,14 @@ void CursorObj::SetVert()
 void CursorObj::Move()
 {
 	// 右に移動
-	if (GetKeyboardRepeat(DIK_RIGHT) || IsButtonRepeated(this->playerNo, STICK_RIGHT))
+	if (GetKeyboardRepeat(DIK_D) || IsButtonRepeated(this->playerNo, STICK_RIGHT))
 	{
 		PlaySound(SE_SELECT);
 		this->selectNo = LoopCountDown(this->selectNo, 0, CURSOROBJ_MAX - 1);
 	}
 
 	// 左に移動
-	if (GetKeyboardRepeat(DIK_LEFT) || IsButtonRepeated(this->playerNo, STICK_LEFT))
+	if (GetKeyboardRepeat(DIK_A) || IsButtonRepeated(this->playerNo, STICK_LEFT))
 	{
 		PlaySound(SE_SELECT);
 		this->selectNo = LoopCountUp(this->selectNo, 0, CURSOROBJ_MAX - 1);

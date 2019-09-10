@@ -12,7 +12,6 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_PAINT		"data/TEXTURE/paint.png"	// 読み込むテクスチャファイル名
 #define	PAINT_WIDTH			(30.0f)						// 幅
 #define	PAINT_HEIGHT		(30.0f)						// 高さ
 #define PAINT_DIVIDE_X		(5)
@@ -44,13 +43,12 @@ private:
 	int						PaintColor;		// ペイントカラー
 	D3DXVECTOR2				ScreenPos;		// スクリーン座標
 
-	static LPDIRECT3DTEXTURE9		D3DTexture;		// テクスチャへのポインタ
 	static float			HalfSize;		// ペイントサイズの半分
 
 	void SetColor();
 	HRESULT MakeVertex();
 	// ワールド座標からスクリーン座標に変換する
-	D3DXVECTOR2 WorldToScreenPos(D3DXMATRIX WorldMatrix);
+	void CheckInScreen(D3DXMATRIX WorldMatrix);
 
 public:
 	Paint(int Owner, int PaintColor);
@@ -58,7 +56,6 @@ public:
 
 	void Update();
 	void Draw();
-	static void ReleaseTexture(void);
 
 	// ゲッター
 	bool GetUse() { return this->Use; };

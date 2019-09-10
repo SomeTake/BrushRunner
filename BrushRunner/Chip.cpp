@@ -8,14 +8,11 @@
 #include "Chip.h"
 #include "Camera.h"
 #include "Map.h"
+#include "ResourceManager.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CHIP_TEXTURE	("data/MAP/tilea5.png")
-#define OBJECT_TEXTURE	("data/MAP/mapchip_object.png")
-//#define MAP_POS			D3DXVECTOR3(0.0f, 0.0f, 0.0f)		// 表示場所
-//#define MAP_ROT			D3DXVECTOR3(D3DXToRadian(-90), 0.0f, 0.0f)	// 回転
 #define CHIP_DIVIDE_X	(8)
 #define CHIP_DIVIDE_Y	(16)
 
@@ -24,24 +21,27 @@
 
 #define REVERSE_TIME	(300)	// 反転時間
 
-//*****************************************************************************
-// メンバの初期化
-//*****************************************************************************
-LPDIRECT3DTEXTURE9	Chip::D3DTextureMap = NULL;		// テクスチャへのポインタ
-LPDIRECT3DTEXTURE9	Chip::D3DTextureObj = NULL;		// テクスチャへのポインタ
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 Chip::Chip(int x, int y, int _texnum, int ChipType)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	this->ChipType = ChipType;
+
+	switch (ChipType)
+	{
+	case eMapChip:
+		ResourceManager::Instance()->GetTexture("MapChip", &D3DTexture);
+		break;
+	case eObjectChip:
+		ResourceManager::Instance()->GetTexture("ObjectChip", &D3DTexture);
+		break;
+	}
 
 	// 位置・回転・スケールの初期設定
 	pos = D3DXVECTOR3(x * CHIP_SIZE, -(y * CHIP_SIZE), 0.0f);
 	//scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
-	this->ChipType = ChipType;
 	texnum = _texnum;
 	cnt = 0;
 	reverse = false;
@@ -50,20 +50,6 @@ Chip::Chip(int x, int y, int _texnum, int ChipType)
 
 	// 頂点情報の作成
 	MakeVertex();
-
-	// テクスチャの読み込み
-	if (D3DTextureMap == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-			CHIP_TEXTURE,					// ファイルの名前
-			&D3DTextureMap);				// 読み込むメモリー
-	}
-	if (D3DTextureObj == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,	// デバイスへのポインタ
-			OBJECT_TEXTURE,					// ファイルの名前
-			&D3DTextureObj);				// 読み込むメモリー
-	}
 
 }
 
@@ -74,6 +60,8 @@ Chip::~Chip()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
+
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -132,14 +120,7 @@ void Chip::Draw()
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
 		// テクスチャの設定
-		if (ChipType == eMapChip)
-		{
-			pDevice->SetTexture(0, D3DTextureMap);
-		}
-		else if (ChipType == eObjectChip)
-		{
-			pDevice->SetTexture(0, D3DTextureObj);
-		}
+		pDevice->SetTexture(0, D3DTexture);
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);

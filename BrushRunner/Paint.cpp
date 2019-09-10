@@ -7,13 +7,14 @@
 #include "Main.h"
 #include "Paint.h"
 #include "Camera.h"
+#include "MyLibrary.h"
+#include "ResourceManager.h"
 
 #define DecAlpha (0.1f)
 
 //*****************************************************************************
 // メンバの初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	Paint::D3DTexture = NULL;		// テクスチャへのポインタ
 float Paint::HalfSize = PAINT_WIDTH / 2;
 
 //=============================================================================
@@ -21,7 +22,7 @@ float Paint::HalfSize = PAINT_WIDTH / 2;
 //=============================================================================
 Paint::Paint(int Owner, int PaintColor)
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ResourceManager::Instance()->GetTexture("Paint", &D3DTexture);
 
 	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -37,14 +38,6 @@ Paint::Paint(int Owner, int PaintColor)
 	this->Owner = Owner;
 	this->PaintColor = PaintColor;
 
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(Device,	// デバイスへのポインタ
-			TEXTURE_PAINT,					// ファイルの名前
-			&D3DTexture);					// 読み込むメモリー
-	}
-
 	MakeVertex();
 }
 
@@ -55,11 +48,8 @@ Paint::~Paint()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
-}
 
-void Paint::ReleaseTexture(void)
-{
-	SAFE_RELEASE(Paint::D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================
@@ -144,7 +134,9 @@ void Paint::Draw()
 
 		// ワールドマトリックスの設定
 		Device->SetTransform(D3DTS_WORLD, &WorldMtx);
-		this->ScreenPos = WorldToScreenPos(WorldMtx);
+
+		// 現在のオブジェクトが画面内を確認
+		CheckInScreen(WorldMtx);
 
 		// 頂点バッファをデバイスのデータストリームにバインド
 		Device->SetStreamSource(0, D3DVtxBuff, 0, sizeof(Vertex3D));
@@ -254,26 +246,14 @@ void Paint::SetColor()
 //=============================================================================
 // ワールド座標からスクリーン座標に変換する
 //=============================================================================
-D3DXVECTOR2 Paint::WorldToScreenPos(D3DXMATRIX WorldMatrix)
+void Paint::CheckInScreen(D3DXMATRIX WorldMatrix)
 {
-	D3DXMATRIX ViewMatrix, ProjMatrix;
-	D3DXMATRIX WVP;
-	LPDIRECT3DDEVICE9 Device = GetDevice();
+	ScreenPos = WorldToScreenPos(WorldMatrix);
 
-	Device->GetTransform(D3DTS_VIEW, &ViewMatrix);
-	Device->GetTransform(D3DTS_PROJECTION, &ProjMatrix);
-	WVP = WorldMatrix * ViewMatrix * ProjMatrix;
-
-	D3DXVECTOR3 ScreenCoord = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVec3TransformCoord(&ScreenCoord, &ScreenCoord, &WVP);
-
-	ScreenCoord.x = ((ScreenCoord.x + 1.0f) / 2.0f) * SCREEN_WIDTH;
-	ScreenCoord.y = ((-ScreenCoord.y + 1.0f) / 2.0f) * SCREEN_HEIGHT;
-
-	if (ScreenCoord.x < 0 ||
-		ScreenCoord.x > SCREEN_WIDTH ||
-		ScreenCoord.y < 0 ||
-		ScreenCoord.y > SCREEN_HEIGHT)
+	if (ScreenPos.x < 0 ||
+		ScreenPos.x > SCREEN_WIDTH ||
+		ScreenPos.y < 0 ||
+		ScreenPos.y > SCREEN_HEIGHT)
 	{
 		this->InScreen = false;
 	}
@@ -281,6 +261,4 @@ D3DXVECTOR2 Paint::WorldToScreenPos(D3DXMATRIX WorldMatrix)
 	{
 		this->InScreen = true;
 	}
-
-	return (D3DXVECTOR2)ScreenCoord;
 }

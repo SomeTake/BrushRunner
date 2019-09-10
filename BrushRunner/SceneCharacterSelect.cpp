@@ -7,11 +7,13 @@
 #include "Main.h"
 #include "SceneCharacterSelect.h"
 #include "Input.h"
+#include "SceneManager.h"
+#include "SceneGame.h"
+#include "CircleSceneChanger.h"
+
 //2d obje
 #include "_2dobj.h"
 #include "SelectLogo.h"
-#include "SceneManager.h"
-#include "SceneGame.h"
 
 #include "Sound.h"
 
@@ -45,7 +47,8 @@ enum
 	// 最大数
 	_2dMx,
 };
-static int SelectCharacter[PLAYER_MAX];
+int SceneCharacterSelect::SelectCharacter[PLAYER_MAX];
+//static int SelectCharacter[PLAYER_MAX];
 bool cpu[PLAYER_MAX];
 //=============================================================================
 // コンストラクタ
@@ -64,6 +67,16 @@ SceneCharacterSelect::SceneCharacterSelect()
 			pCursor[playerNo][cursorNo] = new CursorObj(playerNo, cursorNo);
 		}
 	}
+
+	// 選択結果の初期化
+	for (int i = 0; i < PLAYER_MAX; i++)
+	{
+		SelectCharacter[i] = 0;
+	}
+
+/*****************************************************************************/
+	// シーンチェンジの終了
+	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
 //=============================================================================
@@ -93,19 +106,16 @@ SceneCharacterSelect::~SceneCharacterSelect()
 //=============================================================================
 void SceneCharacterSelect::Update(int SceneID)
 {
-//	if (GetKeyboardTrigger(DIK_SPACE))
-	//{
-	//	SetScene(nSceneGame);
-	//}
-	//SetScene(new SceneGame(), nSceneGame);
-	//StopSound(BGM_TITLE);
-	//Playsound(BGM_CHARSEL);
+	// シーンチェンジ
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
 			PlaySound(SE_CHOICE);
-			SetScene(new SceneGame(), nSceneGame);
+			CircleSceneChanger::Instance()->SetChanger(true, []()
+			{
+				SetScene(nSceneGame);
+			});
 			return;
 		}
 	}
@@ -211,7 +221,7 @@ void SceneCharacterSelect::Draw()
 //=============================================================================
 // キャラクターセレクト番号のゲッター
 //=============================================================================
-int *GetSelectCharacter(int no)
+int SceneCharacterSelect::GetSelectCharacter(int playerNo)
 {
-	return &SelectCharacter[no];
+	return SelectCharacter[playerNo];
 }

@@ -7,10 +7,10 @@
 #include "Main.h"
 #include "CountDown.h"
 #include "Sound.h"
+#include "ResourceManager.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_COUNTDOWN	("data/TEXTURE/countdown.png")
 #define COUNTDOWN_SIZE		D3DXVECTOR2(360.0f, 360.0f)
 #define COUNTDOWN_DIVIDE_Y	(4)
 #define COUNTDOWN_POS		D3DXVECTOR3(SCREEN_WIDTH / 2 - COUNTDOWN_SIZE.x / 2, SCREEN_HEIGHT / 2 - COUNTDOWN_SIZE.y / 2, 0.0f)
@@ -22,12 +22,7 @@
 //=============================================================================
 CountDown::CountDown()
 {
-	LPDIRECT3DDEVICE9 Device = GetDevice();
-
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(Device,	// デバイスのポインタ
-		TEXTURE_COUNTDOWN,				// ファイルの名前
-		&D3DTexture);					// 読み込むメモリのポインタ
+	ResourceManager::Instance()->GetTexture("CountDown", &D3DTexture);
 
 	use = true;
 	pos = COUNTDOWN_POS;
@@ -44,7 +39,7 @@ CountDown::CountDown()
 CountDown::~CountDown()
 {
 	// テクスチャの開放
-	SAFE_RELEASE(D3DTexture);
+	D3DTexture = NULL;
 }
 
 //=============================================================================
