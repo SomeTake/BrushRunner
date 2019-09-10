@@ -47,9 +47,11 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneTitle();
 		break;
 	case nSceneTutorial:
+		PlaySound(BGM_TUTORIAL);
 		scene = new SceneTutorial();
 		break;
 	case nSceneStageSelect:
+		// PlaySound(BGM_STAGESELECT);
 		scene = new SceneStageSelect();
 		break;
 	case nSceneCharacterSelect:
@@ -61,6 +63,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
+		// PlaySound(BGM_RESULT);
 		scene = new SceneResult();
 		break;
 	case nSceneExit:
@@ -90,10 +93,7 @@ SceneManager::~SceneManager()
 //=============================================================================
 void SceneManager::Update()
 {
-	if (!CircleSceneChanger::Instance()->GetUseMask())
-	{
-		UpdateInput();
-	}
+	UpdateInput();
 
 	scene->Update(eScene);
 
@@ -196,34 +196,42 @@ void SetScene(int _scene)
 	switch (_scene)
 	{
 	case nSceneTitle:
+		// StopSound(BGM_RESULT);
 		scene = new SceneTitle();
+		PlaySound(BGM_TITLE);
 		break;
 	case nSceneTutorial:
+		StopSound(BGM_TITLE);
 		scene = new SceneTutorial();
+		PlaySound(BGM_TUTORIAL);
 		break;
 	case nSceneStageSelect:
+		StopSound(BGM_TUTORIAL);
 		scene = new SceneStageSelect();
+		// PlaySound(BGM_STAGESELECT);
 		break;
 	case nSceneCharacterSelect:
+		// StopSound(BGM_STAGESELECT);
 		scene = new SceneCharacterSelect();
+		PlaySound(BGM_CHARSEL);
 		break;
 	case nSceneGame:
+		StopSound(BGM_CHARSEL);
 		scene = new SceneGame();
+		PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
+		StopSound(BGM_TRAINING);
 		scene = new SceneResult();
+		// PlaySound(BGM_RESULT);
 		break;
 	case nSceneExit:
+		StopSound(BGM_TITLE);
 		scene = new SceneExit();
 		break;
 	default:
 		break;
 	}
-//<<<<<<< HEAD
-//	delete scene;
-//	scene = NewScene;
-//=======
-//>>>>>>> Develop
 }
 
 //=====================================================================================================

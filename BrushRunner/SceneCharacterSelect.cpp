@@ -112,10 +112,12 @@ void SceneCharacterSelect::Update(int SceneID)
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
 			PlaySound(SE_CHOICE);
+
 			CircleSceneChanger::Instance()->SetChanger(true, []()
 			{
 				SetScene(nSceneGame);
 			});
+
 			return;
 		}
 	}

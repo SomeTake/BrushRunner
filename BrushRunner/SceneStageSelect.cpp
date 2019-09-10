@@ -10,6 +10,7 @@
 #include "SceneCharacterSelect.h"
 #include "Input.h"
 #include "CircleSceneChanger.h"
+#include "Sound.h"
 
 #include "StageSelectBG.h"
 #include "StageName.h"
@@ -60,6 +61,8 @@ void SceneStageSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
+			PlaySound(SE_CHOICE);
+
 			CircleSceneChanger::Instance()->SetChanger(true, []() 
 			{
 				SetScene(nSceneCharacterSelect);

@@ -14,6 +14,7 @@
 #include "DebugWindow.h"
 #include "SceneResult.h"
 #include "CircleSceneChanger.h"
+#include "Sound.h"
 
 // 2d obj
 #include "Frame01.h"
@@ -430,6 +431,8 @@ void SceneGame::CheckResult()
 		{
 			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(pNo, BUTTON_C))
 			{
+				PlaySound(SE_CHOICE);
+
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
 					SetScene(nSceneResult);

@@ -6,6 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "Input.h"
+#include "CircleSceneChanger.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -184,6 +185,17 @@ HRESULT UpdateKeyboard(void)
 			}
 
 			g_aKeyState[nCntKey] = aKeyState[nCntKey];
+
+			// シーンチェンジ中はキー入力を消去する
+			if (CircleSceneChanger::Instance()->GetUseMask())
+			{
+				g_aKeyState[nCntKey] = NULL;
+				g_aKeyStateRepeatCnt[nCntKey] = NULL;
+				g_aKeyStateRepeat[nCntKey] = NULL;
+				g_aKeyStateTrigger[nCntKey] = NULL;
+				g_aKeyStateRelease[nCntKey] = NULL;
+			}
+
 		}
 	}
 	else
@@ -422,6 +434,14 @@ void UpdatePad()
 		//	PrintDebugProc("JoyStickVec[%d] %f\n", i, JoyStickVec[i]);
 		//}
 #endif
+		// シーンチェンジ中はキー入力を消去する
+		if (CircleSceneChanger::Instance()->GetUseMask())
+		{
+			PadTrigger[i] = NULL;
+			PadState[i] = NULL;
+			PadRepeat[i] = NULL;
+			PadRelease[i] = NULL;
+		}
 	}
 }
 

@@ -9,7 +9,11 @@
 #include "ResourceManager.h"
 #include "Input.h"
 #include "DebugWindow.h"
+#include "Sound.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
 #define TUTORIAL_POS	D3DXVECTOR3((float)SCREEN_CENTER_X * 3, (float)SCREEN_CENTER_Y, 0.0f)
 #define TUTORIAL_SIZE	D3DXVECTOR3((float)SCREEN_WIDTH * 3, (float)SCREEN_HEIGHT, 0.0f)
 #define TUTORIAL_DIVIDE_X	(1)
@@ -17,6 +21,9 @@
 #define TUTORIAL_DIVIDE		(3)
 #define MOVE_FRAME			(20)
 
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
 int Tutorial::slideNo = 0;
 
 //=============================================================================
@@ -59,6 +66,8 @@ void Tutorial::Update()
 	{
 		if (GetKeyboardTrigger(DIK_D) || IsButtonTriggered(0, STICK_RIGHT))
 		{
+			PlaySound(SE_SELECT);
+
 			slideNo = min(slideNo++, TUTORIAL_DIVIDE - 1);
 			newPos.x = TUTORIAL_POS.x - slideNo * (float)SCREEN_WIDTH;
 			move.x = (newPos.x - pos.x) / (float)MOVE_FRAME;
@@ -66,6 +75,8 @@ void Tutorial::Update()
 		}
 		else if (GetKeyboardTrigger(DIK_A) || IsButtonTriggered(0, STICK_LEFT))
 		{
+			PlaySound(SE_SELECT);
+
 			slideNo = max(slideNo--, 0);
 			newPos.x = TUTORIAL_POS.x - slideNo * (float)SCREEN_WIDTH;
 			move.x = (newPos.x - pos.x) / (float)MOVE_FRAME;

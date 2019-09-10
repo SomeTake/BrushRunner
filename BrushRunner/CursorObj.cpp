@@ -9,8 +9,6 @@
 #include "Player.h"
 #include "Input.h"
 #include "_2dobj.h"
-int pnum=0;
-bool canch = false;
 #include "MyLibrary.h"
 #include "Sound.h"
 #include "ResourceManager.h"
@@ -22,6 +20,9 @@ bool canch = false;
 #define CURSOROBJ_POS		D3DXVECTOR3(350.0f, 100.0f, 0.0f)
 #define CURSOROBJ_SPACE		D3DXVECTOR3(150.0f, 150.0f, 0.0f)	// 表示間隔
 
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
 LPDIRECT3DTEXTURE9	CursorObj::D3DTexture = NULL;				// テクスチャのポインタ
 LPDIRECT3DTEXTURE9	CursorObj::D3DTexture2 = NULL;				// テクスチャのポインタ
 
@@ -30,21 +31,6 @@ LPDIRECT3DTEXTURE9	CursorObj::D3DTexture2 = NULL;				// テクスチャのポインタ
 //=============================================================================
 CursorObj::CursorObj(int playerNo, int cursorNo)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// テクスチャの読み込み
-	if (D3DTexture == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_CURSOROBJ,					// ファイルの名前
-			&D3DTexture);						// 読み込むメモリのポインタ
-	}
-	if (D3DTexture2 == NULL)
-	{
-		D3DXCreateTextureFromFile(pDevice,		// デバイスのポインタ
-			TEXTURE_CURSOROBJ2,					// ファイルの名前
-			&D3DTexture2);						// 読み込むメモリのポインタ
-	}
 	ResourceManager::Instance()->GetTexture("SelectCursor", &D3DTexture);
 
 	this->playerNo = playerNo;

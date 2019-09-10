@@ -88,11 +88,13 @@ void SceneTitle::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
 		{
+			PlaySound(SE_SELECT);
 			IsOption = true;
 			break;
 		}
 		else if (GetKeyboardTrigger(DIK_S) || IsButtonTriggered(playerNo, STICK_DOWN))
 		{
+			PlaySound(SE_SELECT);
 			IsOption = false;
 			break;
 		}
@@ -101,6 +103,8 @@ void SceneTitle::Update(int SceneID)
 		{
 			if (IsOption == true)
 			{
+				PlaySound(SE_CHOICE);
+
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
 					SetScene(nSceneTutorial);
@@ -110,7 +114,7 @@ void SceneTitle::Update(int SceneID)
 			}
 			else
 			{
-				//SetScene(new SceneExit(), nSceneExit);
+				PlaySound(SE_CHOICE);
 
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
