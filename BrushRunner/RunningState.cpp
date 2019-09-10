@@ -11,6 +11,7 @@
 #include "Input.h"
 #include "Map.h"
 #include "Timer.h"
+#include "ParticleManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -61,4 +62,7 @@ void RunningState::Update(int AnimCurtID)
 		owner_->ChangeState(new IdleState(owner_));
 		return;
 	}
+
+	// エフェクト
+	owner_->RunningEffect();
 }

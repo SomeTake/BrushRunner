@@ -9,6 +9,7 @@
 #include "DebugWindow.h"
 
 std::vector<UIParticle*> ParticleManager::uiparticleVector;
+std::vector<Particle*> ParticleManager::particleVector;
 
 //=============================================================================
 // コンストラクタ
@@ -18,6 +19,7 @@ ParticleManager::ParticleManager()
 	// メモリ確保
 	confettiVector.reserve(500);
 	uiparticleVector.reserve(500);
+	particleVector.reserve(1000);
 }
 
 //=============================================================================
@@ -39,6 +41,18 @@ ParticleManager::~ParticleManager()
 	}
 	uiparticleVector.clear();
 	ReleaseVector(uiparticleVector);
+
+	for (auto &Particle : particleVector)
+	{
+		SAFE_DELETE(Particle);
+	}
+	particleVector.clear();
+	ReleaseVector(particleVector);
+
+	// テクスチャの削除
+	UIParticle::ReleaseTexture();
+	Confetti::ReleaseTexture();
+	Particle::ReleaseTexture();
 }
 
 //=============================================================================
@@ -59,8 +73,13 @@ void ParticleManager::Update()
 		Particle->Update();
 	}
 
-#if _DEBUG_
-	//Debug();
+	for (auto &Particle : particleVector)
+	{
+		Particle->Update();
+	}
+
+#if _DEBUG
+	Debug();
 #endif
 }
 
@@ -75,6 +94,11 @@ void ParticleManager::Draw()
 	}
 
 	for (auto &Particle : uiparticleVector)
+	{
+		Particle->Draw();
+	}
+
+	for (auto &Particle : particleVector)
 	{
 		Particle->Draw();
 	}
@@ -111,6 +135,19 @@ void ParticleManager::Check()
 		}
 	}
 
+	for (auto Particle = particleVector.begin(); Particle != particleVector.end();)
+	{
+		if ((*Particle)->GetUse() == false)
+		{
+			SAFE_DELETE((*Particle));
+			Particle = particleVector.erase(Particle);
+		}
+		else
+		{
+			Particle++;
+		}
+	}
+
 }
 
 //=============================================================================
@@ -118,15 +155,9 @@ void ParticleManager::Check()
 //=============================================================================
 void ParticleManager::Debug()
 {
-	int count = 0;
-	for (auto &p : confettiVector)
-	{
-		count++;
-	}
-
 	BeginDebugWindow("Particle");
 
-	DebugText("Count:%d", count);
+	DebugText("Count:%d", particleVector.capacity());
 
 	EndDebugWindow("Particle");
 }
@@ -140,9 +171,17 @@ void ParticleManager::SetConfetti()
 }
 
 //=============================================================================
-// UI用パーティクルベクターのゲット
+// UI用パーティクルベクターのゲッター
 //=============================================================================
 std::vector<UIParticle*> *ParticleManager::GetUIParticle()
 {
 	return &uiparticleVector;
+}
+
+//=============================================================================
+// 3D用パーティクルベクターのゲッター
+//=============================================================================
+std::vector<Particle*> *ParticleManager::GetParticle()
+{
+	return &particleVector;
 }

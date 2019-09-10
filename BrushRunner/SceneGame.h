@@ -19,6 +19,7 @@
 #include "EffectManager.h"
 #include "Object3D.h"
 #include "Timer.h"
+#include "ParticleManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -39,8 +40,9 @@ private:
 	Player			*pPlayer[PLAYER_MAX];	// プレイヤー
 	QUADTREE		*Quadtree = nullptr;	// 四分木
 	PaintGroup		*paintGroup = nullptr;	// ペイントグループ
-	EffectManager	*pEffectManager;		// 2Dエフェクト管理
+	EffectManager	*pEffectManager;		// エフェクト管理
 	Timer			*pTimer;				// タイマー
+	ParticleManager *particleManager;		// パーティクルマネージャ
 
 	int				startframe;				// 開始カウントダウン
 	bool			result;					// 終了フラグ

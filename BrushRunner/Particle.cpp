@@ -1,11 +1,11 @@
 //=============================================================================
 //
-// 紙吹雪 [Confetti.cpp]
+// パーティクル [Particle.cpp]
 // Author : HAL東京 GP12B332-19 80277 染谷武志
 //
 //=============================================================================
 #include "Main.h"
-#include "Confetti.h"
+#include "Particle.h"
 #include "Camera.h"
 #include "MyLibrary.h"
 #include "ResourceManager.h"
@@ -13,49 +13,34 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define CONFETTI_FILE		("data/TEXTURE/Confetti.png")
-#define CONFETTI_WIDTH		(10.0f)		// 大きさ
-#define CONFETTI_HEIGHT		(10.0f)		// 大きさ
-#define CONFETTI_RANGE_X	(500.0f)	// 落下範囲
-#define CONFETTI_RANGE_Z	(500.0f)	// 落下範囲
-#define CONFETTI_FALL_SPEED	(1.0f)		// 落下速度
-#define CONFETTI_DIVIDE_X	(4)			// テクスチャ分割数
-#define CONFETTI_POS_Y		(500.0f)	// 落下する高さ
-#define CONFETTI_MOVE_COUNT	(20)		// 動きをつけるタイミング
-#define CONFETTI_MOVE_VALUE	(0.3f)		// 前後左右に動くスピードの最大
+#define EFFECT_FILE	("data/TEXTURE/Effect.jpg")
 
 //*****************************************************************************
 // メンバ変数の初期化
 //*****************************************************************************
-LPDIRECT3DTEXTURE9 Confetti::D3DTexture = NULL;
+LPDIRECT3DTEXTURE9 Particle::D3DTexture = NULL;
 
 //=============================================================================
 // コンストラクタ
 //=============================================================================
-Confetti::Confetti()
+Particle::Particle(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, D3DXVECTOR3 scl, int time)
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
 	if (D3DTexture == NULL)
 	{
-		D3DXCreateTextureFromFile(Device, CONFETTI_FILE, &D3DTexture);
+		D3DXCreateTextureFromFile(Device, EFFECT_FILE, &D3DTexture);
 	}
 
 	// 発生座標、色、テクスチャをランダムで指定する
-	pos.x = RandomRange(-CONFETTI_RANGE_X, CONFETTI_RANGE_X);
-	pos.y = CONFETTI_POS_Y;
-	pos.z = RandomRange(-CONFETTI_RANGE_Z, CONFETTI_RANGE_Z);
-	int color = rand() % nColorMax;
-	col = MyColor[color];
-	texNo = rand() % CONFETTI_DIVIDE_X;
-
-	rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	move = D3DXVECTOR3(0.0f, CONFETTI_FALL_SPEED, 0.0f);
-	width = CONFETTI_WIDTH;
-	height = CONFETTI_HEIGHT;
-	use = true;
-	moveCnt = 0;
+	this->pos = pos;
+	this->scl = scl;
+	this->move = move;
+	this->col = col;
+	this->time = time;
+	this->decAlpha = (float)this->col.a / (float)this->time;
+	this->use = true;
+	this->rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	MakeVertex();
 }
@@ -63,7 +48,7 @@ Confetti::Confetti()
 //=============================================================================
 // デストラクタ
 //=============================================================================
-Confetti::~Confetti()
+Particle::~Particle()
 {
 	// 頂点バッファの開放
 	SAFE_RELEASE(this->D3DVtxBuff);
@@ -72,34 +57,29 @@ Confetti::~Confetti()
 //=============================================================================
 // 更新
 //=============================================================================
-void Confetti::Update()
+void Particle::Update()
 {
-	// 使用しているもののみ更新
-	if (use)
+	if (!use)
+		return;
+
+	this->pos += this->move;
+
+	// 透明度の増加
+	this->col.a -= this->decAlpha;
+	if (this->col.a <= 0)
 	{
-		moveCnt++;
-		// 一定のタイミングで動き方を変える
-		if (moveCnt == CONFETTI_MOVE_COUNT)
-		{
-			moveCnt = 0;
-			move.x = RandomRange(-CONFETTI_MOVE_VALUE, CONFETTI_MOVE_VALUE);
-			move.z = RandomRange(-CONFETTI_MOVE_VALUE, CONFETTI_MOVE_VALUE);
-		}
-
-		pos -= move;
-
-		// 落下仕切ったら消滅
-		if (pos.y < 0 - height)
-		{
-			use = false;
-		}
+		this->use = false;
 	}
+
+	SetTexture();
+	SetVertex();
+	SetColor();
 }
 
 //=============================================================================
 // 描画
 //=============================================================================
-void Confetti::Draw()
+void Particle::Draw()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 	CAMERA *cameraWk = GetCamera();
@@ -172,7 +152,7 @@ void Confetti::Draw()
 		Device->SetFVF(FVF_VERTEX_3D);
 
 		// テクスチャの設定
-		Device->SetTexture(0, Confetti::D3DTexture);
+		Device->SetTexture(0, Particle::D3DTexture);
 
 		// ポリゴンの描画
 		Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
@@ -199,7 +179,7 @@ void Confetti::Draw()
 //=============================================================================
 // 頂点情報の作成
 //=============================================================================
-HRESULT Confetti::MakeVertex()
+HRESULT Particle::MakeVertex()
 {
 	LPDIRECT3DDEVICE9 Device = GetDevice();
 
@@ -221,10 +201,10 @@ HRESULT Confetti::MakeVertex()
 	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点座標の設定
-	pVtx[0].vtx = D3DXVECTOR3(-width / 2, height / 2, 0.0f);
-	pVtx[1].vtx = D3DXVECTOR3(width / 2, height / 2, 0.0f);
-	pVtx[2].vtx = D3DXVECTOR3(-width / 2, -height / 2, 0.0f);
-	pVtx[3].vtx = D3DXVECTOR3(width / 2, -height / 2, 0.0f);
+	pVtx[0].vtx = D3DXVECTOR3(-scl.x / 2, scl.y / 2, 0.0f);
+	pVtx[1].vtx = D3DXVECTOR3(scl.x / 2, scl.y / 2, 0.0f);
+	pVtx[2].vtx = D3DXVECTOR3(-scl.x / 2, -scl.y / 2, 0.0f);
+	pVtx[3].vtx = D3DXVECTOR3(scl.x / 2, -scl.y / 2, 0.0f);
 
 	// 法線ベクトルの設定
 	pVtx[0].nor = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
@@ -239,17 +219,79 @@ HRESULT Confetti::MakeVertex()
 	pVtx[3].diffuse = col;
 
 	// テクスチャ座標の設定
-	int x = texNo % CONFETTI_DIVIDE_X;
-	float sizeX = 1.0f / CONFETTI_DIVIDE_X;
-
-	pVtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
 	// 頂点データをアンロックする
 	D3DVtxBuff->Unlock();
 
 	return S_OK;
+
+}
+
+//=============================================================================
+// 頂点座標のセット
+//=============================================================================
+void Particle::SetVertex()
+{
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点座標の設定
+	pVtx[0].vtx = D3DXVECTOR3(-scl.x / 2, scl.y / 2, 0.0f);
+	pVtx[1].vtx = D3DXVECTOR3(scl.x / 2, scl.y / 2, 0.0f);
+	pVtx[2].vtx = D3DXVECTOR3(-scl.x / 2, -scl.y / 2, 0.0f);
+	pVtx[3].vtx = D3DXVECTOR3(scl.x / 2, -scl.y / 2, 0.0f);
+
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
+
+}
+
+//=============================================================================
+// 反射光のセット
+//=============================================================================
+void Particle::SetColor()
+{
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	pVtx[0].diffuse = col;
+	pVtx[1].diffuse = col;
+	pVtx[2].diffuse = col;
+	pVtx[3].diffuse = col;
+
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
+
+}
+
+//=============================================================================
+// テクスチャ座標のセット
+//=============================================================================
+void Particle::SetTexture()
+{
+	//頂点バッファの中身を埋める
+	Vertex3D *pVtx;
+
+	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+	D3DVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// テクスチャ座標の設定
+	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+	// 頂点データをアンロックする
+	D3DVtxBuff->Unlock();
 
 }

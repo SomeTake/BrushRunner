@@ -544,6 +544,7 @@ void Player::ObjectItemCollider(Map *pMap)
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
+			ItemGetEffect(Obj->GetPos());
 			hitItem = true;
 			PlaySound(SE_PICITEM);
 			return;
@@ -706,6 +707,64 @@ void Player::HitObjectInfluence(int type)
 	default:
 		break;
 	}
+}
+
+//=====================================================================================================
+// パワーアップエフェクトの付与
+//=====================================================================================================
+void Player::PowwrUpEffect()
+{
+	if (GetAnimCurtID() == Running || GetAnimCurtID() == Idle || GetAnimCurtID() == Jump)
+	{
+		D3DXVECTOR3 NewPos = pos;
+		std::vector<Particle*> *vector = ParticleManager::GetParticle();
+
+		NewPos.x += (float)(rand() % 20 - 10) * 0.1f;
+		NewPos.y += (float)(rand() % 20 - 10) * 0.1f;
+		NewPos.z += (float)(rand() % 20 - 10) * 0.1f;
+
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.00f, 0.00f, 0.5f), D3DXVECTOR3(5.0f, 5.0f, 5.0f), 10));
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.20f, 0.00f, 0.3f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), 15));
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.40f, 0.00f, 0.15f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 20));
+	}
+}
+
+//=====================================================================================================
+// ランニングエフェクトの付与
+//=====================================================================================================
+void Player::RunningEffect()
+{
+	// 空中なら発生しない
+	if (!hitGround && !hitPaint)
+		return;
+
+	// 何かしらアイテムを使っている最中ならエフェクトを発生させない
+	if (blind || spike || PowerBanana || jet || PaintSystem->GetSpInk())
+		return;
+
+	std::vector<Particle*> *vector = ParticleManager::GetParticle();
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(5.0f, 5.0f, 5.0f), 20));
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), 40));
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 60));
+}
+
+//=====================================================================================================
+// アイテム取得エフェクトの付与
+//=====================================================================================================
+void Player::ItemGetEffect(D3DXVECTOR3 pos)
+{
+	std::vector<Particle*> *particle = ParticleManager::GetParticle();
+
+	D3DXVECTOR3 move;
+
+	for (int i = 0; i < 10; i++)
+	{
+		move.x = RandomRange(-3.0f, 3.0f);
+		move.y = RandomRange(-3.0f, 3.0f);
+		move.z = 0.0f;
+		particle->push_back(new Particle(pos, move, MyColor[nYellow], D3DXVECTOR3(3.0f, 3.0f, 3.0f), 30));
+	}
+
 }
 
 //=====================================================================================================

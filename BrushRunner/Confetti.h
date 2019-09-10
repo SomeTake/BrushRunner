@@ -19,6 +19,8 @@ private:
 	bool						use;			// 使用しているかどうか
 	int							texNo;			// 使用するテクスチャ番号
 	int							moveCnt;		// 動きをつけるタイミング
+	static LPDIRECT3DTEXTURE9	D3DTexture;
+
 	HRESULT MakeVertex();
 
 public:
@@ -29,6 +31,8 @@ public:
 	void Draw();
 
 	bool GetUse() { return use; };
+
+	static void ReleaseTexture() { SAFE_RELEASE(D3DTexture); };
 
 };
 

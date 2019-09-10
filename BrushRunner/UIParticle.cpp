@@ -8,13 +8,28 @@
 #include "UIParticle.h"
 #include "ResourceManager.h"
 
+//*****************************************************************************
+// マクロ定義
+//*****************************************************************************
+#define PARTICLE_FILE	("data/TEXTURE/Particle.png")
+
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
+LPDIRECT3DTEXTURE9 UIParticle::D3DTexture = NULL;
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
 UIParticle::UIParticle(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, D3DXVECTOR3 size, int time)
 {
-	ResourceManager::Instance()->GetTexture("Particle", &D3DTexture);
-	
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	if (D3DTexture == NULL)
+	{
+		D3DXCreateTextureFromFile(Device, PARTICLE_FILE, &D3DTexture);
+	}
+
 	this->pos = pos;
 	this->size = size;
 	this->move = move;
@@ -31,7 +46,6 @@ UIParticle::UIParticle(D3DXVECTOR3 pos, D3DXVECTOR3 move, D3DXCOLOR col, D3DXVEC
 //=============================================================================
 UIParticle::~UIParticle()
 {
-	this->D3DTexture = NULL;
 }
 
 //=============================================================================

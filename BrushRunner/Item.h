@@ -21,13 +21,6 @@
 #define DIVIDE_ITEM_X			(7)
 #define DIVIDE_ITEM_Y			(1)
 
-static D3DXVECTOR3 ItemPos[PLAYER_MAX] = {
-	D3DXVECTOR3(245.0f, 30.0f, 0.0f),
-	//D3DXVECTOR3(565.0f, 30.0f, 0.0f),
-	//D3DXVECTOR3(885.0f, 30.0f, 0.0f),
-	//D3DXVECTOR3(1205.0f, 30.0f, 0.0f),
-};
-
 enum ItemNum
 {
 	NumJet,		// ジェットパック

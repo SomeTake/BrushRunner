@@ -165,3 +165,32 @@ float RandomRange(float min, float max)
 {
 	return min + (float)(rand() % 1000) / 999.0f * (max - min);
 }
+
+//=============================================================================
+// ‹…‘Ì•\–Êã‚Ì”CˆÓÀ•W‚ğæ“¾‚·‚é
+//=============================================================================
+D3DXVECTOR3 GetSpherePosition(float Angle1, float Angle2, float Radius)
+{
+	D3DXVECTOR3 Pos;
+
+	Pos.x = Radius * sinf(D3DXToRadian(Angle1)) * cosf(D3DXToRadian(Angle2));
+	Pos.y = Radius * sinf(D3DXToRadian(Angle1)) * sinf(D3DXToRadian(Angle2));
+	Pos.z = Radius * cosf(D3DXToRadian(Angle1));
+
+	return Pos;
+}
+
+//=============================================================================
+// ‰~üã‚Ì”CˆÓÀ•W‚ğæ“¾‚·‚é(X,Y,0.0f)
+//=============================================================================
+D3DXVECTOR3 GetCirclePosition(float Angle1, float Radius)
+{
+	D3DXVECTOR3 Pos;
+
+	Pos.x = Radius * cosf(D3DXToRadian(Angle1));
+	Pos.y = Radius * sinf(D3DXToRadian(Angle1));
+	Pos.z = 0.0f;
+
+	return Pos;
+
+}

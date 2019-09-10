@@ -14,6 +14,7 @@
 #include "StageSelectBG.h"
 #include "StageName.h"
 #include "StageSelectCursor.h"
+#include "StageSelectLogo.h"
 
 //=============================================================================
 // コンストラクタ
@@ -26,6 +27,8 @@ SceneStageSelect::SceneStageSelect()
 	obj.push_back(new StageSelectCursor());
 	// ステージ名
 	obj.push_back(new StageName());
+	// ロゴ
+	obj.push_back(new StageSelectLogo());
 
 /*****************************************************************************/
 	// シーンチェンジの終了
