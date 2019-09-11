@@ -44,7 +44,6 @@ void SelectLogo::Update()
 {
 	if (use == true)
 	{
-
 		//テクスチャ座標をセット
 		SetTexture(PatternAnim);
 
@@ -62,16 +61,12 @@ void SelectLogo::Draw()
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	if (use == true)
-	{
-		// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
-		// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
-		pDevice->SetTexture(0, D3DTexture);
+	// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
+	// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
+	pDevice->SetTexture(0, D3DTexture);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
-	}
-
+	// ポリゴンの描画
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 }
 
 //=============================================================================

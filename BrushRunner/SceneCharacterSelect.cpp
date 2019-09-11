@@ -10,45 +10,20 @@
 #include "SceneManager.h"
 #include "SceneGame.h"
 #include "CircleSceneChanger.h"
-
-//2d obje
+#include "Sound.h"
 #include "_2dobj.h"
 #include "SelectLogo.h"
+#include "Cursor.h"
+#include "ResourceManager.h"
 
-#include "Sound.h"
+bool SceneCharacterSelect::AIUse[PLAYER_MAX];					// AIの使用フラグ
+int SceneCharacterSelect::SelectedCharacter[PLAYER_MAX];		// 選択したキャラクターモデルの番号
 
-enum
-{
-	logo,
-	obj1p01,
-	obj1p02,
-	obj1p03,
-	obj1p04,
-	obj2p01,
-	obj2p02,
-	obj2p03,
-	obj2p04,
-	obj3p01,
-	obj3p02,
-	obj3p03,
-	obj3p04,
-	obj4p01,
-	obj4p02,
-	obj4p03,
-	obj4p04,
-	//obj4p01,
-	//obj4p02,
-	//obj4p03,
-	//NumColorinkline02,
-	//NumColorinkline03,
-	//NumColorinkline04,
-
-
-	// 最大数
-	_2dMx,
-};
-int SceneCharacterSelect::SelectCharacter[PLAYER_MAX];
-bool cpu[PLAYER_MAX];
+#define SelectCenter_Up (D3DXVECTOR2(635.0f,175.0f))
+#define SelectCenter_Down (D3DXVECTOR2(635.0f,550.0f))
+#define SelectCenter_Left (D3DXVECTOR2(440.0f,360.0f))
+#define SelectCenter_Right (D3DXVECTOR2(840.0f,360.0f))
+#define SelectRange (D3DXVECTOR2(150.0f,150.0f))
 
 //=============================================================================
 // コンストラクタ
@@ -56,22 +31,51 @@ bool cpu[PLAYER_MAX];
 SceneCharacterSelect::SceneCharacterSelect()
 {
 	// セレクト画面のロゴ
-	p2dobj.push_back(new SelectLogo());
+	selectLogo = new SelectLogo();
+
+	ResourceManager::Instance()->GetTexture("CharacterSelect", &D3DTexture);
+
+	MakeVertex();
+
+	SelectFrame.reserve(4);
+	SelectFrame.push_back(new CharSelectFrame(SelectCenter_Right));
+	SelectFrame.push_back(new CharSelectFrame(SelectCenter_Up));
+	SelectFrame.push_back(new CharSelectFrame(SelectCenter_Down));
+	SelectFrame.push_back(new CharSelectFrame(SelectCenter_Left));
 
 	// セレクト用のカーソル
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	int PadCount = GetPadCount();
+	if (PadCount == 0)
 	{
-		cpu[playerNo] = false;
-		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
+		// キーボードプレイ、一人しかいない
+		cursor.push_back(new Cursor(0));
+		charSelectUI.push_back(new CharSelectUI(0, false));
+		SelectOver[0] = false;
+		AIUse[0] = false;
+	}
+	else
+	{
+		// ゲームパッドプレイ、繋がるパッドの数のカーソルの表示
+		for (int PlayerNo = 0; PlayerNo < PadCount; PlayerNo++)
 		{
-			pCursor[playerNo][cursorNo] = new CursorObj(playerNo, cursorNo);
+			cursor.push_back(new Cursor(PlayerNo));
+			charSelectUI.push_back(new CharSelectUI(PlayerNo, false));
+			SelectOver[PlayerNo] = false;
+			AIUse[PlayerNo] = false;
 		}
 	}
 
-	// 選択結果の初期化
-	for (int i = 0; i < PLAYER_MAX; i++)
+	// AIがランダムで決める
+	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		SelectCharacter[i] = 0;
+		if (PlayerNo > PadCount)
+		{
+			SelectedCharacter[PlayerNo] = rand() % (3 + 1);
+			charSelectUI.push_back(new CharSelectUI(PlayerNo, true));
+			charSelectUI.at(PlayerNo)->SetCharTexture(SelectedCharacter[PlayerNo]);
+			SelectOver[PlayerNo] = true;
+			AIUse[PlayerNo] = true;
+		}
 	}
 
 	/*****************************************************************************/
@@ -84,22 +88,28 @@ SceneCharacterSelect::SceneCharacterSelect()
 //=============================================================================
 SceneCharacterSelect::~SceneCharacterSelect()
 {
-	// 2Dオブジェクトの削除
-	for (auto &Object : p2dobj)
+	SAFE_DELETE(selectLogo);
+
+	for (auto &Object : cursor)
 	{
 		SAFE_DELETE(Object);
 	}
-	p2dobj.clear();
-	ReleaseVector(p2dobj);
+	cursor.clear();
+	ReleaseVector(cursor);
 
-	// カーソルの削除
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	for (auto &Object : SelectFrame)
 	{
-		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
-		{
-			SAFE_DELETE(pCursor[playerNo][cursorNo]);
-		}
+		SAFE_DELETE(Object);
 	}
+	SelectFrame.clear();
+	ReleaseVector(SelectFrame);
+
+	for (auto &Object : charSelectUI)
+	{
+		SAFE_DELETE(Object);
+	}
+	charSelectUI.clear();
+	ReleaseVector(charSelectUI);
 }
 
 //=============================================================================
@@ -108,83 +118,49 @@ SceneCharacterSelect::~SceneCharacterSelect()
 void SceneCharacterSelect::Update(int SceneID)
 {
 	// シーンチェンジ
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	if (SelectOver[0] && SelectOver[1] &&
+		SelectOver[2] && SelectOver[3])
 	{
-		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
+		CircleSceneChanger::Instance()->SetChanger(true, []()
 		{
-			PlaySound(SE_CHOICE);
-
-			CircleSceneChanger::Instance()->SetChanger(true, []()
-			{
-				SetScene(nSceneGame);
-			});
-			return;
-		}
+			SetScene(nSceneGame);
+		});
+		return;
 	}
 
-	// 2Dオブジェクトの更新
-	for (auto & Obj : p2dobj)
+	// フラグ初期化
+	for (auto &Object : SelectFrame)
 	{
-		Obj->Update();
+		Object->SetUse(false);
+	}
+
+	// キャラクター選択
+	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	{
+		if (!SelectOver[playerNo])
+		{
+			if (CheckSelect(playerNo))
+			{
+				if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
+				{
+					PlaySound(SE_CHOICE);
+					charSelectUI.at(playerNo)->SetCharTexture(SelectedCharacter[playerNo]);
+					SelectOver[playerNo] = true;
+				}
+			}
+		}
 	}
 
 	// カーソルの更新
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	for (auto & Object : cursor)
 	{
-		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
-		{
-			pCursor[playerNo][cursorNo]->Update();
-		}
+		Object->Update();
 	}
 
-	// 一番左のカーソルをキャラクターセレクトの番号として使用する
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	// セレクトフレーム更新
+	for (auto &Object : SelectFrame)
 	{
-		SelectCharacter[playerNo] = pCursor[playerNo][0]->GetSelectNo();
-	}
-	if (GetKeyboardTrigger(DIK_1))
-	{
-		if (cpu[0] == false)
-		{
-			cpu[0] = true;
-		}
-		else if (cpu[0] == true)
-		{
-			cpu[0] = false;
-		}
-	}
-	else if (GetKeyboardTrigger(DIK_2))
-	{
-		if (cpu[1] == false)
-		{
-			cpu[1] = true;
-		}
-		else if (cpu[1] == true)
-		{
-			cpu[1] = false;
-		}
-	}
-	else if (GetKeyboardTrigger(DIK_3))
-	{
-		if (cpu[2] == false)
-		{
-			cpu[2] = true;
-		}
-		else if (cpu[2] == true)
-		{
-			cpu[2] = false;
-		}
-	}
-	else if (GetKeyboardTrigger(DIK_4))
-	{
-		if (cpu[3] == false)
-		{
-			cpu[3] = true;
-		}
-		else if (cpu[3] == true)
-		{
-			cpu[3] = false;
-		}
+		Object->Update();
 	}
 }
 
@@ -193,43 +169,127 @@ void SceneCharacterSelect::Update(int SceneID)
 //=============================================================================
 void SceneCharacterSelect::Draw()
 {
-	// 2Dオブジェクトの描画
-	for (auto & Obj : p2dobj)
+	LPDIRECT3DDEVICE9 Device = GetDevice();
+
+	Device->SetFVF(FVF_VERTEX_2D);
+	Device->SetTexture(0, D3DTexture);
+	Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+
+	// セレクトロゴの描画
+	selectLogo->Draw();
+
+	// セレクトフレームの描画
+	for (auto &Object : SelectFrame)
 	{
-		Obj->Draw();
+		Object->Draw();
+	}
+
+	// セレクトUIの描画
+	for (auto &Object : charSelectUI)
+	{
+		Object->Draw();
 	}
 
 	// カーソルの描画
-	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
+	for (auto & Object : cursor)
 	{
-		if (cpu[playerNo] == false)
-		{
-			for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
-			{
-				pCursor[playerNo][cursorNo]->Draw();
-			}
-		}
-		else if (cpu[playerNo] == true)
-		{
-			for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
-			{
-				pCursor[playerNo][cursorNo]->Draw2();
-			}
-		}
+		Object->Draw();
 	}
+}
+
+
+//=============================================================================
+// 頂点の作成
+//=============================================================================
+void SceneCharacterSelect::MakeVertex(void)
+{
+	// 頂点座標の設定
+	vertexWk[0].vtx = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	vertexWk[1].vtx = D3DXVECTOR3(SCREEN_WIDTH, 0.0f, 0.0f);
+	vertexWk[2].vtx = D3DXVECTOR3(0.0f, SCREEN_HEIGHT, 0.0f);
+	vertexWk[3].vtx = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
+
+	// rhwの設定
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
+
+	// 反射光の設定
+	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+
+	// テクスチャ座標の設定
+	vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+}
+
+//=============================================================================
+// セレクト座標をチェックする
+//=============================================================================
+bool SceneCharacterSelect::CheckSelect(int PlayerNo)
+{
+	D3DXVECTOR3 CursorPos = cursor.at(PlayerNo)->GetPos();
+
+	if (CursorPos.x > SelectCenter_Right.x - SelectRange.x / 2 &&
+		CursorPos.x < SelectCenter_Right.x + SelectRange.x / 2 &&
+		CursorPos.y > SelectCenter_Right.y - SelectRange.y / 2 &&
+		CursorPos.y < SelectCenter_Right.y + SelectRange.y / 2)
+	{
+		SelectedCharacter[PlayerNo] = 0;
+		SelectFrame.at(0)->SetUse(true);
+		return true;
+	}
+
+	if (CursorPos.x > SelectCenter_Up.x - SelectRange.x / 2 &&
+		CursorPos.x < SelectCenter_Up.x + SelectRange.x / 2 &&
+		CursorPos.y > SelectCenter_Up.y - SelectRange.y / 2 &&
+		CursorPos.y < SelectCenter_Up.y + SelectRange.y / 2)
+	{
+		SelectedCharacter[PlayerNo] = 1;
+		SelectFrame.at(1)->SetUse(true);
+		return true;
+	}
+
+	if (CursorPos.x > SelectCenter_Down.x - SelectRange.x / 2 &&
+		CursorPos.x < SelectCenter_Down.x + SelectRange.x / 2 &&
+		CursorPos.y > SelectCenter_Down.y - SelectRange.y / 2 &&
+		CursorPos.y < SelectCenter_Down.y + SelectRange.y / 2)
+	{
+		SelectedCharacter[PlayerNo] = 2;
+		SelectFrame.at(2)->SetUse(true);
+		return true;
+	}
+
+	if (CursorPos.x > SelectCenter_Left.x - SelectRange.x / 2 &&
+		CursorPos.x < SelectCenter_Left.x + SelectRange.x / 2 &&
+		CursorPos.y > SelectCenter_Left.y - SelectRange.y / 2 &&
+		CursorPos.y < SelectCenter_Left.y + SelectRange.y / 2)
+	{
+		SelectedCharacter[PlayerNo] = 3;
+		SelectFrame.at(3)->SetUse(true);
+		return true;
+	}
+
+	return false;
 }
 
 //=============================================================================
 // キャラクターセレクト番号のゲッター
 //=============================================================================
-int SceneCharacterSelect::GetSelectCharacter(int playerNo)
+int SceneCharacterSelect::GetSelectCharacter(int PlayerNo)
 {
-	return SelectCharacter[playerNo];
+	return SelectedCharacter[PlayerNo];
 }
+
 //=============================================================================
 // ゲッター
 //=============================================================================
-bool SceneCharacterSelect::GetAI(int playerNo)
+bool SceneCharacterSelect::GetAIUse(int PlayerNo)
 {
-	return cpu[playerNo];
+	return AIUse[PlayerNo];
 }

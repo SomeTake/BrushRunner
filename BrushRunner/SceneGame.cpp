@@ -72,7 +72,7 @@ SceneGame::SceneGame()
 	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo, false);
+		pPlayer[PlayerNo] = new Player(PlayerNo, SceneCharacterSelect::GetAIUse(PlayerNo));
 	}
 #endif
 
