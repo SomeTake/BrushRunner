@@ -36,20 +36,27 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	// BGM
-	{ "data/BGM/title.wav", true, 0.50f },
-{ "data/BGM/tutorial.wav", true, 1.00f },
-{ "data/BGM/ToysCarnival.wav", true, 0.50f },
-{ "data/BGM/training.wav", true, 1.00f },
-//{ "data/BGM/battle.wav", true, 0.50f }
+	{ "data/BGM/title.wav", true, 0.50f },		// Title
+{ "data/BGM/ToysCarnival.wav", true, 0.50f },	// Tutorial
+{ "data/BGM/StageSelect.wav", true, 0.50f },	// StageSelect
+{ "data/BGM/ClipOut.wav", true, 0.50f },		// CharacterSelect
+{ "data/BGM/tw012.wav", true, 0.50f },			// Stage01
+{ "data/BGM/tw052.wav", true, 0.50f },		// Stage02
+{ "data/BGM/tw069.wav", true, 0.50f },		// Stage03
+{ "data/BGM/Result.wav", true, 0.50f },		// Result
+
 //SE
 { "data/SE/choice.wav", false, 0.50f },
-{ "data/SE/select.wav", false, 0.50f },
+{ "data/SE/select.wav", false, 0.20f },
 { "data/SE/kaifuku.wav", false, 0.50f },
 { "data/SE/explosion.wav", false, 0.50f },
 { "data/SE/UseItem.wav", false, 0.50f },
 { "data/SE/slime.wav", false, 0.50f },
 { "data/SE/count.wav", false, 0.20f },
 { "data/SE/itemru.wav", false, 0.20f },
+{ "data/SE/damage.wav", false, 0.20f },
+{ "data/SE/Goal.wav", false, 0.50f },
+
 //{ "data/SE/effect0.wav", false, 1.00f },
 //{ "data/SE/cutin0.wav", false, 1.00f },
 //{ "data/SE/countdown0.wav", false, 1.00f },

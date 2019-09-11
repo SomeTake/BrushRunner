@@ -588,7 +588,7 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
 			Effect3DVector->push_back(effect);
 
-			PlaySound(SE_EXP);
+			PlaySound(SE_DAMAGE);
 		}
 	}
 }
@@ -647,7 +647,6 @@ void Player::HitObjectInfluence(int type)
 		break;
 
 	case eObjJump:
-
 		jumpSpd = JUMP_SPEED * jumpValue;
 		ChangeAnim(Jump);
 		ChangeState(new JumpState(this));

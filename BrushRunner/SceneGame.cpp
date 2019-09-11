@@ -15,6 +15,7 @@
 #include "SceneResult.h"
 #include "CircleSceneChanger.h"
 #include "Sound.h"
+#include "StageSelectBG.h"
 
 // 2d obj
 #include "Frame01.h"
@@ -399,7 +400,20 @@ void SceneGame::Start()
 		}
 
 		pTimer->Start();
-		PlaySound(BGM_TRAINING);
+
+		// BGM再生開始
+		switch (StageSelectBG::GetStageSelect())
+		{
+		case 0:
+			PlaySound(BGM_STAGE01);
+			break;
+		case 1:
+			PlaySound(BGM_STAGE02);
+			break;
+		case 2:
+			PlaySound(BGM_STAGE03);
+			break;
+		}
 	}
 }
 
@@ -519,13 +533,13 @@ void SceneGame::InsertResult(int pNo)
 			{
 				data[rNo].playerNo = pNo;
 				data[rNo].time = pTimer->Check();
+				
 				// PlaySound(ゴールSE)
-
-				// 1位がゴールしたらBGM変更
 				if (rNo == 0)
 				{
-					StopSound(BGM_TRAINING);
+					PlaySound(SE_GOAL);
 				}
+
 				break;
 			}
 		}
