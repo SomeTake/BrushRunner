@@ -40,8 +40,6 @@ void PowerUpBananaState::Update()
 	if (cnt == ACTIVE_TIME)
 	{
 		owner_->GetPlayer()->SetPowerBanana(false);
-		//owner_->GetPlayer()->SetJumpValue(1.0f);
-		//owner_->GetPlayer()->SetRunSpd(1.0f);
 
 		// アイテムを使用
 		owner_->SetPatternAnim(NumKawa);
@@ -62,7 +60,5 @@ void PowerUpBananaState::Start()
 {
 	cnt = 0;
 
-	//owner_->GetPlayer()->SetJumpValue(2.0f);
-	//owner_->GetPlayer()->SetJumpValue(2.0f);
 	owner_->GetPlayer()->SetPowerBanana(true);
 }

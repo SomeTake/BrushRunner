@@ -207,31 +207,11 @@ void SceneGame::Update(int SceneID)
 					}
 				}
 			}
-
 		}
 	}
 
 	// カメラの更新
 	UpdateCamera(pPlayer[FirstPlayer]->GetPos());
-
-#if 0
-	std::vector<float> vec(PLAYER_MAX);
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		if (pPlayer[i]->GetOnCamera())
-		{
-			vec.at(i) = pPlayer[i]->GetModel()->pos.x;
-		}
-	}
-	auto max = std::max_element(vec.begin(), vec.end());
-	size_t maxIdx = std::distance(vec.begin(), max);
-
-	auto min = std::min_element(vec.begin(), vec.end());
-	SceneGame::TheLastPlayer = (int)std::distance(vec.begin(), min);
-
-	// カメラの更新
-	UpdateCamera(pPlayer[(int)maxIdx]->GetModel()->pos);
-#endif
 
 	// マップの更新
 	pMap->Update();
@@ -408,18 +388,6 @@ void SceneGame::Start()
 //=============================================================================
 void SceneGame::CheckResult()
 {
-#if _DEBUG
-	if (GetKeyboardTrigger(DIK_N))
-	{
-		CircleSceneChanger::Instance()->SetChanger(true, []()
-		{
-			SetScene(nSceneResult);
-			InitCamera();
-		});
-		return;
-	}
-#endif
-
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{

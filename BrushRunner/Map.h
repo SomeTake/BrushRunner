@@ -17,8 +17,7 @@
 #define MAP_SIZE_X		(500)								// マップの横の枚数
 #define MAP_SIZE_Y		(50)								// マップの縦の枚数
 #define START_POS		D3DXVECTOR3(50.0f, 0.0f, 0.0f)		// スタート地点
-//#define GOAL_POS		D3DXVECTOR3(500.0f, 0.0f, 0.0f)	// ゴール地点
-#define GOAL_POS		D3DXVECTOR3(9800.0f, 0.0f, 0.0f)		// ゴール地点
+#define GOAL_POS		D3DXVECTOR3(9800.0f, 0.0f, 0.0f)	// ゴール地点
 
 // マップチップ座標を取得の種類
 enum e_ChipPosType
@@ -48,11 +47,11 @@ enum e_ChipType
 class Map
 {
 private:
-	static std::vector<std::vector<int>>	maptbl;
-	std::vector<Chip*>						MapChipVector;
+	static std::vector<std::vector<int>>	maptbl;				// csvデータを保存する2次元ベクトル
+	std::vector<Chip*>						MapChipVector;		// マップチップのベクトル
 
-	static std::vector<std::vector<int>>	objtbl;
-	std::vector<Chip*>						ObjectChipVector;
+	static std::vector<std::vector<int>>	objtbl;				// csvデータを保存する2次元ベクトル
+	std::vector<Chip*>						ObjectChipVector;	// オブジェクトチップのベクトル
 
 public:
 	Map();
@@ -69,10 +68,9 @@ public:
 	static D3DXVECTOR3 GetMapChipPos(int x, int y, int PosType);
 	static int GetObjTbl(int ObjX, int ObjY);
 	static int GetObjTbl(D3DXVECTOR3 Pos, int ChipDirection);
-
-	static void SetObjTbl(int ObjX, int ObjY, int texnum);
 	std::vector<Chip*> GetObjectChip() { return ObjectChipVector; };
 
+	static void SetObjTbl(int ObjX, int ObjY, int texnum);
 };
 
 #endif

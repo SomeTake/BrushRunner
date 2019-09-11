@@ -118,6 +118,7 @@ void PaintManager::Update()
 	}
 	for (auto &Color : this->ColorPaint)
 	{
+		// オブジェクトが画面内かつ、ノードの範囲内じゃないなら、もう一度四分木に入れる
 		if (Color->GetInScreen() && !PaintManager::Quadtree->CheckObjectInNode(Color))
 		{
 			PaintManager::Quadtree->InsertObject(Color);
@@ -129,8 +130,13 @@ void PaintManager::Update()
 	if (GetKeyboardTrigger(DIK_P) || IsButtonTriggered(Owner, BUTTON_R1) ||
 		(AIUse && AIptr->GetAIChangeInk()))
 	{
+		// インクの種類交換
 		InkType = InkType == BlackInk ? ColorInk : BlackInk;
+
+		// カーソルの画像を切り替える
 		pCursor->ChangeInk();
+
+		// AIのパラメータを設定
 		if (AIUse)
 		{
 			AIptr->SetInkType(InkType);
@@ -144,11 +150,13 @@ void PaintManager::Update()
 		// 使用するインクの残量チェック
 		if (this->InkValue[InkType] > 0)
 		{
+			// 押す瞬間
 			if (GetKeyboardTrigger(DIK_O) || IsButtonTriggered(Owner, BUTTON_C))
 			{
 				PaintManager::paintGroup->Start(Owner);
 			}
 
+			// 押している
 			if (GetKeyboardPress(DIK_O) || IsButtonPressed(this->Owner, BUTTON_C))
 			{
 				// ペイントを設置する
@@ -160,6 +168,7 @@ void PaintManager::Update()
 				}
 			}
 
+			// 離す瞬間
 			if ((GetKeyboardRelease(DIK_O) || IsButtonReleased(Owner, BUTTON_C)) ||
 				InkValue[InkType] <= 0)
 			{
@@ -172,10 +181,13 @@ void PaintManager::Update()
 	{
 		if (AIptr->GetPaintState() == ePaintStart)
 		{
+			// カラーインクなら、このペイントグループを記録する
 			if (InkType == ColorInk)
 			{
 				PaintManager::paintGroup->Start(Owner);
 			}
+
+			// AIのペイントステートを変更
 			AIptr->SetPaintState(ePainting);
 
 			// ペイントを設置する
@@ -376,6 +388,7 @@ void PaintManager::CheckPaintUse(void)
 	{
 		if ((*Paint)->GetUse() == false)
 		{
+			// 使用していないペイントを削除
 			SAFE_DELETE((*Paint));
 			Paint = this->BlackPaint.erase(Paint);
 		}
@@ -389,6 +402,7 @@ void PaintManager::CheckPaintUse(void)
 	{
 		if ((*Paint)->GetUse() == false)
 		{
+			// 使用していないペイントを削除
 			SAFE_DELETE((*Paint));
 			Paint = this->ColorPaint.erase(Paint);
 		}

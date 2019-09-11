@@ -58,11 +58,6 @@ void Sky::Draw()
 
 	D3DXVECTOR3 oldpos = pos;
 
-	// αテストを有効に
-	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	//pDevice->SetRenderState(D3DRS_ALPHAREF, TRUE);
-	//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-
 	for (int cntY = 0; cntY < SKY_NUM_Y; cntY++)
 	{
 		for (int cntX = 0; cntX < SKY_NUM_X; cntX++)
@@ -96,10 +91,6 @@ void Sky::Draw()
 		pos.y -= SCREEN_HEIGHT;
 	}
 	pos = oldpos;
-
-	// αテストを無効に
-	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
 }
 
 //=============================================================================
@@ -153,7 +144,6 @@ HRESULT Sky::MakeVertex()
 		// 頂点データをアンロックする
 		D3DVtxBuff->Unlock();
 	}
-
 
 	return S_OK;
 }

@@ -26,20 +26,19 @@
 class PaintManager
 {
 private:
-	std::vector<Paint*>		BlackPaint;
-	std::vector<Paint*>		ColorPaint;
-	std::vector<InkGauge*>	inkGauge;
+	std::vector<Paint*>		BlackPaint;				// 黒ペイントベクトル
+	std::vector<Paint*>		ColorPaint;				// カラーペイントベクトル
+	std::vector<InkGauge*>	inkGauge;				// インク残量ゲージ
 	Cursor					*pCursor;				// 参照するカーソルクラスのポインタ
-	int						Owner;
+	int						Owner;					// 所有者
 	int						InkValue[InkNum];		// インクの残量
 	int						InkType;				// 使用するインクの種類(enum ColorInk=カラー, BlackInk=黒)
 	bool					SpInk;					// trueのときインクが減らない
 	int						HealCnt;				// 自動回復カウント
 
 	// AI用
-	bool					PressPaint = false;
-	bool					AIUse = false;
-	CharacterAI				*AIptr = nullptr;
+	bool					AIUse = false;			// AI使用フラグ
+	CharacterAI				*AIptr = nullptr;		// AIクラスのポインタ
 
 	static QUADTREE			*Quadtree;
 	static PaintGroup		*paintGroup;
@@ -54,8 +53,6 @@ public:
 
 	void Update();
 	void Draw();
-	static void SetQuadtreePtr(QUADTREE *Quadtree) { PaintManager::Quadtree = Quadtree; };
-	static void SetPaintGroupPtr(PaintGroup *Ptr) { PaintManager::paintGroup = Ptr; };
 
 	// ゲッター
 	bool GetSpInk() { return SpInk; };
@@ -69,6 +66,8 @@ public:
 	// セッター
 	void SetSpInk(bool _SpInk) { SpInk = _SpInk; };
 	void SetInkValue(int value, int type) { InkValue[type] = value; };
+	static void SetQuadtreePtr(QUADTREE *Quadtree) { PaintManager::Quadtree = Quadtree; };
+	static void SetPaintGroupPtr(PaintGroup *Ptr) { PaintManager::paintGroup = Ptr; };
 };
 
 #endif

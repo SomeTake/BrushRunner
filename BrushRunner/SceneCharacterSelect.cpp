@@ -75,7 +75,7 @@ SceneCharacterSelect::SceneCharacterSelect()
 	}
 
 	/*****************************************************************************/
-		// シーンチェンジの終了
+	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -91,12 +91,13 @@ SceneCharacterSelect::~SceneCharacterSelect()
 	}
 	p2dobj.clear();
 	ReleaseVector(p2dobj);
+
 	// カーソルの削除
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
 		{
-			delete pCursor[playerNo][cursorNo];
+			SAFE_DELETE(pCursor[playerNo][cursorNo]);
 		}
 	}
 }

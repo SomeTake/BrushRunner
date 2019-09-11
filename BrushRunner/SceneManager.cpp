@@ -23,7 +23,7 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static SceneNum eScene = nSceneCharacterSelect;				// ゲームの開始位置&シーン遷移
+static SceneNum eScene = nSceneResult;				// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
@@ -79,10 +79,11 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 SceneManager::~SceneManager()
 {
 	SAFE_DELETE(scene);
-	UninitSound();
 
 	// リソースの削除
 	ResourceManager::Instance()->AllRelease();
+
+	UninitSound();
 
 	UninitInput();
 }

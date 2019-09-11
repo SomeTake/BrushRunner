@@ -30,9 +30,11 @@ Chip::Chip(int x, int y, int _texnum, int ChipType)
 
 	switch (ChipType)
 	{
+		// マップチップ
 	case eMapChip:
 		ResourceManager::Instance()->GetTexture("MapChip", &D3DTexture);
 		break;
+		// オブジェクトチップ
 	case eObjectChip:
 		ResourceManager::Instance()->GetTexture("ObjectChip", &D3DTexture);
 		break;
@@ -40,7 +42,6 @@ Chip::Chip(int x, int y, int _texnum, int ChipType)
 
 	// 位置・回転・スケールの初期設定
 	pos = D3DXVECTOR3(x * CHIP_SIZE, -(y * CHIP_SIZE), 0.0f);
-	//scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	use = true;
 	texnum = _texnum;
 	cnt = 0;
@@ -50,7 +51,6 @@ Chip::Chip(int x, int y, int _texnum, int ChipType)
 
 	// 頂点情報の作成
 	MakeVertex();
-
 }
 
 //=============================================================================
