@@ -401,6 +401,7 @@ void SceneGame::Start()
 		}
 
 		pTimer->Start();
+		PlaySound(BGM_TRAINING);
 	}
 }
 

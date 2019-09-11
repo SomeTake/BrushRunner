@@ -23,7 +23,7 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int eScene = nSceneTitle;				// ゲームの開始位置&シーン遷移
+static SceneNum eScene = nSceneTitle;				// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
@@ -59,7 +59,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
-		PlaySound(BGM_TRAINING);
+		//PlaySound(BGM_TRAINING);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
@@ -188,7 +188,7 @@ void SceneManager::LoadResource()
 //=====================================================================================================
 // シーン遷移
 //=====================================================================================================
-void SetScene(int _scene)
+void SetScene(SceneNum _scene)
 {
 	eScene = _scene;
 	SAFE_DELETE(scene)
@@ -218,7 +218,7 @@ void SetScene(int _scene)
 	case nSceneGame:
 		StopSound(BGM_CHARSEL);
 		scene = new SceneGame();
-		PlaySound(BGM_TRAINING);
+		//PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
 		StopSound(BGM_TRAINING);

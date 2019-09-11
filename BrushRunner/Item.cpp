@@ -93,15 +93,6 @@ void Item::Update()
 		// 取得している状態
 		if (use)
 		{
-			// エフェクトを発生させる
-			std::vector<Effect*> *EffectVector = GetEffectVector();
-			effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
-			EffectVector->push_back(effect);
-			use = false;
-			active = true;
-			state[PatternAnim]->Start();
-
-			PlaySound(SE_USEITEM);
 			// アイテムを使用する
 			if ((GetKeyboardTrigger(DIK_I) || IsButtonTriggered(pPlayer->GetCtrlNum(), BUTTON_D)) ||
 				(pPlayer->GetAIUse() && pPlayer->GetAIPtr()->GetUseItem()))
@@ -122,6 +113,8 @@ void Item::Update()
 				}
 
 				// PlaySound(アイテム使用)
+				PlaySound(SE_USEITEM);
+
 			}
 
 			//テクスチャ座標をセット
@@ -137,6 +130,11 @@ void Item::Update()
 #if _DEBUG
 		Debug();
 #endif
+	}
+	else
+	{
+		// 所有しているキャラクターが死亡したらアイテムも削除
+		use = false;
 	}
 }
 
