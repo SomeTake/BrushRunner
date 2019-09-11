@@ -141,6 +141,8 @@
     <ClInclude Include="BlindState.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CharacterAI.h" />
+    <ClInclude Include="CharSelectFrame.h" />
+    <ClInclude Include="CharSelectUI.h" />
     <ClInclude Include="Chip.h" />
     <ClInclude Include="CircleSceneChanger.h" />
     <ClInclude Include="ClappingState.h" />
@@ -252,6 +254,8 @@
     <ClCompile Include="BlindState.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CharacterAI.cpp" />
+    <ClCompile Include="CharSelectFrame.cpp" />
+    <ClCompile Include="CharSelectUI.cpp" />
     <ClCompile Include="Chip.cpp" />
     <ClCompile Include="CircleSceneChanger.cpp" />
     <ClCompile Include="ClappingState.cpp" />

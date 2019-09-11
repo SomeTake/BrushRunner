@@ -49,6 +49,20 @@ Cursor::Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr)
 	MakeVertex();
 }
 
+Cursor::Cursor(int PlayerNo)
+{
+	ResourceManager::Instance()->GetTexture("Cursor", &D3DTexture);
+
+	use = true;
+	pos = CURSOR_FIRST_POS;
+	PatternAnim = ctrlNum = PlayerNo;
+	this->AIUse = false;
+	this->AIptr = nullptr;
+
+	// 頂点情報の作成
+	MakeVertex();
+}
+
 //=============================================================================
 // デストラクタ
 //=============================================================================
@@ -217,7 +231,7 @@ void Cursor::Move()
 		}
 
 #if _DEBUG
-		KeyMove();	// キーボード操作
+		//KeyMove();	// キーボード操作
 #endif
 	}
 }

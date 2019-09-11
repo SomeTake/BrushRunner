@@ -80,10 +80,11 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 SceneManager::~SceneManager()
 {
 	SAFE_DELETE(scene);
-	UninitSound();
 
 	// リソースの削除
 	ResourceManager::Instance()->AllRelease();
+
+	UninitSound();
 
 	UninitInput();
 }
@@ -149,6 +150,9 @@ void SceneManager::LoadResource()
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");
 	ResourceManager::Instance()->LoadTexture("SelectCursor", "data/TEXTURE/CharSelectCursor.png");	// SceneGameのFaceにも使う
+	ResourceManager::Instance()->LoadTexture("CPUIcon", "data/TEXTURE/CpuLogo.png");
+	ResourceManager::Instance()->LoadTexture("CharacterSelect", "data/TEXTURE/CharSelectBg.png");
+	ResourceManager::Instance()->LoadTexture("CharSelectFrame", "data/TEXTURE/CharSelectFrame.png");
 
 	// SceneGame
 	ResourceManager::Instance()->LoadTexture("UIFrame", "data/texture/frame000.png");

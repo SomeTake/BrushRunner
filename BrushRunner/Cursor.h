@@ -41,6 +41,7 @@ private:
 
 public:
 	Cursor(int PlayerNo, bool AIUse, CharacterAI *AIptr);
+	Cursor(int PlayerNo);
 	~Cursor();
 
 	// XV

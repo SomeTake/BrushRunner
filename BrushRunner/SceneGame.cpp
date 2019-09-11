@@ -70,19 +70,10 @@ SceneGame::SceneGame()
 	pPlayer[3] = new Player(3, true);
 	//pPlayer[3]->SetOnCamera(false);
 #else
-	bool AIFlag[PLAYER_MAX] = { true, true, true, true };
-	// 接続されたゲームパッドの個数に合わせてAIフラグを変更
-	for (int i = 0; i < GetPadCount(); i++)
-	{
-		AIFlag[i] = false;
-	}
-	// 1Pのみ常にプレイヤー操作
-	AIFlag[0] = false;
-
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo, AIFlag[PlayerNo]);
+		pPlayer[PlayerNo] = new Player(PlayerNo, SceneCharacterSelect::GetAIUse(PlayerNo));
 	}
 #endif
 
@@ -217,31 +208,11 @@ void SceneGame::Update(int SceneID)
 					}
 				}
 			}
-
 		}
 	}
 
 	// カメラの更新
 	UpdateCamera(pPlayer[FirstPlayer]->GetPos());
-
-#if 0
-	std::vector<float> vec(PLAYER_MAX);
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		if (pPlayer[i]->GetOnCamera())
-		{
-			vec.at(i) = pPlayer[i]->GetModel()->pos.x;
-		}
-	}
-	auto max = std::max_element(vec.begin(), vec.end());
-	size_t maxIdx = std::distance(vec.begin(), max);
-
-	auto min = std::min_element(vec.begin(), vec.end());
-	SceneGame::TheLastPlayer = (int)std::distance(vec.begin(), min);
-
-	// カメラの更新
-	UpdateCamera(pPlayer[(int)maxIdx]->GetModel()->pos);
-#endif
 
 	// マップの更新
 	pMap->Update();
@@ -431,18 +402,6 @@ void SceneGame::Start()
 //=============================================================================
 void SceneGame::CheckResult()
 {
-#if _DEBUG
-	if (GetKeyboardTrigger(DIK_N))
-	{
-		CircleSceneChanger::Instance()->SetChanger(true, []()
-		{
-			SetScene(nSceneResult);
-			InitCamera();
-		});
-		return;
-	}
-#endif
-
 	// 全員ゴールorゲームオーバーならシーン遷移可能
 	if (result)
 	{

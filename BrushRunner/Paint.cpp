@@ -82,9 +82,6 @@ void Paint::Update()
 			// F‚Ìİ’è
 			SetColor();
 		}
-
-#if _DEBUG
-#endif
 	}
 }
 

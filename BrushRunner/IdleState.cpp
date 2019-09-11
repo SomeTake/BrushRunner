@@ -44,7 +44,7 @@ void IdleState::Update(int AnimCurtID)
 		else
 		{
 			// Uキーを押してジャンプ
-			if (GetKeyboardTrigger(DIK_U) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B) 
+			if ((!owner_->GetAIUse() && (GetKeyboardTrigger(DIK_U) || IsButtonTriggered(owner_->GetCtrlNum(), BUTTON_B)))
 				|| owner_->GetAIAction() == eActJump)
 			{
 				float value = owner_->GetJumpValue();
