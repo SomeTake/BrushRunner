@@ -12,9 +12,11 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
-#define FACE_POS		D3DXVECTOR3(31.0f, 30.5f, 0.0f)
-#define FACE_SPACE		(318.5f)							// 表示間隔
+#define FACE_SIZE		D3DXVECTOR3(75.0f, 75.0f, 0.0f)		// テクスチャサイズ
+//#define FACE_SIZE		D3DXVECTOR3(50.0f, 50.0f, 0.0f)		// テクスチャサイズ
+#define FACE_POS		D3DXVECTOR3(17.0f, 19.0f, 0.0f)
+//#define FACE_POS		D3DXVECTOR3(31.0f, 30.5f, 0.0f)
+#define FACE_SPACE		(318.0f)							// 表示間隔
 
 //=============================================================================
 // コンストラクタ
@@ -47,10 +49,7 @@ Face::~Face()
 //=============================================================================
 void Face::Update()
 {
-	if (use == true)
-	{
 
-	}
 }
 
 //=============================================================================
@@ -72,7 +71,6 @@ void Face::Draw()
 		// ポリゴンの描画
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
 	}
-
 }
 
 //=============================================================================
@@ -86,10 +84,10 @@ HRESULT Face::MakeVertex(void)
 	SetVertex();
 
 	// rhwの設定
-	vertexWk[0].rhw =
-		vertexWk[1].rhw =
-		vertexWk[2].rhw =
-		vertexWk[3].rhw = 1.0f;
+	vertexWk[0].rhw = 1.0f;
+	vertexWk[1].rhw = 1.0f;
+	vertexWk[2].rhw = 1.0f;
+	vertexWk[3].rhw = 1.0f;
 
 	// 反射光の設定
 	vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
@@ -111,8 +109,8 @@ void Face::SetTexture()
 	float sizeX = 1.0f / (float)CURSOROBJ_DIVIDE_X;
 
 	// テクスチャ座標の設定
-	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
-	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
+	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.51f);
+	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.51f);
 	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
 	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
 }

@@ -48,8 +48,8 @@ enum
 	_2dMx,
 };
 int SceneCharacterSelect::SelectCharacter[PLAYER_MAX];
-//static int SelectCharacter[PLAYER_MAX];
 bool cpu[PLAYER_MAX];
+
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -74,8 +74,8 @@ SceneCharacterSelect::SceneCharacterSelect()
 		SelectCharacter[i] = 0;
 	}
 
-/*****************************************************************************/
-	// シーンチェンジの終了
+	/*****************************************************************************/
+		// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -192,7 +192,6 @@ void SceneCharacterSelect::Update(int SceneID)
 //=============================================================================
 void SceneCharacterSelect::Draw()
 {
-
 	// 2Dオブジェクトの描画
 	for (auto & Obj : p2dobj)
 	{
@@ -202,14 +201,14 @@ void SceneCharacterSelect::Draw()
 	// カーソルの描画
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
-		if (cpu[playerNo]==false)
+		if (cpu[playerNo] == false)
 		{
 			for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
 			{
 				pCursor[playerNo][cursorNo]->Draw();
 			}
 		}
-		else if(cpu[playerNo]==true)
+		else if (cpu[playerNo] == true)
 		{
 			for (int cursorNo = 0; cursorNo < CURSOROBJ_MAX; cursorNo++)
 			{

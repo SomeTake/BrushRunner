@@ -178,8 +178,8 @@ void CursorObj::SetTexture()
 	// テクスチャ座標の設定
 	vertexWk[0].tex = D3DXVECTOR2((float)(x)* sizeX, 0.0f);
 	vertexWk[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.0f);
-	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, 1.0f);
-	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 1.0f);
+	vertexWk[2].tex = D3DXVECTOR2((float)(x)* sizeX, 0.5f);
+	vertexWk[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, 0.5f);
 }
 //=============================================================================
 // テクスチャ座標の設定

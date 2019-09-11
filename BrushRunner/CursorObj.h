@@ -11,9 +11,10 @@
 
 //*****************************************************************************
 // マクロ定義
-#define TEXTURE_CURSOROBJ	("data/TEXTURE/CharSelectCursor.png")		// フレーム用画像
-#define TEXTURE_CURSOROBJ2	("data/TEXTURE/CpuLogo.png")				// フレーム用画像
+//#define TEXTURE_CURSOROBJ	("data/TEXTURE/CharSelectCursor.png")		// フレーム用画像
+//#define TEXTURE_CURSOROBJ2	("data/TEXTURE/CpuLogo.png")				// フレーム用画像
 #define CURSOROBJ_DIVIDE_X	(4)											// 分割数
+#define CURSOROBJ_DIVIDE_Y	(2)											// 分割数
 #define CURSOROBJ_MAX		(4)											// 1プレイヤーあたりのカーソル数
 
 //*****************************************************************************

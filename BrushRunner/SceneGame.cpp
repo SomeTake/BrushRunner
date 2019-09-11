@@ -61,7 +61,7 @@ SceneGame::SceneGame()
 	PaintManager::SetPaintGroupPtr(paintGroup);
 
 #if _DEBUG
-	pPlayer[0] = new Player(0, true);
+	pPlayer[0] = new Player(0, false);
 	pPlayer[1] = new Player(1, true);
 	//pPlayer[1]->SetOnCamera(false);
 	pPlayer[2] = new Player(2, true);
