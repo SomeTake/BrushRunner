@@ -221,7 +221,7 @@ void SetScene(SceneNum _scene)
 		//PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
-		StopSound(BGM_TRAINING);
+		//StopSound(BGM_TRAINING);
 		scene = new SceneResult();
 		// PlaySound(BGM_RESULT);
 		break;

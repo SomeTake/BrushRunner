@@ -521,6 +521,13 @@ void SceneGame::InsertResult(int pNo)
 			{
 				data[rNo].playerNo = pNo;
 				data[rNo].time = pTimer->Check();
+				// PlaySound(ƒS[ƒ‹SE)
+
+				// 1ˆÊ‚ªƒS[ƒ‹‚µ‚½‚çBGM•ÏX
+				if (rNo == 0)
+				{
+					StopSound(BGM_TRAINING);
+				}
 				break;
 			}
 		}
