@@ -57,9 +57,6 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 { "data/SE/damage.wav", false, 0.20f },
 { "data/SE/Goal.wav", false, 0.50f },
 
-//{ "data/SE/effect0.wav", false, 1.00f },
-//{ "data/SE/cutin0.wav", false, 1.00f },
-//{ "data/SE/countdown0.wav", false, 1.00f },
 };
 
 //=============================================================================

@@ -70,10 +70,19 @@ SceneGame::SceneGame()
 	pPlayer[3] = new Player(3, true);
 	//pPlayer[3]->SetOnCamera(false);
 #else
+	bool AIFlag[PLAYER_MAX] = { true, true, true, true };
+	// 接続されたゲームパッドの個数に合わせてAIフラグを変更
+	for (int i = 0; i < GetPadCount(); i++)
+	{
+		AIFlag[i] = false;
+	}
+	// 1Pのみ常にプレイヤー操作
+	AIFlag[0] = false;
+
 	// プレイヤーの初期化
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		pPlayer[PlayerNo] = new Player(PlayerNo, false);
+		pPlayer[PlayerNo] = new Player(PlayerNo, AIFlag[PlayerNo]);
 	}
 #endif
 
