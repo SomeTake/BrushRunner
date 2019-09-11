@@ -309,7 +309,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitDebugWindow(hWnd, g_pD3DDevice);
 #endif
 	pSceneManager = new SceneManager(hInstance, hWnd);
-
 	return S_OK;
 }
 
@@ -323,7 +322,6 @@ void Uninit(void)
 #endif
 
 	delete pSceneManager;
-
 	// デバイスの開放
 	SAFE_RELEASE(g_pD3DDevice);
 

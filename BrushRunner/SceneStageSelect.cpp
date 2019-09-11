@@ -10,10 +10,12 @@
 #include "SceneCharacterSelect.h"
 #include "Input.h"
 #include "CircleSceneChanger.h"
+#include "Sound.h"
 
 #include "StageSelectBG.h"
 #include "StageName.h"
 #include "StageSelectCursor.h"
+#include "StageSelectLogo.h"
 
 //=============================================================================
 // コンストラクタ
@@ -26,6 +28,8 @@ SceneStageSelect::SceneStageSelect()
 	obj.push_back(new StageSelectCursor());
 	// ステージ名
 	obj.push_back(new StageName());
+	// ロゴ
+	obj.push_back(new StageSelectLogo());
 
 /*****************************************************************************/
 	// シーンチェンジの終了
@@ -57,6 +61,8 @@ void SceneStageSelect::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(playerNo, BUTTON_C))
 		{
+			PlaySound(SE_CHOICE);
+
 			CircleSceneChanger::Instance()->SetChanger(true, []() 
 			{
 				SetScene(nSceneCharacterSelect);

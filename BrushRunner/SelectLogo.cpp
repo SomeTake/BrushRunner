@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "Main.h"
+#include "carslobj.h"
 #include "SelectLogo.h"
 #include "ResourceManager.h"
 

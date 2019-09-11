@@ -31,5 +31,8 @@ int LoopCountDown(int counter, int low, int high);				// カウントダウン関数
 
 float RandomRange(float min, float max);						// floatのランダム値を取得（マイナス対応）
 
+D3DXVECTOR3 GetSpherePosition(float Angle1, float Angle2, float Radius);	// 球体表面上の任意座標を取得する
+D3DXVECTOR3 GetCirclePosition(float Angle1, float Radius);	// 円周上の任意座標を取得する(X,Y,0.0f)
+
 #endif
 

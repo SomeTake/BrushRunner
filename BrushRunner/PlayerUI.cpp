@@ -15,7 +15,7 @@ PlayerUI::PlayerUI(int PlayerNo)
 {
 	this->PopUp = new Pop(PlayerNo);
 	this->miniPlayer = new MiniPlayer(PlayerNo);
-	this->face = new Face(PlayerNo, *GetSelectCharacter(PlayerNo));
+	this->face = new Face(PlayerNo, SceneCharacterSelect::GetSelectCharacter(PlayerNo));
 	this->faceFrame = new FaceFrame(PlayerNo);
 }
 

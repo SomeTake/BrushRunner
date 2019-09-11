@@ -10,6 +10,7 @@
 #include "Title.h"
 #include "Input.h"
 #include "SceneManager.h"
+#include "Sound.h"
 #include "SceneCharacterSelect.h"
 #include "TitleCursor.h"
 #include "SceneTutorial.h"
@@ -19,6 +20,7 @@
 #include "Sky.h"
 #include "Camera.h"
 #include "Runner.h"
+#include "ParticleManager.h"
 
 //=============================================================================
 // コンストラクタ
@@ -40,8 +42,11 @@ SceneTitle::SceneTitle()
 	// 3Dオブジェクト
 	object3d.push_back(new Sky());
 
+	// パーティクルマネージャ
+	particleManager = new ParticleManager();
+
 	/*****************************************************************************/
-		// シーンチェンジの終了
+	// シーンチェンジの終了
 	CircleSceneChanger::Instance()->SetChanger(false);
 }
 
@@ -50,6 +55,7 @@ SceneTitle::SceneTitle()
 //=============================================================================
 SceneTitle::~SceneTitle()
 {
+	// 2Dオブジェクトの開放
 	for (auto &UI : p2dObj)
 	{
 		SAFE_DELETE(UI);
@@ -57,14 +63,19 @@ SceneTitle::~SceneTitle()
 	p2dObj.clear();
 	ReleaseVector(p2dObj);
 
+	// マップの開放
 	SAFE_DELETE(map);
 
+	// 3Dオブジェクトの開放
 	for (auto &obj : object3d)
 	{
 		SAFE_DELETE(obj);
 	}
 	object3d.clear();
 	ReleaseVector(object3d);
+
+	// パーティクルマネージャの開放
+	SAFE_DELETE(particleManager);
 }
 
 //=============================================================================
@@ -72,16 +83,18 @@ SceneTitle::~SceneTitle()
 //=============================================================================
 void SceneTitle::Update(int SceneID)
 {
-
+	// モード選択
 	for (int playerNo = 0; playerNo < PLAYER_MAX; playerNo++)
 	{
 		if (GetKeyboardTrigger(DIK_W) || IsButtonTriggered(playerNo, STICK_UP))
 		{
+			PlaySound(SE_SELECT);
 			IsOption = true;
 			break;
 		}
 		else if (GetKeyboardTrigger(DIK_S) || IsButtonTriggered(playerNo, STICK_DOWN))
 		{
+			PlaySound(SE_SELECT);
 			IsOption = false;
 			break;
 		}
@@ -90,6 +103,8 @@ void SceneTitle::Update(int SceneID)
 		{
 			if (IsOption == true)
 			{
+				PlaySound(SE_CHOICE);
+
 				CircleSceneChanger::Instance()->SetChanger(true, []()
 				{
 					SetScene(nSceneTutorial);
@@ -99,27 +114,38 @@ void SceneTitle::Update(int SceneID)
 			}
 			else
 			{
-				CircleSceneChanger::Instance()->SetChanger(true, []() {SetScene(nSceneExit); });
+				PlaySound(SE_CHOICE);
+
+				CircleSceneChanger::Instance()->SetChanger(true, []()
+				{
+					SetScene( nSceneExit);
+				});
 				return;
 			}
 		}
 
 	}
 
+	// カメラの更新
 	UpdateTitleCamera();
 
+	// 2Dオブジェクトの更新
 	for (auto &UI : p2dObj)
 	{
 		UI->Update();
 	}
 
+	// マップの更新
 	map->Update();
 
+	// 3Dオブジェクトの更新
 	for (auto &obj : object3d)
 	{
 		obj->Update();
 	}
 
+	// パーティクルマネージャの更新
+	particleManager->Update();
 }
 
 //=============================================================================
@@ -127,15 +153,21 @@ void SceneTitle::Update(int SceneID)
 //=============================================================================
 void SceneTitle::Draw()
 {
+	// マップの描画
 	map->Draw();
 
+	// 3Dオブジェクトの描画
 	for (auto &obj : object3d)
 	{
 		obj->Draw();
 	}
 
+	// 2Dオブジェクトの描画
 	for (auto &UI : p2dObj)
 	{
 		UI->Draw();
 	}
+
+	// パーティクルマネージャの描画
+	particleManager->Draw();
 }

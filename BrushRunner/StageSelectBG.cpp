@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "MyLibrary.h"
 #include "Input.h"
+#include "Sound.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -16,6 +17,9 @@
 #define STAGESELECTBG_DIVIDE_X	(1)
 #define STAGESELECTBG_DIVIDE_Y	(3)
 
+//*****************************************************************************
+// メンバ変数の初期化
+//*****************************************************************************
 int StageSelectBG::PatternAnim = 0;
 
 //=============================================================================
@@ -53,11 +57,13 @@ void StageSelectBG::Update()
 		{
 			if (GetKeyboardRepeat(DIK_S) || IsButtonRepeated(playerNo, STICK_DOWN))
 			{
+				PlaySound(SE_SELECT);
 				PatternAnim = LoopCountUp(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
 				break;
 			}
 			else if (GetKeyboardRepeat(DIK_W) || IsButtonRepeated(playerNo, STICK_UP))
 			{
+				PlaySound(SE_SELECT);
 				PatternAnim = LoopCountDown(PatternAnim, 0, STAGESELECTBG_DIVIDE_Y - 1);
 				break;
 			}

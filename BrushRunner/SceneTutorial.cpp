@@ -13,6 +13,7 @@
 #include "TutorialLogo.h"
 #include "Arrow.h"
 #include "Tutorial.h"
+#include "Sound.h"
 
 //=============================================================================
 // コンストラクタ
@@ -40,6 +41,7 @@ SceneTutorial::SceneTutorial()
 //=============================================================================
 SceneTutorial::~SceneTutorial()
 {
+	// 2Dオブジェクトの開放
 	for (auto &Object : obj)
 	{
 		SAFE_DELETE(Object);
@@ -58,6 +60,8 @@ void SceneTutorial::Update(int SceneID)
 	{
 		if (IsButtonTriggered(padNo, BUTTON_C) || GetKeyboardTrigger(DIK_RETURN))
 		{
+			PlaySound(SE_CHOICE);
+
 			CircleSceneChanger::Instance()->SetChanger(true, []() 
 			{
 				SetScene(nSceneStageSelect);

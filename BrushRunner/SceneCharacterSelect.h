@@ -20,8 +20,8 @@ class SceneCharacterSelect :
 {
 private:
 	std::vector<_2dobj*> p2dobj;
-
 	CursorObj *pCursor[PLAYER_MAX][CURSOROBJ_MAX];
+	static int SelectCharacter[PLAYER_MAX];
 
 public:
 	SceneCharacterSelect();
@@ -29,8 +29,9 @@ public:
 
 	void Update(int SceneID);
 	void Draw();
-};
 
-int *GetSelectCharacter(int no);		// 選択したキャラクターの番号
+	static int GetSelectCharacter(int no);		// 選択したキャラクターの番号
+	static bool GetAI(int no);
+};
 
 #endif

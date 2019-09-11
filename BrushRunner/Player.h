@@ -25,25 +25,22 @@
 // 読み込むキャラクターモデル
 static const char* CharaModel[] =
 {
-	"data/MODEL/Shachiku/Shachiku.x",
-	"data/MODEL/Kouhai/Kouhai.x",
+	"data/MODEL/Kaya/Kaya.x",
+	"data/MODEL/Aj/Aj.x",
+	"data/MODEL/Granny/Granny.x",
+	"data/MODEL/Claire/Claire.x",
 };
 
 // キャラクターモデルの番号
 enum CharaModelNum
 {
-	ShachikuModel,
-	KouhaiModel,
+	KayaModel,
+	AjModel,
+	GrannyModel,
+	ClaireModel,
 
 	// モデルの種類
 	MaxModel
-};
-
-// モデルの大きさ設定
-static D3DXVECTOR3 ModelScl[MaxModel] =
-{
-	D3DXVECTOR3(1.0f, 1.0f, 1.0f),
-	D3DXVECTOR3(0.4f, 0.4f, 0.4f)
 };
 
 // キャラクターのアニメーション番号と連動（CharaStateAnim）
@@ -55,6 +52,8 @@ enum CharaStateNum
 	Victory,
 	Slip,
 	Stop,
+	Lose,
+	Clapping,
 	AnimMax,			// アニメーションの最大数
 };
 //*****************************************************************************
@@ -130,6 +129,11 @@ public:
 
 	void HitObjectInfluence(int type);	// フィールドオブジェクトに接触したときの効果
 
+	// エフェクトの発生
+	void PowwrUpEffect();
+	void RunningEffect();
+	void ItemGetEffect(D3DXVECTOR3 pos);
+
 	// ゲッター(なるべく使わない)
 	D3DXVECTOR3 GetPos() { return pos; };
 	FieldItemManager *GetFieldItemManager() { return itemManager; };
@@ -145,6 +149,8 @@ public:
 	bool GetHitItem() { return hitItem; };
 	bool GetSpike() { return spike; };
 	bool GetBlind() { return blind; };
+	bool GetBanana() { return PowerBanana; };
+	bool GetJet() { return jet; };
 
 	// AI用
 	bool GetAIUse(void) { return this->AIUse; };

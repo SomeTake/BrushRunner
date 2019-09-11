@@ -6,6 +6,10 @@
 //=============================================================================
 #include "Main.h"
 #include "Title.h"
+#include "CursorObj.h"
+#include "Sound.h"
+#include "Input.h"
+#include "SceneManager.h"
 #include "ResourceManager.h"
 #include "SceneTitle.h"
 
@@ -17,7 +21,6 @@
 
 #define MENU_SIZE			D3DXVECTOR3(702.0f * 0.45f, 515.0f * 0.45f, 0.0f)				// テクスチャサイズ
 #define MENU_POS			D3DXVECTOR3(SCREEN_CENTER_X, SCREEN_CENTER_Y * 1.65f, 0.0f)		// テクスチャ座標
-
 //=============================================================================
 // コンストラクタ
 //=============================================================================
@@ -65,6 +68,7 @@ void  TITLE::Update()
 
 	if (use == true)
 	{
+
 		// テクスチャ座標をセット
 		SetTexture(PatternAnim);
 

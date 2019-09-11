@@ -22,6 +22,8 @@
 #include "SkyBox.h"
 #include "MeshField.h"
 #include "CircleSceneChanger.h"
+#include "Confetti.h"
+#include "Sound.h"
 
 //=============================================================================
 // コンストラクタ
@@ -104,6 +106,8 @@ void SceneResult::Update(int SceneID)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTriggered(i, BUTTON_C))
 		{
+			PlaySound(SE_CHOICE);
+
 			CircleSceneChanger::Instance()->SetChanger(true, [] 
 			{
 				SetScene(nSceneTitle);
@@ -130,6 +134,9 @@ void SceneResult::Update(int SceneID)
 	{
 		Obj->Update();
 	}
+
+	// 毎フレームパーティクルを発生させる
+	particleManager->SetConfetti();
 
 	// パーティクルマネージャの更新
 	particleManager->Update();

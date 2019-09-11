@@ -19,8 +19,10 @@
 #include "StopState.h"
 #include "SlipState.h"
 #include "Item.h"
+#include "Sound.h"
 #include "Timer.h"
 #include "ResourceManager.h"
+#include "SceneCharacterSelect.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -52,7 +54,7 @@ enum CallbackKeyType
 Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 {
 	// xFileを読み込む
-	this->Load_xFile(CharaModel[KouhaiModel], "Player");
+	this->Load_xFile(CharaModel[SceneCharacterSelect::GetSelectCharacter(_CtrlNum)], "Player");
 
 	// アニメーションセットを設置する
 	this->CreateAnimSet();
@@ -63,7 +65,7 @@ Player::Player(int _CtrlNum, bool AIUse) : state(nullptr)
 	// 位置・回転・スケールの初期設定
 	pos = DefaultPosition - D3DXVECTOR3(15.0f * _CtrlNum, 0.0f, 0.0f);
 	rot = PLAYER_ROT;
-	scl = ModelScl[KouhaiModel];
+	scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	hitGround = false;
 	hitPaint = false;
 	runSpd = 1.0f;
@@ -330,6 +332,16 @@ void Player::CreateAnimSet()
 			AnimationSet->SetData("Stop", NULL, 1.5f, 0.1f, 0.0f);
 			break;
 
+		case Lose:
+
+			AnimationSet->SetData("Lose", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
+		case Clapping:
+
+			AnimationSet->SetData("Clapping", NULL, 1.5f, 0.1f, 0.0f);
+			break;
+
 		default:
 			break;
 		}
@@ -396,7 +408,7 @@ void Player::CheckOnCamera()
 		Effect3D *effect = new Effect3D(DeadEffect3D, setpos, 1);
 		Effect3DVector->push_back(effect);
 
-		// PlaySound(爆発音)
+		PlaySound(SE_EXP);
 	}
 }
 
@@ -520,7 +532,6 @@ void Player::ObjectItemCollider(Map *pMap)
 	{
 		return;
 	}
-
 	D3DXVECTOR3 colliderpos = pos;
 	colliderpos.y += OBJECT_HIT_SIZE.y * 0.5f;
 
@@ -533,8 +544,9 @@ void Player::ObjectItemCollider(Map *pMap)
 
 		if (HitCheckBB(colliderpos, Obj->GetPos(), OBJECT_HIT_SIZE, D3DXVECTOR2(CHIP_SIZE, CHIP_SIZE)))
 		{
+			ItemGetEffect(Obj->GetPos());
 			hitItem = true;
-			// PlaySound(アイテム取得音)
+			PlaySound(SE_PICITEM);
 			return;
 		}
 	}
@@ -576,7 +588,7 @@ void Player::FieldItemCollider(FieldItemManager *pFIManager)
 			Effect3D *effect = new Effect3D(ExplosionEffect3D, pos, 1);
 			Effect3DVector->push_back(effect);
 
-			// PlaySound(アイテムヒット音)
+			PlaySound(SE_EXP);
 		}
 	}
 }
@@ -653,7 +665,7 @@ void Player::HitObjectInfluence(int type)
 				ink = PaintSystem->GetInkValue(ColorInk);
 				PaintSystem->SetInkValue(max(--ink, 0), ColorInk);
 
-				// PlaySound(インクが減る音)
+				//PlaySound(インクが減る音)
 			}
 		}
 
@@ -695,6 +707,64 @@ void Player::HitObjectInfluence(int type)
 	default:
 		break;
 	}
+}
+
+//=====================================================================================================
+// パワーアップエフェクトの付与
+//=====================================================================================================
+void Player::PowwrUpEffect()
+{
+	if (GetAnimCurtID() == Running || GetAnimCurtID() == Idle || GetAnimCurtID() == Jump)
+	{
+		D3DXVECTOR3 NewPos = pos;
+		std::vector<Particle*> *vector = ParticleManager::GetParticle();
+
+		NewPos.x += (float)(rand() % 20 - 10) * 0.1f;
+		NewPos.y += (float)(rand() % 20 - 10) * 0.1f;
+		NewPos.z += (float)(rand() % 20 - 10) * 0.1f;
+
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.00f, 0.00f, 0.5f), D3DXVECTOR3(5.0f, 5.0f, 5.0f), 10));
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.20f, 0.00f, 0.3f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), 15));
+		vector->push_back(new Particle(NewPos, D3DXVECTOR3(0.0f, 3.0f, 0.0f), D3DXCOLOR(1.00f, 0.40f, 0.00f, 0.15f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 20));
+	}
+}
+
+//=====================================================================================================
+// ランニングエフェクトの付与
+//=====================================================================================================
+void Player::RunningEffect()
+{
+	// 空中なら発生しない
+	if (!hitGround && !hitPaint)
+		return;
+
+	// 何かしらアイテムを使っている最中ならエフェクトを発生させない
+	if (blind || spike || PowerBanana || jet || PaintSystem->GetSpInk())
+		return;
+
+	std::vector<Particle*> *vector = ParticleManager::GetParticle();
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(5.0f, 5.0f, 5.0f), 20));
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(3.0f, 3.0f, 3.0f), 40));
+	vector->push_back(new Particle(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXCOLOR(1.00f, 0.85f, 0.73f, 0.15f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), 60));
+}
+
+//=====================================================================================================
+// アイテム取得エフェクトの付与
+//=====================================================================================================
+void Player::ItemGetEffect(D3DXVECTOR3 pos)
+{
+	std::vector<Particle*> *particle = ParticleManager::GetParticle();
+
+	D3DXVECTOR3 move;
+
+	for (int i = 0; i < 10; i++)
+	{
+		move.x = RandomRange(-3.0f, 3.0f);
+		move.y = RandomRange(-3.0f, 3.0f);
+		move.z = 0.0f;
+		particle->push_back(new Particle(pos, move, MyColor[nYellow], D3DXVECTOR3(3.0f, 3.0f, 3.0f), 30));
+	}
+
 }
 
 //=====================================================================================================

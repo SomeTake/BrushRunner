@@ -9,6 +9,7 @@
 #include "Input.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Sound.h"
 #include "SceneTitle.h"
 #include "SceneCharacterSelect.h"
 #include "SceneGame.h"
@@ -22,7 +23,8 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int eScene = nSceneTitle;			// ゲームの開始位置&シーン遷移
+//static int eScene = nSceneTitle;			// ゲームの開始位置&シーン遷移
+static SceneNum eScene = nSceneTitle;				// ゲームの開始位置&シーン遷移
 static Scene *scene;						// ゲームシーンのポインタ
 
 //=============================================================================
@@ -33,6 +35,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	InitInput(hInstance, hWnd);
 	InitCamera();
 	InitLight();
+	InitSound(hWnd);
 
 	// リソースの読み込み
 	LoadResource();
@@ -41,21 +44,27 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 	switch (eScene)
 	{
 	case nSceneTitle:
+		PlaySound(BGM_TITLE);
 		scene = new SceneTitle();
 		break;
 	case nSceneTutorial:
+		PlaySound(BGM_TUTORIAL);
 		scene = new SceneTutorial();
 		break;
 	case nSceneStageSelect:
+		// PlaySound(BGM_STAGESELECT);
 		scene = new SceneStageSelect();
 		break;
 	case nSceneCharacterSelect:
+		PlaySound(BGM_CHARSEL);
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
+		//PlaySound(BGM_TRAINING);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
+		// PlaySound(BGM_RESULT);
 		scene = new SceneResult();
 		break;
 	case nSceneExit:
@@ -71,6 +80,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 SceneManager::~SceneManager()
 {
 	SAFE_DELETE(scene);
+	UninitSound();
 
 	// リソースの削除
 	ResourceManager::Instance()->AllRelease();
@@ -83,10 +93,7 @@ SceneManager::~SceneManager()
 //=============================================================================
 void SceneManager::Update()
 {
-	if (!CircleSceneChanger::Instance()->GetUseMask())
-	{
-		UpdateInput();
-	}
+	UpdateInput();
 
 	scene->Update(eScene);
 
@@ -137,6 +144,7 @@ void SceneManager::LoadResource()
 	// SceneStageSelect
 	ResourceManager::Instance()->LoadTexture("StageSelectBG", "data/TEXTURE/StageSelectBG.png");
 	ResourceManager::Instance()->LoadTexture("StageName", "data/TEXTURE/StageName.png");
+	ResourceManager::Instance()->LoadTexture("StageSelectLogo", "data/TEXTURE/StageSelectLogo.png");
 
 	// SceneCharacterSelect
 	ResourceManager::Instance()->LoadTexture("SelectLogo", "data/TEXTURE/CharSelectLogo.png");
@@ -167,10 +175,9 @@ void SceneManager::LoadResource()
 	ResourceManager::Instance()->LoadTexture("FaceFrame", "data/texture/faceframe.png");
 	ResourceManager::Instance()->LoadTexture("MiniPlayer", "data/TEXTURE/MiniPlayer.png");
 	ResourceManager::Instance()->LoadTexture("Pop", "data/TEXTURE/pointer.png");
-	ResourceManager::Instance()->LoadTexture("Timer", "data/TEXTURE/Colon.png");
+	ResourceManager::Instance()->LoadTexture("FieldItem", "data/TEXTURE/FieldItem.png");
 
 	// SceneResult
-	ResourceManager::Instance()->LoadTexture("Confetti", "data/TEXTURE/Confetti.png");
 	ResourceManager::Instance()->LoadTexture("ResultRank", "data/TEXTURE/ResultPlayer.png");
 	ResourceManager::Instance()->LoadTexture("SkyBox", "data/TEXTURE/SkyBox.png");
 	ResourceManager::Instance()->LoadTexture("MeshField", "data/TEXTURE/Block.jpg");
@@ -181,7 +188,7 @@ void SceneManager::LoadResource()
 //=====================================================================================================
 // シーン遷移
 //=====================================================================================================
-void SetScene(int _scene)
+void SetScene(SceneNum _scene)
 {
 	eScene = _scene;
 	SAFE_DELETE(scene)
@@ -189,24 +196,37 @@ void SetScene(int _scene)
 	switch (_scene)
 	{
 	case nSceneTitle:
+		// StopSound(BGM_RESULT);
 		scene = new SceneTitle();
+		PlaySound(BGM_TITLE);
 		break;
 	case nSceneTutorial:
+		StopSound(BGM_TITLE);
 		scene = new SceneTutorial();
+		PlaySound(BGM_TUTORIAL);
 		break;
 	case nSceneStageSelect:
+		StopSound(BGM_TUTORIAL);
 		scene = new SceneStageSelect();
+		// PlaySound(BGM_STAGESELECT);
 		break;
 	case nSceneCharacterSelect:
+		// StopSound(BGM_STAGESELECT);
 		scene = new SceneCharacterSelect();
+		PlaySound(BGM_CHARSEL);
 		break;
 	case nSceneGame:
+		StopSound(BGM_CHARSEL);
 		scene = new SceneGame();
+		//PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
+		//StopSound(BGM_TRAINING);
 		scene = new SceneResult();
+		// PlaySound(BGM_RESULT);
 		break;
 	case nSceneExit:
+		StopSound(BGM_TITLE);
 		scene = new SceneExit();
 		break;
 	default:

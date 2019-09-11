@@ -37,21 +37,22 @@ PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	// BGM
 	{ "data/BGM/title.wav", true, 0.50f },
-	{ "data/BGM/tutorial.wav", true, 0.50f },
-	{ "data/BGM/training.wav", true, 0.50f },
-	{ "data/BGM/battle.wav", true, 0.50f }
-	//SE
-	//{ "data/SE/Defend0.wav", false, 1.00f },
-	//{ "data/SE/Hit0.wav", false, 1.00f },
-	//{ "data/SE/Hit1.wav", false, 1.00f },
-	//{ "data/SE/Swing0.wav", false, 1.00f },
-	//{ "data/SE/Select0.wav", false, 1.00f },
-	//{ "data/SE/Select1.wav", false, 1.00f },
-	//{ "data/SE/yattaze0.wav", false, 0.20f },
-	//{ "data/SE/KO.wav", false, 0.20f },
-	//{ "data/SE/effect0.wav", false, 1.00f },
-	//{ "data/SE/cutin0.wav", false, 1.00f },
-	//{ "data/SE/countdown0.wav", false, 1.00f },
+{ "data/BGM/tutorial.wav", true, 1.00f },
+{ "data/BGM/ToysCarnival.wav", true, 0.50f },
+{ "data/BGM/training.wav", true, 1.00f },
+//{ "data/BGM/battle.wav", true, 0.50f }
+//SE
+{ "data/SE/choice.wav", false, 0.50f },
+{ "data/SE/select.wav", false, 0.50f },
+{ "data/SE/kaifuku.wav", false, 0.50f },
+{ "data/SE/explosion.wav", false, 0.50f },
+{ "data/SE/UseItem.wav", false, 0.50f },
+{ "data/SE/slime.wav", false, 0.50f },
+{ "data/SE/count.wav", false, 0.20f },
+{ "data/SE/itemru.wav", false, 0.20f },
+//{ "data/SE/effect0.wav", false, 1.00f },
+//{ "data/SE/cutin0.wav", false, 1.00f },
+//{ "data/SE/countdown0.wav", false, 1.00f },
 };
 
 //=============================================================================
@@ -240,7 +241,7 @@ HRESULT PlaySound(SOUND_LABEL label)
 	buffer.AudioBytes = g_aSizeAudio[label];
 	buffer.pAudioData = g_apDataAudio[label];
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	
+
 	// ÉãÅ[ÉvÇÃâ¬î€ê›íË
 	if (g_aParam[label].bLoop == true)
 	{

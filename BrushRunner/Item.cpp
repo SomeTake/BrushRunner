@@ -17,12 +17,15 @@
 #include "SpInkState.h"
 #include "DebugWindow.h"
 #include "EffectManager.h"
+#include "Sound.h"
 #include "ResourceManager.h"
+#include "ParticleManager.h"
+#include "MyLibrary.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define ItemPos (D3DXVECTOR3(245.0f, 30.0f, 0.0f))
+#define ItemPos (D3DXVECTOR3(270.0f, 55.0f, 0.0f))
 #define ItemInterval (320.0f)
 
 //=============================================================================
@@ -38,6 +41,7 @@ Item::Item(Player *ptr)
 	PatternAnim = 0;
 	rouletteCnt = 0;
 	useCnt = 0;
+	size = D3DXVECTOR3(ITEM_SIZE.x, ITEM_SIZE.y, 0.0f);
 	active = false;
 
 	// 頂点情報の作成
@@ -59,6 +63,8 @@ Item::Item(Player *ptr)
 Item::~Item()
 {
 	D3DTexture = NULL;
+	
+	pPlayer = nullptr;
 
 	// ステートパターンの削除
 	for (int i = 0; i < NumItemMax; i++)
@@ -93,7 +99,7 @@ void Item::Update()
 			{
 				// エフェクトを発生させる
 				std::vector<Effect*> *EffectVector = GetEffectVector();
-				effect = new Effect(ExplosionEffect, pos, INFINITY_LOOP);
+				effect = new Effect(ExplosionEffect, D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, 0.0f), INFINITY_LOOP);
 				EffectVector->push_back(effect);
 
 				use = false;
@@ -107,6 +113,8 @@ void Item::Update()
 				}
 
 				// PlaySound(アイテム使用)
+				PlaySound(SE_USEITEM);
+
 			}
 
 			//テクスチャ座標をセット
@@ -122,6 +130,11 @@ void Item::Update()
 #if _DEBUG
 		Debug();
 #endif
+	}
+	else
+	{
+		// 所有しているキャラクターが死亡したらアイテムも削除
+		use = false;
 	}
 }
 
@@ -198,10 +211,10 @@ void Item::SetTexture()
 void Item::SetVertex()
 {
 	// 頂点座標の設定
-	vertexWk[0].vtx = D3DXVECTOR3(pos.x, pos.y, pos.z);
-	vertexWk[1].vtx = D3DXVECTOR3(pos.x + ITEM_SIZE.x, pos.y, pos.z);
-	vertexWk[2].vtx = D3DXVECTOR3(pos.x, pos.y + ITEM_SIZE.y, pos.z);
-	vertexWk[3].vtx = D3DXVECTOR3(pos.x + ITEM_SIZE.x, pos.y + ITEM_SIZE.y, pos.z);
+	vertexWk[0].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[1].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y - size.y / 2, pos.z);
+	vertexWk[2].vtx = D3DXVECTOR3(pos.x - size.x / 2, pos.y + size.y / 2, pos.z);
+	vertexWk[3].vtx = D3DXVECTOR3(pos.x + size.x / 2, pos.y + size.y / 2, pos.z);
 }
 
 //=============================================================================
@@ -213,6 +226,7 @@ void Item::Start()
 	rouletteCnt = LoopCountUp(rouletteCnt, 0, ROULETTE_COUNTER);
 	if (rouletteCnt == 0)
 	{
+		PlaySound(SE_ITEMRU);
 		// テクスチャも回す
 		PatternAnim = LoopCountUp(PatternAnim, 0, NumItemMax);
 		if (PatternAnim == 0)

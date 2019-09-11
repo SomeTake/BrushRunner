@@ -6,6 +6,7 @@
 //=============================================================================
 #include "Main.h"
 #include "PowerUpBananaState.h"
+#include "ParticleManager.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -45,6 +46,12 @@ void PowerUpBananaState::Update()
 		// アイテムを使用
 		owner_->SetPatternAnim(NumKawa);
 		owner_->ChangeState(NumKawa);
+	}
+
+	// プレイヤーにエフェクト発生
+	if (owner_->GetPlayer()->GetAnimCurtID() == Running || owner_->GetPlayer()->GetAnimCurtID() == Idle || owner_->GetPlayer()->GetAnimCurtID() == Jump)
+	{
+		owner_->GetPlayer()->PowwrUpEffect();
 	}
 }
 
