@@ -55,7 +55,7 @@ SceneCharacterSelect::SceneCharacterSelect()
 	}
 	else
 	{
-		// ゲームパッドプレイ、繋がるパッドの数のカーソルの表示
+		// ゲームパッドプレイ、接続しているパッドの数のカーソルを表示
 		for (int PlayerNo = 0; PlayerNo < PadCount; PlayerNo++)
 		{
 			cursor.push_back(new Cursor(PlayerNo));
@@ -68,7 +68,12 @@ SceneCharacterSelect::SceneCharacterSelect()
 	// AIがランダムで決める
 	for (int PlayerNo = 0; PlayerNo < PLAYER_MAX; PlayerNo++)
 	{
-		if (PlayerNo > PadCount)
+		// 1Pは手動で決定
+		if (PlayerNo == 0)
+			continue;
+
+		// 2P以降
+		if (PlayerNo >= PadCount)
 		{
 			SelectedCharacter[PlayerNo] = rand() % (3 + 1);
 			charSelectUI.push_back(new CharSelectUI(PlayerNo, true));
@@ -162,6 +167,9 @@ void SceneCharacterSelect::Update(int SceneID)
 	{
 		Object->Update();
 	}
+
+	// ロゴ更新
+	selectLogo->Update();
 }
 
 //=============================================================================

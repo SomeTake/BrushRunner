@@ -12,7 +12,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define SELECTLOGO_SIZE		D3DXVECTOR3(1280.0f, 114.0f, 0.0f)		// テクスチャサイズ
+#define SELECTLOGO_SIZE		D3DXVECTOR3(512.0f, 128.0f, 0.0f)		// テクスチャサイズ
+#define FLASH_TIME			(45)
+#define DELETE_TIME			(30)
 
 //=============================================================================
 // コンストラクタ
@@ -22,7 +24,10 @@ SelectLogo::SelectLogo()
 	ResourceManager::Instance()->GetTexture("SelectLogo", &D3DTexture);
 
 	use = true;
-	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	pos = D3DXVECTOR3((float)SCREEN_CENTER_X - SELECTLOGO_SIZE.x / 2, 0.0f, 0.0f);
+	cntFlash = 0;
+	flash = true;
+
 	PatternAnim = 1;
 	// 頂点情報の作成
 	MakeVertex();
@@ -42,13 +47,25 @@ SelectLogo::~SelectLogo()
 //=============================================================================
 void SelectLogo::Update()
 {
-	if (use == true)
-	{
-		//テクスチャ座標をセット
-		SetTexture(PatternAnim);
+	if (!use)
+		return;
 
-		SetVertex();
+	// 点滅処理
+	cntFlash++;
+
+	// 表示中に一定フレーム経過で消滅
+	if (flash && cntFlash == FLASH_TIME)
+	{
+		flash = false;
+		cntFlash = 0;
 	}
+	// 消滅中に一定フレーム経過で表示
+	else if (!flash && cntFlash == DELETE_TIME)
+	{
+		flash = true;
+		cntFlash = 0;
+	}
+
 }
 
 //=============================================================================
@@ -56,17 +73,16 @@ void SelectLogo::Update()
 //=============================================================================
 void SelectLogo::Draw()
 {
+	// 使用していないor点滅中は表示しない
+	if (!use || !flash)
+		return;
+
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定(ポリゴンの描画前に読み込んだテクスチャのセットを行う)
-	// テクスチャのセットをしないと前にセットされたテクスチャが貼られる→何もはらないことを指定するpDevide->SetTexture(0, NULL);
 	pDevice->SetTexture(0, D3DTexture);
-
-	// ポリゴンの描画
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, vertexWk, sizeof(Vertex2D));
+
 }
 
 //=============================================================================

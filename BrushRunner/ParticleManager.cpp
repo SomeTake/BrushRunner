@@ -7,6 +7,7 @@
 #include "Main.h"
 #include "ParticleManager.h"
 #include "DebugWindow.h"
+#include "SceneManager.h"
 
 std::vector<UIParticle*> ParticleManager::uiparticleVector;
 std::vector<Particle*> ParticleManager::particleVector;
@@ -17,9 +18,18 @@ std::vector<Particle*> ParticleManager::particleVector;
 ParticleManager::ParticleManager()
 {
 	// ÉÅÉÇÉäämï€
-	confettiVector.reserve(500);
-	uiparticleVector.reserve(500);
-	particleVector.reserve(1000);
+	switch (GetScene())
+	{
+	case nSceneResult:
+		confettiVector.reserve(500);
+		break;
+	case nSceneTitle:
+		uiparticleVector.reserve(500);
+		break;
+	case nSceneGame:
+		particleVector.reserve(1000);
+		break;
+	}
 }
 
 //=============================================================================

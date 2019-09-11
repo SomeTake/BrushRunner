@@ -14,6 +14,10 @@
 //*****************************************************************************
 class SelectLogo :
 	public _2dobj {
+private:
+	int cntFlash;
+	bool flash;
+
 public:
 	SelectLogo();
 	~SelectLogo();

@@ -16,6 +16,7 @@
 #include "CircleSceneChanger.h"
 #include "Sound.h"
 #include "StageSelectBG.h"
+#include "SceneCharacterSelect.h"
 
 // 2d obj
 #include "Frame01.h"
