@@ -51,7 +51,6 @@ void RunningState::Update(int AnimCurtID)
 		owner_->ChangeAnim(Jump);
 		owner_->ChangeState(new JumpState(owner_));
 
-		// PlaySound(ƒWƒƒƒ“ƒv‰¹)
 		return;
 	}
 

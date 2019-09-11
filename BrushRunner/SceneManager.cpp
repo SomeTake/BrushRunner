@@ -19,6 +19,7 @@
 #include "SceneTutorial.h"
 #include "ResourceManager.h"
 #include "CircleSceneChanger.h"
+#include "StageSelectBG.h"
 
 //*****************************************************************************
 // ÉOÉçÅ[ÉoÉãïœêî
@@ -51,7 +52,7 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneTutorial();
 		break;
 	case nSceneStageSelect:
-		// PlaySound(BGM_STAGESELECT);
+		PlaySound(BGM_STAGESELECT);
 		scene = new SceneStageSelect();
 		break;
 	case nSceneCharacterSelect:
@@ -59,11 +60,11 @@ SceneManager::SceneManager(HINSTANCE hInstance, HWND hWnd)
 		scene = new SceneCharacterSelect();
 		break;
 	case nSceneGame:
-		//PlaySound(BGM_TRAINING);
+		PlaySound(BGM_STAGE01);
 		scene = new SceneGame();
 		break;
 	case nSceneResult:
-		// PlaySound(BGM_RESULT);
+		PlaySound(BGM_RESULT);
 		scene = new SceneResult();
 		break;
 	case nSceneExit:
@@ -196,7 +197,7 @@ void SetScene(SceneNum _scene)
 	switch (_scene)
 	{
 	case nSceneTitle:
-		// StopSound(BGM_RESULT);
+		StopSound(BGM_RESULT);
 		scene = new SceneTitle();
 		PlaySound(BGM_TITLE);
 		break;
@@ -208,22 +209,32 @@ void SetScene(SceneNum _scene)
 	case nSceneStageSelect:
 		StopSound(BGM_TUTORIAL);
 		scene = new SceneStageSelect();
-		// PlaySound(BGM_STAGESELECT);
+		PlaySound(BGM_STAGESELECT);
 		break;
 	case nSceneCharacterSelect:
-		// StopSound(BGM_STAGESELECT);
+		StopSound(BGM_STAGESELECT);
 		scene = new SceneCharacterSelect();
 		PlaySound(BGM_CHARSEL);
 		break;
 	case nSceneGame:
 		StopSound(BGM_CHARSEL);
 		scene = new SceneGame();
-		//PlaySound(BGM_TRAINING);
 		break;
 	case nSceneResult:
-		//StopSound(BGM_TRAINING);
+		switch (StageSelectBG::GetStageSelect())
+		{
+		case 0:
+			StopSound(BGM_STAGE01);
+			break;
+		case 1:
+			StopSound(BGM_STAGE02);
+			break;
+		case 2:
+			StopSound(BGM_STAGE03);
+			break;
+		}
 		scene = new SceneResult();
-		// PlaySound(BGM_RESULT);
+		PlaySound(BGM_RESULT);
 		break;
 	case nSceneExit:
 		StopSound(BGM_TITLE);
