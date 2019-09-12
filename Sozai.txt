@@ -1,12 +1,12 @@
 使用した素材
 
-タイトルロゴ
+＜テクスチャ＞
 シルエットデザイン
 http://kage-design.com/wp/
 シルエットイラスト
 https://www.silhouette-illust.com/
 
-音
+＜音＞
 フリーBGM・音楽素材MusMus
 http://musmus.main.jp/
 
@@ -15,3 +15,22 @@ https://dova-s.jp/
 
 WinglesSeraph
 https://wingless-seraph.net/
+
+＜3Dモデル、アニメーションデータ＞
+mixamo
+https://www.mixamo.com/#/
+
+＜使用ツール、ライブラリ＞
+・ツール
+VisualStudio2017
+Illustrator
+3ds Max
+TiledMapEditor
+GitHub
+
+・ライブラリ
+DirectX9(June 2010)
+ImGui
+
+・言語
+C++
